@@ -1,2 +1,9 @@
 # acrylic-app
-Acrylic Application
+Acrylic Frontend Application
+
+## Requirements
+
+## Running the project
+
+## Environments
+Production: https://app.acrylic.la/
