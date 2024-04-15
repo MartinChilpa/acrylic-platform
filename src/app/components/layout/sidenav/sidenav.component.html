@@ -1,0 +1,17 @@
+<div class="acr-box">
+    <button class="btn btn-warning w-100 mb-2">
+        Sign Split Sheet
+    </button>
+    <button class="btn btn-info w-100">
+        Upload Track
+    </button>
+</div>
+
+<div class="acr-box mt-2">
+    @for (item of sidenavItems; track item) {
+        <div class="p-2 d-inline-flex" [routerLink]="[item.routerLink]" routerLinkActive="text-info fw-semibold">
+            <img [ngSrc]="'assets/images/icons/' + item.icon + '.svg'" alt="Icon" width="16" height="16">
+            <span class="ms-2">{{item.label}}</span>
+        </div>
+    }
+</div>

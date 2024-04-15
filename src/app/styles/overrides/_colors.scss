@@ -1,0 +1,51 @@
+@use '../variables/variables' as *;
+
+// Background Colors
+.bg-primary {
+    background: var(--primary-color) !important;
+}
+
+.bg-secondary {
+    background: var(--secondary-color) !important;
+}
+
+.bg-danger {
+    background: var(--danger-color) !important;
+}
+
+.bg-warning {
+    background: var(--warning-color) !important;
+}
+
+.bg-info {
+    background: var(--info-color) !important;
+}
+
+.bg-darkgrey {
+    background: var(--darkgrey-color) !important;
+}
+
+.bg-invert{
+    background-color: var(--text-color) !important;
+}
+
+// Text Colors
+.text-primary {
+    color: var(--text-color) !important;
+}
+
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+.text-warning {
+    color: var(--warning-color) !important;
+}
+
+.text-info {
+    color: var(--info-color) !important;
+}

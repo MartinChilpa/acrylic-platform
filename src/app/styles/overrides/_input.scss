@@ -1,0 +1,16 @@
+@use '../variables/variables' as *;
+
+.acr-input-group {
+    position: relative;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: var(--darkgrey-color);
+}
+
+.acr-input-group input {
+    border: none;
+    outline: none;
+    background-color: var(--darkgrey-color);
+    color: var(--text-color);
+    padding-left: 10px;
+}

@@ -1,0 +1,89 @@
+import { Injectable, WritableSignal, inject, signal } from '@angular/core';
+import { environment } from '../../environments/environment';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { AuthUtils } from '../utils/auth.utils';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+
+  AUTH_API_URL = `${environment.API_URL}/${environment.VERSION}/auth`;
+
+  private _http = inject(HttpClient);
+  public IsLoggedIn: WritableSignal<boolean> = signal(false);
+
+  constructor() {
+    this.IsLoggedIn.set(!!this.accessToken);
+  }
+
+  set accessToken(token: string) {
+    localStorage.setItem('accessToken', token);
+  }
+
+  get accessToken(): string {
+    return localStorage.getItem('accessToken') ?? '';
+  }
+
+  signIn(credentials: { username: string; password: string }): Observable<any> {
+
+    //dummy token as of now
+    this.accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGVtbyIsImlhdCI6MTcxMzExOTQwMCwiZXhwIjoxNzE0NDE1NDAwfQ.BN0NLtV9AWW97ql0HiTvc7fH9qAQv50Vpj5g0jAYq6w";
+    this.IsLoggedIn.set(true);
+    return of(true);
+    // Throw error, if the user is already logged in
+    // if (this._authenticated) {
+    //   return throwError(() => 'User is already logged in.');
+    // }
+
+    // return this._http.post(this.AUTH_API_URL + '/token', credentials).pipe(
+    //   switchMap((response: any) => {
+    //     // Store the access token in the local storage
+    //     this.accessToken = response.access;
+
+    //     //Store user info
+    //     // this._userInfoService.user = response.userInfo;
+    //     // this.userInfo = JSON.stringify(response.userInfo);
+
+    //     // Set the authenticated flag to true
+    //     this.IsLoggedIn.next(true);
+
+    //     // Return a new observable with the response
+    //     return of(response);
+    //   })
+    // ).pipe(catchError(this.errorHandler));
+  }
+
+  signOut(): Observable<any> {
+    // Remove the access token from the local storage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('userInfo');
+
+    //Make subject null
+    // this._userInfoService.user = null;
+
+    this.IsLoggedIn.set(false);
+
+    // Return the observable
+    return of(true);
+  }
+
+  check(): Observable<boolean> {
+    // Check if the user is logged in
+    if (this.IsLoggedIn()) {
+      return of(this.IsLoggedIn());
+    }
+
+    // Check the access token expire date
+    if (AuthUtils.isTokenExpired(this.accessToken)) {
+      return of(false);
+    }
+
+    return of(!!this.accessToken || false);
+  }
+
+  errorHandler(error: HttpErrorResponse) {
+    return throwError(() => error.error || error.message || "server error.");
+  }
+}

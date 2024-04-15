@@ -1,0 +1,39 @@
+@use "../variables/variables" as *;
+
+.btn{
+    font-size: 14px;
+	border-radius: 5px;
+}
+
+.btn-fw{
+    font-weight: 600;
+}
+
+.btn-warning{
+    background: var(--warning-color) !important;
+    color: var(--text-color) !important;
+}
+
+.btn-info{
+    background: var(--info-color) !important;
+    color: var(--text-color) !important;
+}
+
+.btn-darkgrey{
+    background: var(--darkgrey-color) !important;
+    color: var(--text-color) !important;
+}
+
+.btn-main{
+    background: var(--default-gradient-color) !important;
+    color: var(--primary-color) !important;
+}
+
+.btn-main:hover {
+	background: var(--default-gradient-hover-color);
+	color: var(--primary-color);
+}
+
+.btn-main:focus {
+	background: var(--default-gradient-focus-color);
+}

@@ -1,0 +1,43 @@
+@use "../variables/variables" as *;
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 18.5px;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--switch-on-wrapper-color);
+    border-radius: 15px;
+    transition: background-color 0.3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: var(--text-color);
+    border-color: var(--text-color);
+    transition: transform 0.3s;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="checkbox"]:checked+.slider {
+    background-color: var(--info-color);
+}
+
+input[type="checkbox"]:checked+.slider::before {
+    transform: translateX(20px);
+}

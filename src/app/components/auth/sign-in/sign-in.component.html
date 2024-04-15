@@ -1,0 +1,49 @@
+<section>
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-xl-10">
+                <div class="auth-card">
+                    <div class="row g-0 bg-primary">
+                        <div class="col-md-6 col-lg-5 d-none d-md-block">
+                            <img src="assets/images/others/slider1.jpg" alt="slider" class="slider" />
+                        </div>
+                        <div class="col-md-6 col-lg-7">
+                            <div class="h-100 text-center">
+                                <div class="p-4">
+                                    <form [formGroup]="signInForm">
+                                        <h2 class="auth-tagline">Welcome Back</h2>
+                                        <div class="login-input">
+                                            <div class="input-with-lbl success">
+                                                <span class="input-lbl">Username</span>
+                                                <input type="text" [formControlName]="'username'" class="form-control mb-2 w-100" placeholder="Enter Username">
+                                            </div>
+                                            <div class="forgot-pwd-txt">
+                                                Forgot Password?
+                                            </div>
+                                            <div class="input-with-lbl success">
+                                                <span class="input-lbl">Password</span>
+                                                <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'"
+                                                    class="form-control mb-4" placeholder="Enter Password">
+                                                <img src="assets/images/icons/{{ showPassword ? 'eye-slash.svg' : 'eye.svg' }}"
+                                                    class="eye-icon" width="16" height="16"
+                                                    (click)="showPassword = !showPassword">
+                                            </div>
+
+                                            <div>
+                                                <button type="button" class="btn w-100 btn-main btn-fw btn-auth" [disabled]="signInForm.invalid" (click)="signIn()">Sign In</button>
+                                            </div>
+                                        </div>
+                                        <div class="create-account">Don’t have an account? <span
+                                                class="default-link">Sign Up</span>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
