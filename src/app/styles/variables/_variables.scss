@@ -7,12 +7,14 @@
     --danger-color: #EE593B;
     --warning-color: #BC7B2D;
     --blue-color: #446BCB;
+
     --darkgrey-color: #242424;
     --switch-on-wrapper-color: #454545;
     --switch-off-container-color: #2E2E2E;
     --default-gradient-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
     --default-gradient-hover-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
     --default-gradient-focus-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
+    --primary-radial-gradient-color: radial-gradient(circle, rgba(84, 191, 187, 1) 0%, rgba(13, 66, 153, 1) 2%, rgba(9, 18, 23, 1) 100%);
 }
 
 /* Light Theme Colors */
@@ -24,10 +26,14 @@
     --danger-color: #EE813B;
     --warning-color: #FDB560;
     --blue-color: #002A92;
+
+    //Change below colors later
     --darkgrey-color: #242424;
     --switch-on-wrapper-color: #454545;
     --switch-off-container-color: #2E2E2E;
     --default-gradient-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
     --default-gradient-hover-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
     --default-gradient-focus-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
+    --primary-radial-gradient-color: radial-gradient(circle, rgba(84, 191, 187, 1) 0%, rgba(13, 66, 153, 1) 2%, rgba(9, 18, 23, 1) 100%);
+
 }
