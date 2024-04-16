@@ -13,26 +13,41 @@
                                     <form [formGroup]="signInForm">
                                         <h2 class="auth-tagline">Welcome Back</h2>
                                         <div class="login-input">
-                                            <div class="input-with-lbl success">
+                                            <div class="input-with-lbl">
                                                 <span class="input-lbl">Username</span>
-                                                <input type="text" [formControlName]="'username'" class="form-control mb-2 w-100" placeholder="Enter Username">
+                                                <input type="text" [formControlName]="'username'"
+                                                    class="form-control mb-2 w-100" placeholder="Enter Username"
+                                                    autocomplete="off">
                                             </div>
-                                            <div class="forgot-pwd-txt">
-                                                Forgot Password?
-                                            </div>
-                                            <div class="input-with-lbl success">
+                                            <a class="d-flex justify-content-end text-decoration-none">
+                                                <small>
+                                                    Forgot Password?
+                                                </small>
+                                            </a>
+                                            <div class="input-with-lbl">
                                                 <span class="input-lbl">Password</span>
-                                                <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'"
-                                                    class="form-control mb-4" placeholder="Enter Password">
-                                                <img src="assets/images/icons/{{ showPassword ? 'eye-slash.svg' : 'eye.svg' }}"
+                                                <input [type]="showPassword ? 'text' : 'password'"
+                                                    [formControlName]="'password'" class="form-control mb-4"
+                                                    placeholder="Enter Password" autocomplete="off">
+                                                <img ngSrc="assets/images/icons/{{ showPassword ? 'eye-slash.svg' : 'eye.svg' }}"
                                                     class="eye-icon" width="16" height="16"
                                                     (click)="showPassword = !showPassword">
                                             </div>
 
                                             <div>
-                                                <button type="button" class="btn w-100 btn-main btn-fw btn-auth" [disabled]="signInForm.invalid" (click)="signIn()">Sign In</button>
+                                                <button type="button" class="btn w-100 btn-main btn-fw btn-auth"
+                                                    [disabled]="signInForm.invalid" (click)="signIn()">Sign In</button>
                                             </div>
                                         </div>
+
+                                        <div class="d-flex-center my-2">
+                                            <div class="line"></div>
+                                            <div class="text">Or</div>
+                                            <div class="line"></div>
+                                        </div>
+
+
+
                                         <div class="create-account">Don’t have an account? <span
                                                 class="default-link">Sign Up</span>
                                         </div>

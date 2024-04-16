@@ -1,0 +1,108 @@
+@use '../../../styles/variables/variables' as *;
+
+.auth-card {
+    border-radius: 5px 5px 80px 5px;
+}
+
+.bg-primary {
+    border-radius: 80px 0px 80px 0px;
+}
+
+.slider {
+    max-width: 100%;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 80px 0px 80px 0px;
+}
+
+.auth-tagline {
+    font-weight: bold;
+    background: linear-gradient(90deg, rgba(244, 244, 244, 1) 0%, rgba(219, 195, 155, 1) 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.input-with-lbl {
+    position: relative;
+}
+
+.input-lbl {
+    position: absolute;
+    color: var(--text-color);
+    // background: var(--primary-color);
+    font-size: 11px;
+    font-weight: 400;
+    left: 16px;
+    top: -8px;
+    line-height: normal;
+    letter-spacing: .5px;
+}
+
+.login-input input[type="text"],
+.login-input input[type="password"],
+.btn-auth {
+    border: 0;
+    height: 50px;
+    background-color: var(--darkgrey-color);
+    padding-left: 16px;
+    box-shadow: none;
+    color: var(--text-color);
+}
+
+.login-input input[type="text"]::placeholder,
+.login-input input[type="password"]::placeholder {
+    color: var(--text-color);
+    opacity: 0.3;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.login-input .success input[type="text"],
+.login-input .success input[type="password"] {
+    border: 1px solid var(--info-color);
+}
+
+.login-input .success .input-lbl,
+.login-input .success .input-lbl {
+    color: var(--info-color);
+}
+
+.login-input .error input[type="text"],
+.login-input .error input[type="password"] {
+    border: 1px solid var(--danger-color);
+}
+
+.login-input .error .input-lbl,
+.login-input .error .input-lbl {
+    color: var(--danger-color);
+}
+
+.eye-icon {
+    position: absolute;
+    width: 20px;
+    right: 16px;
+    top: 16px;
+    cursor: pointer;
+}
+
+.create-account {
+    font-size: 14px;
+    text-align: center;
+    color: var(--text-color);
+    margin-top: 25px;
+}
+
+.default-link {
+    color: var(--blue-color);
+    cursor: pointer;
+}
+
+.line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--text-color);
+}
+
+.text {
+    margin: 0 10px;
+}
