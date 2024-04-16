@@ -1,6 +1,6 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from '../layout/header/header.component';
+import { HeaderComponent } from '../shared/header/header.component';
 
 @Component({
   selector: 'acrylic-auth',
@@ -10,8 +10,7 @@ import { HeaderComponent } from '../layout/header/header.component';
     HeaderComponent
   ],
   templateUrl: './auth.component.html',
-  styleUrl: './auth.component.scss',
-  encapsulation: ViewEncapsulation.None
+  styleUrl: './auth.component.scss'
 })
 export class AuthComponent {
   constructor() {

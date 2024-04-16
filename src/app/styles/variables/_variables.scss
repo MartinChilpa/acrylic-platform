@@ -1,13 +1,6 @@
-/* Dark Theme Colors */
+/* Base Colors */
 :root {
-    --primary-color: #060606;
-    --secondary-color: #141414;
-    --text-color: #FFFFFF;
-    --info-color: #6A9391;
-    --danger-color: #EE593B;
-    --warning-color: #BC7B2D;
-    --blue-color: #446BCB;
-
+    --success-color: #05DB67;
     --darkgrey-color: #242424;
     --switch-on-wrapper-color: #454545;
     --switch-off-container-color: #2E2E2E;
@@ -17,7 +10,17 @@
     --primary-radial-gradient-color: radial-gradient(circle, rgba(84, 191, 187, 1) 0%, rgba(13, 66, 153, 1) 2%, rgba(9, 18, 23, 1) 100%);
 }
 
-/* Light Theme Colors */
+/* Dark Theme */
+:root .dark-theme {
+    --primary-color: #060606;
+    --secondary-color: #141414;
+    --text-color: #FFFFFF;
+    --info-color: #6A9391;
+    --danger-color: #EE593B;
+    --warning-color: #BC7B2D;
+}
+
+/* Light Theme */
 :root .light-theme {
     --primary-color: #F4F4F4;
     --secondary-color: #B8B8B8;
@@ -25,15 +28,4 @@
     --info-color: #54BFBB;
     --danger-color: #EE813B;
     --warning-color: #FDB560;
-    --blue-color: #002A92;
-
-    //Change below colors later
-    --darkgrey-color: #242424;
-    --switch-on-wrapper-color: #454545;
-    --switch-off-container-color: #2E2E2E;
-    --default-gradient-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
-    --default-gradient-hover-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
-    --default-gradient-focus-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
-    --primary-radial-gradient-color: radial-gradient(circle, rgba(84, 191, 187, 1) 0%, rgba(13, 66, 153, 1) 2%, rgba(9, 18, 23, 1) 100%);
-
 }
