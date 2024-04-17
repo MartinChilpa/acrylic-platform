@@ -3,6 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'acrylic-sign-in',
@@ -21,11 +22,12 @@ export class SignInComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _authService = inject(AuthService);
   private _router = inject(Router);
+  private _alertService = inject(AlertService);
 
   ngOnInit(): void {
     this.signInForm = this._fb.group({
-      username: ['demo', Validators.required],
-      password: ['d3m0us3R!', Validators.required],
+      username: ['', Validators.required],
+      password: ['', Validators.required],
     });
   }
 
@@ -40,12 +42,11 @@ export class SignInComponent implements OnInit {
       .subscribe({
         next: () => {
           this._router.navigateByUrl('/home');
-          // this._alertService.show('Logged In Successfully', '', 'sb-success');
+          this._alertService.success("Logged in successfully");
         },
         error: () => {
-          // Re-enable the form
-          this.signInForm.enable();
-          // this._alertService.show('Invalid Email or Password', '', 'sb-error');
+          this.signInForm.enable(); // Re-enable the form
+          this._alertService.success("Invalid Email or Password");
         }
       });
   }

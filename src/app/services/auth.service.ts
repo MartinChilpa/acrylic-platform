@@ -27,6 +27,11 @@ export class AuthService {
   }
 
   signIn(credentials: { username: string; password: string }): Observable<any> {
+
+    // this.accessToken = "token";
+    // this.IsLoggedIn.set(true);
+    // return of(true);
+
     // Throw error, if the user is already logged in
     if (this.IsLoggedIn()) {
       return throwError(() => 'User is already logged in.');

@@ -12,14 +12,14 @@
                 @if(_authService.IsLoggedIn()){
                     <div class="acr-input-group col-lg-5 col-12">
                         <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
-                        <input type="text">
+                        <input type="text" placeholder="Search">
                     </div>
                     <div class="col-lg-7 col-12 d-flex justify-content-end align-items-center p-0 mt-lg-0 mt-2">
-                        <div class="switch" title="Theme">
+                        <!-- <div class="switch" title="Theme">
                             <input type="checkbox" id="custom-switch" (change)="toggleTheme()" [checked]="isDarkTheme">
                             <label for="custom-switch" class="slider"></label>
-                        </div>
-                        <span class="mx-2">|</span>
+                        </div> -->
+                        <!-- <span class="mx-2">|</span> -->
                         <button class="btn btn-sm btn-darkgrey" title="Notification">
                             <img ngSrc="assets/images/icons/bell.svg" width="17" height="17">
                         </button>

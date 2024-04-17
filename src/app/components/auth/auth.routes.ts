@@ -19,7 +19,8 @@ export const AUTH_ROUTES: Routes = [
             {
                 path: authRoutesNames.SIGNIN,
                 loadComponent: () => import('./sign-in/sign-in.component').then((mod) => mod.SignInComponent),
-            }, {
+            },
+            {
                 path: authRoutesNames.SIGNUP,
                 loadComponent: () => import('./sign-up/sign-up.component').then((mod) => mod.SignUpComponent),
             }
