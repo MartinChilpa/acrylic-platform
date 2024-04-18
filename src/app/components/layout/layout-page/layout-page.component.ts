@@ -1,6 +1,6 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component } from '@angular/core';
-import { HeaderComponent } from '../header/header.component';
+import { HeaderComponent } from '../../shared/header/header.component';
 import { SidenavComponent } from '../sidenav/sidenav.component';
 import { RouterOutlet } from '@angular/router';
 

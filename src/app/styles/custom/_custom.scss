@@ -1,22 +1,26 @@
 @use '../variables/variables' as *;
+@use '../custom/fonts' as *;
 
 html,
 body {
     height: 100%;
 }
 
+img {
+    max-width: 100%;
+}
+
 body {
+    font-family: 'Inter', sans-serif;
     margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
     padding: 10px;
-    // background: var(--primary-color);
     font-size: 14px;
     color: var(--text-color);
     overflow-x: hidden;
 }
 
 .bg-primary-gradient {
-	background: radial-gradient(circle, rgba(84, 191, 187, 1) 0%, rgba(13, 66, 153, 1) 2%, rgba(9, 18, 23, 1) 100%) !important;
+    background: var(--primary-radial-gradient-color);
 }
 
 .acr-box {
@@ -33,6 +37,12 @@ body {
     transform: translate(-50%, -50%);
 }
 
-path{
-    fill: var(--text-color) !important;
+.d-flex-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.w-90{
+    width: 90%;
 }

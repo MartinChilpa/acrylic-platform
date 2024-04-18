@@ -1,7 +1,7 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, catchError, of, switchMap, throwError } from 'rxjs';
 import { AuthUtils } from '../utils/auth.utils';
 
 @Injectable({
@@ -28,31 +28,27 @@ export class AuthService {
 
   signIn(credentials: { username: string; password: string }): Observable<any> {
 
-    //dummy token as of now
-    this.accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGVtbyIsImlhdCI6MTcxMzExOTQwMCwiZXhwIjoxNzE0NDE1NDAwfQ.BN0NLtV9AWW97ql0HiTvc7fH9qAQv50Vpj5g0jAYq6w";
-    this.IsLoggedIn.set(true);
-    return of(true);
+    // this.accessToken = "token";
+    // this.IsLoggedIn.set(true);
+    // return of(true);
+
     // Throw error, if the user is already logged in
-    // if (this._authenticated) {
-    //   return throwError(() => 'User is already logged in.');
-    // }
+    if (this.IsLoggedIn()) {
+      return throwError(() => 'User is already logged in.');
+    }
 
-    // return this._http.post(this.AUTH_API_URL + '/token', credentials).pipe(
-    //   switchMap((response: any) => {
-    //     // Store the access token in the local storage
-    //     this.accessToken = response.access;
+    return this._http.post(this.AUTH_API_URL + '/token/', credentials).pipe(
+      switchMap((response: any) => {
+        // Store the access token in the local storage
+        this.accessToken = response.access;
 
-    //     //Store user info
-    //     // this._userInfoService.user = response.userInfo;
-    //     // this.userInfo = JSON.stringify(response.userInfo);
+        // Set the logged in to true
+        this.IsLoggedIn.set(true);
 
-    //     // Set the authenticated flag to true
-    //     this.IsLoggedIn.next(true);
-
-    //     // Return a new observable with the response
-    //     return of(response);
-    //   })
-    // ).pipe(catchError(this.errorHandler));
+        // Return a new observable with the response
+        return of(response);
+      })
+    ).pipe(catchError(this.errorHandler));
   }
 
   signOut(): Observable<any> {
@@ -60,9 +56,7 @@ export class AuthService {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userInfo');
 
-    //Make subject null
-    // this._userInfoService.user = null;
-
+    // Set the logged in to false
     this.IsLoggedIn.set(false);
 
     // Return the observable

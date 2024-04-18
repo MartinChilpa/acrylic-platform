@@ -1,0 +1,57 @@
+@use '../../../styles/variables/variables' as *;
+
+.alerts {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.alert {
+    position: relative;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 7px;
+    width: 250px;
+    border: none;
+    font-weight: 500;
+}
+
+.alert .alert-title {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.alert .alert-message {
+    flex-grow: 1;
+}
+
+.alert button.close {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.alert-success {
+    background-color: var(--success-color);
+    color: var(--primary-color);
+}
+
+.alert-info {
+    background-color: var(--info-color);
+    color: var(--text-color);
+}
+
+.alert-error {
+    background-color:  var(--danger-color);
+    color: var(--text-color);
+}
+
+.alert-warning {
+    background-color: var(--warning-color);
+    color: var(--text-color);
+}

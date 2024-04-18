@@ -1,0 +1,15 @@
+@if(alerts && alerts.length > 0){
+    <div class="alerts">
+        @for(alert of alerts; track alert; let idx = $index){
+            <div class="alert" [ngClass]="'alert-' + alert.type" [@fadeAnimation]>
+                <div class="w-90">
+                    <div class="alert-title">{{ alert.title }}</div>
+                    <div class="alert-message">{{ alert.message }}</div>
+                </div>
+                <button type="button" class="close" [ngClass]="'alert-' + alert.type" (click)="dismiss(idx)">
+                    <span>&times;</span>
+                </button>
+            </div>
+        }
+    </div>
+}
