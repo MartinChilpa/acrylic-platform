@@ -46,7 +46,7 @@ export class SignInComponent implements OnInit {
         },
         error: () => {
           this.signInForm.enable(); // Re-enable the form
-          this._alertService.success("Invalid Email or Password");
+          this._alertService.error("Invalid Email or Password");
         }
       });
   }

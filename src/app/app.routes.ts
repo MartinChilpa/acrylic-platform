@@ -4,6 +4,7 @@ import { authGuard } from './guards/auth.guard';
 export const routesNames = {
   HOME: 'home',
   AUTH: 'auth',
+  PAGE_NOT_FOUND: 'page-not-found',
   EMPTY: ''
 };
 
@@ -27,5 +28,10 @@ export const routes: Routes = [
   {
     path: routesNames.AUTH,
     loadChildren: () => import('./components/auth/auth.routes').then((mod) => mod.AUTH_ROUTES)
-  }
+  },
+  { path: '**', redirectTo: routesNames.PAGE_NOT_FOUND },
+  {
+    path: routesNames.PAGE_NOT_FOUND,
+    loadComponent: () => import('./components/shared/page-not-found/page-not-found.component').then((c) => c.PageNotFoundComponent)
+  },
 ];

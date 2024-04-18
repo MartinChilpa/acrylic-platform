@@ -14,7 +14,7 @@
     border-radius: 7px;
     width: 250px;
     border: none;
-    color: var(--text-color);
+    font-weight: 500;
 }
 
 .alert .alert-title {
@@ -32,25 +32,26 @@
     right: 10px;
     transform: translateY(-50%);
     border: none;
-    background: transparent;
     cursor: pointer;
     font-size: 20px;
-    color: var(--text-color);
-    outline: none;
 }
 
 .alert-success {
     background-color: var(--success-color);
+    color: var(--primary-color);
 }
 
 .alert-info {
     background-color: var(--info-color);
+    color: var(--text-color);
 }
 
 .alert-error {
     background-color:  var(--danger-color);
+    color: var(--text-color);
 }
 
 .alert-warning {
     background-color: var(--warning-color);
+    color: var(--text-color);
 }
