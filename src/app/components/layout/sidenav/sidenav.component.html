@@ -9,9 +9,9 @@
 
 <div class="acr-box mt-2">
     @for (item of sidenavItems; track item) {
-        <div class="p-2 d-inline-flex" [routerLink]="[item.routerLink]" routerLinkActive="text-info fw-semibold">
+        <a class="sidenav-item" [routerLink]="[item.routerLink]" routerLinkActive="text-info fw-semibold">
             <img [ngSrc]="'assets/images/icons/' + item.icon + '.svg'" alt="Icon" width="16" height="16">
             <span class="ms-2">{{item.label}}</span>
-        </div>
+        </a>
     }
 </div>
