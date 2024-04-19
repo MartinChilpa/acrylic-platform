@@ -46,3 +46,74 @@ body {
 .w-90{
     width: 90%;
 }
+.font-weight-600{
+	font-weight:600 !important;
+}
+.font-size14 {
+	font-size:14px !important;
+}
+.font-size12 {
+	font-size:12px !important;
+}
+.font-size16 {
+	font-size:16px !important;
+}
+.font-size18 {
+	font-size:18px !important;
+}
+.font-size36 {
+	font-size:36px !important;
+}
+.p-12{
+	padding:12px !important;
+}
+.height-40{
+	height:40px;
+}
+
+.track-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    font-size: 12px;
+    padding: 0 16px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.transp-btn {
+	background: transparent !important;
+	border: 1px solid rgba(255,255,255,0.3);
+  }
+
+.card-beige-color{
+	color:#DBC39B;
+}
+
+.border-maroon{
+	border:1px solid #EE593B;	
+}
+.border-radius-5{
+	border-radius:5px;
+}
+
+.p-12 {
+	padding: 12px !important;
+}
+.height-36{
+	height:36px;
+}
+.min-height-52{
+	min-height:52px;
+}
+
+.text-decoration-underline{
+	text-decoration:underline;
+}
+
+.max-width-560{
+	max-width:560px;
+}
+.mb-20{
+	margin-bottom:20px !important;
+}

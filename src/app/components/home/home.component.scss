@@ -83,37 +83,37 @@
 }
 
 .main-card {
-    background: url('../../../assets/images/others/main.jpg') center center;
+    background-position: center center;
     background-repeat: no-repeat;
     background-size: 100%;
 }
 
 .md-card-1 {
-    background: url('../../../assets/images/others/ms1.png') center center;
+    background-position: center center;
     background-repeat: no-repeat;
     background-size: 100%;
 }
 
 .md-card-2 {
-    background: url('../../../assets/images/others/ms2.png') center center;
+    background-position: center center;
     background-repeat: no-repeat;
     background-size: 100%;
 }
 
 .sm-card-1 {
-    background: url('../../../assets/images/others/sm1.png') center center;
+    background-position: center center;
     background-repeat: no-repeat;
     background-size: 100%;
 }
 
 .sm-card-2 {
-    background: url('../../../assets/images/others/sm2.png') center center;
+    background-position: center center;
     background-repeat: no-repeat;
     background-size: 100%;
 }
 
 .sm-card-3 {
-    background: url('../../../assets/images/others/sm3.png') center center;
+    background-position: center center;
     background-repeat: no-repeat;
     background-size: 100%;
 }
@@ -153,7 +153,13 @@
     }
 
     .artist-box {
-        background: url("../../../assets/images/others/frame-bg.png") center center;
+        background-position: center center;
         background-size: 2832px;
     }
+    .home-section{
+        flex-wrap: wrap;
+    }
+    .main-card {
+        background-size: cover;
+      }
 }

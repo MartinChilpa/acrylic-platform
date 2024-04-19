@@ -1,10 +1,10 @@
 <section>
-    <div class="main-body-holder">
+    <div class="d-flex home-section">
         <div class="home-tiles">
             <div class="w-100">
                 <div class="home-main-card">
                     <div>
-                        <div class="home-card main-card card-border-radius"></div>
+                        <div class="home-card main-card card-border-radius" setBackgroundImage [imageUrl]="mainImage"></div>
                     </div>
                     <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
                     <div class="font-size12 font-weight400">Learn about synchronization and how to promote your sync
@@ -17,7 +17,7 @@
                 <div class="home-main-card pe-3">
                     <div class="">
                         <div>
-                            <div class="home-card md-card-1 card-border-radius"></div>
+                            <div class="home-card md-card-1 card-border-radius" setBackgroundImage [imageUrl]="mdCard1"></div>
                         </div>
                     </div>
                     <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
@@ -29,7 +29,7 @@
                 <div class="home-main-card">
                     <div class="">
                         <div>
-                            <div class="home-card md-card-2 card-border-radius"></div>
+                            <div class="home-card md-card-2 card-border-radius" setBackgroundImage [imageUrl]="mdCard2"></div>
                         </div>
                     </div>
                     <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
@@ -43,7 +43,7 @@
                 <div class="home-main-card pe-3">
                     <div class="">
                         <div>
-                            <div class="home-card sm-card-1 card-border-radius"></div>
+                            <div class="home-card sm-card-1 card-border-radius" setBackgroundImage [imageUrl]="smCard1"></div>
                         </div>
                     </div>
                     <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
@@ -55,7 +55,7 @@
                 <div class="home-main-card pe-3">
                     <div class="">
                         <div>
-                            <div class="home-card sm-card-2 card-border-radius"></div>
+                            <div class="home-card sm-card-2 card-border-radius" setBackgroundImage [imageUrl]="smCard2"></div>
                         </div>
                     </div>
                     <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="home-main-card">
                     <div>
-                        <div class="home-card sm-card-3 card-border-radius"></div>
+                        <div class="home-card sm-card-3 card-border-radius" setBackgroundImage [imageUrl]="smCard3"></div>
                     </div>
                     <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
                     <div class="font-size12 font-weight400">Learn about synchronization and how to promote your sync
@@ -90,61 +90,19 @@
                         <div class="font-weight-600">Total Uses</div>
                     </div>
                     <ul class="p-0 m-0 accordion">
+                        @for (item of topTrack; track item) {
                         <li class="side-menu-list list-group-item">
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="d-flex align-items-center">
                                     <span class="me-2">
-                                        <img src="assets/images/others/top-track.png" />
+                                        <img src={{item.imageLink}} />
                                     </span>
-                                    <span>Chill Vibes Café</span>
+                                    <span>{{item.name}}</span>
                                 </span>
-                                <span>24,876</span>
+                                <span>{{item.price}}</span>
                             </div>
                         </li>
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src="assets/images/others/top-track.png" />
-                                    </span>
-                                    <span>Chill Vibes Café</span>
-                                </span>
-                                <span>24,876</span>
-                            </div>
-                        </li>
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src="assets/images/others/top-track.png" />
-                                    </span>
-                                    <span>Chill Vibes Café</span>
-                                </span>
-                                <span>24,876</span>
-                            </div>
-                        </li>
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src="assets/images/others/top-track.png" />
-                                    </span>
-                                    <span>Chill Vibes Café</span>
-                                </span>
-                                <span>24,876</span>
-                            </div>
-                        </li>
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src="assets/images/others/top-track.png" />
-                                    </span>
-                                    <span>Chill Vibes Café</span>
-                                </span>
-                                <span>24,876</span>
-                            </div>
-                        </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -159,61 +117,19 @@
                         <div class="font-weight-600">Total Uses</div>
                     </div>
                     <ul class="p-0 m-0">
+                        @for (item of topArtist; track item) {
                         <li class="side-menu-list list-group-item">
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="d-flex align-items-center">
                                     <span class="me-2">
-                                        <img src="assets/images/others/artist.png" />
+                                        <img src={{item.imageLink}} />
                                     </span>
-                                    <span>Lily Johnson</span>
+                                    <span>{{item.name}}</span>
                                 </span>
-                                <span>24,876</span>
+                                <span>{{item.price}}</span>
                             </div>
                         </li>
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src="assets/images/others/artist.png" />
-                                    </span>
-                                    <span>Marcus Davis</span>
-                                </span>
-                                <span>24,876</span>
-                            </div>
-                        </li>
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src="assets/images/others/artist.png" />
-                                    </span>
-                                    <span>Savannah Carter</span>
-                                </span>
-                                <span>24,876</span>
-                            </div>
-                        </li>
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src="assets/images/others/artist.png" />
-                                    </span>
-                                    <span>Chill Vibes Café</span>
-                                </span>
-                                <span>24,876</span>
-                            </div>
-                        </li>
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src="assets/images/others/artist.png" />
-                                    </span>
-                                    <span>Chill Vibes Café</span>
-                                </span>
-                                <span>24,876</span>
-                            </div>
-                        </li>
+                        }
                     </ul>
                 </div>
             </div>
