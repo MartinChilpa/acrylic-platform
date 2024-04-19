@@ -1,7 +1,7 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, of, switchMap, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, switchMap } from 'rxjs';
 import { AuthUtils } from '../utils/auth.utils';
 
 @Injectable({
@@ -32,11 +32,6 @@ export class AuthService {
     // this.IsLoggedIn.set(true);
     // return of(true);
 
-    // Throw error, if the user is already logged in
-    if (this.IsLoggedIn()) {
-      return throwError(() => 'User is already logged in.');
-    }
-
     return this._http.post(this.AUTH_API_URL + '/token/', credentials).pipe(
       switchMap((response: any) => {
         // Store the access token in the local storage
@@ -48,7 +43,7 @@ export class AuthService {
         // Return a new observable with the response
         return of(response);
       })
-    ).pipe(catchError(this.errorHandler));
+    );
   }
 
   signOut(): Observable<any> {
@@ -75,9 +70,5 @@ export class AuthService {
     }
 
     return of(!!this.accessToken || false);
-  }
-
-  errorHandler(error: HttpErrorResponse) {
-    return throwError(() => error.error || error.message || "server error.");
   }
 }

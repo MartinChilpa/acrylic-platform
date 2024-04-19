@@ -12,23 +12,25 @@
                                 <div class="p-4">
                                     <form [formGroup]="signInForm">
                                         <h2 class="auth-tagline">Welcome Back</h2>
-                                        <div class="login-input">
-                                            <div class="input-with-lbl">
-                                                <span class="input-lbl">Username</span>
+                                        <div>
+                                            <div class="input-with-label">
+                                                <span class="input-label">Username</span>
                                                 <input type="text" [formControlName]="'username'"
                                                     class="form-control mb-2 w-100" placeholder="Enter Username"
-                                                    autocomplete="off">
+                                                    autocomplete="off" readonly
+                                                    onfocus="this.removeAttribute('readonly');">
                                             </div>
-                                            <a class="d-flex justify-content-end text-decoration-none">
+                                            <a class="d-flex justify-content-end a-blue">
                                                 <small>
                                                     Forgot Password?
                                                 </small>
                                             </a>
-                                            <div class="input-with-lbl">
-                                                <span class="input-lbl">Password</span>
+                                            <div class="input-with-label">
+                                                <span class="input-label">Password</span>
                                                 <input [type]="showPassword ? 'text' : 'password'"
                                                     [formControlName]="'password'" class="form-control mb-4"
-                                                    placeholder="Enter Password" autocomplete="off">
+                                                    placeholder="Enter Password" autocomplete="off" readonly
+                                                    onfocus="this.removeAttribute('readonly');">
                                                 <img ngSrc="assets/images/icons/{{ showPassword ? 'eye-slash.svg' : 'eye.svg' }}"
                                                     class="eye-icon" width="16" height="16"
                                                     (click)="showPassword = !showPassword">
@@ -40,16 +42,15 @@
                                             </div>
                                         </div>
 
-                                        <div class="d-flex-center my-2">
+                                        <div class="d-flex-center my-3">
                                             <div class="line"></div>
                                             <div class="text">Or</div>
                                             <div class="line"></div>
                                         </div>
 
-
-
-                                        <div class="create-account">Don’t have an account? <span
-                                                class="default-link">Sign Up</span>
+                                        <div class="mt-2">
+                                            <span>Don’t have an account?</span>
+                                            <a class="a-blue ms-2">Sign Up</a>
                                         </div>
 
                                     </form>
