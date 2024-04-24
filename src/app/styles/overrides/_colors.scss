@@ -2,31 +2,35 @@
 
 // Background Colors
 .bg-primary {
-    background: var(--primary-color) !important;
+    background-color: var(--primary-color) !important;
 }
 
 .bg-secondary {
-    background: var(--secondary-color) !important;
+    background-color: var(--secondary-color) !important;
 }
 
 .bg-danger {
-    background: var(--danger-color) !important;
+    background-color: var(--danger-color) !important;
 }
 
 .bg-warning {
-    background: var(--warning-color) !important;
+    background-color: var(--warning-color) !important;
 }
 
 .bg-info {
-    background: var(--info-color) !important;
+    background-color: var(--info-color) !important;
 }
 
 .bg-darkgrey {
-    background: var(--darkgrey-color) !important;
+    background-color: var(--darkgrey-color) !important;
 }
 
 .bg-invert{
     background-color: var(--text-color) !important;
+}
+
+.bg-lightgrey {
+    background-color: var(--lightgrey-color) !important;
 }
 
 // Text Colors
@@ -53,4 +57,8 @@
 .a-blue{
     color: var(--blue-color) !important;
     text-decoration: none;
+}
+
+.text-info-success {
+    color: var(--info-success-color) !important;
 }

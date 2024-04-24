@@ -43,6 +43,17 @@ body {
     align-items: center;
 }
 
+.d-flex-align-center{
+    display: flex;
+    align-items: center;
+}
+
+.d-flex-between{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .w-90{
     width: 90%;
 }

@@ -1,137 +1,122 @@
 <section>
-    <div class="d-flex home-section">
-        <div class="home-tiles">
-            <div class="w-100">
-                <div class="home-main-card">
-                    <div>
-                        <div class="home-card main-card card-border-radius" setBackgroundImage [imageUrl]="mainImage"></div>
-                    </div>
-                    <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
-                    <div class="font-size12 font-weight400">Learn about synchronization and how to promote your sync
-                        rights.
-                    </div>
-                    <div class="font-size12 font-weight400 card-link-color pt-2 ">KAM feels lucky 🦎</div>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between medium-cards">
-                <div class="home-main-card pe-3">
-                    <div class="">
-                        <div>
-                            <div class="home-card md-card-1 card-border-radius" setBackgroundImage [imageUrl]="mdCard1"></div>
-                        </div>
-                    </div>
-                    <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
-                    <div class="font-size12 font-weight400">Learn about synchronization and how to promote your sync
-                        rights.
-                    </div>
-                    <div class="font-size12 font-weight400 card-link-color pt-2 ">KAM feels lucky 🦎</div>
-                </div>
-                <div class="home-main-card">
-                    <div class="">
-                        <div>
-                            <div class="home-card md-card-2 card-border-radius" setBackgroundImage [imageUrl]="mdCard2"></div>
-                        </div>
-                    </div>
-                    <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
-                    <div class="font-size12 font-weight400">Learn about synchronization and how to promote your sync
-                        rights.
-                    </div>
-                    <div class="font-size12 font-weight400 card-link-color pt-2 ">KAM feels lucky 🦎</div>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between small-cards">
-                <div class="home-main-card pe-3">
-                    <div class="">
-                        <div>
-                            <div class="home-card sm-card-1 card-border-radius" setBackgroundImage [imageUrl]="smCard1"></div>
-                        </div>
-                    </div>
-                    <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
-                    <div class="font-size12 font-weight400">Learn about synchronization and how to promote your sync
-                        rights.
-                    </div>
-                    <div class="font-size12 font-weight400 card-link-color pt-2 ">KAM feels lucky 🦎</div>
-                </div>
-                <div class="home-main-card pe-3">
-                    <div class="">
-                        <div>
-                            <div class="home-card sm-card-2 card-border-radius" setBackgroundImage [imageUrl]="smCard2"></div>
-                        </div>
-                    </div>
-                    <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
-                    <div class="font-size12 font-weight400">Learn about synchronization and how to promote your sync
-                        rights.
-                    </div>
-                    <div class="font-size12 font-weight400 card-link-color pt-2 ">KAM feels lucky 🦎</div>
-                </div>
-                <div class="home-main-card">
-                    <div>
-                        <div class="home-card sm-card-3 card-border-radius" setBackgroundImage [imageUrl]="smCard3"></div>
-                    </div>
-                    <div class="font-size14 font-weight600 pt-3 pb-1">Sync University</div>
-                    <div class="font-size12 font-weight400">Learn about synchronization and how to promote your sync
-                        rights.
-                    </div>
-                    <div class="font-size12 font-weight400 card-link-color pt-2 ">KAM feels lucky 🦎</div>
-                </div>
-            </div>
-        </div>
-        <div class="right-side-menu">
+    <div class="row">
+        <div class="col-md-8 col-12">
             <div>
-                <div class="artist-box">
-                    <div class="me-2"><img src="assets/images/others/d.png" /></div>
-                    <div class="font-size18 font-weight-600">Diego Ramos</div>
-                </div>
-                <div class="side-menu-options">
-                    <h3 class="top-tracks-title pt-0 font-size16 d-flex align-items-center"><img
-                            src="assets/images/others/beat.png" class="me-2" /> Top Synclists</h3>
-                    <div class="track-details card-link-color">
-                        <div class="font-weight-600">Synclist Name</div>
-                        <div class="font-weight-600">Total Uses</div>
-                    </div>
-                    <ul class="p-0 m-0 accordion">
-                        @for (item of topTrack; track item) {
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src={{item.imageLink}} />
-                                    </span>
-                                    <span>{{item.name}}</span>
-                                </span>
-                                <span>{{item.price}}</span>
-                            </div>
-                        </li>
-                        }
-                    </ul>
+                <img [src]="mainImage" class="img-card" />
+                <div class="my-md-3 my-2">
+                    <div>Sync University</div>
+                    <small class="d-block">Learn about synchronization and how to promote your sync rights.</small>
+                    <small class="text-info-success pt-2">KAM feels lucky 🦎</small>
                 </div>
             </div>
 
-            <div class="mt-3">
-                <div class="side-menu-options">
-                    <h3 class="top-tracks-title pt-0 font-size16 d-flex align-items-center">
-                        <img src="assets/images/others/beat.png" class="me-2" /> Top Artists
-                    </h3>
-                    <div class="track-details card-link-color">
-                        <div class="font-weight-600">Artist Name</div>
-                        <div class="font-weight-600">Total Uses</div>
+            <div class="row my-3">
+                <div class="col-lg-6 col-12">
+                    <img [src]="mdCard1" class="img-card" />
+                    <div class="my-md-3 my-2">
+                        <div>The Acrylic Museum</div>
+                        <small class="d-block">Check out all the coolest syncs our ARTISTS have landed!</small>
+                        <small class="text-info-success pt-2">KAM's Top 10</small>
                     </div>
-                    <ul class="p-0 m-0">
-                        @for (item of topArtist; track item) {
-                        <li class="side-menu-list list-group-item">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="d-flex align-items-center">
-                                    <span class="me-2">
-                                        <img src={{item.imageLink}} />
-                                    </span>
-                                    <span>{{item.name}}</span>
-                                </span>
-                                <span>{{item.price}}</span>
-                            </div>
-                        </li>
-                        }
-                    </ul>
                 </div>
+                <div class="col-lg-6 col-12">
+                    <img [src]="mdCard2" class="img-card" />
+                    <div class="my-md-3 my-2">
+                        <div>My Art Studio</div>
+                        <small class="d-block">Create artwork and landing pages to promote your work on all
+                            stores.</small>
+                        <small class="text-info-success pt-2">The KAM Drop 🔥</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row my-3">
+                <div class="col-lg-4 col-12">
+                    <img [src]="smCard1" class="img-card" />
+                    <div class="my-md-3 my-2">
+                        <div>The Acrylic KAM-UNITY</div>
+                        <small class="d-block">Connect with other chameleons like you via our Discord channel.</small>
+                        <small class="text-info-success pt-2">"Just join." - KAM.</small>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-12">
+                    <img [src]="smCard2" class="img-card" />
+                    <div class="my-md-3 my-2">
+                        <div>Sync Secrets</div>
+                        <small class="d-block">Learn about best sync practices to maximize you success with us.</small>
+                        <small class="text-info-success pt-2">KAM's Sync Tip of Week</small>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-12">
+                    <img [src]="smCard3" class="img-card" />
+                    <div class="my-md-3 my-2">
+                        <div>Help the Acrylic Fam!</div>
+                        <small class="d-block">Help spread KAM's love and earn valuable treats along the way 🦎</small>
+                        <small class="text-info-success pt-2">KAM of the Week 🔥</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-12">
+            <div class="artist-box">
+                <img src="assets/images/others/d.png" />
+                <h5 class="fw-bold mb-0">Diego Ramos</h5>
+            </div>
+
+            <div class="acr-box p-0 my-lg-3 my-2">
+                <div class="bg-lightgrey p-2">
+                    <div class="d-flex-align-center mb-lg-3 mb-2">
+                        <img src="assets/images/others/beat.png" class="me-2" />
+                        <h6 class="mb-0">Top Synclists</h6>
+                    </div>
+                    <div class="d-flex-between p-2">
+                        <small class="text-info-success">Synclist Name</small>
+                        <small class="text-info-success">Total Uses</small>
+                    </div>
+                </div>
+                <ul class="p-2">
+                    @for (item of topTrack; track item) {
+                    <li class="menu-list list-group-item">
+                        <div class="d-flex align-items-center justify-content-between p-2">
+                            <span class="d-flex align-items-center">
+                                <span class="me-2">
+                                    <img src={{item.imageLink}} />
+                                </span>
+                                <span>{{item.name}}</span>
+                            </span>
+                            <span>{{item.price}}</span>
+                        </div>
+                    </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="acr-box p-0 my-lg-3 my-2">
+                <div class="bg-lightgrey p-2">
+                    <div class="d-flex-align-center mb-lg-3 mb-2">
+                        <img src="assets/images/others/beat.png" class="me-2" />
+                        <h6 class="mb-0">Top Artists</h6>
+                    </div>
+                    <div class="d-flex-between p-2">
+                        <small class="text-info-success">Artist Name</small>
+                        <small class="text-info-success">Total Uses</small>
+                    </div>
+                </div>
+                <ul class="p-2">
+                    @for (item of topArtist; track item) {
+                    <li class="menu-list list-group-item">
+                        <div class="d-flex align-items-center justify-content-between p-2">
+                            <span class="d-flex align-items-center">
+                                <span class="me-2">
+                                    <img src={{item.imageLink}} />
+                                </span>
+                                <span>{{item.name}}</span>
+                            </span>
+                            <span>{{item.price}}</span>
+                        </div>
+                    </li>
+                    }
+                </ul>
             </div>
         </div>
     </div>
