@@ -1,3 +1,4 @@
+import { environment } from './../environments/environment.prod';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LoaderComponent } from './components/shared/loader/loader.component';
@@ -17,4 +18,10 @@ import { AlertComponent } from './components/shared/alert/alert.component';
 })
 export class AppComponent{
   public _loadingService = inject(LoaderService);
+
+  name = environment.name;
+  public throwTestError(): void {
+    throw new Error("Sentry Test Error");
+  }
+  
 }
