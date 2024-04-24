@@ -1,152 +1,17 @@
-.home-tiles {
-    margin-right: 16px;
-    color: var(--text-color);
-}
-
-.home-main-card {
-    padding-bottom: 14px;
-}
-
-.card-border-radius {
-    border-radius: 40px 5px 40px 5px;
-    overflow: hidden;
-}
-
-.card-link-color {
-    color: var(--card-link-color);
-}
-
-.small-cards .home-main-card {
-    width: 244px;
-}
-
-.right-side-menu {
-    width: 374px;
-    color: var(--text-color);
-}
-
-.track-details {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 40px;
-    font-size: 12px;
-    padding: 0 16px;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.right-side-menu .side-menu-list {
-    font-size: 14px;
-    font-weight: 400;
-    cursor: default;
-}
-
-.right-side-menu .side-menu-options {
-    background: linear-gradient(0deg, #141414, #141414), linear-gradient(180deg, rgba(108, 171, 154, 0.1) 0%, rgba(108, 171, 154, 0) 41.98%);
-}
-
-.right-side-menu .side-menu-list:hover {
-    background: none;
-    color: unset;
-}
-
-.right-side-menu .side-menu-list {
-    padding: 11.1px 16px;
-}
-
-.right-side-menu .side-menu-list:nth-child(even) {
-    background: var(--card-grey-color);
+.menu-list:nth-child(even) {
+    background: var(--lightgrey-color);
 }
 
 .artist-box {
     display: flex;
     align-items: center;
-    height: 92px;
     border-radius: 5px;
-    margin-bottom: 12px;
-    background: url('../../../assets/images/others/frame-bg.png') -329px -226px;
+    background: url('../../../assets/images/others/frame-bg.png');
+    background-position: -329px -226px;
     background-repeat: no-repeat;
-    background-size: 784px;
 }
 
-.home-card {
-    min-height: 164px;
-}
-
-.main-card {
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: 100%;
-}
-
-.md-card-1 {
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: 100%;
-}
-
-.md-card-2 {
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: 100%;
-}
-
-.sm-card-1 {
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: 100%;
-}
-
-.sm-card-2 {
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: 100%;
-}
-
-.sm-card-3 {
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: 100%;
-}
-
-@media(max-width:768px) {
-    .home-main-card {
-        padding-top: 16px;
-    }
-
-    .medium-cards {
-        flex-wrap: wrap !important;
-    }
-
-    .small-cards {
-        flex-wrap: wrap !important;
-    }
-
-    .home-tiles {
-        margin-right: 0;
-    }
-
-    .small-cards .home-main-card,
-    .medium-cards .home-main-card {
-        width: 100%;
-    }
-
-    .home-main-card.pe-3 {
-        padding-right: 0 !important;
-    }
-
-    .right-side-menu {
-        width: 100%;
-    }
-
-    .artist-box {
-        background-position: center center;
-        background-size: 2832px;
-    }
-    .home-section{
-        flex-wrap: wrap;
-    }
-    .main-card {
-        background-size: cover;
-      }
+.img-card {
+    border-radius: 50px 5px 50px 5px;
+    width: 100%;
 }
