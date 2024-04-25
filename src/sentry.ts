@@ -3,10 +3,10 @@ import { environment } from "./environments/environment";
 
 Sentry.init({
     // Data Source Name (https://PUBLIC_KEY:SECRET_KEY@HOST/PROJECT_ID)
-    dsn: "https://c93db1c5719cc2b3e5b7b3150ca8e636@o4507050707779584.ingest.us.sentry.io/4507050707976192",
+    dsn: environment.SENTRY.DSN,
 
     // Sentry automatically creates an environment when it receives an event with the environment parameter set.
-    environment: environment.name,
+    environment: environment.NAME,
 
     integrations: [
         // Registers and configures the Tracing integration,
@@ -25,10 +25,7 @@ Sentry.init({
     tracesSampleRate: 1.0,
 
     // Set `tracePropagationTargets` to control for which URLs distributed tracing should be enabled
-    tracePropagationTargets: [
-        environment.APP_REGEX,
-        environment.API_REGEX
-    ],
+    tracePropagationTargets: environment.SENTRY.TARGETS,
 
     // Capture Replay for 10% of all sessions,
     // plus for 100% of sessions with an error
