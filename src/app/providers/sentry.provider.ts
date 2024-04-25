@@ -11,7 +11,6 @@ export function provideSentryProviders(platformId: object): unknown[] {
       {
         provide: ErrorHandler,
         useValue: Sentry.createErrorHandler({
-          logErrors: true,
           showDialog: false,
         }),
       },

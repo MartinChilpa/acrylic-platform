@@ -23,6 +23,7 @@ export class HeaderComponent {
   }
 
   redirectToSignUp() {
+    throw new Error('Sign up page is in progress');
     this._router.navigate(['auth/sign-up']);
   }
 

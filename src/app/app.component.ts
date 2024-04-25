@@ -1,3 +1,4 @@
+import { environment } from './../environments/environment.prod';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LoaderComponent } from './components/shared/loader/loader.component';
@@ -15,6 +16,6 @@ import { AlertComponent } from './components/shared/alert/alert.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent{
+export class AppComponent {
   public _loadingService = inject(LoaderService);
 }

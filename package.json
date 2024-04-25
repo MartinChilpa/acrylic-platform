@@ -4,10 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "node server.js",
-    "build": "ng build",
+    "build": "ng build && npm run sentry:sourcemaps",
+    "build:prod": "ng build --configuration=production && npm run sentry:sourcemaps",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "postinstall": "ng build"
+    "postinstall": "ng build",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org sentry-fluffy-64415 --project sentry-fluffy-64415 dist/acrylic-app/browser && sentry-cli sourcemaps upload --org sentry-fluffy-64415 --project sentry-fluffy-64415 dist/acrylic-app/browser"
   },
   "private": true,
   "dependencies": {
@@ -20,6 +22,7 @@
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/router": "^17.3.0",
     "@sentry/angular-ivy": "^7.111.0",
+    "@sentry/cli": "^2.31.0",
     "bootstrap": "^5.3.3",
     "express": "^4.19.2",
     "path": "^0.12.7",

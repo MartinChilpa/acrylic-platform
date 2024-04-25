@@ -1,8 +1,13 @@
 export const environment = {
     production: true,
-    name: 'production',
+    NAME: 'production',
     API_URL: 'https://platform.acrylic.la/api',
     VERSION: 'v1',
-    API_REGEX: /^https:\/\/platform\.acrylic\.la\/api/,
-    APP_REGEX: /^https:\/\/app\.acrylic\.la\//
+    SENTRY: {
+        DSN: 'https://c93db1c5719cc2b3e5b7b3150ca8e636@o4507050707779584.ingest.us.sentry.io/4507050707976192',
+        TARGETS: [
+            /^https:\/\/platform\.acrylic\.la\/api/,
+            /^https:\/\/app\.acrylic\.la\//,
+        ]
+    }
 };
