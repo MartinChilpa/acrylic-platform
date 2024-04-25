@@ -8,6 +8,8 @@ Sentry.init({
     // Sentry automatically creates an environment when it receives an event with the environment parameter set.
     environment: environment.NAME,
 
+    release: "acrylic-app@1.0.0",
+
     integrations: [
         // Registers and configures the Tracing integration,
         // which automatically instruments your application to monitor its
