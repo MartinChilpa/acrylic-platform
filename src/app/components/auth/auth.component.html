@@ -1,2 +1,24 @@
 <acrylic-header></acrylic-header>
-<router-outlet />
+
+<section>
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-xl-10">
+                <div class="auth-card">
+                    <div class="row g-0 bg-primary">
+                        <div class="col-md-5 d-none d-md-block">
+                            <img src="assets/images/others/slider1.jpg" alt="slider" class="slider w-100" fetchpriority="high"/>
+                        </div>
+                        <div class="col-md-7 col-12">
+                            <div class="h-100 text-center d-flex-center">
+                                <div class="p-4 w-100">
+                                    <router-outlet />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

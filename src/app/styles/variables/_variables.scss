@@ -2,7 +2,6 @@
 :root {
     --success-color: #05DB67;
     --darkgrey-color: #242424;
-    --blue-color: #457aff;
     --switch-on-wrapper-color: #454545;
     --switch-off-container-color: #2E2E2E;
     --default-gradient-color: linear-gradient(180deg, #F4F4F4 25.13%, #B8B8B8 100%);
@@ -22,6 +21,7 @@
     --info-color: #6A9391;
     --danger-color: #EE593B;
     --warning-color: #BC7B2D;
+    --blue-color: #5c86f0;
 }
 
 /* Light Theme */
@@ -32,4 +32,5 @@
     --info-color: #54BFBB;
     --danger-color: #EE813B;
     --warning-color: #FDB560;
+    --blue-color: #457aff;
 }

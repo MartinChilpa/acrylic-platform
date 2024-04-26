@@ -2,7 +2,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AlertService } from '../../../services/alert.service';
 
 @Component({
@@ -10,7 +10,8 @@ import { AlertService } from '../../../services/alert.service';
   standalone: true,
   imports: [
     NgOptimizedImage,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.scss'
@@ -26,8 +27,8 @@ export class SignInComponent implements OnInit {
 
   ngOnInit(): void {
     this.signInForm = this._fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required],
+      username: ['demo', Validators.required],
+      password: ['d3m0us3R!', Validators.required],
     });
   }
 

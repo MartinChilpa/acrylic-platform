@@ -47,28 +47,32 @@ export class AuthService {
   }
 
   signOut(): Observable<any> {
-    // Remove the access token from the local storage
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('userInfo');
-
-    // Set the logged in to false
-    this.IsLoggedIn.set(false);
+    this.endSession();
 
     // Return the observable
     return of(true);
   }
 
   check(): Observable<boolean> {
+    // Check the access token expire date
+    if (AuthUtils.isTokenExpired(this.accessToken)) {
+      this.endSession();
+      return of(false);
+    }
+
     // Check if the user is logged in
     if (this.IsLoggedIn()) {
       return of(this.IsLoggedIn());
     }
 
-    // Check the access token expire date
-    if (AuthUtils.isTokenExpired(this.accessToken)) {
-      return of(false);
-    }
-
     return of(!!this.accessToken || false);
+  }
+
+  endSession(): void {
+    // Remove the access token from the local storage
+    localStorage.removeItem('accessToken');
+
+    // Set the logged in to false
+    this.IsLoggedIn.set(false);
   }
 }
