@@ -1,9 +1,10 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, catchError, of, switchMap } from 'rxjs';
 import { AuthUtils } from '../utils/auth.utils';
 import { NavigationService } from './navigation.service';
+import { ISignInResponse } from '../interfaces/response/sign-in.response';
 
 @Injectable({
   providedIn: 'root'
@@ -28,27 +29,24 @@ export class AuthService {
     return localStorage.getItem('accessToken') ?? '';
   }
 
-  signIn(credentials: { username: string; password: string }): Observable<any> {
+  set refreshToken(refreshToken: string) {
+    localStorage.setItem('refreshToken', refreshToken);
+  }
 
-    // this.accessToken = "token";
-    // this.IsLoggedIn.set(true);
-    // return of(true);
+  get refreshToken(): string {
+    return localStorage.getItem('refreshToken') ?? '';
+  }
 
-    return this._http.post(this.AUTH_API_URL + '/token/', credentials).pipe(
-      switchMap((response: any) => {
-        // Store the access token in the local storage
-        this.accessToken = response.access;
-
-        // Set the logged in to true
-        this.IsLoggedIn.set(true);
-
-        // Return a new observable with the response
+  signIn(credentials: { username: string; password: string }): Observable<ISignInResponse> {
+    return this._http.post<ISignInResponse>(this.AUTH_API_URL + '/token/', credentials).pipe(
+      switchMap((response: ISignInResponse) => {
+        this.setSignInResponse(response);
         return of(response);
       })
     );
   }
 
-  signOut(){
+  signOut() {
     this.endSession();
     this._navigationService.navigateToSignIn();
   }
@@ -56,8 +54,7 @@ export class AuthService {
   check(): Observable<boolean> {
     // Check the access token expire date
     if (AuthUtils.isTokenExpired(this.accessToken)) {
-      this.endSession();
-      return of(false);
+      return this.refreshTokenSignIn();
     }
 
     // Check if the user is logged in
@@ -68,11 +65,39 @@ export class AuthService {
     return of(!!this.accessToken || false);
   }
 
-  endSession(): void {
+  private refreshTokenSignIn(): Observable<boolean> {
+    if (!this.refreshToken) {
+      return this.endSession();
+    }
+    return this._http.post<ISignInResponse>(this.AUTH_API_URL + '/token/refresh/', { refresh: this.refreshToken }).pipe(
+      switchMap((response: ISignInResponse) => {
+        console.log('refresh token generated');
+        this.setSignInResponse(response);
+        return of(true);
+      }),
+      catchError(() => {
+        return this.endSession();
+      })
+    );
+  }
+
+  private setSignInResponse(response: ISignInResponse) {
+    // Store the access token in the local storage
+    this.accessToken = response.access;
+    this.refreshToken = response.refresh;
+
+    // Set the logged in to true
+    this.IsLoggedIn.set(true);
+  }
+
+  private endSession(): Observable<boolean> {
     // Remove the access token from the local storage
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
 
     // Set the logged in to false
     this.IsLoggedIn.set(false);
+
+    return of(false);
   }
 }
