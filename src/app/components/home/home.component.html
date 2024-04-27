@@ -58,12 +58,14 @@
             </div>
         </div>
         <div class="col-lg-4 col-sm-5 col-12">
-            <div class="w-100">
-                <div class="artist-box">
-                    <img src="assets/images/others/d.png" />
-                    <h5 class="fw-bold mb-0">Diego Ramos</h5>
+            @if (_myArtistService.myArtist()) {
+                <div class="w-100">
+                    <div class="artist-box" acrylicBackgroundImage [backgroundImage]="_myArtistService.myArtist()?.background_image">
+                        <img [src]="_myArtistService.myArtist()?.image" width="84" />
+                        <h5 class="fw-bold mb-0">{{ _myArtistService.myArtist()?.name }}</h5>
+                    </div>
                 </div>
-            </div>
+            }
 
             <div class="acr-box p-0 my-lg-3 my-2">
                 <div class="bg-lightgrey p-2">

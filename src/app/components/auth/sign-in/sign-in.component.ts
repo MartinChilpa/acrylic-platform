@@ -2,8 +2,8 @@ import { NgOptimizedImage } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
-import { Router } from '@angular/router';
 import { AlertService } from '../../../services/alert.service';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'acrylic-sign-in',
@@ -21,8 +21,8 @@ export class SignInComponent implements OnInit {
 
   private _fb = inject(FormBuilder);
   private _authService = inject(AuthService);
-  private _router = inject(Router);
   private _alertService = inject(AlertService);
+  public _navigationService = inject(NavigationService);
 
   ngOnInit(): void {
     this.signInForm = this._fb.group({
@@ -41,12 +41,12 @@ export class SignInComponent implements OnInit {
     this._authService.signIn(this.signInForm.value)
       .subscribe({
         next: () => {
-          this._router.navigateByUrl('/home');
           this._alertService.success("Logged in successfully");
+          this._navigationService.navigateToHome();
         },
         error: () => {
-          this.signInForm.enable(); // Re-enable the form
           this._alertService.error("Invalid Email or Password");
+          this.signInForm.enable(); // Re-enable the form
         }
       });
   }

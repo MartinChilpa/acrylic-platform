@@ -1,7 +1,8 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
-import { Router } from '@angular/router';
+import { MyArtistService } from '../../../services/my-artist.service';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'acrylic-header',
@@ -12,23 +13,20 @@ import { Router } from '@angular/router';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
 
   public _authService = inject(AuthService);
-  private _router = inject(Router);
+  public _myArtistService = inject(MyArtistService)
+  public _navigationService = inject(NavigationService);
+
+  ngOnInit(): void {
+    if (this._authService.IsLoggedIn() && !this._myArtistService.myArtist()) {
+      this._myArtistService.getMyArtist().subscribe();
+    }
+  }
 
   signOut(): void {
     this._authService.signOut();
-    this.redirectToSignIn();
-  }
-
-  redirectToSignUp() {
-    throw new Error('Sign up page is in progress');
-    this._router.navigate(['auth/sign-up']);
-  }
-
-  redirectToSignIn() {
-    this._router.navigate(['auth/sign-in']);
   }
 }
 

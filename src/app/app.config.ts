@@ -6,6 +6,7 @@ import { HttpClientModule, provideHttpClient, withFetch, withInterceptors } from
 import { loaderInterceptor } from './interceptors/loader.interceptor';
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { provideSentryProviders } from './providers/sentry.provider';
+import { authInterceptor } from './interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(HttpClientModule),
     provideHttpClient(
       withFetch(),
-      withInterceptors([ loaderInterceptor, errorInterceptor ]),
+      withInterceptors([ loaderInterceptor, authInterceptor, errorInterceptor ]),
     ),
     {
       provide: 'sentryProviders',

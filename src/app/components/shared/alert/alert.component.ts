@@ -1,5 +1,5 @@
 import { Component, OnDestroy, effect, inject } from '@angular/core';
-import { Alert } from '../../../models/alert.model';
+import { Alert } from '../../../interfaces/common/alert';
 import { AlertService } from '../../../services/alert.service';
 import { NgClass } from '@angular/common';
 import { fadeAnimation } from '../../../utils/fadeanimation.util';

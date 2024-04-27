@@ -1,65 +1,47 @@
-<section>
-    <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col col-xl-10">
-                <div class="auth-card">
-                    <div class="row g-0 bg-primary">
-                        <div class="col-md-6 col-lg-5 d-none d-md-block">
-                            <img src="assets/images/others/slider1.jpg" alt="slider" class="slider" fetchpriority="high"/>
-                        </div>
-                        <div class="col-md-6 col-lg-7">
-                            <div class="h-100 text-center d-flex-center">
-                                <div class="p-4 w-100">
-                                    <form [formGroup]="signInForm">
-                                        <h1 class="auth-tagline mb-4">Welcome Back</h1>
-                                        <div>
-                                            <div class="input-with-label">
-                                                <span class="input-label">Username</span>
-                                                <input type="text" [formControlName]="'username'"
-                                                    class="form-control mb-2 w-100" placeholder="Enter Username"
-                                                    autocomplete="off" readonly
-                                                    onfocus="this.removeAttribute('readonly');">
-                                            </div>
-                                            <a class="d-flex justify-content-end a-blue">
-                                                <small>
-                                                    Forgot Password?
-                                                </small>
-                                            </a>
-                                            <div class="input-with-label">
-                                                <span class="input-label">Password</span>
-                                                <input [type]="showPassword ? 'text' : 'password'"
-                                                    [formControlName]="'password'" class="form-control mb-4"
-                                                    placeholder="Enter Password" autocomplete="off" readonly
-                                                    onfocus="this.removeAttribute('readonly');">
-                                                <img ngSrc="assets/images/icons/{{ showPassword ? 'eye-slash.svg' : 'eye.svg' }}"
-                                                    class="eye-icon" width="16" height="16"
-                                                    (click)="showPassword = !showPassword">
-                                            </div>
+<form [formGroup]="signInForm">
+    <h1 class="auth-tagline">Welcome Back</h1>
+    <ng-container>
+        <div>
+            <div class="acr-input-label">Username</div>
+            <input type="text" [formControlName]="'username'" class="form-control acr-input"
+                placeholder="Enter Username" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+        </div>
 
-                                            <div>
-                                                <button type="button" class="btn w-100 btn-main btn-fw btn-auth"
-                                                    [disabled]="signInForm.invalid" (click)="signIn()">Sign In</button>
-                                            </div>
-                                        </div>
+        <div class="my-3">
+            <div class="d-flex-between">
+                <div class="acr-input-label">Password</div>
+                <a class="d-flex justify-content-end a-blue" (click)="_navigationService.navigateToForgotPassword();">
+                    <small>
+                        Forgot Password?
+                    </small>
+                </a>
+            </div>
 
-                                        <div class="d-flex-center my-3">
-                                            <div class="line"></div>
-                                            <div class="text">Or</div>
-                                            <div class="line"></div>
-                                        </div>
-
-                                        <div class="mt-2">
-                                            <span>Don’t have an account?</span>
-                                            <a class="a-blue ms-2">Sign Up</a>
-                                        </div>
-
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="acr-password">
+                <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'"
+                    class="form-control acr-input" placeholder="Enter Password" autocomplete="off" readonly
+                    onfocus="this.removeAttribute('readonly');">
+                <img ngSrc="assets/images/icons/{{ showPassword ? 'eye-slash.svg' : 'eye.svg' }}" class="eye-icon"
+                    width="16" height="16" (click)="showPassword = !showPassword">
             </div>
         </div>
+
+        <div>
+            <button type="button" class="btn w-100 btn-main fw-bold h-50px" [disabled]="signInForm.invalid"
+                (click)="signIn()">Sign In
+            </button>
+        </div>
+    </ng-container>
+
+    <div class="d-flex-center my-3">
+        <div class="line"></div>
+        <div class="mx-3">Or</div>
+        <div class="line"></div>
     </div>
-</section>
+
+    <div class="mt-2">
+        <span>Don’t have an account?</span>
+        <a class="a-blue ms-2" (click)="_navigationService.navigateToSignUp();">Sign Up</a>
+    </div>
+
+</form>
