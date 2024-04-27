@@ -3,7 +3,9 @@ import { Routes } from '@angular/router';
 export const authRoutesNames = {
     EMPTY: '',
     SIGNIN: 'sign-in',
-    SIGNUP: 'sign-up'
+    SIGNUP: 'sign-up',
+    FORGOT_PASSWORD: 'forgot-password',
+    RESET_PASSWORD: 'reset-password'
 };
 
 export const AUTH_ROUTES: Routes = [
@@ -23,6 +25,14 @@ export const AUTH_ROUTES: Routes = [
             {
                 path: authRoutesNames.SIGNUP,
                 loadComponent: () => import('./sign-up/sign-up.component').then((mod) => mod.SignUpComponent),
+            },
+            {
+                path: authRoutesNames.FORGOT_PASSWORD,
+                loadComponent: () => import('./forgot-password/forgot-password.component').then((mod) => mod.ForgotPasswordComponent),
+            },
+            {
+                path: authRoutesNames.RESET_PASSWORD,
+                loadComponent: () => import('./reset-password/reset-password.component').then((mod) => mod.ResetPasswordComponent),
             }
         ],
     }

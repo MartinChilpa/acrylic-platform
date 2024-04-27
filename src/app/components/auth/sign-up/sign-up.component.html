@@ -1,9 +1,15 @@
 <form>
-    <h1 class="auth-tagline mb-4">Create Your Account</h1>
+    <h1 class="auth-tagline">Create Your Account</h1>
 
-    <div class="mt-2">
-        <span>Return to </span>
-        <a class="a-blue ms-2" [routerLink]="['/auth/sign-in']">Sign In</a>
+    <div class="d-flex-center my-3">
+        <div class="line"></div>
+        <div class="mx-3">Or</div>
+        <div class="line"></div>
+    </div>
+
+    <div>
+        <span>Return to</span>
+        <a class="a-blue ms-2" (click)="_navigationService.navigateToSignIn();">Sign In</a>
     </div>
 
 </form>

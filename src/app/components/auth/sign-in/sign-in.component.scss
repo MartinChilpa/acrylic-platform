@@ -1,15 +1,2 @@
 @use '../../../styles/variables/variables' as *;
 @use '../../../styles/overrides/input' as *;
-
-.eye-icon {
-    position: absolute;
-    right: 16px;
-    top: 16px;
-    cursor: pointer;
-}
-
-.line {
-    flex-grow: 1;
-    height: 1px;
-    background-color: var(--text-color);
-}

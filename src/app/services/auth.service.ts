@@ -3,6 +3,7 @@ import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
 import { AuthUtils } from '../utils/auth.utils';
+import { NavigationService } from './navigation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class AuthService {
   AUTH_API_URL = `${environment.API_URL}/${environment.VERSION}/auth`;
 
   private _http = inject(HttpClient);
+  private _navigationService = inject(NavigationService);
   public IsLoggedIn: WritableSignal<boolean> = signal(false);
 
   constructor() {
@@ -46,11 +48,9 @@ export class AuthService {
     );
   }
 
-  signOut(): Observable<any> {
+  signOut(){
     this.endSession();
-
-    // Return the observable
-    return of(true);
+    this._navigationService.navigateToSignIn();
   }
 
   check(): Observable<boolean> {

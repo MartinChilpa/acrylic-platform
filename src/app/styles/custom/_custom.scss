@@ -68,6 +68,15 @@ body {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 3rem;
-    margin-bottom: 25px;
-    font-family: system-ui;
+    margin-bottom: 30px;
+}
+
+.line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--text-color);
+}
+
+.font-12{
+    font-size: 12px;
 }

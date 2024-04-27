@@ -16,6 +16,39 @@
     padding-left: 8px;
 }
 
+.acr-input {
+    border: none;
+    outline: none;
+    height: 50px;
+    background-color: var(--darkgrey-color);
+    box-shadow: none;
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 15px;
+}
+
+.acr-input::placeholder {
+    color: var(--text-color);
+    opacity: 0.3;
+}
+
+.acr-input-label{
+    text-align: left;
+    margin: 4px;
+}
+
+.acr-password{
+    position: relative;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 16px;
+    top: 35%;
+    cursor: pointer;
+}
+
 .input-with-label {
     position: relative;
 }

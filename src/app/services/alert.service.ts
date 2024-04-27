@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Alert } from '../models/alert.model';
+import { Alert } from '../interfaces/common/alert';
 import { AlertType } from '../enums/alert-type.enum';
 
 @Injectable({

@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { SetBackgroundImageDirective } from '../../directives/set-background-image-directive';
+import { Component, OnInit, inject } from '@angular/core';
+import { MyArtistService } from '../../services/my-artist.service';
+import { BackgroundImageDirective } from '../../directives/background-image.directive';
 
 @Component({
   selector: 'acrylic-home',
   standalone: true,
-  imports: [SetBackgroundImageDirective],
+  imports: [BackgroundImageDirective],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
+
+  public _myArtistService = inject(MyArtistService);
 
   topTrack = [
     { name: 'Chill Vibes Café', price: '24,876' , imageLink:'assets/images/others/top-track.png'},
@@ -31,8 +34,4 @@ export class HomeComponent implements OnInit {
   smCard1 = 'assets/images/others/sm1.png';
   smCard2 = 'assets/images/others/sm2.png';
   smCard3 = 'assets/images/others/sm3.png';
-
-
-  ngOnInit(): void {
-  }
 }

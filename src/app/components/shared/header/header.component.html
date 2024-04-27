@@ -20,10 +20,12 @@
                             <label for="custom-switch" class="slider"></label>
                         </div> -->
                         <!-- <span class="mx-2">|</span> -->
-                        <button class="btn btn-sm btn-darkgrey" title="Notification">
-                            <img ngSrc="assets/images/icons/bell.svg" width="17" height="17">
-                        </button>
-                        <span class="mx-2">|</span>
+                        @if(_myArtistService.myArtist()?.image){
+                            <button class="btn btn-sm btn-darkgrey p-0" title="Profile">
+                                <img [ngSrc]="_myArtistService.myArtist()!.image" width="30" height="30">
+                            </button>
+                            <span class="mx-2">|</span>
+                        }
                         <button class="btn btn-sm btn-darkgrey" title="Sign Out" (click)="signOut();">
                             <img ngSrc="assets/images/icons/signout.svg" width="17" height="17">
                         </button>
@@ -31,10 +33,10 @@
                 }
                 @else{
                     <div class="col-12 d-flex justify-content-end align-items-center p-0">
-                        <button class="btn btn-darkgrey" (click)="redirectToSignUp();">
+                        <button class="btn btn-darkgrey" (click)="_navigationService.navigateToSignUp();">
                             Sign Up
                         </button>
-                        <button class="btn btn-main ms-2" (click)="redirectToSignIn();">
+                        <button class="btn btn-main ms-2" (click)="_navigationService.navigateToSignIn();">
                             Sign In
                         </button>
                     </div>   
