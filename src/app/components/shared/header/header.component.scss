@@ -1,8 +1,12 @@
 @use '../../../styles/overrides/input' as *;
-@use '../../../styles/custom/border' as *;
 // @use '../../../styles/custom/switch' as *;
 
 .navbar-brand{
     width: 200px;
     margin-left: 10px;
+}
+
+.auth-box{
+    border-bottom: 2px solid #4a75a1;
+    border-radius: 5px;
 }

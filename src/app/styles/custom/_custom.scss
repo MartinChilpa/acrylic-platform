@@ -1,5 +1,6 @@
 @use '../variables/variables' as *;
 @use '../custom/fonts' as *;
+@use '../custom/border' as *;
 
 html,
 body {
@@ -58,7 +59,7 @@ body {
     width: 90%;
 }
 
-.h-50px{
+.h-50px {
     height: 50px;
 }
 
@@ -68,7 +69,12 @@ body {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 3rem;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+    font-family: system-ui;
+}
+
+.height-fit-content {
+    height: fit-content;
 }
 
 .line {
@@ -77,6 +83,10 @@ body {
     background-color: var(--text-color);
 }
 
-.font-12{
+.font-12 {
     font-size: 12px;
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }

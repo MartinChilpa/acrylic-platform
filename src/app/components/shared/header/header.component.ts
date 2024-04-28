@@ -1,4 +1,4 @@
-import { NgOptimizedImage } from '@angular/common';
+import { NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
 import { MyArtistService } from '../../../services/my-artist.service';
@@ -8,7 +8,9 @@ import { NavigationService } from '../../../services/navigation.service';
   selector: 'acrylic-header',
   standalone: true,
   imports: [
-    NgOptimizedImage
+    NgOptimizedImage,
+    NgClass
+    
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'

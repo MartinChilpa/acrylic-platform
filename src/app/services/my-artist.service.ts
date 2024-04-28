@@ -1,8 +1,9 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { of, switchMap } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { IMyArtist } from '../interfaces/response/my-artist.response';
+import { IMyArtistSynclist } from '../interfaces/response/my-artist-synclist.response';
 
 @Injectable({
   providedIn: 'root'
@@ -26,4 +27,7 @@ export class MyArtistService {
     )
   }
 
+  getMyArtistSynclist(): Observable<IMyArtistSynclist> {
+    return this._http.get<IMyArtistSynclist>(`${this.MY_ARTIST_API_URL}/synclists/`);
+  }
 }

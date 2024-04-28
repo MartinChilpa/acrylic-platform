@@ -23,4 +23,12 @@ export class NavigationService {
   navigateToForgotPassword() {
     this._router.navigate(['auth/forgot-password']);
   }
+
+  navigateToSyncList() {
+    this._router.navigateByUrl('my-profile/add-synclist');
+  }
+
+  navigateToMyProfile() {
+    this._router.navigateByUrl('/my-profile');
+  }
 }

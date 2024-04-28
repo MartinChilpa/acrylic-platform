@@ -1,0 +1,29 @@
+.share-img-1 {
+    transform: translate(35%, 15%) rotate(-5deg);
+    z-index: 1;
+    
+    img {
+        height: 165px;
+        width: 165px;
+    }
+}
+
+.share-img-2 {
+    transform: translate(0px) rotate(0deg);
+    z-index: 5;
+
+    img {
+        height: 222px;
+        width: 222px;
+    }
+}
+
+.share-img-3 {
+    transform: translate(-35%, 15%) rotate(5deg);
+    z-index: 1;
+
+    img {
+        height: 165px;
+        width: 165px;
+    }
+}
