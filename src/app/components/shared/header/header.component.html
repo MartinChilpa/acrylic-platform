@@ -10,11 +10,11 @@
         <div class="collapse navbar-collapse" id="navbar-collapse">
             <div class="row w-100 mt-md-0 mt-3">
                 @if(_authService.IsLoggedIn()){
-                    <div class="acr-input-group col-lg-5 col-12">
+                    <div class="acr-input-group col-lg-5 col-md-6 col-12">
                         <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
                         <input type="text" placeholder="Search">
                     </div>
-                    <div class="col-lg-7 col-12 d-flex justify-content-end align-items-center p-0 mt-lg-0 mt-2">
+                    <div class="col-lg-7 col-md-6 col-12 d-flex justify-content-end align-items-center p-0 mt-lg-0 mt-2">
                         <!-- <div class="switch" title="Theme">
                             <input type="checkbox" id="custom-switch" (change)="toggleTheme()" [checked]="isDarkTheme">
                             <label for="custom-switch" class="slider"></label>

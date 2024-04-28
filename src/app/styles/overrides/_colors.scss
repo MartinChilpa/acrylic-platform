@@ -33,7 +33,15 @@
     background-color: var(--lightgrey-color) !important;
 }
 
+.bg-success{
+    background-color: var(--success-color) !important;
+}
+
 // Text Colors
+.text-success{
+    color: var(--success-color) !important;
+}
+
 .text-primary {
     color: var(--text-color) !important;
 }
@@ -51,7 +59,7 @@
 }
 
 .text-info {
-    color: var(--info-color) !important;
+    color: var(--text-info-color) !important;
 }
 
 .a-blue{

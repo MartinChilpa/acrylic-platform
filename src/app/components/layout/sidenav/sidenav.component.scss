@@ -1,9 +1,17 @@
-@use '../../../styles/variables/variables' as *;
-
 .sidenav-item{
     padding: 10px;
     width: 100%;
     display: inline-flex;
+    align-items: center;
     text-decoration: none;
     color: var(--text-color);
+}
+
+.active-route{
+    img{
+        filter: invert(70%) sepia(40%) saturate(550%) hue-rotate(128deg) brightness(300%) contrast(100%);
+    }
+    span{
+        color: var(--text-info-color);
+    }
 }
