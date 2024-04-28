@@ -40,6 +40,21 @@
     color: var(--text-color) !important;
 }
 
+.acrylic-next-button:disabled {
+    background-color: var(--darkgrey-color) !important;
+    color: var(--light-gray-table-border-color) !important;
+}
+
+.btn-lightgray {
+    background-color: var(--light-gray-border-color);
+    color: var(--text-color);
+}
+
+.btn-orange {
+    background-color: var(--default-orange-color);
+    color: var(--text-color);
+}
+
 .btn-warning-outline {
     border-color: var(--default-orange-color) !important;
     color: var(--default-orange-color) !important;

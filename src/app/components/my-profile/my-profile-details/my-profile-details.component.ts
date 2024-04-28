@@ -30,9 +30,7 @@ export class MyProfileDetailsComponent {
   constructor() {
     effect(() => {
       this.myArtist = this._myArtistService.myArtist();
-      this.myArtist  = {} as any
     })
-    this.myArtist  = {} as any
   }
 
   ngOnInit(): void {

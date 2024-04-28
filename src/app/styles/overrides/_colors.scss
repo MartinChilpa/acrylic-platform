@@ -33,6 +33,10 @@
     background-color: var(--lightgrey-color) !important;
 }
 
+.bg-lightgray-border {
+    background-color: var(--light-gray-border-color) !important;
+}
+
 .bg-success{
     background-color: var(--success-color) !important;
 }
@@ -98,4 +102,12 @@
 
 .text-secondary {
     color: var(--secondary-color) !important;
+}
+
+.text-light-gray {
+    color: var(--light-gray-text-color) !important;
+}
+
+.text-beige {
+    color: var(--card-beige-color) !important;
 }
