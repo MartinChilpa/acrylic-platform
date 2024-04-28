@@ -2,7 +2,7 @@
 <section>
     <div class="row me-1 gx-4 gy-2">
         <div class="col-lg-7 col-12 pe-0">
-            <div class="p-3 flex-column radius-5" acrylicBackgroundImage [backgroundImage]="myArtist.background_image">
+            <div class="p-3 flex-column radius-5 bg-img" acrylicBackgroundImage [backgroundImage]="myArtist.background_image">
                 <div class="mb-5 pb-5 d-flex justify-content-end px-0">
                     <button class="btn btn-darkgrey p-1">
                         <img ngSrc="assets/images/icons/three-dots.svg" alt="side_icon" width="20" height="20" />
@@ -18,7 +18,9 @@
                         <button class="align-self-center btn btn-sm btn-main fw-bold px-3" data-bs-toggle="modal"
                             data-bs-target="#profile-share">Share</button>
                     </div>
-                    <p class="mb-0 fw-lighter">ARTIST from {{ artistLocation }}</p>
+                    @if(artistLocation){
+                        <p class="mb-0 fw-lighter">ARTIST from {{ artistLocation }}</p>
+                    }
                 </div>
             </div>
         </div>
@@ -44,7 +46,7 @@
     </div>
     <div class="p-3 bg-secondary mx-1 mt-3 radius-5 mb-5">
         <div class="px-0">
-            <p class="fw-bold">Pinned Synclists</p>
+            <p class="fs-6">Pinned Synclists</p>
         </div>
         <div class="row g-2">
             @for (item of artistSynclist; track item) {
@@ -72,11 +74,9 @@
                 </div>
             </div>
             }
-            <div class="col-lg-4 col-md-6 col-12 pinned-sync-box">
-                <div
-                    class="d-flex-center flex-column h-100 light-gray-border radius-5">
-                    <button class="btn btn-darkgrey p-1" (click)="addSync()"><img ngSrc="assets/images/icons/vector.svg"
-                            alt="plus-circle" width="20" height="20" /></button>
+            <div class="col-lg-4 col-md-6 col-12 pinned-sync-box" (click)="addSync()">
+                <div class="d-flex-center flex-column h-100 light-gray-border radius-5">
+                    <img ngSrc="assets/images/icons/vector.svg" alt="plus-circle" width="20" height="20" />
                     <p class="mb-0 pt-1">Add a Synclist</p>
                 </div>
             </div>

@@ -13,12 +13,12 @@
 
 .list-group-item.current-active-stepper {
     background-color: var(--light-gray-border-color) !important;
-    color: var(--card-beige-color);
+    color: var(--beige-color);
     font-weight: 600;
 }
 
 .list-group-item.current-active-stepper span {
-    background-color: var(--card-beige-color);
+    background-color: var(--beige-color);
 }
 
 .list-group-item.completed-step span {

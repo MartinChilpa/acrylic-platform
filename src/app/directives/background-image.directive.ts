@@ -13,18 +13,5 @@ export class BackgroundImageDirective {
       'backgroundImage',
       `url(${this.backgroundImage})`
     );
-
-    this.renderer.setStyle(
-      this.elementRef.nativeElement,
-      'backgroundSize',
-      'cover'
-    );
-
-    this.renderer.setStyle(
-      this.elementRef.nativeElement,
-      'backgroundPosition',
-      'center center'
-    );
   }
-
 }

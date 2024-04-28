@@ -59,6 +59,26 @@ body {
     display: flex;
     justify-content: space-between;
 }
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background-color: var(--secondary-color);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: var(--warning-color);
+  }
+  
+  ::-webkit-scrollbar {
+    height: 5px;
+    width: 5px;
+    background-color: var(--secondary-color);
+    margin-right: 5px;
+    border-radius: 10px;
+  }
+  
+
 .w-90 {
     width: 90%;
 }
@@ -89,4 +109,25 @@ body {
 
 .cursor-pointer {
     cursor: pointer;
+}
+
+.bg-img {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+}
+
+.bg-img::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+.acr-sub-box {
+    background: var(--sub-box-color) !important;
 }

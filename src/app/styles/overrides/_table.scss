@@ -10,7 +10,11 @@
 
 .acrylic-table thead {
     background-color: var(--light-gray-border-color);
-    color: var(--card-beige-color);
+    color: var(--beige-color);
+    font-size: 12px;
+    th{
+        font-weight: normal;
+    }
 }
 
 .acrylic-table tbody tr:nth-child(even) td {

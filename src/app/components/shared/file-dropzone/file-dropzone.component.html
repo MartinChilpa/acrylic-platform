@@ -1,7 +1,7 @@
-<div acrylicFileDragDrop class="dropped-image-area p-3 bg-darkgrey rounded-2" (click)="dropzoneClicked($event)"
+<div acrylicFileDragDrop class="dropped-image-area p-3 bg-darkgrey rounded-2 cursor-pointer" (click)="dropzoneClicked($event)"
     (filesChangeEmiter)="onFileChange($event)"
     [ngClass]="{ 'd-flex-center flex-column': !uploadedFiles.length }">
-    <div class="text-center cursor-pointer"
+    <div class="text-center"
         [ngClass]="{ 'd-flex-center flex-column': uploadedFiles.length }">
         <img [ngSrc]="droppedImageIcon" height="32" width="32" />
         <p class="mb-0 pt-2">Drop your Cover Art File here or upload it manually</p>

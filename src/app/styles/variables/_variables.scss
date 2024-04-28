@@ -11,16 +11,16 @@
     --default-gradient-background-color: linear-gradient(180deg, #28547E 0%, rgba(40, 84, 126, 0) 100%);
     --default-gradient-gray-background-color:linear-gradient(180deg, rgba(20, 20, 20, 0) 0%, rgba(20, 20, 20, 0.6) 71.36%);
     --info-success-color: #6CAB9A;
-    --card-beige-color: #DBC39B;
+    --beige-color: #DBC39B;
     --lightgrey-color: #1b201f;
     --text-info-color: #4CCEC8;
     --gray-color: #202020;
     --light-gray-border-color: #FFFFFF1A;
     --light-gray-background-color: #FFFFFF08;
-    --default-orange-color: #EBA452;
     --light-gray-table-border-color: #FFFFFF0D;
     --light-gray-text-color: #FFFFFF80;
     --blue-grey-color: #25323b;
+    --sub-box-color: #1A1916;
 }
 
 /* Dark Theme */
@@ -28,9 +28,9 @@
     --primary-color: #060606;
     --secondary-color: #141414;
     --text-color: #FFFFFF;
-    --info-color: #54BFBB; //6A9391
+    --info-color: #29a7a2; //54BFBB //6A9391
     --danger-color: #EE593B;
-    --warning-color: #BC7B2D;
+    --warning-color: #EBA452;
     --blue-color: #5c86f0;
 }
 
@@ -41,6 +41,6 @@
     --text-color: #000000;
     --info-color: #54BFBB;
     --danger-color: #EE813B;
-    --warning-color: #FDB560;
+    --warning-color: #EBA452;
     --blue-color: #457aff;
 }

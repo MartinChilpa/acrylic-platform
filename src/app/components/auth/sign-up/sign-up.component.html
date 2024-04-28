@@ -1,15 +1,94 @@
-<form>
-    <h1 class="auth-tagline">Create Your Account</h1>
+<div class="sign-up-scroll">
+    <form [formGroup]="signUpForm">
+        <h1 class="auth-tagline">Create an Account</h1>
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <div class="acr-input-label">First Name</div>
+                <input type="text" [formControlName]="'first_name'" class="form-control acr-input"
+                    placeholder="Enter First Name" autocomplete="off">
+            </div>
+            <div class="col-md-6 col-12">
+                <div class="acr-input-label">Last Name</div>
+                <input type="text" [formControlName]="'last_name'" class="form-control acr-input"
+                    placeholder="Enter Last Name" autocomplete="off">
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <div class="acr-input-label">Username</div>
+                <input type="text" [formControlName]="'username'" class="form-control acr-input"
+                placeholder="Enter Username" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+            </div>
+            <div class="col-md-6 col-12">
+                <div class="acr-input-label">Email</div>
+                <input type="email" [formControlName]="'email'" class="form-control acr-input"
+                placeholder="Enter Email" autocomplete="off" onfocus="this.removeAttribute('readonly');">
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <div class="d-flex-between">
+                    <div class="acr-input-label">Password</div>
+                </div>
+                <div class="acr-password">
+                    <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'"
+                        class="form-control acr-input" placeholder="Enter Password" acrylicPasswordValidator="password" autocomplete="off" readonly
+                        onfocus="this.removeAttribute('readonly');">
+                    <img src="assets/images/icons/{{ showPassword ? 'eye-slash.svg' : 'eye.svg' }}" class="eye-icon"
+                        width="16" height="16" (click)="showPassword = !showPassword">
+                </div>
+            </div>
+            <div class="col-md-6 col-12">
+                <div class="d-flex-between">
+                    <div class="acr-input-label">Confirm Password</div>
+                </div>
+                <div class="acr-password">
+                    <input [type]="showConfirmPassword ? 'text' : 'password'" [formControlName]="'password_confirm'"
+                    class="form-control acr-input" placeholder="Confirm Password" autocomplete="off" readonly
+                    onfocus="this.removeAttribute('readonly');">
+                <img src="assets/images/icons/{{ showConfirmPassword ? 'eye-slash.svg' : 'eye.svg' }}" class="eye-icon"
+                    width="16" height="16" (click)="showConfirmPassword = !showConfirmPassword">
+                </div>
+            </div>
+        </div>
 
+        <div class="acr-input-label mb-3 small">
+            <div
+                [ngClass]="signUpForm.get('password')?.errors?.['invalidPassword']?.requiredLength ? 'text-danger': 'text-success'">
+                Your password must contain at least 8 characters.
+            </div>
+            <div
+                [ngClass]="signUpForm.get('password')?.errors?.['invalidPassword']?.hasLetter ? 'text-danger': 'text-success'">
+                Your password must contain at least one letter.
+            </div>
+            <div
+                [ngClass]="signUpForm.get('password')?.errors?.['invalidPassword']?.hasNumber ? 'text-danger': 'text-success'">
+                Your password must contain at least one number.
+            </div>
+            <div
+                [ngClass]="signUpForm.get('password')?.errors?.['invalidPassword']?.hasSpecialChar ? 'text-danger': 'text-success'">
+                Your password must contain at least one special character (example: # ? ! & ).
+            </div>
+        </div>
+
+        <div>
+            <button type="button" class="btn w-100 btn-main fw-bold h-50px" [disabled]="signUpForm.invalid"
+                (click)="signUp()">Sign Up
+            </button>
+        </div>
+    </form>
+    
     <div class="d-flex-center my-3">
         <div class="line"></div>
         <div class="mx-3">Or</div>
         <div class="line"></div>
     </div>
-
-    <div>
-        <span>Return to</span>
+    
+    <div class="mt-2">
+        <span>Already have an account?</span>
         <a class="a-blue ms-2" (click)="_navigationService.navigateToSignIn();">Sign In</a>
     </div>
-
-</form>
+    
+</div>

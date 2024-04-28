@@ -3,10 +3,11 @@
 .btn{
     font-size: 14px;
 	border-radius: 5px;
+    border: none;
 }
 
 .btn-warning{
-    background: var(--default-orange-color) !important;
+    background: var(--warning-color) !important;
     color: var(--text-color) !important;
 }
 
@@ -23,7 +24,6 @@
 .btn-main{
     background: var(--default-gradient-color) !important;
     color: var(--primary-color) !important;
-    border: none;
 }
 
 .btn-main:hover {
@@ -51,11 +51,11 @@
 }
 
 .btn-orange {
-    background-color: var(--default-orange-color);
+    background-color: var(--warning-color);
     color: var(--text-color);
 }
 
 .btn-warning-outline {
-    border-color: var(--default-orange-color) !important;
-    color: var(--default-orange-color) !important;
+    border-color: var(--warning-color) !important;
+    color: var(--warning-color) !important;
 }
