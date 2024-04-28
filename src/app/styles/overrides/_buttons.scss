@@ -6,7 +6,7 @@
 }
 
 .btn-warning{
-    background: var(--warning-color) !important;
+    background: var(--default-orange-color) !important;
     color: var(--text-color) !important;
 }
 
@@ -38,4 +38,9 @@
 .btn-blue-grey {
     background: var(--blue-grey-color) !important;
     color: var(--text-color) !important;
+}
+
+.btn-warning-outline {
+    border-color: var(--default-orange-color) !important;
+    color: var(--default-orange-color) !important;
 }
