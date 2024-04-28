@@ -55,6 +55,10 @@ body {
     align-items: center;
 }
 
+.d-flex-justify-between {
+    display: flex;
+    justify-content: space-between;
+}
 .w-90 {
     width: 90%;
 }
@@ -81,10 +85,6 @@ body {
     flex-grow: 1;
     height: 1px;
     background-color: var(--text-color);
-}
-
-.font-12 {
-    font-size: 12px;
 }
 
 .cursor-pointer {

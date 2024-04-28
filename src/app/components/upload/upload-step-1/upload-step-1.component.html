@@ -5,7 +5,7 @@
     </select>
 </div>
 <div class="mt-2">
-    <p class="font-12">Don’t have a split sheet?  <span class="text-orange">Create one here</span></p>
+    <p class="small">Don’t have a split sheet?  <span class="text-orange">Create one here</span></p>
 </div>
 <div class="bg-secondary p-3 radius-5">
     <div class="row">
@@ -17,12 +17,12 @@
                 <p>Publishing Splits</p>
                 <div>
                    <ul class="split-list list-group">
-                        <li class="list-group-item border-0 text-info-success d-flex justify-content-between bg-light-gray p-3">
+                        <li class="list-group-item border-0 text-info-success d-flex-justify-between bg-light-gray p-3">
                             <span>Name</span>
                             <span>%</span>
                         </li>
                         @for(item of connectSplit; track item) {
-                            <li class="list-group-item border-0 d-flex justify-content-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orange fw-semibold': $index === 0}">
+                            <li class="list-group-item border-0 d-flex-justify-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orange fw-semibold': $index === 0}">
                                 <span>{{ item.Name }}</span>
                                 <span>{{ item.percentage }}</span>
                             </li>
@@ -37,12 +37,12 @@
                 <p>Master Splits</p>
                 <div>
                    <ul class="split-list list-group">
-                        <li class="list-group-item border-0 text-info-success d-flex justify-content-between bg-light-gray p-3">
+                        <li class="list-group-item border-0 text-info-success d-flex-justify-between bg-light-gray p-3">
                             <span>Name</span>
                             <span>%</span>
                         </li>
                         @for(item of connectSplit; track item) {
-                            <li class="list-group-item border-0 d-flex justify-content-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orange fw-semibold': $index === 0}">
+                            <li class="list-group-item border-0 d-flex-justify-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orange fw-semibold': $index === 0}">
                                 <span>{{ item.Name }}</span>
                                 <span>{{ item.percentage }}</span>
                             </li>

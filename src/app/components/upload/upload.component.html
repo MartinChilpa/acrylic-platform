@@ -1,7 +1,7 @@
 <section>
     <div>
-        <div class="row">
-            <div class="col-lg-7 col-12">
+        <div class="row gy-3">
+            <div class="col-lg-7 col-12 order-2 order-lg-1">
                 @switch (activeStepper) {
                     @case(1) {
                         <acrylic-upload-step-1></acrylic-upload-step-1>
@@ -20,13 +20,13 @@
                     }
                 }
             </div>
-            <div class="col-lg-5 col-12">
+            <div class="col-lg-5 col-12 order-1 order-lg-2">
                 <div class="bg-secondary p-3 radius-5">
                     <ul class="list-group">
                         @for(item of uploadStepperList; track item) {
-                            <li class="list-group-item bg-transparent light-gray-border d-flex align-items-center gap-2 cursor-pointer"
+                            <li class="list-group-item bg-transparent light-gray-border d-flex-align-center gap-2 cursor-pointer"
                             (click)="uploadStepper($index + 1)" [ngClass]="{'current-active-stepper': activeStepper === $index + 1, 'completed-step': activeStepper > $index + 1}"> 
-                               <span class="d-flex justify-content-center align-items-center text-secondary fw-bold">{{ $index + 1 }}</span>
+                               <span class="d-flex-center text-secondary fw-bold">{{ $index + 1 }}</span>
                                {{ item }}
                             </li>
                         }

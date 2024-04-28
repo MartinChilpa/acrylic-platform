@@ -156,3 +156,17 @@ input[type=checkbox].acrylic-checkbox:checked::before {
         }
     }
 }
+
+input[type=radio].acrylic-radio {
+    &:checked {
+        + label {
+            background: var(--default-gradient-color);
+            color: var(--primary-color);
+        }
+    }
+    &:not(:checked) {
+        + label {
+            color: var(--text-color);
+        }
+    }
+}

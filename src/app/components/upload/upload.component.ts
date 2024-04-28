@@ -15,7 +15,7 @@ import { NgClass, NgOptimizedImage } from '@angular/common';
 })
 export class UploadComponent {
   activeStepper: number = 1;
-  uploadStepperList = ['Connect split sheet', 'Distribution & splits', 'Upload assets', 'Preview & Confirm', 'Set your prices'];
+  uploadStepperList = ['Connect split sheet', 'General Information', 'Upload assets', 'Preview & Confirm', 'Set your prices'];
 
   uploadStepper(index: number) {
     this.activeStepper = index;
