@@ -1,0 +1,68 @@
+<div class="acrylic-select-box">
+    <label for="" class="acrylic-select-label">Split Sheet</label>
+    <select class="w-100 radius-5 h-50px acrylic-select rounded-bottom-0">
+        <option value="" disabled selected hidden>Choose or search Split Sheet</option>
+    </select>
+</div>
+<div class="mt-2">
+    <p class="font-12">Don’t have a split sheet?  <span class="text-orange">Create one here</span></p>
+</div>
+<div class="bg-secondary p-3 radius-5">
+    <div class="row">
+        <div class="col-12">
+            <p class="fw-bold mb-1">Splits</p>
+        </div>
+        <div class="col-lg-6 col-12">
+            <div class="connect-split bg-light-gray-500 radius-5 p-3">
+                <p>Publishing Splits</p>
+                <div>
+                   <ul class="split-list list-group">
+                        <li class="list-group-item border-0 text-info-success d-flex justify-content-between bg-light-gray p-3">
+                            <span>Name</span>
+                            <span>%</span>
+                        </li>
+                        @for(item of connectSplit; track item) {
+                            <li class="list-group-item border-0 d-flex justify-content-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orange fw-semibold': $index === 0}">
+                                <span>{{ item.Name }}</span>
+                                <span>{{ item.percentage }}</span>
+                            </li>
+
+                        }
+                   </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12">
+            <div class="connect-split bg-light-gray-500 radius-5 p-3">
+                <p>Master Splits</p>
+                <div>
+                   <ul class="split-list list-group">
+                        <li class="list-group-item border-0 text-info-success d-flex justify-content-between bg-light-gray p-3">
+                            <span>Name</span>
+                            <span>%</span>
+                        </li>
+                        @for(item of connectSplit; track item) {
+                            <li class="list-group-item border-0 d-flex justify-content-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orange fw-semibold': $index === 0}">
+                                <span>{{ item.Name }}</span>
+                                <span>{{ item.percentage }}</span>
+                            </li>
+
+                        }
+                   </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row gap-2 mt-4">
+    <div class="col-12">
+        <div class="row justify-content-center gy-2">
+            <div class="col-lg-4 col-md-5 col-12">
+                <button class="btn btn-darkgrey w-100 py-3 light-gray-border">Cancel</button>
+            </div>
+            <div class="col-lg-4 col-md-5 col-12">
+                <button class="btn btn-info w-100 py-3 light-gray-border">Skip For Now</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -5,6 +5,7 @@ export const routesNames = {
   HOME: 'home',
   AUTH: 'auth',
   MY_PROFILE: 'my-profile',
+  UPLOAD: 'upload',
   PAGE_NOT_FOUND: 'page-not-found',
   EMPTY: ''
 };
@@ -27,7 +28,11 @@ export const routes: Routes = [
       {
         path: routesNames.MY_PROFILE,
         loadChildren: () => import('./components/my-profile/my-profile.routes').then((mod) => mod.MY_PROFILE_ROUTES)
-      }
+      },
+      {
+        path: routesNames.UPLOAD,
+        loadComponent: () => import('./components/upload/upload.component').then((c) => c.UploadComponent),
+      },
     ],
   },
   {

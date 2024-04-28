@@ -1,132 +1,89 @@
 @if(myArtist){
-    <section>
-        <div class="row me-1 gx-4 gy-2">
-            <div class="col-lg-7 col-12 pe-0">
-                <div class="p-3 flex-column radius-5" acrylicBackgroundImage
-                    [backgroundImage]="myArtist.background_image">
-                    <div class="mb-5 pb-5 d-flex justify-content-end px-0">
-                        <button class="btn btn-darkgrey p-1">
-                            <img ngSrc="assets/images/icons/three-dots.svg" alt="side_icon" width="20" height="20" />
-                        </button>
+<section>
+    <div class="row me-1 gx-4 gy-2">
+        <div class="col-lg-7 col-12 pe-0">
+            <div class="p-3 flex-column radius-5" acrylicBackgroundImage [backgroundImage]="myArtist.background_image">
+                <div class="mb-5 pb-5 d-flex justify-content-end px-0">
+                    <button class="btn btn-darkgrey p-1">
+                        <img ngSrc="assets/images/icons/three-dots.svg" alt="side_icon" width="20" height="20" />
+                    </button>
+                </div>
+                <div class="position-relative">
+                    @if (myArtist.image) {
+                    <img [ngSrc]="myArtist.image" alt="diego" width="40" height="40"
+                        class="position-absolute diego-img" />
+                    }
+                    <div class="d-flex gap-3">
+                        <h1 class="fw-bold">{{ myArtist.name }}</h1>
+                        <button class="align-self-center btn btn-sm btn-main fw-bold px-3" data-bs-toggle="modal"
+                            data-bs-target="#profile-share">Share</button>
                     </div>
-                    <div class="position-relative">
-                        @if (myArtist.image) {
-                        <img [ngSrc]="myArtist.image" alt="diego" width="40" height="40"
-                            class="position-absolute diego-img" />
-                        }
-                        <div class="d-flex gap-3">
-                            <h1 class="fw-bold">{{ myArtist.name }}</h1>
-                            <button class="align-self-center btn btn-sm btn-main fw-bold px-3"
-                                data-bs-toggle="modal" data-bs-target="#profile-share">Share</button>
-                        </div>
-                        <p class="mb-0 fw-lighter">ARTIST from {{ artistLocation }}</p>
-                    </div>
+                    <p class="mb-0 fw-lighter">ARTIST from {{ artistLocation }}</p>
                 </div>
             </div>
-            <div class="col-lg-5 col-12 pe-0">
-                <div class="p-3 pb-5 bg-secondary radius-5 h-100">
-                    <div class="d-flex justify-content-between">
-                        <h6>Bio</h6>
-                        <button class="btn btn-darkgrey p-1">
-                            <img ngSrc="assets/images/icons/three-dots.svg" alt="side_icon" width="20" height="20" />
-                        </button>
-                    </div>
-                    <p class="pt-2">{{ myArtist.bio }}</p>
-                    @if(myArtist){
-                    <div class="d-flex gap-2">
-                        @for (item of profileBioTrack; track item.icon) {
-                        <a class="btn btn-darkgrey p-1"
-                            [href]="item.link" target="_blank"><img [src]="item.icon" alt="side_icon" width="22"
-                                height="22" /></a>
-                        }
-                    </div>
+        </div>
+        <div class="col-lg-5 col-12 pe-0">
+            <div class="p-3 pb-5 bg-secondary radius-5 h-100">
+                <div class="d-flex justify-content-between">
+                    <h6>Bio</h6>
+                    <button class="btn btn-darkgrey p-1">
+                        <img ngSrc="assets/images/icons/three-dots.svg" alt="side_icon" width="20" height="20" />
+                    </button>
+                </div>
+                <p class="pt-2">{{ myArtist.bio }}</p>
+                @if(myArtist){
+                <div class="d-flex gap-2">
+                    @for (item of profileBioTrack; track item.icon) {
+                    <a class="btn btn-darkgrey p-1" [href]="item.link" target="_blank"><img [src]="item.icon"
+                            alt="side_icon" width="22" height="22" /></a>
                     }
                 </div>
-            </div>
-        </div>
-        <div class="p-3 bg-secondary mx-1 mt-3 radius-5 mb-5">
-            <div class="px-0">
-                <p class="fw-bold">Pinned Synclists</p>
-            </div>
-            <div class="row g-2">
-                @for (item of artistSynclist; track item) {
-                <div class="col-lg-4 col-md-6 col-12 pinned-sync-box">
-                    <div class="pinned-sync-back radius-5 p-3 h-100 d-flex"
-                        [style.backgroundImage]="'url(' + item.background_image + ')'"
-                        [ngClass]="{'justify-content-between flex-column': item.cover_image,'align-items-end': !item.cover_image}">
-                        <div class="pinned-sync-gradient-layer"></div>
-                        @if (item.cover_image) {
-                            <div class="radius-5 bg-white align-self-baseline p-1 pe-2 pinned-sync-content">
-                                <img [ngSrc]="item.cover_image" alt="pinned-profile" width="20" height="20"
-                                    class="radius-5 pinned-profile-img" />
-                                <span class="text-dark ps-1">{{ ':)' }}</span>
-                            </div>
-                        }
-                        <div class="d-flex align-items-center gap-3 pinned-sync-content">
-                            <img [ngSrc]="item.cover_image" alt="pinned-img" width="60" height="60"
-                                class="radius-5 pinned-sunc-front" />
-                            <div class="d-flex flex-column">
-                                <h6 class="fw-bold mb-0">{{ item.name }}</h6>
-                                <p class="mb-0">{{ item.description }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 }
-                <div class="col-lg-4 col-md-6 col-12 pinned-sync-box">
-                    <div
-                        class="d-flex flex-column justify-content-center align-items-center h-100 light-gray-border radius-5">
-                        <button class="btn btn-darkgrey p-1" (click)="addSync()"><img ngSrc="assets/images/icons/vector.svg"
-                                alt="plus-circle" width="20" height="20" /></button>
-                        <p class="mb-0 pt-1">Add a Synclist</p>
-                    </div>
-                </div>
             </div>
         </div>
-    </section>
-    <!-- <div class="modal fade " id="profile-share" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body bg-darkgrey radius-5 p-0">
-                    <div class="p-3">
-                        <div class="d-flex justify-content-between px-2">
-                            <h6 class="fw-semibold">Share your profile</h6>
-                            <button class="bg-transparent border-0" data-bs-dismiss="modal"><img [ngSrc]="closeIcon"
-                                    alt="close" width="20" height="20" /></button>
-                        </div>
-                        <div class="d-flex flex-column gap-4 bg-light-gray py-4 radius-5 mt-3">
-                            <div class="d-flex justify-content-center share-images-section">
-                                @for (item of profileShareList; track item) {
-                                <div [ngStyle]="applyShareImagesDynamicstyles(item)" class="height-fit-content ">
-                                    <img [ngSrc]="item.picture" alt="share-img" [height]="item.height" [width]="item.height"
-                                        class="radius-5 object-fit-cover" />
-                                </div>
-                                }
-                            </div>
-                            <button class="bg-info border-0 radius-5 align-self-center text-primary py-2 px-5">Download
-                                Marketing Assets</button>
-                        </div>
-                        <div class="d-flex mt-3 w-100">
-                            <div class="bg-light-gray p-3 radius-5 w-75">
-                                <button class="bg-transparent border-0 rounded-end-0"><img [ngSrc]="linkIcon" alt="link"
-                                        width="20" height="10" /></button>
-                                <span class="text-break">acrylic.la/woidhweidu2g3fdu234idtgwie</span>
-                            </div>
-                            <button class="bg-orange border-0 radius-5 rounded-start-0 w-25 text-primary">Copy Link</button>
-                        </div>
+    </div>
+    <div class="p-3 bg-secondary mx-1 mt-3 radius-5 mb-5">
+        <div class="px-0">
+            <p class="fw-bold">Pinned Synclists</p>
+        </div>
+        <div class="row g-2">
+            @for (item of artistSynclist; track item) {
+            <div class="col-lg-4 col-md-6 col-12 pinned-sync-box">
+                <div class="pinned-sync-back radius-5 p-3 h-100 d-flex"
+                    [style.backgroundImage]="'url(' + item.background_image + ')'"
+                    [class.justify-content-between]="item.cover_image" [class.flex-column]="item.cover_image"
+                    [class.align-items-end]="!item.cover_image">
+                    <div class="pinned-sync-gradient-layer"></div>
+                    @if (item.cover_image) {
+                    <div class="radius-5 bg-white align-self-baseline p-1 pe-2 pinned-sync-content">
+                        <img [ngSrc]="item.cover_image" alt="pinned-profile" width="20" height="20"
+                            class="radius-5 pinned-profile-img" />
+                        <span class="text-dark ps-1">{{ ':)' }}</span>
                     </div>
-                    <div class="bg-lght-gray-500 py-3 text-center">
-                        <span>Or Share Via</span>
-                        <div class="d-flex justify-content-center gap-2 pt-2">
-                            @for (item of profileBioTrack; track item.icon) {
-                            <a class="side-icon bg-lght-gray-500 light-gray-border rounded-2 p-1 align-self-center"
-                                [href]="item.link" target="_blank"><img [src]="item.icon" alt="side_icon" width="22"
-                                    height="22" /></a>
-                            }
+                    }
+                    <div class="d-flex align-items-center gap-3 pinned-sync-content">
+                        <img [ngSrc]="item.cover_image" alt="pinned-img" width="60" height="60"
+                            class="radius-5 pinned-sunc-front" />
+                        <div class="d-flex flex-column">
+                            <h6 class="fw-bold mb-0">{{ item.name }}</h6>
+                            <p class="mb-0">{{ item.description }}</p>
                         </div>
                     </div>
                 </div>
             </div>
+            }
+            <div class="col-lg-4 col-md-6 col-12 pinned-sync-box">
+                <div
+                    class="d-flex flex-column justify-content-center align-items-center h-100 light-gray-border radius-5">
+                    <button class="btn btn-darkgrey p-1" (click)="addSync()"><img ngSrc="assets/images/icons/vector.svg"
+                            alt="plus-circle" width="20" height="20" /></button>
+                    <p class="mb-0 pt-1">Add a Synclist</p>
+                </div>
+            </div>
         </div>
-    </div> -->
+    </div>
+</section>
+<div class="modal fade" id="profile-share" data-bs-backdrop="static">
+    <acrylic-share-profile></acrylic-share-profile>
+</div>
 }

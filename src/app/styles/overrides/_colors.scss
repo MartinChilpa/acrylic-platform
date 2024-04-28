@@ -25,7 +25,7 @@
     background-color: var(--darkgrey-color) !important;
 }
 
-.bg-invert{
+.bg-invert {
     background-color: var(--text-color) !important;
 }
 
@@ -54,7 +54,7 @@
     color: var(--info-color) !important;
 }
 
-.a-blue{
+.a-blue {
     color: var(--blue-color) !important;
     text-decoration: none;
     cursor: pointer;
@@ -62,4 +62,32 @@
 
 .text-info-success {
     color: var(--info-success-color) !important;
+}
+
+.bg-linear-gray {
+    background-color: var(--default-gradient-gray-background-color) !important;
+}
+
+.bg-light-gray {
+    background-color: var(--light-gray-background-color) !important;
+}
+
+.bg-orange {
+    background-color: var(--default-orange-color) !important;
+}
+
+.bg-lght-gray-500 {
+    background-color: var(--light-gray-border-color) !important;
+}
+
+.bg-linear-blue {
+    background-color: var(--default-gradient-background-color) !important;
+}
+
+.text-orange {
+    color: var(--default-orange-color) !important;
+}
+
+.text-secondary {
+    color: var(--secondary-color) !important;
 }

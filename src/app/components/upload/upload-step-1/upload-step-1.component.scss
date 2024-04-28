@@ -1,0 +1,7 @@
+@use '../../../styles/variables/variables' as *;
+@use '../../../styles/overrides/input' as *;
+
+.split-list {
+    list-style: none;
+    padding: 0;
+}

@@ -1,0 +1,43 @@
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-body bg-darkgrey radius-5 p-0">
+            <div class="p-3">
+                <div class="d-flex justify-content-between px-2">
+                    <h6 class="fw-semibold">Share your profile</h6>
+                    <button class="bg-transparent border-0" data-bs-dismiss="modal"><img [ngSrc]="closeIcon" alt="close"
+                            width="20" height="20" /></button>
+                </div>
+                <div class="d-flex flex-column gap-4 bg-light-gray py-4 radius-5 mt-3">
+                    <div class="d-flex justify-content-center share-images-section">
+                        @for (item of profileShareList; let i = $index; track item) {
+                        <div class="height-fit-content" [class.share-img-1]="i == 0" [class.share-img-2]="i == 1"
+                            [class.share-img-3]="i == 2">
+                            <img [src]="item.picture" alt="share-img" class="radius-5 object-fit-cover" />
+                        </div>
+                        }
+                    </div>
+                    <button class="bg-info border-0 radius-5 align-self-center text-primary py-2 px-5">Download
+                        Marketing Assets</button>
+                </div>
+                <div class="d-flex mt-3 w-100">
+                    <div class="bg-light-gray p-3 radius-5 w-75">
+                        <button class="bg-transparent border-0 rounded-end-0"><img [ngSrc]="linkIcon" alt="link"
+                                width="20" height="10" /></button>
+                        <span class="text-break">acrylic.la/woidhweidu2g3fdu234idtgwie</span>
+                    </div>
+                    <button class="bg-orange border-0 radius-5 rounded-start-0 w-25 text-primary">Copy Link</button>
+                </div>
+            </div>
+            <div class="bg-lght-gray-500 py-3 text-center">
+                <span>Or Share Via</span>
+                <div class="d-flex justify-content-center gap-2 pt-2">
+                    @for (item of profileBioTrack; track item.icon) {
+                    <a class="side-icon bg-lght-gray-500 light-gray-border rounded-2 p-1 align-self-center"
+                        [href]="item.link" target="_blank"><img [src]="item.icon" alt="side_icon" width="22"
+                            height="22" /></a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,1 +1,103 @@
-<p>add-synclist works!</p>
+<section>
+    <div class="p-3 bg-secondary radius-5">
+        <div class="row flex-column gap-1">
+            <div class="col-12">
+                <p class="fw-bold mb-2">Synclist Details</p>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="input-with-label w-100">
+                    <input type="text" class="form-control mb-2 w-100" placeholder="Synclist Name" autocomplete="off">
+                </div>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="input-with-label text-area-with-content-length w-100">
+                    <textarea name="" id="" cols="30" rows="80" class="form-control mb-2 w-100"
+                        placeholder="Synclist Description" autocomplete="off" [value]="''">
+                    </textarea>
+                </div>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="input-with-label text-area-with-content-length w-100">
+                    <textarea name="" id="" cols="30" rows="80" class="form-control mb-2 w-100"
+                        placeholder="Synclist Description" autocomplete="off" [value]="''">
+                    </textarea>
+                </div>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="input-with-label w-100">
+                    <textarea name="" id="" cols="30" rows="80" class="form-control mb-2 w-100"
+                        placeholder="Short Message" autocomplete="off" [value]="''">
+                    </textarea>
+                </div>
+            </div>
+            <div class="col-lg-6 col-12">
+                <acrylic-file-dropzone></acrylic-file-dropzone>
+            </div>
+        </div>
+    </div>
+    <div class="p-3 bg-secondary radius-5 mt-4">
+        <div class="row flex-column gap-2">
+            <div class="col-12">
+                <p class="fw-bold mb-1">Add Tracks</p>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="acr-input-group w-100">
+                    <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
+                    <input type="text" placeholder="Search" class="w-100">
+                </div>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="light-gray-table-border rounded-2 table-responsive">
+                    <table class="acrylic-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Track Name</th>
+                                <th scope="col">Tags</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for(item of trackSyncList; track item) {
+                            <tr>
+                                <td>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <img [ngSrc]="item.trackImage" height="36" width="36" class="radius-5" />
+                                        <span>{{ item.name }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        @for(tag of item.tags; track tag) {
+                                        <span class="bg-light-gray px-2 py-1 radius-5">{{ tag }}</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <input type="checkbox" class="acrylic-checkbox">
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="my-4">
+        <div class="row gap-2">
+            <div class="col-lg-6 col-12">
+                <div class="row justify-content-center gy-2">
+                    <div class="col-md-5 col-12">
+                        <button class="btn-darkgrey radius-5 w-100 py-3 light-gray-border"
+                            (click)="backProfile()">Back</button>
+                    </div>
+                    <div class="col-md-5 col-12">
+                        <button class="btn-info radius-5 w-100 py-3 light-gray-border">Publish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
