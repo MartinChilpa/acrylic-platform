@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { noAuthGuard } from './guards/no-auth.guard';
 
 export const routesNames = {
   HOME: 'home',
@@ -37,6 +38,7 @@ export const routes: Routes = [
   },
   {
     path: routesNames.AUTH,
+    canActivate: [noAuthGuard],
     loadChildren: () => import('./components/auth/auth.routes').then((mod) => mod.AUTH_ROUTES)
   },
   { path: '**', redirectTo: routesNames.PAGE_NOT_FOUND },
