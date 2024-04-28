@@ -23,6 +23,7 @@
 .btn-main{
     background: var(--default-gradient-color) !important;
     color: var(--primary-color) !important;
+    border: none;
 }
 
 .btn-main:hover {
@@ -32,4 +33,9 @@
 
 .btn-main:focus {
 	background: var(--default-gradient-focus-color);
+}
+
+.btn-blue-grey {
+    background: var(--blue-grey-color) !important;
+    color: var(--text-color) !important;
 }

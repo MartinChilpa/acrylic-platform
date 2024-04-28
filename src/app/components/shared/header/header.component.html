@@ -1,7 +1,7 @@
-<nav class="navbar acr-box navbar-expand-md p-2">
+<nav class="navbar navbar-expand-md" [ngClass]="_authService.IsLoggedIn() ? 'acr-box p-2':'auth-box'">
     <div class="container-fluid ">
         <a class="navbar-brand">
-            <img ngSrc="assets/images/logos/acrylic-white.png" width="125" height="30">
+            <img ngSrc="assets/images/logos/acrylic-white.png" width="125" height="30" priority="true">
         </a>
         <button class="navbar-toggler bg-invert" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbar-collapse">
@@ -33,10 +33,10 @@
                 }
                 @else{
                     <div class="col-12 d-flex justify-content-end align-items-center p-0">
-                        <button class="btn btn-darkgrey" (click)="_navigationService.navigateToSignUp();">
+                        <button class="btn btn-blue-grey px-md-4" (click)="_navigationService.navigateToSignUp();">
                             Sign Up
                         </button>
-                        <button class="btn btn-main ms-2" (click)="_navigationService.navigateToSignIn();">
+                        <button class="btn btn-main ms-2 px-md-4" (click)="_navigationService.navigateToSignIn();">
                             Sign In
                         </button>
                     </div>   
