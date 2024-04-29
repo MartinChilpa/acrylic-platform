@@ -34,7 +34,8 @@ export class UploadStep3Component {
     Object.keys(this.form.value).forEach(item => {
       formData.append(item, this.form.value[item]);
     })
-    this._myArtistService.createTracks(formData).subscribe({
+    const trackType = !this.form.value.id ? this._myArtistService.createTracks(formData) : this._myArtistService.updateTracks(formData, this.form.value.id)
+    trackType.subscribe({
       next: response => {
         this.form.get('id')?.setValue(response.uuid)
         this.form.get('tags')?.setValue(response.tags)
