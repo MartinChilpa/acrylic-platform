@@ -1,5 +1,5 @@
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FileDragDropDirective } from '../../../directives/file-drag-drop.directive';
 
 @Component({
@@ -14,6 +14,10 @@ import { FileDragDropDirective } from '../../../directives/file-drag-drop.direct
   styleUrl: './file-dropzone.component.scss'
 })
 export class FileDropzoneComponent {
+  @Input() fileDropzoneIcon!: string;
+  @Input() fileDropzoneHeader!: string;
+  @Input() fileDropzoneSize!: string;
+  @Input() fileDropzoneExternalLink!: string;
 
   @ViewChild("fileUpload") fileUpload!: ElementRef<HTMLElement>
   uploadedFiles: File[] = []

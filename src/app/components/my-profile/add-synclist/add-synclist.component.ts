@@ -14,7 +14,9 @@ import { FileDropzoneComponent } from '../../shared/file-dropzone/file-dropzone.
   styleUrl: './add-synclist.component.scss'
 })
 export class AddSynclistComponent {
-  
+  fileDropzoneIcon = '/assets/images/icons/drop.svg'
+  fileDropzoneHeader = 'Drop your Cover Art File here or upload it manually';
+  fileDropzoneSize = 'JPG 1920px x 1080px';
   private _navigationService = inject(NavigationService);
 
   trackSyncList = [

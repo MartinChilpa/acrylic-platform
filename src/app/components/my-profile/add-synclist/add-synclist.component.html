@@ -1,5 +1,5 @@
 <section>
-    <div class="p-3 bg-secondary radius-5">
+    <div class="acr-box">
         <div class="row flex-column gap-1">
             <div class="col-12">
                 <p class="fs-6 mb-2">Synclist Details</p>
@@ -16,11 +16,11 @@
                 <ng-container>
                     <input type="text" class="form-control acr-input mb-2" placeholder="Short Message">
                 </ng-container>
-                <acrylic-file-dropzone></acrylic-file-dropzone>
+                <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon" [fileDropzoneHeader]="fileDropzoneHeader" [fileDropzoneSize]="fileDropzoneSize"></acrylic-file-dropzone>
             </div>
         </div>
     </div>
-    <div class="p-3 bg-secondary radius-5 mt-4">
+    <div class="acr-box mt-4">
         <div class="row flex-column gap-2">
             <div class="col-12">
                 <p class="fs-6 mb-1">Add Tracks</p>

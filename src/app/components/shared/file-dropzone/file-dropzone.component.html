@@ -3,9 +3,12 @@
     [ngClass]="{ 'd-flex-center flex-column': !uploadedFiles.length }">
     <div class="text-center"
         [ngClass]="{ 'd-flex-center flex-column': uploadedFiles.length }">
-        <img [ngSrc]="droppedImageIcon" height="32" width="32" />
-        <p class="mb-0 pt-2">Drop your Cover Art File here or upload it manually</p>
-        <span>JPG 1920px x 1080px</span>
+        <img [ngSrc]="fileDropzoneIcon" height="32" width="32" />
+        <p class="mb-0 pt-2">{{ fileDropzoneHeader }}</p>
+        <span>{{ fileDropzoneSize }}</span>
+        <div>
+            <a href="" class="a-blue">{{ fileDropzoneExternalLink }}</a>
+        </div>
         <input type="file" name="file" class="hidden d-none" (change)="onFileChange($event.target)" #fileUpload
             multiple>
     </div>

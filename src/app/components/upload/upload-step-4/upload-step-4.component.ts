@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'acrylic-upload-step-4',
@@ -9,5 +9,9 @@ import { Component } from '@angular/core';
   styleUrl: './upload-step-4.component.scss'
 })
 export class UploadStep4Component {
+  @Output() nextStepper = new EventEmitter();
 
+  nextUploadStepper(count: number) {
+    this.nextStepper.emit(count);
+  }
 }

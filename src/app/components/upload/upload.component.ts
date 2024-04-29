@@ -18,6 +18,13 @@ export class UploadComponent {
   uploadStepperList = ['Connect split sheet', 'General Information', 'Upload assets', 'Preview & Confirm', 'Set your prices'];
 
   uploadStepper(index: number) {
+    if(this.activeStepper < index) {
+      return;
+    }
     this.activeStepper = index;
+  }
+
+  stepperCount(step: number) {
+    this.activeStepper = step;
   }
 }

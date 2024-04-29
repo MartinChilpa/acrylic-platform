@@ -1,8 +1,5 @@
-<div class="acrylic-select-box">
-    <label class="acr-input-label">Split Sheet</label>
-    <select class="w-100 radius-5 h-50px acrylic-select rounded-bottom-0">
-        <option value="" disabled selected hidden>Choose or search Split Sheet</option>
-    </select>
+<div>
+    <acrylic-custom-dropdown></acrylic-custom-dropdown>
 </div>
 <div class="mt-2">
     <p class="small">Don’t have a split sheet?  <span class="text-orange">Create one here</span></p>
@@ -61,7 +58,7 @@
                 <button class="btn btn-darkgrey w-100 py-3 light-gray-border">Cancel</button>
             </div>
             <div class="col-lg-4 col-md-5 col-12">
-                <button class="btn btn-info w-100 py-3 light-gray-border">Skip For Now</button>
+                <button class="btn btn-info w-100 py-3 light-gray-border" (click)="nextUploadStepper(2)">Next</button>
             </div>
         </div>
     </div>
