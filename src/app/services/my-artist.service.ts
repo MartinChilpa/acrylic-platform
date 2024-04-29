@@ -3,7 +3,7 @@ import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
 import { IMyArtist } from '../interfaces/response/my-artist.response';
-import { IMyArtistSynclist } from '../interfaces/response/my-artist-synclist.response';
+import { IMyArtistSynclist, IMyArtistSynclistResult } from '../interfaces/response/my-artist-synclist.response';
 import { ICreateTracks } from '../interfaces/response/create-tracks.response';
 
 @Injectable({
@@ -32,11 +32,15 @@ export class MyArtistService {
     return this._http.get<IMyArtistSynclist>(`${this.MY_ARTIST_API_URL}/synclists/`);
   }
 
-  createTracks(request: any): Observable<ICreateTracks> {
+  createSynclist(request: FormData): Observable<IMyArtistSynclistResult> {
+    return this._http.post<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/`, request);
+  }
+
+  createTracks(request: FormData): Observable<ICreateTracks> {
     return this._http.post<ICreateTracks>(`${this.MY_ARTIST_API_URL}/tracks/`, request);
   }
 
-  updateTracks(request: any, uuid: string): Observable<ICreateTracks> {
+  updateTracks(request: FormData, uuid: string): Observable<ICreateTracks> {
     return this._http.put<ICreateTracks>(`${this.MY_ARTIST_API_URL}/tracks/${uuid}/`, request);
   }
 }

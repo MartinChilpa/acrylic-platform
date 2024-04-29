@@ -51,18 +51,9 @@
         <div class="row g-2">
             @for (item of artistSynclist; track item) {
             <div class="col-lg-4 col-md-6 col-12 pinned-sync-box">
-                <div class="pinned-sync-back radius-5 p-3 h-100 d-flex"
-                    [style.backgroundImage]="'url(' + item.background_image + ')'"
-                    [class.justify-content-between]="item.cover_image" [class.flex-column]="item.cover_image"
-                    [class.align-items-end]="!item.cover_image">
+                <div class="pinned-sync-back radius-5 p-3 h-100 d-flex align-items-end"
+                    [style.backgroundImage]="'url(' + item.background_image + ')'">
                     <div class="pinned-sync-gradient-layer"></div>
-                    @if (item.cover_image) {
-                    <div class="radius-5 bg-white align-self-baseline p-1 pe-2 pinned-sync-content">
-                        <img [ngSrc]="item.cover_image" alt="pinned-profile" width="20" height="20"
-                            class="radius-5 pinned-profile-img" />
-                        <span class="text-dark ps-1">{{ ':)' }}</span>
-                    </div>
-                    }
                     <div class="d-flex-align-center gap-3 pinned-sync-content">
                         <img [ngSrc]="item.cover_image" alt="pinned-img" width="60" height="60"
                             class="radius-5 pinned-sunc-front" />
