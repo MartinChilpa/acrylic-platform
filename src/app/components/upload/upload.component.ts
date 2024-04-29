@@ -27,10 +27,10 @@ export class UploadComponent implements OnInit {
   ngOnInit(): void {
     this.uploadTrackForm = this._fb.group({
       id: [null],
-      isrc: ['GBQS21200010', [Validators.required, Validators.pattern(/^[A-Z]{4}\d{8}$/)]],
+      isrc: ['', [Validators.required, Validators.pattern(/^[A-Z]{4}\d{8}$/)]],
       name: ['', Validators.required],
       duration: [2],
-      released: ['2024-04-29'],
+      released: [new Date().toJSON().split('T')[0]],
       is_cover: [false],
       is_remix: [false],
       is_instrumental: [false],
