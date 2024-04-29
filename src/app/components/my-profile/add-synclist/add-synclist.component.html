@@ -1,26 +1,34 @@
 <section>
-    <div class="p-3 bg-secondary radius-5">
+    <form class="acr-box" [formGroup]="synclistForm">
         <div class="row flex-column gap-1">
             <div class="col-12">
                 <p class="fs-6 mb-2">Synclist Details</p>
             </div>
             <div class="col-lg-6 col-12">
                 <ng-container>
-                    <input type="text" class="form-control acr-input mb-2" placeholder="Synclist Name">
+                    <input type="text" class="form-control acr-input mb-2" formControlName="name"
+                        placeholder="Synclist Name">
                 </ng-container>
                 <div class="input-with-label">
-                    <textarea rows="5" class="form-control mb-2"
-                        placeholder="Synclist Description" [value]="''">
+                    <textarea rows="5" class="form-control mb-2" formControlName="description"
+                        placeholder="Synclist Description">
                     </textarea>
                 </div>
-                <ng-container>
-                    <input type="text" class="form-control acr-input mb-2" placeholder="Short Message">
-                </ng-container>
-                <acrylic-file-dropzone></acrylic-file-dropzone>
+                <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon" [fileDropzoneHeader]="fileDropzoneHeader"
+                    [fileDropzoneSize]="fileDropzoneSize" [existingFiles]="[synclistForm.get('cover_image')?.value]"
+                    (uploadedFileList)="setUploadFile('cover_image', $event)"></acrylic-file-dropzone>
+                <div class="mt-2">
+                    <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
+                        [fileDropzoneHeader]="'Drop your Background Image File here or upload it manually'"
+                        [fileDropzoneSize]="fileDropzoneSize" [existingFiles]="[synclistForm.get('background_image')?.value]"
+                        (uploadedFileList)="setUploadFile('background_image', $event)"></acrylic-file-dropzone>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="p-3 bg-secondary radius-5 mt-4">
+    </form>
+    <!-- For Edit -->
+    @if (synclistId) {
+    <div class="acr-box mt-4">
         <div class="row flex-column gap-2">
             <div class="col-12">
                 <p class="fs-6 mb-1">Add Tracks</p>
@@ -70,12 +78,13 @@
             </div>
         </div>
     </div>
+    }
     <div class="my-4">
         <div class="row gap-2">
             <div class="col-lg-6 col-12">
                 <div class="d-flex-center">
                     <button class="btn btn-darkgrey px-4 px-lg-5 py-2 me-3" (click)="backProfile()">Back</button>
-                    <button class="btn btn-info px-4 px-lg-5 py-2">Publish</button>
+                    <button class="btn btn-info px-4 px-lg-5 py-2" (click)="saveSynclist()">Publish</button>
                 </div>
             </div>
         </div>

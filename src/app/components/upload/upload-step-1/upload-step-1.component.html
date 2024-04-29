@@ -1,8 +1,5 @@
-<div class="acrylic-select-box">
-    <label class="acr-input-label">Split Sheet</label>
-    <select class="w-100 radius-5 h-50px acrylic-select rounded-bottom-0">
-        <option value="" disabled selected hidden>Choose or search Split Sheet</option>
-    </select>
+<div>
+    <acrylic-custom-dropdown (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
 </div>
 <div class="mt-2">
     <p class="small">Don’t have a split sheet?  <span class="text-orange">Create one here</span></p>
@@ -57,11 +54,11 @@
 <div class="row gap-2 mt-4">
     <div class="col-12">
         <div class="row justify-content-center gy-2">
-            <div class="col-lg-4 col-md-5 col-12">
-                <button class="btn btn-darkgrey w-100 py-3 light-gray-border">Cancel</button>
+            <div class="col-lg-4 col-md-5 col-12 text-end">
+                <button class="btn btn-darkgrey px-4 px-lg-5 py-2 light-gray-border">Cancel</button>
             </div>
             <div class="col-lg-4 col-md-5 col-12">
-                <button class="btn btn-info w-100 py-3 light-gray-border">Skip For Now</button>
+                <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" [disabled]="!form.get('name')?.value" (click)="nextUploadStepper(2)">Next</button>
             </div>
         </div>
     </div>

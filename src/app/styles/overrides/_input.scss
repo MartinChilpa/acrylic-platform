@@ -137,36 +137,45 @@ input[type=checkbox].acrylic-checkbox:checked::before {
     transform: scale(1.2);
 }
 
-.acrylic-select-box {
-    position: relative;
-    select.acrylic-select {
-        background-color: var(--darkgrey-color);
-        border: none;
-        outline: none;
-        color: var(--light-gray-border-color);
-        appearance: none;
-        background-image: url('/assets/images/icons/down-arrow.svg');
-        background-repeat: no-repeat;
-        background-position: right 0.9rem top 50%;
-        background-size: 0.65rem auto;
-        padding: 15px;
-
-        option {
-            background-color: var(--switch-off-container-color);
-        }
-    }
-}
-
 input[type=radio].acrylic-radio {
     &:checked {
-        + label {
+        +label {
             background: var(--default-gradient-color);
             color: var(--primary-color);
         }
     }
     &:not(:checked) {
-        + label {
+        +label {
             color: var(--text-color);
         }
     }
+}
+
+.acrylic-select {
+    .select-down-arrow {
+        height: 15px;
+        width: 15px;
+        background-image: url('/assets/images/icons/down-arrow.svg');
+        background-repeat: no-repeat;
+        margin-bottom: -8px;
+    }
+        
+    .content .acrylic-select-options {
+        max-height: 250px;
+    }
+    
+    .acrylic-select-options li:hover,
+    li.selected {
+        background-color: var(--light-gray-border-color);
+    }
+    
+    .acrylic-select-options::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .acrylic-select-options {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
 }

@@ -1,5 +1,5 @@
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FileDragDropDirective } from '../../../directives/file-drag-drop.directive';
 
 @Component({
@@ -13,12 +13,24 @@ import { FileDragDropDirective } from '../../../directives/file-drag-drop.direct
   templateUrl: './file-dropzone.component.html',
   styleUrl: './file-dropzone.component.scss'
 })
-export class FileDropzoneComponent {
+export class FileDropzoneComponent implements OnInit {
+  @Input() fileDropzoneIcon!: string;
+  @Input() fileDropzoneHeader!: string;
+  @Input() fileDropzoneSize!: string;
+  @Input() fileDropzoneExternalLink!: string;
+  @Input() existingFiles!: any[];
+  @Output() uploadedFileList = new EventEmitter<File[]>();
 
   @ViewChild("fileUpload") fileUpload!: ElementRef<HTMLElement>
   uploadedFiles: File[] = []
 
   droppedImageIcon = 'assets/images/icons/drop.svg';
+
+  ngOnInit(): void {
+    if (this.existingFiles && this.existingFiles?.length) {
+      this.uploadedFiles = this.existingFiles.filter(file => file).map(file => <File>file)
+    }
+  }
 
   dropzoneClicked($event: any) {
     if ($event?.target?.classList?.contains('ignore-upload')) {
@@ -31,12 +43,14 @@ export class FileDropzoneComponent {
   onFileChange($event: any) {
     const files = <File[]>Array.from($event.files ? $event.files : $event)
     this.uploadedFiles = this.uploadedFiles.concat(files)
+    this.uploadedFileList.emit(this.uploadedFiles);
   }
 
   removeUpload(index: number) {
     const uploadIndex = this.uploadedFiles.findIndex((_, i) => i == index);
     if (uploadIndex >= 0) {
       this.uploadedFiles.splice(uploadIndex, 1)
+      this.uploadedFileList.emit(this.uploadedFiles);
     }
   }
 }

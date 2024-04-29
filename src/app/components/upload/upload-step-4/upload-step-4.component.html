@@ -6,14 +6,18 @@
                 <div class="d-flex gap-2">
                     <img ngSrc="/assets/images/others/preview.svg" height="110" width="110" class="radius-5" />
                     <div class="d-flex flex-column">
-                        <span>Track Name</span>
-                        <span>Artist Name</span>
-                        <span>2:43</span>
-                        <div class="mt-3 d-flex gap-2">
-                            <span class="bg-light-gray px-2 py-1 radius-5">Hip-Hop</span>
-                            <span class="bg-light-gray px-2 py-1 radius-5">Synthwave</span>
-                        </div>
-                        <a href="" class="a-blue mt-2">Feel like the tags don’t match to the track?</a>
+                        <span>{{ form.get('isrc')?.value }}</span>
+                        <span>{{ myArtist?.name }}</span>
+                        <span>{{ form.get('duration')?.value }}</span>
+                        @if (form.value['tags']?.length) {
+                            <div class="mt-3 d-flex gap-2">
+                                @for (item of form.value['tags']; track item) {
+                                <span class="bg-light-gray px-2 py-1 radius-5">{{ item }}</span>
+                                }
+                            </div>
+                        }
+                        <a href="javascript: void(0);" class="a-blue mt-2">Feel like the tags don’t match to the
+                            track?</a>
                     </div>
                 </div>
             </div>
@@ -23,11 +27,13 @@
         <div class="row gap-2">
             <div class="col-12">
                 <div class="row justify-content-center gy-2">
-                    <div class="col-md-5 col-12">
-                        <button class="btn-darkgrey radius-5 w-100 py-3 light-gray-border">Back</button>
+                    <div class="col-md-5 col-12 text-end">
+                        <button class="btn-darkgrey radius-5 px-4 px-lg-5 py-2 light-gray-border"
+                            (click)="nextUploadStepper(3)">Back</button>
                     </div>
                     <div class="col-md-5 col-12">
-                        <button class="btn-info radius-5 w-100 py-3 light-gray-border acrylic-next-button">Next</button>
+                        <button class="btn-info radius-5 px-4 px-lg-5 py-2 light-gray-border acrylic-next-button"
+                            (click)="nextUploadStepper(5)">Next</button>
                     </div>
                 </div>
             </div>
