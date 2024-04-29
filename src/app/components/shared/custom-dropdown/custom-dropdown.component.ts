@@ -1,37 +1,49 @@
 import { NgOptimizedImage, NgClass } from '@angular/common';
-import { Component, ElementRef, HostListener } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, OnInit, Output, inject } from '@angular/core';
 import { SearchFilterPipe } from '../../../pipes/search-filter.pipe';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HighLightDirective } from '../../../directives/high-light.directive';
 
 @Component({
   selector: 'acrylic-custom-dropdown',
   standalone: true,
-  imports: [NgClass, FormsModule, NgOptimizedImage, SearchFilterPipe, HighLightDirective],
+  imports: [NgClass, ReactiveFormsModule, NgOptimizedImage, SearchFilterPipe, HighLightDirective],
   templateUrl: './custom-dropdown.component.html',
   styleUrl: './custom-dropdown.component.scss'
 })
-export class CustomDropdownComponent {
+export class CustomDropdownComponent implements OnInit {
+
+  @Output() dropdownSelected = new EventEmitter();
+
   isActive: boolean = false;
   values = [
-    {title: "Track Name 1", date: 'Dec 25, 2024, 6:44 PM'},
-    {title: "Track Name 2", date: 'Dec 25, 2024, 6:44 PM'},
-    {title: "Track Name 3", date: 'Dec 25, 2024, 6:44 PM'},
-    {title: "Track Name 4", date: 'Dec 25, 2024, 6:44 PM'},
-    {title: "Track Name 5", date: 'Dec 25, 2024, 6:44 PM'},
+    { title: "Track Name 1", date: 'Dec 25, 2024, 6:44 PM' },
+    { title: "Track Name 2", date: 'Dec 25, 2024, 6:44 PM' },
+    { title: "Track Name 3", date: 'Dec 25, 2024, 6:44 PM' },
+    { title: "Track Name 4", date: 'Dec 25, 2024, 6:44 PM' },
+    { title: "Track Name 5", date: 'Dec 25, 2024, 6:44 PM' },
   ];
   selectedValue: string = '';
-  searchText = '';
+  searchForm!: FormGroup;
+  private _fb = inject(FormBuilder);
+  private _elementRef = inject(ElementRef);
 
-  constructor(private elementRef: ElementRef) { }
+  ngOnInit(): void {
+    this.searchForm = this._fb.group({
+      searchText: ['']
+    });
+  }
+
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
-    if (this.isActive && !this.elementRef.nativeElement.contains(event.target)) {
+    if (this.isActive && !this._elementRef.nativeElement.contains(event.target)) {
       this.isActive = false;
     }
   }
-  updateName(val: string) {
-    this.selectedValue = val;
+
+  updateName(val: any) {
+    this.selectedValue = val.title;
+    this.dropdownSelected.emit(val)
   }
 
   handleItemClick(event: MouseEvent) {

@@ -31,4 +31,8 @@ export class NavigationService {
   navigateToMyProfile() {
     this._router.navigateByUrl('/my-profile');
   }
+
+  navigateToMyTracks() {
+    this._router.navigateByUrl('/my-tracks');
+  }
 }

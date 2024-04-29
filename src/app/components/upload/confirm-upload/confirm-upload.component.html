@@ -4,8 +4,8 @@
             <div class="p-3">
                 <div class="d-flex-justify-between px-2">
                     <h6 class="fw-semibold">Are You Sure?</h6>
-                    <button class="bg-transparent border-0" data-bs-dismiss="modal"><img ngSrc="/assets/images/icons/close.svg" alt="close"
-                            width="20" height="20" /></button>
+                    <button class="bg-transparent border-0" data-bs-dismiss="modal"><img
+                            ngSrc="/assets/images/icons/close.svg" alt="close" width="20" height="20" /></button>
                 </div>
                 <div class="bg-light-gray p-3 radius-5 card-beige-border mt-3">
                     <h6 class="text-beige"><b>Basic</b></h6>
@@ -16,13 +16,16 @@
                         <p class="mb-0">1/3</p>
                     </div>
                 </div>
-                <p class="mt-3">Lorem ipsum dolor sit amet consectetur. A dictum eget vitae neque nisl feugiat tincidunt dignissim.</p>
+                <p class="mt-3">Lorem ipsum dolor sit amet consectetur. A dictum eget vitae neque nisl feugiat tincidunt
+                    dignissim.</p>
                 <div class="row">
                     <div class="col-lg-6 col-12">
-                        <button class="btn-lightgray radius-5 w-100 py-2 light-gray-border" data-bs-toggle="modal" data-bs-target="#live-upload">Yes, I’m sure</button>
+                        <button class="btn-lightgray radius-5 w-100 py-2 light-gray-border" (click)="publishTrack()"
+                            data-bs-dismiss="modal">Yes, I’m sure</button>
                     </div>
                     <div class="col-lg-6 col-12">
-                        <button class="btn-orange radius-5 w-100 py-2 light-gray-border" data-bs-dismiss="modal">No, cancel</button>
+                        <button class="btn-orange radius-5 w-100 py-2 light-gray-border" data-bs-dismiss="modal">No,
+                            cancel</button>
                     </div>
                 </div>
             </div>

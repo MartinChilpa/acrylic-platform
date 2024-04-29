@@ -1,38 +1,44 @@
 <section>
-    <div>
+    <form [formGroup]="uploadTrackForm">
         <div class="row gy-3">
             <div class="col-lg-7 col-12 order-2 order-lg-1">
                 @switch (activeStepper) {
-                    @case(1) {
-                        <acrylic-upload-step-1 (nextStepper)="stepperCount($event)"></acrylic-upload-step-1>
-                    }
-                    @case(2) {
-                        <acrylic-upload-step-2 (nextStepper)="stepperCount($event)"></acrylic-upload-step-2>
-                    }
-                    @case(3) {
-                        <acrylic-upload-step-3 (nextStepper)="stepperCount($event)"></acrylic-upload-step-3>
-                    }
-                    @case(4) {
-                        <acrylic-upload-step-4 (nextStepper)="stepperCount($event)"></acrylic-upload-step-4>
-                    }
-                    @case(5) {
-                        <acrylic-upload-step-5 (nextStepper)="stepperCount($event)"></acrylic-upload-step-5>
-                    }
+                @case(1) {
+                <acrylic-upload-step-1 [form]="uploadTrackForm"
+                    (nextStepper)="stepperCount($event)"></acrylic-upload-step-1>
+                }
+                @case(2) {
+                <acrylic-upload-step-2 [form]="uploadTrackForm"
+                    (nextStepper)="stepperCount($event)"></acrylic-upload-step-2>
+                }
+                @case(3) {
+                <acrylic-upload-step-3 [form]="uploadTrackForm"
+                    (nextStepper)="stepperCount($event)"></acrylic-upload-step-3>
+                }
+                @case(4) {
+                <acrylic-upload-step-4 [form]="uploadTrackForm"
+                    (nextStepper)="stepperCount($event)"></acrylic-upload-step-4>
+                }
+                @case(5) {
+                <acrylic-upload-step-5 [form]="uploadTrackForm" (nextStepper)="stepperCount($event)"
+                    (uploadAction)="publishTrack()"></acrylic-upload-step-5>
+                }
                 }
             </div>
             <div class="col-lg-5 col-12 order-1 order-lg-2">
                 <div class="acr-box">
                     <ul class="list-group">
                         @for(item of uploadStepperList; track item) {
-                            <li class="list-group-item bg-transparent light-gray-border d-flex-align-center gap-2 cursor-pointer"
-                            (click)="uploadStepper($index + 1)" [ngClass]="{'current-active-stepper': activeStepper === $index + 1, 'completed-step': activeStepper > $index + 1}"> 
-                               <span class="d-flex-center text-secondary fw-bold">{{ $index + 1 }}</span>
-                               {{ item }}
-                            </li>
+                        <li class="list-group-item bg-transparent light-gray-border d-flex-align-center gap-2 cursor-pointer"
+                            (click)="uploadStepper($index + 1)"
+                            [ngClass]="{'current-active-stepper': activeStepper === $index + 1, 'completed-step': activeStepper > $index + 1}">
+                            <span class="d-flex-center text-secondary fw-bold">{{ $index + 1 }}</span>
+                            {{ item }}
+                        </li>
                         }
                     </ul>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </section>

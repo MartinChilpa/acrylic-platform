@@ -1,24 +1,34 @@
 <section>
     <div class="row gy-3">
         <div class="col-12">
-            <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[0].fileDropzoneIcon" [fileDropzoneHeader]="UploadFileTextDetails[0].fileDropzoneHeader"></acrylic-file-dropzone>
+            <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[2].fileDropzoneIcon"
+                [fileDropzoneHeader]="UploadFileTextDetails[2].fileDropzoneHeader"
+                [fileDropzoneExternalLink]="UploadFileTextDetails[2].fileDropzoneExternalLink"
+                (uploadedFileList)="setUploadFile('snippet', $event)"></acrylic-file-dropzone>
         </div>
         <div class="col-12">
-            <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[1].fileDropzoneIcon" [fileDropzoneHeader]="UploadFileTextDetails[1].fileDropzoneHeader" [fileDropzoneSize]="UploadFileTextDetails[1].fileDropzoneSize"></acrylic-file-dropzone>
+            <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[0].fileDropzoneIcon"
+                [fileDropzoneHeader]="UploadFileTextDetails[0].fileDropzoneHeader"
+                (uploadedFileList)="setUploadFile('file_wav', $event)"></acrylic-file-dropzone>
         </div>
         <div class="col-12">
-            <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[2].fileDropzoneIcon" [fileDropzoneHeader]="UploadFileTextDetails[2].fileDropzoneHeader" [fileDropzoneExternalLink]="UploadFileTextDetails[2].fileDropzoneExternalLink"></acrylic-file-dropzone>
+            <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[1].fileDropzoneIcon"
+                [fileDropzoneHeader]="UploadFileTextDetails[1].fileDropzoneHeader"
+                [fileDropzoneSize]="UploadFileTextDetails[1].fileDropzoneSize"
+                (uploadedFileList)="setUploadFile('cover_image', $event)"></acrylic-file-dropzone>
         </div>
     </div>
     <div class="my-4">
         <div class="row gap-2">
             <div class="col-12">
                 <div class="row justify-content-center gy-2">
-                    <div class="col-md-5 col-12">
-                        <button class="btn-darkgrey radius-5 w-100 py-3 light-gray-border" (click)="nextUploadStepper(2)">Back</button>
+                    <div class="col-md-5 col-12 text-end">
+                        <button class="btn-darkgrey radius-5 px-4 px-lg-5 py-2 light-gray-border"
+                            (click)="nextUploadStepper(2)">Back</button>
                     </div>
                     <div class="col-md-5 col-12">
-                        <button class="btn-info radius-5 w-100 py-3 light-gray-border acrylic-next-button" (click)="nextUploadStepper(4)">Next</button>
+                        <button class="btn-info radius-5 px-4 px-lg-5 py-2 light-gray-border acrylic-next-button"
+                            (click)="nextUploadStepper(4)">Next</button>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FileDragDropDirective } from '../../../directives/file-drag-drop.directive';
 
 @Component({
@@ -18,6 +18,7 @@ export class FileDropzoneComponent {
   @Input() fileDropzoneHeader!: string;
   @Input() fileDropzoneSize!: string;
   @Input() fileDropzoneExternalLink!: string;
+  @Output() uploadedFileList = new EventEmitter<File[]>();
 
   @ViewChild("fileUpload") fileUpload!: ElementRef<HTMLElement>
   uploadedFiles: File[] = []
@@ -35,12 +36,14 @@ export class FileDropzoneComponent {
   onFileChange($event: any) {
     const files = <File[]>Array.from($event.files ? $event.files : $event)
     this.uploadedFiles = this.uploadedFiles.concat(files)
+    this.uploadedFileList.emit(this.uploadedFiles);
   }
 
   removeUpload(index: number) {
     const uploadIndex = this.uploadedFiles.findIndex((_, i) => i == index);
     if (uploadIndex >= 0) {
       this.uploadedFiles.splice(uploadIndex, 1)
+      this.uploadedFileList.emit(this.uploadedFiles);
     }
   }
 }

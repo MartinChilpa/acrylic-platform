@@ -1,5 +1,5 @@
 <div class="acrylic-select-box">
-    <label for="" class="acrylic-select-label">Split Sheet</label>
+    <label for="" class="acrylic-select-label">Split Sheet <span class="text-danger">*</span></label>
     <div class="acrylic-select w-100 cursor-pointer position-relative" (click)="isActive = !isActive">
         <div class="select-btn d-flex-between bg-darkgrey h-50px px-3 radius-5" [ngClass]="{'rounded-bottom-0': isActive}">
           <span>{{ selectedValue ? selectedValue : 'Choose or search Split Sheet' }}</span>
@@ -7,23 +7,25 @@
         </div>
         <div class="content bg-switch-off radius-5 rounded-top-0 position-absolute w-100 z-3" [ngClass]="{'d-none': !isActive, 'd-block': isActive}">
             <div class="acrylic-select-search p-3" (click)="handleItemClick($event)">
-                <div class="acr-input-group w-100">
-                    <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
-                    <input type="text" placeholder="Search" class="w-100" [(ngModel)]="searchText">
-                </div>
+                <form [formGroup]="searchForm">
+                    <div class="acr-input-group w-100">
+                        <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
+                        <input type="text" placeholder="Search" class="w-100" formControlName="searchText">
+                    </div>
+                </form>
             </div>
           <ul class="acrylic-select-options overflow-y-auto p-0">
             <ng-container>
-                @for(item of values | acrylicSearchFilter: searchText; track item.title) {
-                    <li (click)="updateName(item.title)" class="list-unstyled d-flex-between px-3 py-2" [class.selected]="item.title === selectedValue"
-                    acrylicHighLight [searchedWord]="searchText" [content]="item" [classToApply]="'fw-bold'">
+                @for(item of values | acrylicSearchFilter: searchForm.value.searchText; track item.title) {
+                    <li (click)="updateName(item)" class="list-unstyled d-flex-between px-3 py-2" [class.selected]="item.title === selectedValue"
+                    acrylicHighLight [searchedWord]="searchForm.value.searchText" [content]="item" [classToApply]="'fw-bold'">
                     <span>{{ item.title }}</span>
                     <span class="bg-light-gray px-2 py-1 radius-5">{{ item.date }}</span>
                 </li>
                 }
             </ng-container>
             <ng-container>
-                @if((values | acrylicSearchFilter: searchText).length === 0) {
+                @if((values | acrylicSearchFilter: searchForm.value.searchText).length === 0) {
                     <li class="list-unstyled ps-3 py-2 text-center">No data available</li>
                 }
             </ng-container>

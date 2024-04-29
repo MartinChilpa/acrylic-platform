@@ -1,5 +1,6 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'acrylic-live-upload',
@@ -9,5 +10,5 @@ import { Component } from '@angular/core';
   styleUrl: './live-upload.component.scss'
 })
 export class LiveUploadComponent {
-
+  public _navigationService = inject(NavigationService)
 }
