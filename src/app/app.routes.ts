@@ -7,6 +7,7 @@ export const routesNames = {
   AUTH: 'auth',
   MY_PROFILE: 'my-profile',
   UPLOAD: 'upload',
+  SPLITSHEET: 'create-split-sheet',
   PAGE_NOT_FOUND: 'page-not-found',
   EMPTY: ''
 };
@@ -33,6 +34,10 @@ export const routes: Routes = [
       {
         path: routesNames.UPLOAD,
         loadComponent: () => import('./components/upload/upload.component').then((c) => c.UploadComponent),
+      },
+      {
+        path: routesNames.SPLITSHEET,
+        loadComponent: () => import('./components/create-split-sheet/create-split-sheet.component').then((c) => c.CreateSplitSheetComponent),
       },
     ],
   },
