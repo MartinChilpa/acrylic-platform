@@ -68,22 +68,12 @@
         </div>
     </div>
     <div class="acr-box mt-4">
-        <div class="row g-2">
+        <div class="row g-2 mb-2">
             <div class="col">
-                <select class="acr-input form-select text-light-gray h-auto">
-                    <option selected disabled hidden>Release Date</option>
-                    <option value="1" class="bg-light-gray text-light-gray">1</option>
-                    <option value="2" class="bg-light-gray text-light-gray">2</option>
-                    <option value="3" class="bg-light-gray text-light-gray">3</option>
-                </select>
+                <acrylic-custom-dropdown placeholder="Release Date" class="my-track-select-box"></acrylic-custom-dropdown>
             </div>
             <div class="col">
-                <select class="acr-input form-select text-light-gray h-auto">
-                    <option selected disabled hidden>Assigned Tags</option>
-                    <option value="1" class="bg-light-gray text-light-gray">1</option>
-                    <option value="2" class="bg-light-gray text-light-gray">2</option>
-                    <option value="3" class="bg-light-gray text-light-gray">3</option>
-                </select>
+                <acrylic-custom-dropdown placeholder="Assigned Tags" class="my-track-select-box"></acrylic-custom-dropdown>
             </div>
             <div class="col-xxl-4 col-xl-3">
                 <div class="acr-input-group">
@@ -176,7 +166,7 @@
                         <td>
                             <div class="d-flex gap-2">
                                 @for(assignedTag of item.tags; track assignedTag) {
-                                <span class="bg-light-gray px-2 py-1 radius-5">{{ assignedTag }}</span>
+                                <span class="bg-light-gray px-2 py-1 radius-5">{{ assignedTag.name }}</span>
                                 }
                             </div>
                         </td>
@@ -194,8 +184,8 @@
                         </td>
                         <td>
                             <div class="d-flex gap-2">
-                                @for(popularTag of item.tags; track popularTag) {
-                                <span class="bg-light-gray px-2 py-1 radius-5">{{ popularTag }}</span>
+                                @for(popularTag of item.genres; track popularTag) {
+                                <span class="bg-light-gray px-2 py-1 radius-5">{{ popularTag.name }}</span>
                                 }
                             </div>
                         </td>
@@ -203,7 +193,8 @@
                             <span>{{ item.released }}</span>
                         </td>
                         <td class="text-nowrap">
-                            <button class="btn btn-sm btn-darkgrey light-gray-border" (click)="openTrack(item.uuid)">{{ 'Open Track' }}</button>
+                            <button class="btn btn-sm btn-darkgrey light-gray-border" (click)="openTrack(item.uuid)">{{
+                                'Open Track' }}</button>
                         </td>
                     </tr>
                     }

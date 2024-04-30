@@ -14,6 +14,7 @@ import { HighLightDirective } from '../../../directives/high-light.directive';
 export class CustomDropdownComponent implements OnInit, OnChanges {
   @Input() inputValue: string = ''
   @Input() title: string = ''
+  @Input() placeholder: string = 'Choose or search'
   @Input() values: any[] = []
   @Output() dropdownSelected = new EventEmitter();
 

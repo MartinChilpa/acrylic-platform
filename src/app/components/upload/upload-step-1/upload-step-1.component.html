@@ -19,7 +19,7 @@
                             <small>%</small>
                         </li>
                         @for(item of connectSplit; track item) {
-                            <li class="list-group-item border-0 d-flex-justify-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orangey': $index === 0}">
+                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary">
                                 <span>{{ item.Name }}</span>
                                 <span>{{ item.percentage }}</span>
                             </li>
@@ -38,11 +38,10 @@
                             <small>%</small>
                         </li>
                         @for(item of connectSplit; track item) {
-                            <li class="list-group-item border-0 d-flex-justify-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orangey': $index === 0}">
+                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary">
                                 <span>{{ item.Name }}</span>
                                 <span>{{ item.percentage }}</span>
                             </li>
-
                         }
                    </ul>
                 </div>

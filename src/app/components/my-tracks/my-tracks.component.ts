@@ -3,11 +3,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { MyArtistService } from '../../services/my-artist.service';
 import { ICreateTracks } from '../../interfaces/response/create-tracks.response';
 import { NavigationService } from '../../services/navigation.service';
+import { CustomDropdownComponent } from '../shared/custom-dropdown/custom-dropdown.component';
 
 @Component({
   selector: 'acrylic-my-tracks',
   standalone: true,
-  imports: [NgOptimizedImage, NgClass],
+  imports: [NgOptimizedImage, NgClass, CustomDropdownComponent],
   templateUrl: './my-tracks.component.html',
   styleUrl: './my-tracks.component.scss'
 })

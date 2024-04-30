@@ -1,9 +1,11 @@
 <div class="acrylic-select-box">
-    <label for="" class="acrylic-select-label">{{ title }} <span class="text-danger">*</span></label>
+    @if (title) {
+        <label for="" class="acrylic-select-label">{{ title }} <span class="text-danger">*</span></label>
+    }
     <div class="acrylic-select w-100 cursor-pointer position-relative" (click)="isActive = !isActive">
         <div class="select-btn d-flex-between bg-darkgrey h-50px px-3 radius-5"
             [ngClass]="{'rounded-bottom-0': isActive}">
-            <span>{{ selectedValue ? selectedValue : 'Choose or search' }}</span>
+            <span>{{ selectedValue ? selectedValue : placeholder }}</span>
             <span class="select-down-arrow height-15px width-15px"></span>
         </div>
         <div class="content bg-switch-off radius-5 rounded-top-0 position-absolute w-100 z-3"
