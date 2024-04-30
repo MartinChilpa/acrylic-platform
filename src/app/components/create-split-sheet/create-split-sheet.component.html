@@ -6,7 +6,7 @@
             <div class="max-width-560">
                 <div class="mb-20">
                     <div class="font-size12 mb-1 dart-color-txt-60">ISRC Code:</div>
-                    <div class="font-size14">GBQS21200001</div>
+                    <div class="font-size14">{{reviewObject.isrcCode}}</div>
                 </div>
 
                 <div class="split-pnct-box p-3 mb-20">
@@ -25,33 +25,22 @@
 
                 <div class="mb-20">
                     <div class="font-size12 mb-1 dart-color-txt-60">Email Address Of Distributor Or Label Contact</div>
-                    <div class="font-size14">sikandersshotmail.com</div>
+                    <div class="font-size14">{{reviewObject.email}}</div>
 
                 </div>
 
                 <div class="default-box mb-20 darkgrey-color-bg">
                     <div class="max-width-560">
                         <div class="font-size12 mb-1 dart-color-txt-60">Publishing Splits</div>
-                        <div class="row font-size14 mb-1">
+                        <div class="row font-size14 mb-1" *ngFor="let item of reviewObject.publishing; let i = index">
                             <div class="col">
-                                Diego Ramos
+                                {{item.name}}
                             </div>
                             <div class="col">
-                                diegoramos.gmail.com
+                                {{item.email}}
                             </div>
                             <div class="col info-color-txt">
-                                50%
-                            </div>
-                        </div>
-                        <div class="row font-size14 mb-1">
-                            <div class="col">
-                                Diego Ramos
-                            </div>
-                            <div class="col">
-                                diegoramos.gmail.com
-                            </div>
-                            <div class="col info-color-txt">
-                                50%
+                                {{item.percentage}}
                             </div>
                         </div>
                     </div>
@@ -59,26 +48,15 @@
                 <div class="default-box mb-20 darkgrey-color-bg">
                     <div class="max-width-560">
                         <div class="font-size12 mb-1 dart-color-txt-60">Masters Splits</div>
-                        <div class="row font-size14 mb-1">
+                        <div class="row font-size14 mb-1" *ngFor="let item of reviewObject.mastering; let i = index">
                             <div class="col">
-                                Diego Ramos
+                                {{item.name}}
                             </div>
                             <div class="col">
-                                diegoramos.gmail.com
+                                {{item.email}}
                             </div>
                             <div class="col info-color-txt">
-                                50%
-                            </div>
-                        </div>
-                        <div class="row font-size14 mb-1">
-                            <div class="col">
-                                Diego Ramos
-                            </div>
-                            <div class="col">
-                                diegoramos.gmail.com
-                            </div>
-                            <div class="col info-color-txt">
-                                50%
+                                {{item.percentage}}
                             </div>
                         </div>
                     </div>
@@ -163,9 +141,9 @@
                             </div>
                         </div>
                         <div class="split-pnct-box">
-                            <div
-                                class="font-size14 font-weight-400 min-height-50 d-flex align-items-center justify-content-center">
-                                <span class="me-1">100</span><span class="info-color-txt">%</span>
+                            <div class="font-size14 font-weight-400 min-height-50 d-flex align-items-center justify-content-center width-80">
+                                <input type="text" formControlName="percentage" class="form-control">
+                                <span class="info-color-txt">%</span>                            
                             </div>
                         </div>
                     </div>
@@ -193,16 +171,16 @@
                     </div>
                 </div> -->
                     <div class="py-2" (click)="addPublishingSheet()">
-                        <div class="progress my-4" role="progressbar" aria-label="Basic example" aria-valuenow="75"
+                        <div class="progress my-4" role="progressbar" aria-label="Basic example" aria-valuenow="100"
                             aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar" style="width: 75%">
+                            <div class="progress-bar" style="width: 100%">
                                 <div class="plus-icon">
                                     <span><img src="assets/images/icons/plus.svg" width="20" height="20"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div><span class="dart-color-txt-30 me-1">Total:</span> <span>100%</span></div>
+                    <div><span class="dart-color-txt-30 me-1">Total:</span> <span>{{total}}%</span></div>
                 </div>
             </div>
 
@@ -227,25 +205,25 @@
                             </div>
                         </div>
                         <div class="split-pnct-box">
-                            <div
-                                class="font-size14 font-weight-400 min-height-50 d-flex align-items-center justify-content-center">
-                                <span class="me-1">100</span><span class="info-color-txt">%</span>
+                            <div class="font-size14 font-weight-400 min-height-50 d-flex align-items-center justify-content-center width-80">
+                                <input type="text" formControlName="percentage" class="form-control">
+                                <span class="info-color-txt">%</span>                            
                             </div>
                         </div>
                     </div>
 
 
                     <div class="py-2" (click)="addMasterSheet()">
-                        <div class="progress my-4" role="progressbar" aria-label="Basic example" aria-valuenow="75"
+                        <div class="progress my-4" role="progressbar" aria-label="Basic example" aria-valuenow="100"
                             aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar" style="width: 75%">
+                            <div class="progress-bar" style="width: 100%">
                                 <div class="plus-icon">
                                     <span><img src="assets/images/icons/plus.svg" width="20" height="20"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div><span class="dart-color-txt-30 me-1">Total:</span> <span>100%</span></div>
+                    <div><span class="dart-color-txt-30 me-1">Total:</span> <span>{{total}}%</span></div>
                 </div>
             </div>
 

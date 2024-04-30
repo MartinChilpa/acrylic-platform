@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NavigationService } from '../../services/navigation.service';
 import { NgFor } from '@angular/common';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'acrylic-create-split-sheet',
@@ -10,15 +11,20 @@ import { NgFor } from '@angular/common';
   templateUrl: './create-split-sheet.component.html',
   styleUrl: './create-split-sheet.component.scss'
 })
-export class CreateSplitSheetComponent implements OnInit{
+export class CreateSplitSheetComponent implements OnInit {
 
   createSplitSheetForm!: FormGroup;
-  reveiwBtnClick:boolean = false;
+  reveiwBtnClick: boolean = false;
   publishingSheetForms: any[] = [{}];
   masterSheetForms: any[] = [{}];
+  total: number = 100;
+  totalPublishingPercentage: number = 100;
+  totalMasteringPercentage: number = 100;
+  reviewObject: any = {};
 
   private _fb = inject(FormBuilder);
   public _navigationService = inject(NavigationService);
+  private _alertService = inject(AlertService);
 
 
   ngOnInit(): void {
@@ -26,17 +32,17 @@ export class CreateSplitSheetComponent implements OnInit{
       isrcCode: ['', Validators.required],
       email: ['', Validators.required],
       publishing: new FormArray([
-        new FormGroup ({
+        new FormGroup({
           name: new FormControl(''),
           email: new FormControl(''),
-          percentage: new FormControl('')
+          percentage: new FormControl('100')
         })
       ]),
       mastering: new FormArray([
-        new FormGroup ({
+        new FormGroup({
           name: new FormControl(''),
           email: new FormControl(''),
-          percentage: new FormControl('')
+          percentage: new FormControl(100)
         })
       ])
     });
@@ -52,41 +58,79 @@ export class CreateSplitSheetComponent implements OnInit{
     return this.createSplitSheetForm.get('mastering') as FormArray;
   }
 
-  addPublishingSheet () {
-    this.publishing.push(
-      new FormGroup({
-        name: new FormControl(''),
-        email: new FormControl(''),
-        percentage: new FormControl('')
-      })
-    );
+  calculatePercentage(object: [any]) {
+    let result = 0
+    if (object.length > 0) {
+      let percentage = object.map(x => x.percentage).map(val => parseInt(val));
+      if (percentage.some(val => { return val != 0 })) {
+        let sum = 0
+        percentage.forEach(item => {
+          sum = sum + item;
+        });
+    
+        if (sum < this.total) {
+          result = this.total - sum;
+        }
+      }
+
+    }
+    return result;
   }
 
-  addMasterSheet () {
-    this.mastering.push(
-      new FormGroup({
-        name: new FormControl(''),
-        email: new FormControl(''),
-        percentage: new FormControl('')
-      })
-    );
+  addPublishingSheet() {
+    let publishingArray = this.createSplitSheetForm.controls['publishing'].value;
+    let percentage = this.calculatePercentage(publishingArray);
+    if (percentage > 0) {
+      this.publishing.push(
+        new FormGroup({
+          name: new FormControl(''),
+          email: new FormControl(''),
+          percentage: new FormControl(percentage)
+        })
+      );
+    } else {
+      this._alertService.error("Cannot add more publish member, because 100% percentage split created");
+    }
   }
 
-  reviewSheet () {
+  addMasterSheet() {
+    let masterArray = this.createSplitSheetForm.controls['mastering'].value;
+    let percentage = this.calculatePercentage(masterArray);
+    if (percentage > 0) {
+      this.mastering.push(
+        new FormGroup({
+          name: new FormControl(''),
+          email: new FormControl(''),
+          percentage: new FormControl(percentage)
+        })
+      );
+    } else {
+      this._alertService.error("Cannot add more mastering member, because 100% percentage split created");
+    }
+  }
+
+  reviewSheet() {
+    if (this.createSplitSheetForm.invalid)
+      return;
+    let controls = this.createSplitSheetForm.controls;
+    this.reviewObject = {
+      isrcCode: controls['isrcCode'].value,
+      email: controls['email'].value,
+      publishing: controls['publishing'].value,
+      mastering: controls['mastering'].value
+    };
     this.reveiwBtnClick = true;
   }
 
-  backToSplitSheetForm () {
+  backToSplitSheetForm() {
     this.reveiwBtnClick = false;
-    console.log(this.createSplitSheetForm.patchValue);
   }
 
-  sendRequestToCreateSheet () {
-    console.log(this.createSplitSheetForm.value);
+  sendRequestToCreateSheet() {
+    console.log(this.reviewObject);
   }
 
-  navigateToHome () {
+  navigateToHome() {
     this._navigationService.navigateToHome();
   }
-
 }
