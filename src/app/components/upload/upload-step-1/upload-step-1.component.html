@@ -18,8 +18,8 @@
                             <small>Name</small>
                             <small>%</small>
                         </li>
-                        @for(item of connectSplit; track item) {
-                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary">
+                        @for(item of connectSplit; let i = $index; track item) {
+                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary" [class.selected]="i == 0">
                                 <span>{{ item.Name }}</span>
                                 <span>{{ item.percentage }}</span>
                             </li>
@@ -37,8 +37,8 @@
                             <small>Name</small>
                             <small>%</small>
                         </li>
-                        @for(item of connectSplit; track item) {
-                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary">
+                        @for(item of connectSplit; let i = $index; track item) {
+                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary" [class.selected]="i == 0">
                                 <span>{{ item.Name }}</span>
                                 <span>{{ item.percentage }}</span>
                             </li>
