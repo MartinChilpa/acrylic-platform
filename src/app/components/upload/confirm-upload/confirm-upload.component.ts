@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'acrylic-confirm-upload',
@@ -9,5 +9,9 @@ import { Component } from '@angular/core';
   styleUrl: './confirm-upload.component.scss'
 })
 export class ConfirmUploadComponent {
+  @Output() actionTaken = new EventEmitter<boolean>()
 
+  publishTrack() {
+    this.actionTaken.emit(true);
+  }
 }

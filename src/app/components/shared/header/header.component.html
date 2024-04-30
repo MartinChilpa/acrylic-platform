@@ -21,7 +21,7 @@
                         </div> -->
                         <!-- <span class="mx-2">|</span> -->
                         @if(_myArtistService.myArtist()?.image){
-                            <button class="btn btn-sm btn-darkgrey p-0" title="Profile">
+                            <button class="btn btn-sm btn-darkgrey p-0" [routerLink]="['/my-profile']" title="Profile">
                                 <img [ngSrc]="_myArtistService.myArtist()!.image" width="30" height="30">
                             </button>
                             <span class="mx-2">|</span>

@@ -3,7 +3,8 @@ import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
 import { IMyArtist } from '../interfaces/response/my-artist.response';
-import { IMyArtistSynclist } from '../interfaces/response/my-artist-synclist.response';
+import { IMyArtistSynclist, IMyArtistSynclistResult } from '../interfaces/response/my-artist-synclist.response';
+import { ICreateTracks } from '../interfaces/response/create-tracks.response';
 
 @Injectable({
   providedIn: 'root'
@@ -29,5 +30,33 @@ export class MyArtistService {
 
   getMyArtistSynclist(): Observable<IMyArtistSynclist> {
     return this._http.get<IMyArtistSynclist>(`${this.MY_ARTIST_API_URL}/synclists/`);
+  }
+
+  getSynclistById(id: string): Observable<IMyArtistSynclistResult> {
+    return this._http.get<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/${id}`);
+  }
+
+  createSynclist(request: FormData): Observable<IMyArtistSynclistResult> {
+    return this._http.post<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/`, request);
+  }
+
+  updateSynclist(request: FormData, id: string): Observable<IMyArtistSynclistResult> {
+    return this._http.put<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/${id}`, request);
+  }
+
+  getTracks(): Observable<ICreateTracks[]> {
+    return this._http.get<ICreateTracks[]>(`${this.MY_ARTIST_API_URL}/tracks/`);
+  }
+
+  getTrackById(id: string): Observable<ICreateTracks> {
+    return this._http.get<ICreateTracks>(`${this.MY_ARTIST_API_URL}/tracks/${id}`);
+  }
+
+  createTracks(request: FormData): Observable<ICreateTracks> {
+    return this._http.post<ICreateTracks>(`${this.MY_ARTIST_API_URL}/tracks/`, request);
+  }
+
+  updateTracks(request: FormData, uuid: string): Observable<ICreateTracks> {
+    return this._http.put<ICreateTracks>(`${this.MY_ARTIST_API_URL}/tracks/${uuid}/`, request);
   }
 }

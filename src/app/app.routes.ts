@@ -8,6 +8,8 @@ export const routesNames = {
   MY_PROFILE: 'my-profile',
   UPLOAD: 'upload',
   SPLITSHEET: 'create-split-sheet',
+  EDIT_UPLOAD: 'upload/:trackId',
+  TRACKS: 'my-tracks',
   PAGE_NOT_FOUND: 'page-not-found',
   EMPTY: ''
 };
@@ -38,6 +40,14 @@ export const routes: Routes = [
       {
         path: routesNames.SPLITSHEET,
         loadComponent: () => import('./components/create-split-sheet/create-split-sheet.component').then((c) => c.CreateSplitSheetComponent),
+      },
+      {
+        path: routesNames.EDIT_UPLOAD,
+        loadComponent: () => import('./components/upload/upload.component').then((c) => c.UploadComponent),
+      },
+      {
+        path: routesNames.TRACKS,
+        loadComponent: () => import('./components/my-tracks/my-tracks.component').then((c) => c.MyTracksComponent),
       },
     ],
   },

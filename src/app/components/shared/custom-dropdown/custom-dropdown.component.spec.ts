@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddSynclistComponent } from './add-synclist.component';
+import { CustomDropdownComponent } from './custom-dropdown.component';
 
-describe('AddSynclistComponent', () => {
-  let component: AddSynclistComponent;
-  let fixture: ComponentFixture<AddSynclistComponent>;
+describe('CustomDropdownComponent', () => {
+  let component: CustomDropdownComponent;
+  let fixture: ComponentFixture<CustomDropdownComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddSynclistComponent]
+      imports: [CustomDropdownComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(AddSynclistComponent);
+    fixture = TestBed.createComponent(CustomDropdownComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

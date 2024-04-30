@@ -3,9 +3,12 @@
     [ngClass]="{ 'd-flex-center flex-column': !uploadedFiles.length }">
     <div class="text-center"
         [ngClass]="{ 'd-flex-center flex-column': uploadedFiles.length }">
-        <img [ngSrc]="droppedImageIcon" height="32" width="32" />
-        <p class="mb-0 pt-2">Drop your Cover Art File here or upload it manually</p>
-        <span>JPG 1920px x 1080px</span>
+        <img [ngSrc]="fileDropzoneIcon" height="32" width="32" />
+        <p class="mb-0 pt-2">{{ fileDropzoneHeader }}</p>
+        <span>{{ fileDropzoneSize }}</span>
+        <div>
+            <a href="" class="a-blue">{{ fileDropzoneExternalLink }}</a>
+        </div>
         <input type="file" name="file" class="hidden d-none" (change)="onFileChange($event.target)" #fileUpload
             multiple>
     </div>
@@ -13,10 +16,10 @@
     <div class="wrap-upload-section mt-3">
         @for (item of uploadedFiles; let i = $index; track item) {
         <div class="d-flex-between bg-secondary py-2 px-3 upload-wrapper mb-2 py-2 ignore-upload">
-            <div>
+            <div class="text-break ignore-upload">
                 {{ item.name }}
             </div>
-            <div>
+            <div class="text-end ignore-upload">
                 <button class="btn btn-sm btn-darkgrey py-2 ignore-upload" (click)="removeUpload(i)">
                     <img [ngSrc]="'assets/images/icons/delete.svg'" class="ignore-upload" height="20" width="20" />
                 </button>
