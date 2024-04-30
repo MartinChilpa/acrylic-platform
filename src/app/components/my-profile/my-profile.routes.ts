@@ -2,7 +2,8 @@ import { Routes } from '@angular/router';
 
 export const myProfileRoutesNames = {
     EMPTY: '',
-    ADD_SYNCLIST: 'add-synclist'
+    ADD_SYNCLIST: 'add-synclist',
+    EDIT_SYNCLIST: 'edit-synclist/:synclistId',
 };
 
 export const MY_PROFILE_ROUTES: Routes = [
@@ -16,7 +17,11 @@ export const MY_PROFILE_ROUTES: Routes = [
             },
             {
                 path: myProfileRoutesNames.ADD_SYNCLIST,
-                loadComponent: () => import('./add-synclist/add-synclist.component').then((mod) => mod.AddSynclistComponent),
+                loadComponent: () => import('./manage-synclist/manage-synclist.component').then((mod) => mod.ManageSynclistComponent),
+            },
+            {
+                path: myProfileRoutesNames.EDIT_SYNCLIST,
+                loadComponent: () => import('./manage-synclist/manage-synclist.component').then((mod) => mod.ManageSynclistComponent),
             }
         ],
     }

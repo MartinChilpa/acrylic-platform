@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddSynclistComponent } from './add-synclist.component';
+import { ManageSynclistComponent } from './manage-synclist.component';
 
-describe('AddSynclistComponent', () => {
-  let component: AddSynclistComponent;
-  let fixture: ComponentFixture<AddSynclistComponent>;
+describe('ManageSynclistComponent', () => {
+  let component: ManageSynclistComponent;
+  let fixture: ComponentFixture<ManageSynclistComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddSynclistComponent]
+      imports: [ManageSynclistComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(AddSynclistComponent);
+    fixture = TestBed.createComponent(ManageSynclistComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

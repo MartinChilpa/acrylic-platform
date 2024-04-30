@@ -8,6 +8,7 @@ import { NgClass, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MyArtistService } from '../../services/my-artist.service';
 import { ModalService } from '../../services/modal.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'acrylic-upload',
@@ -23,8 +24,12 @@ export class UploadComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   private _modalService = inject(ModalService);
+  private _activatedRoute = inject(ActivatedRoute);
+
+  uploadTrackId: string = ''
 
   ngOnInit(): void {
+    this.uploadTrackId = this._activatedRoute.snapshot.params['trackId'];
     this.uploadTrackForm = this._fb.group({
       id: [null],
       isrc: ['', [Validators.required, Validators.pattern(/^[A-Z]{4}\d{8}$/)]],
@@ -44,6 +49,35 @@ export class UploadComponent implements OnInit {
       distributor: [null],
       tags: [],
     });
+    if (this.uploadTrackId) {
+      this.getTrackById()
+    }
+  }
+
+  getTrackById() {
+    this._myArtistService.getTrackById(this.uploadTrackId).subscribe({
+      next: response => {
+        this.uploadTrackForm.patchValue({
+          id: response.uuid,
+          isrc: response.isrc,
+          name: response.name,
+          duration: response.duration,
+          released: response.released,
+          is_cover: response.is_cover,
+          is_remix: response.is_remix,
+          is_instrumental: response.is_instrumental,
+          is_explicit: response.is_explicit,
+          bpm: response.bpm,
+          lyrics: response.lyrics,
+          cover_image: response.cover_image,
+          snippet: response.snippet,
+          file_wav: response.file_wav,
+          file_mp3: response.file_mp3,
+          distributor: response.distributor,
+          tags: response.tags,
+        })
+      }
+    })
   }
 
   uploadStepper(index: number) {

@@ -13,6 +13,13 @@ import { FormGroup } from '@angular/forms';
 export class UploadStep1Component {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
+  splitNames: any[] = [
+    { name: "Track Name 1", text: 'Dec 25, 2024, 6:44 PM' },
+    { name: "Track Name 2", text: 'Dec 25, 2024, 6:44 PM' },
+    { name: "Track Name 3", text: 'Dec 25, 2024, 6:44 PM' },
+    { name: "Track Name 4", text: 'Dec 25, 2024, 6:44 PM' },
+    { name: "Track Name 5", text: 'Dec 25, 2024, 6:44 PM' },
+  ]
   connectSplit = [
     { Name: 'You', percentage: '60%' },
     { Name: 'John Doe', percentage: '30%' },
@@ -25,6 +32,6 @@ export class UploadStep1Component {
   }
 
   dropdownSelected($event: any) {
-    this.form.get('name')?.setValue($event.title);
+    this.form.get('name')?.setValue($event.name);
   }
 }

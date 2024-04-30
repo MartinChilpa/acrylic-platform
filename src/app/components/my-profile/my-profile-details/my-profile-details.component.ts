@@ -49,6 +49,10 @@ export class MyProfileDetailsComponent {
     this._navigationService.navigateToSyncList();
   }
 
+  editSynclist(item: IMyArtistSynclistResult) {
+    this._navigationService.navigateToEditSyncList(item.uuid);
+  }
+
   public get profileBioTrack() {
     return [
       {

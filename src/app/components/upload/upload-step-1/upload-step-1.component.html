@@ -1,5 +1,5 @@
 <div>
-    <acrylic-custom-dropdown (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
+    <acrylic-custom-dropdown [title]="'Split Sheet'" [inputValue]="form.get('name')?.value" [values]="splitNames" (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
 </div>
 <div class="mt-2">
     <p class="small">Don’t have a split sheet?  <span class="text-orange">Create one here</span></p>
@@ -18,12 +18,11 @@
                             <small>Name</small>
                             <small>%</small>
                         </li>
-                        @for(item of connectSplit; track item) {
-                            <li class="list-group-item border-0 d-flex-justify-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orangey': $index === 0}">
+                        @for(item of connectSplit; let i = $index; track item) {
+                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary" [class.selected]="i == 0">
                                 <span>{{ item.Name }}</span>
                                 <span>{{ item.percentage }}</span>
                             </li>
-
                         }
                    </ul>
                 </div>
@@ -38,12 +37,11 @@
                             <small>Name</small>
                             <small>%</small>
                         </li>
-                        @for(item of connectSplit; track item) {
-                            <li class="list-group-item border-0 d-flex-justify-between bg-light-gray p-3 text-primary" [ngClass]="{'text-orangey': $index === 0}">
+                        @for(item of connectSplit; let i = $index; track item) {
+                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary" [class.selected]="i == 0">
                                 <span>{{ item.Name }}</span>
                                 <span>{{ item.percentage }}</span>
                             </li>
-
                         }
                    </ul>
                 </div>

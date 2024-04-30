@@ -28,11 +28,19 @@ export class NavigationService {
     this._router.navigateByUrl('my-profile/add-synclist');
   }
 
+  navigateToEditSyncList(id: string) {
+    this._router.navigateByUrl(`/my-profile/edit-synclist/${id}`);
+  }
+
   navigateToMyProfile() {
     this._router.navigateByUrl('/my-profile');
   }
 
   navigateToMyTracks() {
     this._router.navigateByUrl('/my-tracks');
+  }
+
+  navigateToEditTracks(id: string) {
+    this._router.navigateByUrl(`/upload/${id}`);
   }
 }

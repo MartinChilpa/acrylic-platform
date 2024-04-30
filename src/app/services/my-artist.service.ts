@@ -32,8 +32,24 @@ export class MyArtistService {
     return this._http.get<IMyArtistSynclist>(`${this.MY_ARTIST_API_URL}/synclists/`);
   }
 
+  getSynclistById(id: string): Observable<IMyArtistSynclistResult> {
+    return this._http.get<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/${id}`);
+  }
+
   createSynclist(request: FormData): Observable<IMyArtistSynclistResult> {
     return this._http.post<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/`, request);
+  }
+
+  updateSynclist(request: FormData, id: string): Observable<IMyArtistSynclistResult> {
+    return this._http.put<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/${id}`, request);
+  }
+
+  getTracks(): Observable<ICreateTracks[]> {
+    return this._http.get<ICreateTracks[]>(`${this.MY_ARTIST_API_URL}/tracks/`);
+  }
+
+  getTrackById(id: string): Observable<ICreateTracks> {
+    return this._http.get<ICreateTracks>(`${this.MY_ARTIST_API_URL}/tracks/${id}`);
   }
 
   createTracks(request: FormData): Observable<ICreateTracks> {

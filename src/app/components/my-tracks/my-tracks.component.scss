@@ -1,0 +1,14 @@
+@use '../../styles/overrides/input' as *;
+@use '../../styles/overrides/table' as *;
+
+.price-tag {
+    width: 100px;
+}
+
+::ng-deep {
+    .my-track-select-box {
+        .select-btn {
+            height: 33px;
+        }
+    }
+}

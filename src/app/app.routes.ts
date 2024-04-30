@@ -7,6 +7,7 @@ export const routesNames = {
   AUTH: 'auth',
   MY_PROFILE: 'my-profile',
   UPLOAD: 'upload',
+  EDIT_UPLOAD: 'upload/:trackId',
   TRACKS: 'my-tracks',
   PAGE_NOT_FOUND: 'page-not-found',
   EMPTY: ''
@@ -33,6 +34,10 @@ export const routes: Routes = [
       },
       {
         path: routesNames.UPLOAD,
+        loadComponent: () => import('./components/upload/upload.component').then((c) => c.UploadComponent),
+      },
+      {
+        path: routesNames.EDIT_UPLOAD,
         loadComponent: () => import('./components/upload/upload.component').then((c) => c.UploadComponent),
       },
       {

@@ -28,7 +28,10 @@ export class FileDropzoneComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.existingFiles && this.existingFiles?.length) {
-      this.uploadedFiles = this.existingFiles.filter(file => file).map(file => <File>file)
+      this.uploadedFiles = this.existingFiles.filter(file => file).map(file =>
+        typeof file === 'string' ? <File>{
+          name: file
+        } : <File>file)
     }
   }
 
