@@ -40,8 +40,13 @@
 .bg-switch-off {
     background-color: var(--switch-off-container-color);
 }
-.bg-success{
+
+.bg-success {
     background-color: var(--success-color) !important;
+}
+
+.bg-blue {
+  background-color: var(--blue-color) !important;
 }
 
 // Text Colors

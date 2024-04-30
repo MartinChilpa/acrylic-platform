@@ -1,5 +1,5 @@
 <div>
-    <acrylic-custom-dropdown (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
+    <acrylic-custom-dropdown [title]="'Split Sheet'" [inputValue]="form.get('name')?.value" [values]="splitNames" (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
 </div>
 <div class="mt-2">
     <p class="small">Don’t have a split sheet?  <span class="text-orange">Create one here</span></p>
@@ -23,7 +23,6 @@
                                 <span>{{ item.Name }}</span>
                                 <span>{{ item.percentage }}</span>
                             </li>
-
                         }
                    </ul>
                 </div>

@@ -4,6 +4,7 @@ import { NavigationService } from '../../../services/navigation.service';
 import { FileDropzoneComponent } from '../../shared/file-dropzone/file-dropzone.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MyArtistService } from '../../../services/my-artist.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'acrylic-add-synclist',
@@ -13,10 +14,10 @@ import { MyArtistService } from '../../../services/my-artist.service';
     FileDropzoneComponent,
     ReactiveFormsModule
   ],
-  templateUrl: './add-synclist.component.html',
-  styleUrl: './add-synclist.component.scss'
+  templateUrl: './manage-synclist.component.html',
+  styleUrl: './manage-synclist.component.scss'
 })
-export class AddSynclistComponent implements OnInit {
+export class ManageSynclistComponent implements OnInit {
   fileDropzoneIcon = '/assets/images/icons/drop.svg'
   fileDropzoneHeader = 'Drop your Cover Art File here or upload it manually';
   fileDropzoneSize = 'JPG 1920px x 1080px';
@@ -24,6 +25,7 @@ export class AddSynclistComponent implements OnInit {
   private _navigationService = inject(NavigationService);
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
+  private _activatedRoute = inject(ActivatedRoute);
 
   trackSyncList = [
     { trackImage: 'assets/images/others/falling.png', name: 'Falling', tags: ['Lo-Fi', 'Pop'] },
@@ -35,6 +37,7 @@ export class AddSynclistComponent implements OnInit {
   synclistId: string = ''
 
   ngOnInit(): void {
+    this.synclistId = this._activatedRoute.snapshot.params['synclistId'];
     this.synclistForm = this._fb.group({
       id: [null],
       name: [null],
@@ -43,6 +46,9 @@ export class AddSynclistComponent implements OnInit {
       description: [''],
       pinned: [true],
     })
+    if (this.synclistId) {
+      this.getSynclist();
+    }
   }
 
   backProfile() {
@@ -53,12 +59,28 @@ export class AddSynclistComponent implements OnInit {
     this.synclistForm.get(key)?.setValue($event[0])
   }
 
+  getSynclist() {
+    this._myArtistService.getSynclistById(this.synclistId).subscribe({
+      next: response => {
+        this.synclistForm.patchValue({
+          id: response.uuid,
+          name: response.name,
+          cover_image: response.cover_image,
+          background_image: response.background_image,
+          description: response.description,
+          pinned: response.pinned
+        })
+      }
+    })
+  }
+
   saveSynclist() {
     const formData = new FormData();
     Object.keys(this.synclistForm.value).forEach(item => {
       formData.append(item, this.synclistForm.value[item]);
     })
-    this._myArtistService.createSynclist(formData).subscribe({
+    const synclistType = !this.synclistForm.value.id ? this._myArtistService.createSynclist(formData) : this._myArtistService.updateSynclist(formData, this.synclistForm.value.id)
+    synclistType.subscribe({
       next: response => {
         this.backProfile();
       }

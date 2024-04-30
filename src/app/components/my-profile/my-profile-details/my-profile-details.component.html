@@ -50,7 +50,7 @@
         </div>
         <div class="row g-2">
             @for (item of artistSynclist; track item) {
-            <div class="col-lg-4 col-md-6 col-12 pinned-sync-box">
+            <div class="col-lg-4 col-md-6 col-12 pinned-sync-box cursor-pointer" (click)="editSynclist(item)">
                 <div class="pinned-sync-back radius-5 p-3 h-100 d-flex align-items-end"
                     [style.backgroundImage]="'url(' + item.background_image + ')'">
                     <div class="pinned-sync-gradient-layer"></div>
@@ -66,7 +66,7 @@
             </div>
             }
             <div class="col-lg-4 col-md-6 col-12 pinned-sync-box" (click)="addSync()">
-                <div class="d-flex-center flex-column h-100 light-gray-border radius-5">
+                <div class="d-flex-center flex-column h-100 light-gray-border radius-5 cursor-pointer">
                     <img ngSrc="assets/images/icons/vector.svg" alt="plus-circle" width="20" height="20" />
                     <p class="mb-0 pt-1">Add a Synclist</p>
                 </div>

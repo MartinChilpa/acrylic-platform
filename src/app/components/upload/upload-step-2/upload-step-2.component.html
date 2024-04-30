@@ -59,9 +59,9 @@
                     <input type="text" id="isrc-code" formControlName="isrc" class="form-control mt-2 w-100"
                         placeholder="ISRC Code" autocomplete="off">
                     @if (form.get('isrc')?.errors?.['pattern']) {
-                        <div class="text-danger mt-1">
-                            Please enter valid ISRC code.
-                        </div>
+                    <div class="text-danger mt-1">
+                        Please enter valid ISRC code.
+                    </div>
                     }
                 </div>
             </div>
@@ -69,15 +69,9 @@
         <div class="col-12">
             <div class="acr-box">
                 <div class="input-with-label w-100">
-                    <label for="distributor">Name Of Distributor Or Label Contact</label>
-                    <select id="distributor" class="acr-input mt-2 w-100 rounded" formControlName="distributor"
-                        placeholder="Distributor Name">
-                        @for (item of distributors; track item) {
-                            <option [value]="item.uuid">
-                                {{ item.name }}
-                            </option>
-                        }
-                    </select>
+                    <acrylic-custom-dropdown [title]="'Name Of Distributor Or Label Contact'"
+                        [inputValue]="form.get('distributor')?.value" [values]="distributors"
+                        (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
                 </div>
             </div>
         </div>

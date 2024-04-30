@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DistributorsService } from '../../../services/distributors.service';
 import { IDistributorsResult } from '../../../interfaces/response/distributor.response';
+import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
 
 @Component({
   selector: 'acrylic-upload-step-2',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CustomDropdownComponent],
   templateUrl: './upload-step-2.component.html',
   styleUrl: './upload-step-2.component.scss'
 })
@@ -31,5 +32,9 @@ export class UploadStep2Component implements OnInit {
         this.distributors = response.results
       }
     })
+  }
+
+  dropdownSelected($event: any) {
+    this.form.get('distributor')?.setValue($event.uuid);
   }
 }

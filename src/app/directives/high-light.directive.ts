@@ -25,7 +25,7 @@ export class HighLightDirective {
 
   getFormattedText() {
     const re = new RegExp(`(${this.searchedWord})`, 'gi');
-    return this.content.title.replace(re, `<span class="${this.classToApply}">$1</span>`) + `<span class="bg-light-gray px-2 py-1 radius-5 ms-auto">${this.content.date}</span>`;
+    return this.content.name.replace(re, `<span class="${this.classToApply}">$1</span>`) + (this.content.text ? `<span class="bg-light-gray px-2 py-1 radius-5 ms-auto">${this.content.text}</span>` : '');
   }
 
 }
