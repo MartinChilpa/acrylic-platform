@@ -114,7 +114,10 @@ export class ManageSynclistComponent implements OnInit {
   }
 
   synclistChecked(trackId: string) {
-    return this.synclistTracks.some(x => x.uuid == trackId)
+    if (this.synclistTracks && Array.isArray(this.synclistTracks)) {
+      return this.synclistTracks.some(x => x.uuid == trackId)
+    }
+    return false;
   }
 
   manageTags($event: any, trackId: string) {
