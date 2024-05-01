@@ -1,0 +1,118 @@
+<div class="d-flex w-100">    
+    <div class="transaction my-subscriptions w-100">
+        <div class="acr-box mb-20">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="font-size16 font-weight-400 mb-2">You are currently on Monthly package</div>
+                    <div class="font-size14 font-weight-400 mb-2 max-width-560">Lorem ipsum dolor sit amet consectetur.
+                        A dictum eget vitae neque nisl feugiat tincidunt dignissim. Lorem ipsum dolor sit amet
+                        consectetur.</div>
+
+                    <div class="d-inline-block font-size14 font-weight-400 card-beige-color cursor-pointer">Switch to
+                        Annual Package</div>
+                </div>
+                <div><img src="assets/images/others/Colita.png" /></div>
+            </div>
+        </div>
+        <div class="acr-box mb-20">
+            <div class="d-flex align-items-center justify-content-between  mb-2">
+                <div class="font-size16 font-weight-400">Invoice Settings</div>
+                <div class="default-dropdown-toggle mn-width-auto"><span>Save</span></div>
+            </div>
+            <div class="max-width-560">
+                <div class="mb-3">
+                    <input type="text" class="form-control default-input min-height-52" placeholder="Billing Email">
+                    <span class="input-label">Invoices and receipts will be sent to this email address</span>
+                </div>
+                <div class="mb-3">
+                    <textarea placeholder="Company Billing Profile" class="form-control textarea-input"></textarea>
+                    <span class="input-label">Additional company information to be shown on invoices; e. g. address, PO
+                        number, etc.</span>
+                </div>
+                <div class="toggle-section my-3">
+                    <div class="font-size14 font-weight-400">Text notifications when payment fail</div>
+                    <div class="my-2 d-flex align-items-center">
+                        <label class="switch" (click)="toggleSwitch()">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                          </label>
+                          <span id="toggleLabel" class="ps-2">Yes</span>
+                    </div>
+                    <div class="input-label">We’ll notify you about billing issues. We’ll never call or share your
+                        number.</div>
+                </div>
+                <div class="font-size14 font-weight-400 mb-2">Phone Number</div>
+                <div class="d-flex align-items-center mb-2">
+                    <div class="w-35 me-1"><input type="text" class="form-control default-input min-height-52"
+                            placeholder="United State [+1]"></div>
+                    <div class="w-75"><input type="text" class="form-control default-input min-height-52"
+                            placeholder="Phone Number"></div>
+                </div>
+                <div class="input-label">Be sure to include country code. Your wireless provider’s standard messaging
+                    rates apply.</div>
+            </div>
+
+        </div>
+
+        <div class="acr-box mb-20">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="font-size16 font-weight-400">Additional billing info</div>
+                <div>
+                    <div class="default-dropdown-toggle mn-width-auto"><span>Save</span></div>
+                </div>
+            </div>
+            <div class="max-width-560">
+                <div>
+                    <input type="text" class="form-control default-input min-height-52" placeholder="Tax ID">
+                    <span class="input-label">Business with a valid Tax ID will not be subject to tax on their Acrylic
+                        package purchases. </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="acr-box">
+            <div class="font-size16 font-weight-400 mb-2">All Invoices</div>
+            <div class="max-width-560">
+                <div>
+                    <input type="text" class="form-control default-input min-height-52" placeholder="Tax ID">
+                    <span class="input-label">Business with a valid Tax ID will not be subject to tax on their Acrylic
+                        package purchases. </span>
+                </div>
+            </div>
+            <div class="mt-2">
+                <div class="light-gray-table-border rounded-2 table-responsive mt-4 mt-xl-0">
+                    <table class="acrylic-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Invoice Date</th>
+                                <th scope="col">Invoice Details</th>
+                                <th scope="col">Total Charged</th>
+                                <th scope="col">Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td class="text-nowrap">
+                                    <span>Dec 2, 2024, 3:45 PM</span>
+                                </td>
+                                <td class="text-nowrap">
+                                    <span>Fan package</span>
+                                </td>
+                                <td class="text-nowrap">
+                                    <span>$9.99</span>
+                                </td>
+                                <td class="text-nowrap">
+                                    <span><div><button type="button"
+                                        class="btn btn-info w-100 w-100 font-weight-600 font-size14 px-3">Download
+                                        PDF</button></div></span>
+                                </td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

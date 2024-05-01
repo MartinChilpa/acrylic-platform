@@ -11,6 +11,7 @@ export const routesNames = {
   EDIT_UPLOAD: 'upload/:trackId',
   TRACKS: 'my-tracks',
   PAGE_NOT_FOUND: 'page-not-found',
+  FINANCE: 'my-finances',
   EMPTY: ''
 };
 
@@ -48,6 +49,10 @@ export const routes: Routes = [
       {
         path: routesNames.TRACKS,
         loadComponent: () => import('./components/my-tracks/my-tracks.component').then((c) => c.MyTracksComponent),
+      },
+      {
+        path: routesNames.FINANCE,
+        loadChildren: () => import('./components/finance/finance.routes').then((mod) => mod.FINANCE_ROUTES),
       },
     ],
   },

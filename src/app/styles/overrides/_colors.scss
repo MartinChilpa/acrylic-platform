@@ -44,6 +44,9 @@
 .bg-success {
     background-color: var(--success-color) !important;
 }
+.info-bg-success{
+    background-color: var(--info-bg-color) !important;
+}
 
 .bg-blue {
   background-color: var(--blue-color) !important;
@@ -137,4 +140,7 @@
 }
 .darkgrey-color-bg{
     background-color: var(--darkgrey-color)
+}
+.card-beige-color{
+	color:var(--beige-color);
 }

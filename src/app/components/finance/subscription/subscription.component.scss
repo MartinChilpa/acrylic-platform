@@ -1,0 +1,64 @@
+@use '../../../styles/overrides/table' as *;
+@use '../../../styles/overrides/toggle' as *;
+
+.default-dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+    background: #1B1B1B;
+    opacity: 0.5;
+    height: 28px;
+    border-radius: 5px;
+    min-width: 110px;
+    border: 0.3px solid rgba(255, 255, 255, 0.3);
+    padding: 5.5px 11.5px;
+}
+.input-label{
+	opacity:0.5;
+	font-size:12px;
+	font-weight:400;
+	margin-top:4px;
+}
+input.default-input[type="text"]{
+	border:0;
+	height:52px;
+	background-color:var(--darkgrey-color);
+	padding-left:16px;
+	box-shadow:none;
+	color:var(--text-color);
+	height:36px;
+}
+textarea.textarea-input{
+	border:0;
+	height:52px;
+	background-color:var(--darkgrey-color);
+	padding:16px;
+	box-shadow:none;
+	color:var(--text-color);
+	height:36px;
+	outline:0;
+	box-shadow:none;
+	resize:none;
+	border-radius:5px;
+	height:120px;
+}
+
+input.default-input::placeholder,
+textarea.textarea-input::placeholder {
+  color: var(--text-color);
+  opacity:0.3;
+  font-size:14px;  
+}
+textarea.textarea-input.form-control:focus{
+	background-color:var(--darkgrey-color);
+	box-shadow:none;
+}
+input.default-input:hover::placeholder,
+textarea.textarea-input:hover::placeholder{
+	opacity:1;
+	background-color:var(--darkgrey-color);
+}

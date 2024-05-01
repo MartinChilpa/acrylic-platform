@@ -3,6 +3,13 @@ export const sidenavItems = [
     { icon: 'files', label: 'My Split Sheets' },
     { icon: 'music', label: 'My Tracks', routerLink: '/my-tracks' },
     { icon: 'user', label: 'My Profile', routerLink: '/my-profile' },
-    { icon: 'coin', label: 'My Finances' },
+    { icon: 'coin', label: 'My Finances' , routerLink: '/my-finances', child: 
+      [
+        { label: 'My Revenue', routerLink: '/my-finances/my-revenue' },
+        { label: 'My Transactions', routerLink: '/my-finances/my-transactions' }, 
+        { label: 'My Subscription', routerLink: '/my-finances/my-subscription' }, 
+        { label: 'My Documents', routerLink: '/my-finances/my-document'}
+      ]
+    },
     { icon: 'question', label: 'My Support' },
 ];
