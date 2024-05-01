@@ -36,8 +36,11 @@
                 @if(myArtist){
                 <div class="d-flex gap-2">
                     @for (item of profileBioTrack; track item.icon) {
-                    <a class="btn btn-darkgrey p-1" [href]="item.link" target="_blank"><img [src]="item.icon"
-                            alt="side_icon" width="22" height="22" /></a>
+                        @if(item.link){
+                            <a class="btn btn-darkgrey p-1" [href]="item.link" target="_blank">
+                                <img [src]="item.icon" alt="side_icon" width="22" height="22" />
+                            </a>
+                        }
                     }
                 </div>
                 }
@@ -58,8 +61,8 @@
                         <img [ngSrc]="item.cover_image" alt="pinned-img" width="60" height="60"
                             class="radius-5 pinned-sunc-front" />
                         <div class="d-flex flex-column">
-                            <h6 class="fw-bold mb-0">{{ item.name }}</h6>
-                            <p class="mb-0">{{ item.description }}</p>
+                            <h6 class="mb-1">{{ item.name }}</h6>
+                            <small>Rock, Rap</small>
                         </div>
                     </div>
                 </div>
@@ -75,6 +78,6 @@
     </div>
 </section>
 <div class="modal fade" id="profile-share" data-bs-backdrop="static">
-    <acrylic-share-profile></acrylic-share-profile>
+    <acrylic-share-profile [myArtist]="myArtist" [profileBioTrack]="profileBioTrack"></acrylic-share-profile>
 </div>
 }
