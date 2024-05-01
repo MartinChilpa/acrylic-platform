@@ -59,4 +59,20 @@ export class MyArtistService {
   updateTracks(request: FormData, uuid: string): Observable<ICreateTracks> {
     return this._http.put<ICreateTracks>(`${this.MY_ARTIST_API_URL}/tracks/${uuid}/`, request);
   }
+
+  addSynclistTrack(synclistId: string, trackId: string): Observable<Object> {
+    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/add-tracks/`, [
+      {
+        track_uuid: trackId
+      }
+    ]);
+  }
+
+  removeSynclistTrack(synclistId: string, trackId: string): Observable<Object> {
+    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/remove-track/`, [
+      {
+        track_uuid: trackId
+      }
+    ]);
+  }
 }
