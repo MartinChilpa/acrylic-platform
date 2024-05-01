@@ -23,11 +23,13 @@
                         <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
                             [fileDropzoneHeader]="fileDropzoneHeader" [fileDropzoneSize]="fileDropzoneSize"
                             [existingFiles]="[synclistForm.get('cover_image')?.value]"
+                            [allowExtensions]="['jpg']"
                             (uploadedFileList)="setUploadFile('cover_image', $event)"></acrylic-file-dropzone>
                         <div class="mt-2">
                             <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
                                 [fileDropzoneHeader]="'Drop your Background Image File here or upload it manually'"
                                 [fileDropzoneSize]="fileDropzoneSize"
+                                [allowExtensions]="['jpg']"
                                 [existingFiles]="[synclistForm.get('background_image')?.value]"
                                 (uploadedFileList)="setUploadFile('background_image', $event)"></acrylic-file-dropzone>
                         </div>

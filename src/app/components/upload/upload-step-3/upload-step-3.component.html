@@ -5,12 +5,14 @@
                 [fileDropzoneHeader]="UploadFileTextDetails[2].fileDropzoneHeader"
                 [fileDropzoneExternalLink]="UploadFileTextDetails[2].fileDropzoneExternalLink"
                 [existingFiles]="[form.get('snippet')?.value]"
+                [allowExtensions]="['mp3']"
                 (uploadedFileList)="setUploadFile('snippet', $event)"></acrylic-file-dropzone>
         </div>
         <div class="col-12">
             <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[0].fileDropzoneIcon"
                 [fileDropzoneHeader]="UploadFileTextDetails[0].fileDropzoneHeader"
                 [existingFiles]="[form.get('file_wav')?.value]"
+                [allowExtensions]="['wav']"
                 (uploadedFileList)="setUploadFile('file_wav', $event)"></acrylic-file-dropzone>
         </div>
         <div class="col-12">
@@ -18,6 +20,7 @@
                 [fileDropzoneHeader]="UploadFileTextDetails[1].fileDropzoneHeader"
                 [fileDropzoneSize]="UploadFileTextDetails[1].fileDropzoneSize"
                 [existingFiles]="[form.get('cover_image')?.value]"
+                [allowExtensions]="['jpg']"
                 (uploadedFileList)="setUploadFile('cover_image', $event)"></acrylic-file-dropzone>
         </div>
     </div>

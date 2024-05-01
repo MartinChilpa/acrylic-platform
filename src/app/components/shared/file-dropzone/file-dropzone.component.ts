@@ -1,6 +1,7 @@
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, inject } from '@angular/core';
 import { FileDragDropDirective } from '../../../directives/file-drag-drop.directive';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'acrylic-file-dropzone',
@@ -19,7 +20,10 @@ export class FileDropzoneComponent implements OnInit {
   @Input() fileDropzoneSize!: string;
   @Input() fileDropzoneExternalLink!: string;
   @Input() existingFiles!: any[];
+  @Input() allowExtensions: string[] = [];
   @Output() uploadedFileList = new EventEmitter<File[]>();
+
+  private _alertService = inject(AlertService);
 
   @ViewChild("fileUpload") fileUpload!: ElementRef<HTMLElement>
   uploadedFiles: File[] = []
@@ -45,8 +49,22 @@ export class FileDropzoneComponent implements OnInit {
 
   onFileChange($event: any) {
     const files = <File[]>Array.from($event.files ? $event.files : $event)
-    this.uploadedFiles = this.uploadedFiles.concat(files)
-    this.uploadedFileList.emit(this.uploadedFiles);
+    let canUpload = true;
+    if (this.allowExtensions && this.allowExtensions.length > 0) {
+      files.forEach(item => {
+        const extension = item.name.split('.')[item.name.split('.').length - 1]
+        if (this.allowExtensions.some(x => x.toLowerCase() != extension.toLowerCase())) {
+          canUpload = false;
+          this.fileUpload.nativeElement.setAttribute('value', '');
+          this._alertService.error(`Allowed file extensions are ${this.allowExtensions.join(',')} only.`)
+          return;
+        }
+      })
+    }
+    if (canUpload) {
+      this.uploadedFiles = this.uploadedFiles.concat(files)
+      this.uploadedFileList.emit(this.uploadedFiles);
+    }
   }
 
   removeUpload(index: number) {

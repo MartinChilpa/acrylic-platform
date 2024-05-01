@@ -21,7 +21,7 @@ import { TrackDetail } from '../../../interfaces/response/my-artist-synclist.res
   styleUrl: './manage-synclist.component.scss'
 })
 export class ManageSynclistComponent implements OnInit {
-  activeStepper: number = 2;
+  activeStepper: number = 1;
   fileDropzoneIcon = '/assets/images/icons/drop.svg'
   fileDropzoneHeader = 'Drop your Cover Art File here or upload it manually';
   fileDropzoneSize = 'JPG 1920px x 1080px';
