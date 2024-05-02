@@ -5,7 +5,7 @@
     <div class="acrylic-select w-100 cursor-pointer position-relative" [class.mt-2]="title" (click)="isActive = !isActive">
         <div class="select-btn d-flex-between bg-darkgrey h-50px px-3 radius-5"
             [ngClass]="{'rounded-bottom-0': isActive}">
-            <span>{{ selectedValue ? selectedValue : placeholder }}</span>
+            <span [ngClass]="{'text-light-gray': !selectedValue}">{{ selectedValue ? selectedValue : placeholder }}</span>
             <span class="select-down-arrow height-15px width-15px"></span>
         </div>
         <div class="content bg-switch-off radius-5 rounded-top-0 position-absolute w-100 z-3"

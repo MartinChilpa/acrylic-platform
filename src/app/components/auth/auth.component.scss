@@ -8,3 +8,17 @@
     object-fit: cover;
     border-radius: 80px 0px 80px 0px;
 }
+
+#auth-carousel {
+    .carousel-indicators {
+        height: 5px;
+        button {
+            &.active {
+                background-color: var(--beige-color);
+            }
+            &:not(.active) {
+                opacity: 0.2;
+            }
+        }
+    }
+}

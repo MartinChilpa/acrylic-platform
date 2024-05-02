@@ -16,4 +16,10 @@ import { NgOptimizedImage } from '@angular/common';
 })
 export class SidenavComponent {
   sidenavItems = sidenavItems;
+
+  toggleSubMenu(item: any) {
+    if (item.submenu) {
+      item.showSubMenu = !item.showSubMenu;
+    }
+  }
 }
