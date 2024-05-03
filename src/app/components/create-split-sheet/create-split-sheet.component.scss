@@ -1,12 +1,8 @@
+@use '../../styles/overrides/input';
+
 .transp-btn {
 	background: transparent !important;
 	border: 1px solid rgba(255,255,255,0.3);
-}
-
-.default-box{
-	background: var(--secondary-color);
-	padding:16px;
-	border-radius:5px;
 }
 
 .max-width-560{
@@ -85,21 +81,4 @@
     padding-left: 16px;
     box-shadow: none;
     color: var(--text-color);
-}
-
-.form-input input[type="text"]::placeholder
-{
-    color: var(--text-color);
-    opacity: 0.3;
-    font-size: 14px;
-    font-weight: 400;
-}
-.form-input .error input[type="text"],
-.form-input .error input[type="password"] {
-    border: 1px solid var(--danger-color);
-}
-
-.form-input .error .input-lbl,
-.form-input .error .input-lbl {
-    color: var(--danger-color);
 }

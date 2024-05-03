@@ -1,6 +1,6 @@
 export const sidenavItems = [
   { icon: 'home', label: 'Home', routerLink: '/home' },
-  { icon: 'files', label: 'My Split Sheets' },
+  { icon: 'files', label: 'My Split Sheets', routerLink: '/my-split-sheets'},
   { icon: 'music', label: 'My Tracks', routerLink: '/my-tracks' },
   { icon: 'user', label: 'My Profile', routerLink: '/my-profile' },
   {

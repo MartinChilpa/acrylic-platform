@@ -13,6 +13,7 @@ export const routesNames = {
   SUPPORT: 'my-support',
   PAGE_NOT_FOUND: 'page-not-found',
   FINANCE: 'my-finances',
+  MY_SPLIT_SHEETS:'my-split-sheets',
   EMPTY: ''
 };
 
@@ -59,6 +60,10 @@ export const routes: Routes = [
         path: routesNames.FINANCE,
         loadChildren: () => import('./components/finance/finance.routes').then((mod) => mod.FINANCE_ROUTES),
       },
+      {
+        path: routesNames.MY_SPLIT_SHEETS,
+        loadComponent: () => import('./components/my-split-sheets/my-split-sheets.component').then((c) => c.MySplitSheetsComponent)
+      }
     ],
   },
   {

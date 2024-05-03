@@ -2,7 +2,7 @@
     <!--this is edit and view mode--apply d-none class to hide and show-->
     @if(reveiwBtnClick) {
     <div class="split-sheet w-100 send-mode">
-        <div class="default-box mb-20">
+        <div class="acr-box mb-20">
             <div class="max-width-560">
                 <div class="mb-20">
                     <div class="font-size12 mb-1 dart-color-txt-60">ISRC Code:</div>
@@ -29,7 +29,7 @@
 
                 </div>
 
-                <div class="default-box mb-20 darkgrey-color-bg">
+                <div class="acr-box mb-20 darkgrey-color-bg">
                     <div class="max-width-560">
                         <div class="font-size12 mb-1 dart-color-txt-60">Publishing Splits</div>
                         <div class="row font-size14 mb-1" *ngFor="let item of reviewObject.publishing; let i = index">
@@ -40,12 +40,12 @@
                                 {{item.email}}
                             </div>
                             <div class="col info-color-txt">
-                                {{item.percentage}}
+                                {{item.percentage}}%
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="default-box mb-20 darkgrey-color-bg">
+                <div class="acr-box mb-20 darkgrey-color-bg">
                     <div class="max-width-560">
                         <div class="font-size12 mb-1 dart-color-txt-60">Masters Splits</div>
                         <div class="row font-size14 mb-1" *ngFor="let item of reviewObject.mastering; let i = index">
@@ -56,7 +56,7 @@
                                 {{item.email}}
                             </div>
                             <div class="col info-color-txt">
-                                {{item.percentage}}
+                                {{item.percentage}}%
                             </div>
                         </div>
                     </div>
@@ -78,19 +78,19 @@
     <div class="split-sheet w-100 edit-view-mode">
         <form [formGroup]="createSplitSheetForm">
             <!-- ISRC -->
-            <div class="default-box mb-20">
-                <div class="max-width-560 form-input">
+            <div class="acr-box mb-20">
+                <div class="max-width-560">
                     <div class="font-size16 font-weight-600 mb-3">Your Track ISRC Code</div>
-                    <div class="input-with-lbl">
+                    <div>
                         <!-- <span class="input-lbl">ISRC Code</span> -->
-                        <input type="text" [formControlName]="'isrcCode'" class="form-control mb-2 w-100"
+                        <input type="text" [formControlName]="'isrcCode'" class="form-control acr-input mb-2 w-100"
                             placeholder="ISRC Code" autocomplete="off">
                     </div>
                 </div>
             </div>
 
             <!-- Image Track -->
-            <div class="default-box mb-20">
+            <div class="acr-box mb-20">
                 <div class="max-width-560">
                     <div class="split-pnct-box p-3">
                         <div class="d-flex align-items-center">
@@ -109,40 +109,40 @@
             </div>
 
             <!-- EMail -->
-            <div class="default-box mb-20">
-                <div class="max-width-560 form-input">
+            <div class="acr-box mb-20">
+                <div class="max-width-560">
                     <div class="font-size16 font-weight-600 mb-3">Email Address Of Distributor Or Label Contact</div>
-                    <div class="input-with-lbl">
+                    <div>
                         <!-- <span class="input-lbl">Email</span> -->
-                        <input type="text" [formControlName]="'email'" class="form-control mb-2 w-100"
+                        <input type="text" [formControlName]="'email'" class="form-control acr-input mb-2 w-100"
                             placeholder="Email" autocomplete="off">
                     </div>
                 </div>
             </div>
 
             <!-- Publish -->
-            <div class="default-box mb-20" formArrayName="publishing">
-                <div class="max-width-560 form-input">
+            <div class="acr-box mb-20" formArrayName="publishing">
+                <div class="max-width-560">
                     <div class="font-size16 font-weight-600 mb-3">Publishing Splits</div>
                     <div class="d-flex align-items-start mb-3"
                         *ngFor="let publishingGroup of publishing?.controls; let i = index" [formGroupName]="i">
                         <div class="w-35 me-2">
-                            <div class="input-with-lbl">
+                            <div>
                                 <!-- <span class="input-lbl">Full Name</span> -->
-                                <input type="text" formControlName="name" class="form-control mb-2 w-100"
+                                <input type="text" formControlName="name" class="form-control acr-input mb-2 w-100"
                                     placeholder="Full Name" autocomplete="off">
                             </div>
                         </div>
                         <div class="w-75 me-2">
-                            <div class="input-with-lbl">
+                            <div>
                                 <!-- <span class="input-lbl">Email</span> -->
-                                <input type="text" formControlName="email" class="form-control mb-2 w-100"
+                                <input type="text" formControlName="email" class="form-control acr-input mb-2 w-100"
                                     placeholder="Email" autocomplete="off">
                             </div>
                         </div>
-                        <div class="split-pnct-box">
+                        <div class="form-input split-pnct-box">
                             <div class="font-size14 font-weight-400 min-height-50 d-flex align-items-center justify-content-center width-80">
-                                <input type="text" formControlName="percentage" class="form-control">
+                                <input type="text" formControlName="percentage" class="form-control" step=".01">
                                 <span class="info-color-txt">%</span>                            
                             </div>
                         </div>
@@ -185,26 +185,26 @@
             </div>
 
             <!-- Master -->
-            <div class="default-box mb-20" formArrayName="mastering">
-                <div class="max-width-560 form-input">
+            <div class="acr-box mb-20" formArrayName="mastering">
+                <div class="max-width-560">
                     <div class="font-size16 font-weight-600 mb-3">Masters Splits</div>
                     <div class="d-flex align-items-start mb-3"
                         *ngFor="let masteringGroup of mastering?.controls; let i = index" [formGroupName]="i">
                         <div class="w-35 me-2">
-                            <div class="input-with-lbl">
+                            <div>
                                 <!-- <span class="input-lbl">Full Name</span> -->
-                                <input type="text" formControlName="name" class="form-control mb-2 w-100"
+                                <input type="text" formControlName="name" class="form-control acr-input mb-2 w-100"
                                     placeholder="Full Name" autocomplete="off">
                             </div>
                         </div>
                         <div class="w-75 me-2">
-                            <div class="input-with-lbl">
+                            <div>
                                 <!-- <span class="input-lbl">Email</span> -->
-                                <input type="text" formControlName="email" class="form-control mb-2 w-100"
+                                <input type="text" formControlName="email" class="form-control acr-input mb-2 w-100"
                                     placeholder="Email" autocomplete="off">
                             </div>
                         </div>
-                        <div class="split-pnct-box">
+                        <div class="form-input split-pnct-box">
                             <div class="font-size14 font-weight-400 min-height-50 d-flex align-items-center justify-content-center width-80">
                                 <input type="text" formControlName="percentage" class="form-control">
                                 <span class="info-color-txt">%</span>                            

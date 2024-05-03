@@ -59,18 +59,32 @@ export class CreateSplitSheetComponent implements OnInit {
   }
 
   calculatePercentage(object: [any]) {
-    let result = 0
+    let result: any[] = [];
     if (object.length > 0) {
-      let percentage = object.map(x => x.percentage).map(val => parseInt(val));
+      let percentage = object.map(x => x.percentage).map(val => parseFloat(val));
       if (percentage.some(val => { return val != 0 })) {
         let sum = 0
+        let count = 1;
+
         percentage.forEach(item => {
           sum = sum + item;
+          count += 1;
         });
-    
-        if (sum < this.total) {
-          result = this.total - sum;
+
+        let r = 0;
+        if (sum > 0 && sum === this.total) {
+          r = sum / count
+          object.forEach(item => {
+            item.percentage = r;
+          });
+        } else if (sum > this.total) {
+          return result;
         }
+        else {
+          r = this.total - sum;
+        }
+        object.push({ name: '', email: '', percentage: r });
+        result = object;
       }
 
     }
@@ -79,33 +93,41 @@ export class CreateSplitSheetComponent implements OnInit {
 
   addPublishingSheet() {
     let publishingArray = this.createSplitSheetForm.controls['publishing'].value;
-    let percentage = this.calculatePercentage(publishingArray);
-    if (percentage > 0) {
-      this.publishing.push(
-        new FormGroup({
-          name: new FormControl(''),
-          email: new FormControl(''),
-          percentage: new FormControl(percentage)
-        })
-      );
+    let percentage: any[] = this.calculatePercentage(publishingArray);
+    if (percentage.length > 0) {
+      this.publishing.clear();
+      percentage.forEach(item => {
+        this.publishing.push(
+          new FormGroup({
+            name: new FormControl(item.name),
+            email: new FormControl(item.email),
+            percentage: new FormControl(item.percentage)
+          })
+        );
+      });
     } else {
-      this._alertService.error("Cannot add more publish member, because 100% percentage split created");
+      this._alertService.error("Cannot split more");
     }
+
+
   }
 
   addMasterSheet() {
     let masterArray = this.createSplitSheetForm.controls['mastering'].value;
-    let percentage = this.calculatePercentage(masterArray);
-    if (percentage > 0) {
-      this.mastering.push(
-        new FormGroup({
-          name: new FormControl(''),
-          email: new FormControl(''),
-          percentage: new FormControl(percentage)
-        })
-      );
+    let percentage: any[] = this.calculatePercentage(masterArray);
+    if (percentage.length > 0) {
+      this.mastering.clear();
+      percentage.forEach(item => {
+        this.mastering.push(
+          new FormGroup({
+            name: new FormControl(item.name),
+            email: new FormControl(item.email),
+            percentage: new FormControl(item.percentage)
+          })
+        );
+      });
     } else {
-      this._alertService.error("Cannot add more mastering member, because 100% percentage split created");
+      this._alertService.error("Cannot split more");
     }
   }
 
