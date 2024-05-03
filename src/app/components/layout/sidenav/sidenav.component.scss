@@ -15,3 +15,16 @@
         color: var(--text-info-color);
     }
 }
+
+.acr-submenu {
+    transition: all 0.3s ease-in-out;
+}
+
+.open {
+    height: auto;
+}
+
+.closed {
+    height: 0;
+    opacity: 0;
+}

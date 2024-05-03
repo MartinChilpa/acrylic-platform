@@ -3,17 +3,11 @@
 }
 
 .pinned-sync-box {
-    height: 170px;
+    height: 175px;
     .pinned-sync-back {
         background-repeat: no-repeat;
         background-size: cover;
-        position: relative;
         .pinned-sync-gradient-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
             background: var(--default-gradient-gray-background-color);
         }
         .pinned-sync-content {

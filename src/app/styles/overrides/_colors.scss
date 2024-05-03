@@ -56,6 +56,10 @@
     background-color: var(--gray-color) !important;
 }
 
+.bg-auth-gradiant {
+    background: var(--default-gradiant-auth-background-color);
+}
+
 // Text Colors
 .text-success{
     color: var(--success-color) !important;

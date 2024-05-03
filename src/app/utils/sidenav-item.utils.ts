@@ -11,5 +11,11 @@ export const sidenavItems = [
         { label: 'My Documents', routerLink: '/my-finances/my-document'}
       ]
     },
-    { icon: 'question', label: 'My Support' },
+    { icon: 'question', label: 'My Support', routerLink: '',
+      submenu: [
+        { label: 'FAQ & Help', routerLink: '/my-support/faq' },
+        { label: 'Customer Success', routerLink: '/my-support/customer-success' }
+      ],
+      showSubMenu: false
+    },
 ];

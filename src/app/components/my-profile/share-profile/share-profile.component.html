@@ -32,9 +32,11 @@
                 <span>Or Share Via</span>
                 <div class="d-flex justify-content-center gap-2 pt-2">
                     @for (item of profileBioTrack; track item.icon) {
-                    <a class="side-icon bg-lght-gray-500 light-gray-border rounded-2 p-1 align-self-center"
-                        [href]="item.link" target="_blank"><img [src]="item.icon" alt="side_icon" width="22"
-                            height="22" /></a>
+                        @if(item.link){
+                            <a class="side-icon bg-lght-gray-500 light-gray-border rounded-2 p-1 align-self-center" [href]="item.link" target="_blank">
+                                <img [src]="item.icon" alt="side_icon" width="22" height="22" />
+                            </a>
+                        }
                     }
                 </div>
             </div>
