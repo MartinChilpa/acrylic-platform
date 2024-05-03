@@ -1,10 +1,12 @@
-import { NgOptimizedImage } from '@angular/common';
+import { NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { NavigationService } from '../../../services/navigation.service';
 import { FileDropzoneComponent } from '../../shared/file-dropzone/file-dropzone.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MyArtistService } from '../../../services/my-artist.service';
 import { ActivatedRoute } from '@angular/router';
+import { ICreateTracks } from '../../../interfaces/response/create-tracks.response';
+import { TrackDetail } from '../../../interfaces/response/my-artist-synclist.response';
 
 @Component({
   selector: 'acrylic-add-synclist',
@@ -12,12 +14,14 @@ import { ActivatedRoute } from '@angular/router';
   imports: [
     NgOptimizedImage,
     FileDropzoneComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgClass
   ],
   templateUrl: './manage-synclist.component.html',
   styleUrl: './manage-synclist.component.scss'
 })
 export class ManageSynclistComponent implements OnInit {
+  activeStepper: number = 1;
   fileDropzoneIcon = '/assets/images/icons/drop.svg'
   fileDropzoneHeader = 'Drop your Cover Art File here or upload it manually';
   fileDropzoneSize = 'JPG 1920px x 1080px';
@@ -26,7 +30,8 @@ export class ManageSynclistComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   private _activatedRoute = inject(ActivatedRoute);
-
+  trackList: ICreateTracks[] = []
+  manageStepperList = ['Create Synclist', 'Add tracks'];
   trackSyncList = [
     { trackImage: 'assets/images/others/falling.png', name: 'Falling', tags: ['Lo-Fi', 'Pop'] },
     { trackImage: 'assets/images/others/goes.png', name: 'So It Goes', tags: ['Hip-hop', 'Synthwave'] },
@@ -35,6 +40,7 @@ export class ManageSynclistComponent implements OnInit {
     { trackImage: 'assets/images/others/sundown.png', name: 'Sundown', tags: ['Indie Pop'] },
   ]
   synclistId: string = ''
+  synclistTracks!: TrackDetail[]
 
   ngOnInit(): void {
     this.synclistId = this._activatedRoute.snapshot.params['synclistId'];
@@ -49,14 +55,31 @@ export class ManageSynclistComponent implements OnInit {
     if (this.synclistId) {
       this.getSynclist();
     }
+    this.getTracks()
+  }
+
+  getTracks() {
+    this._myArtistService.getTracks().subscribe({
+      next: response => {
+        this.trackList = response
+      }
+    })
   }
 
   backProfile() {
-    this._navigationService.navigateToMyProfile();
+    if (this.activeStepper == 1) {
+      this._navigationService.navigateToMyProfile();
+    } else {
+      this.activeStepper = 1;
+    }
   }
 
   setUploadFile(key: string, $event: File[]) {
     this.synclistForm.get(key)?.setValue($event[0])
+  }
+
+  manageStepper(index: number) {
+    this.activeStepper = index;
   }
 
   getSynclist() {
@@ -70,6 +93,7 @@ export class ManageSynclistComponent implements OnInit {
           description: response.description,
           pinned: response.pinned
         })
+        this.synclistTracks = response.tracks.map(x => x.track)
       }
     })
   }
@@ -82,8 +106,35 @@ export class ManageSynclistComponent implements OnInit {
     const synclistType = !this.synclistForm.value.id ? this._myArtistService.createSynclist(formData) : this._myArtistService.updateSynclist(formData, this.synclistForm.value.id)
     synclistType.subscribe({
       next: response => {
-        this.backProfile();
+        this.synclistForm.get('id')?.setValue(response.uuid);
+        this.synclistId = response.uuid;
+        this.activeStepper = 2;
       }
     })
+  }
+
+  synclistChecked(trackId: string) {
+    if (this.synclistTracks && Array.isArray(this.synclistTracks)) {
+      return this.synclistTracks.some(x => x.uuid == trackId)
+    }
+    return false;
+  }
+
+  manageTags($event: any, trackId: string) {
+    const tagManageType = $event.checked ? this._myArtistService.addSynclistTrack(this.synclistId, trackId) : this._myArtistService.removeSynclistTrack(this.synclistId, trackId)
+    tagManageType.subscribe({
+      next: response => {
+        if ($event.checked) {
+          this.synclistTracks.push({
+            uuid: trackId
+          } as any)
+        } else {
+          this.synclistTracks = this.synclistTracks.filter(x => x.uuid != trackId);
+        }
+      },
+      error: () => {
+        $event.checked = false;
+      }
+    });
   }
 }

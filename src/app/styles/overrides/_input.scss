@@ -1,5 +1,13 @@
 @use '../variables/variables' as *;
 
+.acr-input:-webkit-autofill,
+.acr-input:-webkit-autofill:hover, 
+.acr-input:-webkit-autofill:focus {
+    transition: all 5000s ease-in-out 0s;
+    background-color: currentColor !important;
+    color: currentColor !important;
+}
+
 .acr-input-group {
     display: flex;
     align-items: center;
@@ -56,13 +64,24 @@
 .input-label {
     position: absolute;
     color: var(--text-color);
-    background-color: var(--primary-color);
-    font-size: 11px;
-    font-weight: 400;
+    opacity: 0.3;
     left: 16px;
-    top: -8px;
+    top: 15px;
     line-height: normal;
     letter-spacing: .5px;
+    transition:0.2s ease all; 
+    pointer-events: none;
+}
+
+.acr-input {
+    &:focus,
+    &:not(:placeholder-shown):valid {
+        ~ .input-label {
+            top: -8px;
+            opacity: 1;
+            background-color: var(--secondary-color);
+        }
+    }
 }
 
 .input-with-label input[type="text"],

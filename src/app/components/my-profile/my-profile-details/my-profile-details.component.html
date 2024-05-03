@@ -51,9 +51,9 @@
         <div class="row g-2">
             @for (item of artistSynclist; track item) {
             <div class="col-lg-4 col-md-6 col-12 pinned-sync-box cursor-pointer" (click)="editSynclist(item)">
-                <div class="pinned-sync-back radius-5 p-3 h-100 d-flex align-items-end"
+                <div class="pinned-sync-back position-relative radius-5 p-3 h-100 d-flex align-items-end"
                     [style.backgroundImage]="'url(' + item.background_image + ')'">
-                    <div class="pinned-sync-gradient-layer"></div>
+                    <div class="pinned-sync-gradient-layer position-absolute top-0 start-0 h-100 w-100"></div>
                     <div class="d-flex-align-center gap-3 pinned-sync-content">
                         <img [ngSrc]="item.cover_image" alt="pinned-img" width="60" height="60"
                             class="radius-5 pinned-sunc-front" />
