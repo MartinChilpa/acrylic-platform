@@ -10,9 +10,26 @@ import { CustomAccordionComponent } from '../../shared/custom-accordion/custom-a
   styleUrl: './faq.component.scss'
 })
 export class FaqComponent {
-  faqAccordionBox = Array(6);
+  faqAccordionBox = [
+    { title: '', description: '', isOpen: false },
+    { title: '', description: '', isOpen: false },
+    { title: '', description: '', isOpen: false },
+    { title: '', description: '', isOpen: false },
+    { title: '', description: '', isOpen: false },
+    { title: '', description: '', isOpen: false },
+  ]
   inquirySelect = {
     title: '',
     label: 'Inquiry type'
+  }
+
+  toggleAccordion(index: number) {
+    this.faqAccordionBox.forEach((accordion, i) => {
+      if (i !== index) {
+        accordion.isOpen = false;
+      }
+    });
+
+    this.faqAccordionBox[index].isOpen = !this.faqAccordionBox[index].isOpen;
   }
 }

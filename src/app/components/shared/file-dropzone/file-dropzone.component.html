@@ -1,6 +1,6 @@
 <div acrylicFileDragDrop class="dropped-image-area p-3 bg-darkgrey rounded-2 cursor-pointer" (click)="dropzoneClicked($event)"
     (filesChangeEmiter)="onFileChange($event)"
-    [ngClass]="{ 'd-flex-center flex-column': !uploadedFiles.length }">
+    [ngClass]="{ 'd-flex-center flex-column': !uploadedFiles.length, 'required': required && uploadedFiles.length == 0 }">
     <div class="text-center"
         [ngClass]="{ 'd-flex-center flex-column': uploadedFiles.length }">
         <img [ngSrc]="fileDropzoneIcon" height="32" width="32" />
@@ -9,7 +9,7 @@
         <div>
             <a href="" class="a-blue">{{ fileDropzoneExternalLink }}</a>
         </div>
-        <input type="file" name="file" class="hidden d-none" (change)="onFileChange($event.target)" #fileUpload
+        <input type="file" name="file" [accept]="accept" class="hidden d-none" (change)="onFileChange($event.target)" #fileUpload
             multiple>
     </div>
     @if (uploadedFiles.length) {

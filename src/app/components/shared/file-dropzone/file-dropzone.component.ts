@@ -21,6 +21,8 @@ export class FileDropzoneComponent implements OnInit {
   @Input() fileDropzoneExternalLink!: string;
   @Input() existingFiles!: any[];
   @Input() allowExtensions: string[] = [];
+  @Input() required: boolean = true;
+  @Input() accept: string = '';
   @Output() uploadedFileList = new EventEmitter<File[]>();
 
   private _alertService = inject(AlertService);
@@ -55,7 +57,6 @@ export class FileDropzoneComponent implements OnInit {
         const extension = item.name.split('.')[item.name.split('.').length - 1]
         if (this.allowExtensions.some(x => x.toLowerCase() != extension.toLowerCase())) {
           canUpload = false;
-          this.fileUpload.nativeElement.setAttribute('value', '');
           this._alertService.error(`Allowed file extensions are ${this.allowExtensions.join(',')} only.`)
           return;
         }

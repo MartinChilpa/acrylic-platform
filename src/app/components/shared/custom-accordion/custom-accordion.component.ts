@@ -1,5 +1,5 @@
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'acrylic-custom-accordion',
@@ -9,9 +9,10 @@ import { Component } from '@angular/core';
   styleUrl: './custom-accordion.component.scss',
 })
 export class CustomAccordionComponent {
-  isOpen = false;
+  @Input() isOpen = false;
+  @Output() toggleAccordion = new EventEmitter();
 
-  toggleAccordion() {
-    this.isOpen = !this.isOpen;
+  clickedAccordion() {
+    this.toggleAccordion.emit();
   }
 }
