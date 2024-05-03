@@ -43,4 +43,24 @@ export class NavigationService {
   navigateToEditTracks(id: string) {
     this._router.navigateByUrl(`/upload/${id}`);
   }
+
+  navigateToMyFinance() {
+    this._router.navigateByUrl(`/my-finances`);
+  }
+
+  navigateToMyRevenue() {
+    this._router.navigateByUrl(`/my-finances/my-revenue`);
+  }
+
+  navigateToMyDocument() {
+    this._router.navigateByUrl(`/my-finances/my-document`);
+  }
+
+  navigateToMySubscription() {
+    this._router.navigateByUrl(`/my-finances/my-subscription`);
+  }
+
+  navigateToMyTransaction() {
+    this._router.navigateByUrl(`/my-finances/my-transactions`);
+  }
 }

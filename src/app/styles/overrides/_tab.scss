@@ -1,0 +1,16 @@
+.default-tab{
+    background: var(--secondary-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    padding: 4px;
+}
+.default-tab .nav-item{
+    margin-right: 8px;
+}
+.default-tab .nav-item:last-child{
+    margin-right: 0px;
+}
+.default-tab .nav-link{
+    color: var(--text-color);
+   
+}

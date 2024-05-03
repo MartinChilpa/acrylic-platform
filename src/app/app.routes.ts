@@ -12,6 +12,7 @@ export const routesNames = {
   TRACKS: 'my-tracks',
   SUPPORT: 'my-support',
   PAGE_NOT_FOUND: 'page-not-found',
+  FINANCE: 'my-finances',
   EMPTY: ''
 };
 
@@ -53,6 +54,10 @@ export const routes: Routes = [
       {
         path: routesNames.SUPPORT,
         loadChildren: () => import('./components/my-support/my-support.routes').then((mod) => mod.MY_SUPPORT_ROUTES)
+      },
+      {
+        path: routesNames.FINANCE,
+        loadChildren: () => import('./components/finance/finance.routes').then((mod) => mod.FINANCE_ROUTES),
       },
     ],
   },

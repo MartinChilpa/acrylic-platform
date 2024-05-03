@@ -1,0 +1,100 @@
+<div>
+    <div class="transaction my-revenue w-100">
+        <div class="chart-box">
+            <div class="filters-options">
+                <div style="width: 150px;">
+                    <div>
+                      <acrylic-custom-dropdown [values]="topUsedTrack" (dropdownSelected)="dropdownSelected($event)" placeholder="All Tracks"></acrylic-custom-dropdown>
+                    </div>
+                </div>
+                <div class="filters-options-right">
+                    <div class="me-3"  style="width: 150px;">
+                        <acrylic-custom-dropdown placeholder="Past 7 Days" [values]="topUsedTrack" (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
+                    </div>
+                    <div  style="width: 170px;">
+                       <acrylic-custom-dropdown placeholder="Additional Filters" [values]="topUsedTrack" (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
+                    </div>
+                </div>
+            </div>
+            <div class="box-holder d-flex align-items-center justify-content-between">
+                <div class="data-box">
+                    <div class="data-title">Some Data</div>
+                    <div class="data-date">Jan 22 - Jan 28, 2024</div>
+                    <div class="data-amount"><span>$549K</span> <span class="data-pnct">+47.3%</span></div>
+                </div>
+                <div class="data-box">
+                    <div class="data-title">Some Data</div>
+                    <div class="data-date">Jan 22 - Jan 28, 2024</div>
+                    <div class="data-amount"><span>$549K</span> <span class="data-pnct">+47.3%</span></div>
+                </div>
+                <div class="data-box">
+                    <div class="data-title">Some Data</div>
+                    <div class="data-date">Jan 22 - Jan 28, 2024</div>
+                    <div class="data-amount"><span>$549K</span> <span class="data-pnct">+47.3%</span></div>
+                </div>
+                <div class="data-box border-end-0">
+                    <div class="data-title">Some Data</div>
+                    <div class="data-date">Jan 22 - Jan 28, 2024</div>
+                    <div class="data-amount"><span>$549K</span> <span class="data-pnct">+47.3%</span></div>
+                </div>
+            </div>
+            <div class="chart-holder">
+                <img src="assets/images/others/chart.png" class="w-100" />
+            </div>
+        </div>
+        <div class="mt-3 w-100">
+            <div class="row w-100 top-tracks-box g-0">
+                <div class="col-md-6 mb-3">
+                    <div class="acr-track-menu-options">
+                        <h3 class="top-tracks-title pt-0 font-size16 d-flex align-items-center">Top Used Tracks <img
+                                src="assets/images/others/beat.png" class="ms-2"></h3>
+                        <div class="track-details card-beige-color">
+                            <div class="font-weight-600">Synclist Name</div>
+                            <div class="font-weight-600">Total Uses</div>
+                        </div>
+                        <ul class="p-0 m-0 accordion font-size14">
+                            @for (item of topUsedTrack; track item) {
+                            <li class="acr-track-menu-list list-group-item">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="d-flex align-items-center">
+                                        <span class="me-2">
+                                            <img src="assets/images/others/top-track.png">
+                                        </span>
+                                        <span>{{item.name}}</span>
+                                    </span>
+                                    {{item.price}}
+                                </div>
+                            </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="acr-track-menu-options">
+                        <h3 class="top-tracks-title pt-0 font-size16 d-flex align-items-center">Top Used From Synclists
+                        </h3>
+                        <div class="track-details card-beige-color">
+                            <div class="font-weight-600">Synclist Name</div>
+                            <div class="font-weight-600">Total Uses</div>
+                        </div>
+                        <ul class="p-0 m-0 accordion font-size14">
+                            @for (item of topUseSynclists; track item) {
+                            <li class="acr-track-menu-list list-group-item">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="d-flex align-items-center">
+                                        <span class="me-2">
+                                            <img src="assets/images/others/top-track.png">
+                                        </span>
+                                        <span>{{item.name}}</span>
+                                    </span>
+                                    {{item.price}}
+                                </div>
+                            </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
