@@ -1,6 +1,7 @@
 @use '../variables/variables' as *;
 @use '../custom/fonts' as *;
 @use '../custom/border' as *;
+@use '../overrides/input' as *;
 
 html,
 body {
@@ -95,10 +96,6 @@ body {
     font-size: 3rem;
     margin-bottom: 25px;
     font-family: system-ui;
-}
-
-.height-fit-content {
-    height: fit-content;
 }
 
 .line {

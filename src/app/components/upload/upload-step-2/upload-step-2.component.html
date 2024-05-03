@@ -54,25 +54,21 @@
         </div>
         <div class="col-12">
             <div class="acr-box">
-                <div class="input-with-label w-100">
-                    <label for="isrc-code">Your Track ISRC Code <span class="text-danger">*</span></label>
-                    <input type="text" id="isrc-code" formControlName="isrc" class="form-control mt-2 w-100"
-                        placeholder="ISRC Code" autocomplete="off">
-                    @if (form.get('isrc')?.errors?.['pattern']) {
+                <div class="acr-input-label">Your Track ISRC Code</div>
+                <input type="text" id="isrc-code" formControlName="isrc" class="form-control acr-input"
+                placeholder="ISRC Code" autocomplete="off">
+                @if (form.get('isrc')?.errors?.['pattern']) {
                     <div class="text-danger mt-1">
                         Please enter valid ISRC code.
                     </div>
-                    }
-                </div>
+                }
             </div>
         </div>
         <div class="col-12">
             <div class="acr-box">
-                <div class="input-with-label w-100">
-                    <acrylic-custom-dropdown [title]="'Name Of Distributor Or Label Contact'"
+                <acrylic-custom-dropdown [title]="'Name Of Distributor Or Label Contact'"
                         [inputValue]="form.get('distributor')?.value" [values]="distributors"
                         (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
-                </div>
             </div>
         </div>
     </form>

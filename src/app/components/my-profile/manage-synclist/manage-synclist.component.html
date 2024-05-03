@@ -7,29 +7,24 @@
                 <ng-container>
                     <p class="fs-6 mb-2">Synclist Details</p>
                     <form [formGroup]="synclistForm">
-                        <ng-container>
-                            <div class="input-with-label">
-                                <input type="text" class="form-control acr-input mb-2" formControlName="name"
-                                    placeholder="">
-                                <label class="input-label">Synclist Name</label>
-                            </div>
-                        </ng-container>
-                        <div class="input-with-label">
-                            <textarea rows="5" class="form-control acr-input mb-2" formControlName="description"
-                                placeholder="">
-                                            </textarea>
-                            <label class="input-label">Synclist Description</label>
+                        <div>
+                            <input type="text" class="form-control acr-input mb-2" formControlName="name" placeholder="Synclist Name">
                         </div>
+                        
+                        <div>
+                            <textarea
+                                rows="5" class="form-control acr-input mb-2" formControlName="description" placeholder="Synclist Description">
+                            </textarea>
+                        </div>
+
                         <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
                             [fileDropzoneHeader]="fileDropzoneHeader" [fileDropzoneSize]="fileDropzoneSize"
-                            [existingFiles]="[synclistForm.get('cover_image')?.value]"
-                            [allowExtensions]="['jpg']"
+                            [existingFiles]="[synclistForm.get('cover_image')?.value]" [allowExtensions]="['jpg']"
                             (uploadedFileList)="setUploadFile('cover_image', $event)"></acrylic-file-dropzone>
                         <div class="mt-2">
                             <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
                                 [fileDropzoneHeader]="'Drop your Background Image File here or upload it manually'"
-                                [fileDropzoneSize]="fileDropzoneSize"
-                                [allowExtensions]="['jpg']"
+                                [fileDropzoneSize]="fileDropzoneSize" [allowExtensions]="['jpg']"
                                 [existingFiles]="[synclistForm.get('background_image')?.value]"
                                 (uploadedFileList)="setUploadFile('background_image', $event)"></acrylic-file-dropzone>
                         </div>
@@ -61,8 +56,7 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex-align-center gap-2">
-                                                <img [src]="item.cover_image" height="36" width="36"
-                                                    class="radius-5" />
+                                                <img [src]="item.cover_image" height="36" width="36" class="radius-5" />
                                                 <span>{{ item.name }}</span>
                                             </div>
                                         </td>
@@ -75,7 +69,8 @@
                                         </td>
                                         <td>
                                             <div class="d-flex-center">
-                                                <input type="checkbox" (change)="manageTags($event.target, item.uuid)" [checked]="synclistChecked(item.uuid)" class="acrylic-checkbox">
+                                                <input type="checkbox" (change)="manageTags($event.target, item.uuid)"
+                                                    [checked]="synclistChecked(item.uuid)" class="acrylic-checkbox">
                                             </div>
                                         </td>
                                     </tr>
@@ -110,7 +105,7 @@
                 <div class="d-flex-center">
                     <button class="btn btn-darkgrey px-4 px-lg-5 py-2 me-3" (click)="backProfile()">Back</button>
                     @if (activeStepper == 1) {
-                        <button class="btn btn-info px-4 px-lg-5 py-2" (click)="saveSynclist()">Publish</button>
+                    <button class="btn btn-info px-4 px-lg-5 py-2" (click)="saveSynclist()">Publish</button>
                     }
                 </div>
             </div>
