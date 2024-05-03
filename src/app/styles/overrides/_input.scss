@@ -84,54 +84,54 @@
     }
 }
 
-.input-with-label input[type="text"],
-.input-with-label input[type="password"],
-.input-with-label textarea {
-    border: 0;
-    height: 50px;
-    background-color: var(--darkgrey-color);
-    box-shadow: none;
-    color: var(--text-color);
-}
+// .input-with-label input[type="text"],
+// .input-with-label input[type="password"],
+// .input-with-label textarea {
+//     border: 0;
+//     height: 50px;
+//     background-color: var(--darkgrey-color);
+//     box-shadow: none;
+//     color: var(--text-color);
+// }
 
-.input-with-label input[type="text"]::placeholder,
-.input-with-label input[type="password"]::placeholder,
-.input-with-label textarea::placeholder {
-    color: var(--text-color);
-    opacity: 0.3;
-    font-size: 14px;
-    font-weight: 400;
-}
+// .input-with-label input[type="text"]::placeholder,
+// .input-with-label input[type="password"]::placeholder,
+// .input-with-label textarea::placeholder {
+//     color: var(--text-color);
+//     opacity: 0.3;
+//     font-size: 14px;
+//     font-weight: 400;
+// }
 
-.input-with-label .success input[type="text"],
-.input-with-label .success input[type="password"],
-.input-with-label .success textarea {
-    border: 1px solid var(--info-color);
-}
+// .input-with-label .success input[type="text"],
+// .input-with-label .success input[type="password"],
+// .input-with-label .success textarea {
+//     border: 1px solid var(--info-color);
+// }
 
-.input-with-label .success .input-label,
-.input-with-label .success .input-label {
-    color: var(--info-color);
-}
+// .input-with-label .success .input-label,
+// .input-with-label .success .input-label {
+//     color: var(--info-color);
+// }
 
-.input-with-label .error input[type="text"],
-.input-with-label .error input[type="password"],
-.input-with-label .error textarea {
-    border: 1px solid var(--danger-color);
-}
+// .input-with-label .error input[type="text"],
+// .input-with-label .error input[type="password"],
+// .input-with-label .error textarea {
+//     border: 1px solid var(--danger-color);
+// }
 
-.input-with-label .error .input-label,
-.input-with-label .error .input-label {
-    color: var(--danger-color);
-}
+// .input-with-label .error .input-label,
+// .input-with-label .error .input-label {
+//     color: var(--danger-color);
+// }
 
-.input-with-label textarea {
-    height: 110px;
-}
+// .input-with-label textarea {
+//     height: 110px;
+// }
 
-.input-with-label textarea {
-    resize: none;
-}
+// .input-with-label textarea {
+//     resize: none;
+// }
 
 input[type=checkbox].acrylic-checkbox {
     appearance: none;
