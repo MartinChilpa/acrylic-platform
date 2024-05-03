@@ -10,6 +10,7 @@ export const routesNames = {
   SPLITSHEET: 'create-split-sheet',
   EDIT_UPLOAD: 'upload/:trackId',
   TRACKS: 'my-tracks',
+  SUPPORT: 'my-support',
   PAGE_NOT_FOUND: 'page-not-found',
   EMPTY: ''
 };
@@ -48,6 +49,10 @@ export const routes: Routes = [
       {
         path: routesNames.TRACKS,
         loadComponent: () => import('./components/my-tracks/my-tracks.component').then((c) => c.MyTracksComponent),
+      },
+      {
+        path: routesNames.SUPPORT,
+        loadChildren: () => import('./components/my-support/my-support.routes').then((mod) => mod.MY_SUPPORT_ROUTES)
       },
     ],
   },
