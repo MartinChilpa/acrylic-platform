@@ -10,7 +10,7 @@
                 <div class="d-flex flex-column gap-4 bg-light-gray py-4 radius-5 mt-3">
                     <div class="d-flex justify-content-center share-images-section">
                         @for (item of profileShareList; let i = $index; track item) {
-                        <div class="height-fit-content" [class.share-img-1]="i == 0" [class.share-img-2]="i == 1"
+                        <div [class.share-img-1]="i == 0" [class.share-img-2]="i == 1"
                             [class.share-img-3]="i == 2">
                             <img [src]="item.picture" alt="share-img" class="radius-5 object-fit-cover" />
                         </div>

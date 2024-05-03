@@ -57,10 +57,6 @@
     cursor: pointer;
 }
 
-.input-with-label {
-    position: relative;
-}
-
 .input-label {
     position: absolute;
     color: var(--text-color);
@@ -73,65 +69,19 @@
     pointer-events: none;
 }
 
-.acr-input {
-    &:focus,
-    &:not(:placeholder-shown):valid {
-        ~ .input-label {
-            top: -8px;
-            opacity: 1;
-            background-color: var(--secondary-color);
-        }
-    }
+.acr-input:focus {
+    color: var(--text-color) !important;
+    background-color: var(--darkgrey-color) !important;
+    box-shadow: none !important;
 }
 
-// .input-with-label input[type="text"],
-// .input-with-label input[type="password"],
-// .input-with-label textarea {
-//     border: 0;
-//     height: 50px;
-//     background-color: var(--darkgrey-color);
-//     box-shadow: none;
-//     color: var(--text-color);
-// }
-
-// .input-with-label input[type="text"]::placeholder,
-// .input-with-label input[type="password"]::placeholder,
-// .input-with-label textarea::placeholder {
-//     color: var(--text-color);
-//     opacity: 0.3;
-//     font-size: 14px;
-//     font-weight: 400;
-// }
-
-// .input-with-label .success input[type="text"],
-// .input-with-label .success input[type="password"],
-// .input-with-label .success textarea {
-//     border: 1px solid var(--info-color);
-// }
-
-// .input-with-label .success .input-label,
-// .input-with-label .success .input-label {
-//     color: var(--info-color);
-// }
-
-// .input-with-label .error input[type="text"],
-// .input-with-label .error input[type="password"],
-// .input-with-label .error textarea {
-//     border: 1px solid var(--danger-color);
-// }
-
-// .input-with-label .error .input-label,
-// .input-with-label .error .input-label {
-//     color: var(--danger-color);
-// }
-
-// .input-with-label textarea {
-//     height: 110px;
-// }
-
-// .input-with-label textarea {
-//     resize: none;
-// }
+.acr-input:focus ~ .input-label,
+.acr-input:not(:placeholder-shown):valid ~ .input-label,
+.acr-input:focus ~ .input-label:not(:placeholder-shown):valid {
+    top: -8px;
+    opacity: 1;
+    background-color: var(--secondary-color);
+}
 
 input[type=checkbox].acrylic-checkbox {
     appearance: none;
