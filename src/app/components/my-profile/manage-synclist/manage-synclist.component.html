@@ -8,15 +8,16 @@
                     <p class="fs-6 mb-2">Synclist Details</p>
                     <form [formGroup]="synclistForm">
                         <div>
-                            <input type="text" class="form-control acr-input mb-2" formControlName="name" placeholder="Synclist Name">
-                        </div>
-                        
-                        <div>
-                            <textarea
-                                rows="5" class="form-control acr-input mb-2" formControlName="description" placeholder="Synclist Description">
-                            </textarea>
+                            <input type="text" class="form-control acr-input mb-2" formControlName="name"
+                                placeholder="Synclist Name">
                         </div>
 
+                        <div>
+                            <textarea rows="5" class="form-control acr-input mb-2" formControlName="description"
+                                placeholder="Synclist Description">
+                            </textarea>
+                        </div>
+                        @if (!isLoading) {
                         <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
                             [fileDropzoneHeader]="fileDropzoneHeader" [fileDropzoneSize]="fileDropzoneSize"
                             [existingFiles]="[synclistForm.get('cover_image')?.value]" [allowExtensions]="['jpg']"
@@ -30,6 +31,7 @@
                                 (uploadedFileList)="setUploadFile('background_image', $event)"
                                 [accept]="'.jpg'"></acrylic-file-dropzone>
                         </div>
+                        }
                     </form>
                 </ng-container>
                 }
@@ -107,7 +109,8 @@
                 <div class="d-flex-center">
                     <button class="btn btn-darkgrey px-4 px-lg-5 py-2 me-3" (click)="backProfile()">Back</button>
                     @if (activeStepper == 1) {
-                    <button class="btn btn-info px-4 px-lg-5 py-2" (click)="saveSynclist()">Publish</button>
+                    <button class="btn btn-info px-4 px-lg-5 py-2" [disabled]="!synclistForm.valid"
+                        (click)="saveSynclist()">Publish</button>
                     }
                 </div>
             </div>

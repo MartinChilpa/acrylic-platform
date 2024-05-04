@@ -10,18 +10,20 @@
         </div>
         <div class="content bg-switch-off radius-5 rounded-top-0 position-absolute w-100 z-3"
             [ngClass]="{'d-none': !isActive, 'd-block': isActive}">
-            <div class="acrylic-select-search p-3" (click)="handleItemClick($event)">
-                <form [formGroup]="searchForm">
-                    <div class="acr-input-group w-100">
-                        <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
-                        <input type="text" placeholder="Search" class="w-100" formControlName="searchText">
-                    </div>
-                </form>
-            </div>
+            @if (showSearch) {
+                <div class="acrylic-select-search p-2" (click)="handleItemClick($event)">
+                    <form [formGroup]="searchForm">
+                        <div class="acr-input-group w-100">
+                            <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
+                            <input type="text" placeholder="Search" class="w-100" formControlName="searchText">
+                        </div>
+                    </form>
+                </div>
+            }
             <ul class="acrylic-select-options overflow-y-auto p-0">
                 <ng-container>
                     @for(item of values | acrylicSearchFilter: searchForm.value.searchText; track item.name) {
-                    <li (click)="updateName(item)" class="list-unstyled d-flex-between px-3 py-2"
+                    <li (click)="updateName(item)" class="list-unstyled d-flex-between px-3 py-1"
                         [class.selected]="item.name === selectedValue" acrylicHighLight
                         [searchedWord]="searchForm.value.searchText" [class.justify-content-start]="!item.text" [content]="item" [classToApply]="'fw-bold'">
                         <span>{{ item.name }}</span>

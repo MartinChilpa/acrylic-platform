@@ -42,7 +42,7 @@ export class MyArtistService {
   }
 
   updateSynclist(request: FormData, id: string): Observable<IMyArtistSynclistResult> {
-    return this._http.put<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/${id}`, request);
+    return this._http.put<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/${id}/`, request);
   }
 
   getTracks(): Observable<ICreateTracks[]> {

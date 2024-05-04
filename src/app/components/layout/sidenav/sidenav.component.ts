@@ -21,7 +21,7 @@ export class SidenavComponent implements OnInit {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-  
+
     this.sidenavItems.forEach(item => {
       if (item.routerLink && currentUrl.includes(item.routerLink)) {
         item.showSubMenu = true;
@@ -30,10 +30,19 @@ export class SidenavComponent implements OnInit {
       }
     });
   }
-  
+
   toggleSubMenu(item: any) {
+    this.sidenavItems.filter(x => x.label != item.label && x.submenu).forEach(item => {
+      item.showSubMenu = false;
+    })
     if (item.submenu) {
       item.showSubMenu = !item.showSubMenu;
     }
+  }
+
+  collapseMenu() {
+    this.sidenavItems.forEach(item => {
+      item.showSubMenu = false;
+    })
   }
 }

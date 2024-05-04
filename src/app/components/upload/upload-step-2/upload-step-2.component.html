@@ -82,7 +82,7 @@
                     </div>
                     <div class="col-md-5 col-12">
                         <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border"
-                            (click)="nextUploadStepper(3)" [disabled]="!form.get('isrc')?.value || form.get('isrc')?.errors?.['pattern']">Next</button>
+                            (click)="nextUploadStepper(3)" [disabled]="!form.get('distributor')?.value || !form.get('isrc')?.value || form.get('isrc')?.errors?.['pattern']">Next</button>
                     </div>
                 </div>
             </div>

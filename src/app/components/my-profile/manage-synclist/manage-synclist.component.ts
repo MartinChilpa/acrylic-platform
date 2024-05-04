@@ -2,7 +2,7 @@ import { NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { NavigationService } from '../../../services/navigation.service';
 import { FileDropzoneComponent } from '../../shared/file-dropzone/file-dropzone.component';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MyArtistService } from '../../../services/my-artist.service';
 import { ActivatedRoute } from '@angular/router';
 import { ICreateTracks } from '../../../interfaces/response/create-tracks.response';
@@ -26,12 +26,13 @@ export class ManageSynclistComponent implements OnInit {
   fileDropzoneHeader = 'Drop your Cover Art File here or upload it manually';
   fileDropzoneSize = 'JPG 1920px x 1080px';
   synclistForm!: FormGroup;
+  isLoading: boolean = true
   private _navigationService = inject(NavigationService);
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   private _activatedRoute = inject(ActivatedRoute);
   trackList: ICreateTracks[] = []
-  manageStepperList = ['Create Synclist', 'Add tracks'];
+  manageStepperList = ['Create Synclist', 'Add Tracks'];
   trackSyncList = [
     { trackImage: 'assets/images/others/falling.png', name: 'Falling', tags: ['Lo-Fi', 'Pop'] },
     { trackImage: 'assets/images/others/goes.png', name: 'So It Goes', tags: ['Hip-hop', 'Synthwave'] },
@@ -46,14 +47,16 @@ export class ManageSynclistComponent implements OnInit {
     this.synclistId = this._activatedRoute.snapshot.params['synclistId'];
     this.synclistForm = this._fb.group({
       id: [null],
-      name: [null],
-      cover_image: [null],
-      background_image: [null],
-      description: [''],
+      name: [null, Validators.required],
+      cover_image: [null, Validators.required],
+      background_image: [null, Validators.required],
+      description: ['', Validators.required],
       pinned: [true],
     })
     if (this.synclistId) {
       this.getSynclist();
+    } else {
+      this.isLoading = false
     }
     this.getTracks()
   }
@@ -79,6 +82,9 @@ export class ManageSynclistComponent implements OnInit {
   }
 
   manageStepper(index: number) {
+    if (this.activeStepper < index) {
+      return;
+    }
     this.activeStepper = index;
   }
 
@@ -94,14 +100,22 @@ export class ManageSynclistComponent implements OnInit {
           pinned: response.pinned
         })
         this.synclistTracks = response.tracks.map(x => x.track)
+        this.isLoading = false
       }
     })
   }
 
   saveSynclist() {
     const formData = new FormData();
+    const fileKeys = ['cover_image', 'background_image']
     Object.keys(this.synclistForm.value).forEach(item => {
-      formData.append(item, this.synclistForm.value[item]);
+      const value = this.synclistForm.value[item]
+      if (!fileKeys.includes(item)) {
+        formData.append(item, value);
+      }
+      else if (value && typeof value !== 'string') {
+        formData.append(item, value);
+      }
     })
     const synclistType = !this.synclistForm.value.id ? this._myArtistService.createSynclist(formData) : this._myArtistService.updateSynclist(formData, this.synclistForm.value.id)
     synclistType.subscribe({
