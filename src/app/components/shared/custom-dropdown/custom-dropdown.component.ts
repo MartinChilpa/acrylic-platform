@@ -16,6 +16,7 @@ export class CustomDropdownComponent implements OnInit, OnChanges {
   @Input() title: string = ''
   @Input() placeholder: string = 'Choose or search'
   @Input() values: any[] = []
+  @Input() showSearch: boolean = true
   @Output() dropdownSelected = new EventEmitter();
 
   isActive: boolean = false;

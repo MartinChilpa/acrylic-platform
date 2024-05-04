@@ -96,6 +96,10 @@ body {
     font-size: 3rem;
     margin-bottom: 25px;
     font-family: system-ui;
+
+    @media only screen and (max-width: 500px) {
+        font-size: 2rem;
+    }
 }
 
 .line {
@@ -299,4 +303,10 @@ body {
 .currency{
     min-width: 105px;
     text-align: right;
+}
+
+@media(max-width:1024px){
+    .w-mobile-100 {
+        width: 100% !important;
+    }
 }

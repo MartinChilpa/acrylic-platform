@@ -15,6 +15,8 @@ export class UploadStep5Component {
   @Output() nextStepper = new EventEmitter();
   @Output() uploadAction = new EventEmitter();
 
+  priceType: number = 1
+
   nextUploadStepper(count: number) {
     this.nextStepper.emit(count);
   }

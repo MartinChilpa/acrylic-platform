@@ -32,21 +32,21 @@ export class UploadComponent implements OnInit {
     this.uploadTrackId = this._activatedRoute.snapshot.params['trackId'];
     this.uploadTrackForm = this._fb.group({
       id: [null],
-      isrc: ['', [Validators.required, Validators.pattern(/^[A-Z]{4}\d{8}$/)]],
+      isrc: ['DDD333333333', [Validators.required, Validators.pattern(/^[A-Z]{2}-?\w{3}-?\d{2}-?\d{5}$/)]],
       name: ['', Validators.required],
-      duration: [2],
+      duration: [0],
       released: [new Date().toJSON().split('T')[0]],
       is_cover: [false],
       is_remix: [false],
       is_instrumental: [false],
       is_explicit: [false],
       bpm: [1],
-      lyrics: [null],
-      cover_image: [null, Validators.required],
-      snippet: [null, Validators.required],
-      file_wav: [null, Validators.required],
-      file_mp3: [null],
-      distributor: [null],
+      lyrics: [''],
+      cover_image: ['', Validators.required],
+      snippet: ['', Validators.required],
+      file_wav: ['', Validators.required],
+      file_mp3: [''],
+      distributor: ['', Validators.required],
       tags: [],
     });
     if (this.uploadTrackId) {
@@ -93,8 +93,15 @@ export class UploadComponent implements OnInit {
 
   publishTrack() {
     const formData = new FormData();
+    const fileKeys = ['cover_image', 'file_mp3', 'file_wav', 'snippet']
     Object.keys(this.uploadTrackForm.value).forEach(item => {
-      formData.append(item, this.uploadTrackForm.value[item]);
+      const value = this.uploadTrackForm.value[item]
+      if (!fileKeys.includes(item)) {
+        formData.append(item, value);
+      }
+      else if (value && typeof value !== 'string') {
+        formData.append(item, value);
+      }
     })
     const uploadType = this.uploadTrackForm.value.id ? this._myArtistService.updateTracks(formData, this.uploadTrackForm.value.id) : this._myArtistService.createTracks(formData)
     uploadType.subscribe({

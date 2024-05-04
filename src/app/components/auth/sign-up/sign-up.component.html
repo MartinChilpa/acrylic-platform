@@ -54,7 +54,7 @@
             </div>
         </div>
         @if(signUpForm.get('password')?.invalid && (signUpForm.get('password')?.dirty || signUpForm.get('password')?.touched)) {
-            <div class="acr-input-label mb-3 small text-danger">
+            <div class="acr-input-label small text-danger">
                 @if(signUpForm.get('password')?.errors?.['invalidPassword']?.requiredLength) {
                     <div> Your password must contain at least 8 characters. </div>
                 }@else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasLetter) {
@@ -64,6 +64,11 @@
                 }@else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasSpecialChar) {
                     <div> Your password must contain at least one special character (example: # ? ! & ). </div>
                 }
+            </div>
+        }
+        @if(signUpForm.get('password_confirm')?.invalid && signUpForm.get('password')?.value != signUpForm.get('password_confirm')?.value  && (signUpForm.get('password_confirm')?.dirty || signUpForm.get('password_confirm')?.touched)) {
+            <div class="acr-input-label small text-danger">
+                <div> Password and Confirm Password must be same. </div>
             </div>
         }
         <div>

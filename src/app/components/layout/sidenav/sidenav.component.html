@@ -12,7 +12,7 @@
         @for (item of sidenavItems; track item) {
         @if (!item.submenu) {
         <li>
-            <a class="sidenav-item" [routerLink]="[item.routerLink]" routerLinkActive="active-route">
+            <a class="sidenav-item" (click)="collapseMenu()" [routerLink]="[item.routerLink]" routerLinkActive="active-route">
                 <img [ngSrc]="'assets/images/icons/' + item.icon + '.svg'" alt="Icon" width="16" height="16">
                 <span class="ms-2">{{item.label}}</span>
             </a>
@@ -24,7 +24,6 @@
                 <span class="ms-2">{{item.label}}</span>
             </a>
         </li>
-        @if (item.showSubMenu) {
         <div class="acr-box bg-darkgrey acr-submenu"
             [ngClass]="{'open': item.showSubMenu, 'closed p-0': !item.showSubMenu}">
             <ul class="ps-0 pe-0 p-2 bg-gray rounded-3">
@@ -37,7 +36,6 @@
                 }
             </ul>
         </div>
-        }
         }
         }
     </ul>

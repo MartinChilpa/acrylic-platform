@@ -15,9 +15,11 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
 
-  @ViewChild("audioSnippet") audioSnippet!: ElementRef<HTMLAudioElement>
+  @ViewChild("videoSnippet") videoSnippet!: ElementRef<HTMLVideoElement>
 
   snippet: string = ''
+  coverImage: string = ''
+  duration: string = ''
 
   private _myArtistService = inject(MyArtistService);
   myArtist: IMyArtist | undefined | null;
@@ -37,15 +39,28 @@ export class UploadStep4Component implements OnInit, OnDestroy {
         this.snippet = URL.createObjectURL(snippet)
       }
     }
+
+    const coverImage = this.form.get('cover_image')?.value
+    if (coverImage) {
+      if (typeof coverImage == 'string') {
+        this.coverImage = coverImage
+      } else {
+        this.coverImage = URL.createObjectURL(coverImage)
+      }
+    }
+
+    this.videoInit()
   }
 
   playSnippet() {
-    if (this.audioSnippet) {
-      if (this.audioSnippet.nativeElement.paused) {
-        this.audioSnippet.nativeElement.play()
-      } else {
-        this.audioSnippet.nativeElement.pause()
-      }
+    if (this.videoSnippet) {
+      this.videoSnippet.nativeElement.play()
+    }
+  }
+
+  pauseSnippet() {
+    if (this.videoSnippet) {
+      this.videoSnippet.nativeElement.pause()
     }
   }
 
@@ -53,9 +68,26 @@ export class UploadStep4Component implements OnInit, OnDestroy {
     this.nextStepper.emit(count);
   }
 
+  videoInit() {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => {
+      URL.revokeObjectURL(video.src);
+      this.form.get('duration')?.setValue(parseInt(`${video.duration}`));
+      this.formatTime(video.duration)
+    };
+    video.src = this.snippet;
+  }
+
+  formatTime(seconds: number) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    this.duration = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  }
+
   ngOnDestroy(): void {
-    if (this.audioSnippet) {
-      this.audioSnippet.nativeElement.remove()
+    if (this.videoSnippet) {
+      this.videoSnippet.nativeElement.remove()
     }
   }
 }

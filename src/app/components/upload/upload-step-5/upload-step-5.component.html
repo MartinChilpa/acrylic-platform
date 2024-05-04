@@ -7,7 +7,7 @@
                 <a href="" class="a-blue">How do prices work?</a>
                 <div class="row mt-3">
                     <div class="col-lg-4 mb-2 px-1">
-                        <div class="bg-light-gray p-3 radius-5 card-beige-border">
+                        <div class="bg-light-gray p-3 radius-5 cursor-pointer" (click)="priceType = 1" [class.card-beige-border]="priceType == 1">
                             <h6 class="text-beige"><b>Basic</b></h6>
                             <p class="mt-4">Lorem ipsum dolor sit amet consectetur.</p>
                             <div class="line bg-lightgray-border"></div>
@@ -18,7 +18,7 @@
                         </div>
                     </div>
                     <div class="col-lg-4 mb-2 px-1">
-                        <div class="bg-light-gray p-3 radius-5">
+                        <div class="bg-light-gray p-3 radius-5 cursor-pointer" (click)="priceType = 2" [class.card-beige-border]="priceType == 2">
                             <h6 class="text-beige"><b>Premium</b></h6>
                             <p class="mt-4">Lorem ipsum dolor sit amet consectetur.</p>
                             <div class="line bg-lightgray-border"></div>
@@ -29,7 +29,7 @@
                         </div>
                     </div>
                     <div class="col-lg-4 mb-2 px-1">
-                        <div class="bg-light-gray p-3 radius-5">
+                        <div class="bg-light-gray p-3 radius-5 cursor-pointer" (click)="priceType = 3" [class.card-beige-border]="priceType == 3">
                             <h6 class="text-beige"><b>Contact Us</b></h6>
                             <p class="mt-4">Lorem ipsum dolor sit amet consectetur.</p>
                             <div class="line bg-lightgray-border"></div>
