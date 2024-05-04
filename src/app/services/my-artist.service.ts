@@ -12,6 +12,7 @@ import { ICreateTracks } from '../interfaces/response/create-tracks.response';
 export class MyArtistService {
 
   MY_ARTIST_API_URL = `${environment.API_URL}/${environment.VERSION}/my-artist`;
+  ARTIST_API_URL = `${environment.API_URL}/${environment.VERSION}/artists`;
 
   private _http = inject(HttpClient);
   public myArtist: WritableSignal<IMyArtist | null> = signal(null);
@@ -74,5 +75,9 @@ export class MyArtistService {
         track_uuid: trackId
       }
     ]);
+  }
+
+  createArtist(request: FormData): Observable<any> {
+    return this._http.post<any>(`${this.ARTIST_API_URL}/register/`, request);
   }
 }

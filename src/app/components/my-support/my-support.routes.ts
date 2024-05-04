@@ -12,6 +12,11 @@ export const MY_SUPPORT_ROUTES: Routes = [
         loadComponent: () => import('./my-support.component').then((c) => c.MySupportComponent),
         children: [
             {
+                path: mySupportRoutesNames.EMPTY,
+                redirectTo: mySupportRoutesNames.FAQ,
+                pathMatch: 'full',
+            },
+            {
                 path: mySupportRoutesNames.FAQ,
                 loadComponent: () => import('./faq/faq.component').then((mod) => mod.FaqComponent),
             },

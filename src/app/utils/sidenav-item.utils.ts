@@ -13,7 +13,7 @@ export const sidenavItems = [
       ]
   },
   {
-    icon: 'question', label: 'My Support', routerLink: '',
+    icon: 'question', label: 'My Support', routerLink: '/my-support',
     submenu: [
       { label: 'FAQ & Help', routerLink: '/my-support/faq' },
       { label: 'Customer Success', routerLink: '/my-support/customer-success' }

@@ -4,11 +4,14 @@
             <div class="acr-box">
                 <p class="mb-2">Preview Your Track</p>
                 <div class="d-flex gap-2">
-                    <img ngSrc="/assets/images/others/preview.svg" height="110" width="110" class="radius-5" />
+                    <img ngSrc="/assets/images/others/preview.svg" (click)="playSnippet()" height="110" width="110" class="radius-5 cursor-pointer" />
                     <div class="d-flex flex-column">
                         <span>{{ form.get('name')?.value }}</span>
                         <span>{{ myArtist?.name }}</span>
                         <span>{{ form.get('duration')?.value }}</span>
+                        @if (snippet) {
+                            <audio [src]="snippet" #audioSnippet class="d-none hidden"></audio>
+                        }
                         @if (form.value['tags']?.length) {
                             <div class="mt-3 d-flex gap-2">
                                 @for (item of form.value['tags']; track item) {
@@ -28,11 +31,11 @@
             <div class="col-12">
                 <div class="row justify-content-center gy-2">
                     <div class="col-md-5 col-12 text-end">
-                        <button class="btn-darkgrey radius-5 px-4 px-lg-5 py-2 light-gray-border"
+                        <button class="btn btn-darkgrey px-4 px-lg-5 py-2 light-gray-border"
                             (click)="nextUploadStepper(3)">Back</button>
                     </div>
                     <div class="col-md-5 col-12">
-                        <button class="btn-info radius-5 px-4 px-lg-5 py-2 light-gray-border acrylic-next-button"
+                        <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border"
                             (click)="nextUploadStepper(5)">Next</button>
                     </div>
                 </div>

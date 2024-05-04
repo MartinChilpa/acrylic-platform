@@ -5,6 +5,7 @@ import { AuthService } from '../../../services/auth.service';
 import { AlertService } from '../../../services/alert.service';
 import { PasswordValidatorDirective } from '../../../directives/password-validator.directive';
 import { NgClass } from '@angular/common';
+import { MyArtistService } from '../../../services/my-artist.service';
 
 @Component({
   selector: 'acrylic-sign-up',
@@ -27,6 +28,7 @@ export class SignUpComponent {
   private _authService = inject(AuthService);
   private _alertService = inject(AlertService);
   public _navigationService = inject(NavigationService);
+  public _myArtistService = inject(MyArtistService);
 
   ngOnInit(): void {
     this.signUpForm = this._fb.group({
@@ -37,7 +39,18 @@ export class SignUpComponent {
       password: ['', Validators.required],
       password_confirm: ['', Validators.required],
       profile: [''],
-    });
+    }, { validator: this.passwordMatchValidator });
+  }
+
+  passwordMatchValidator(formGroup: FormGroup) {
+    const passwordControl = formGroup.get('password');
+    const confirmPasswordControl = formGroup.get('password_confirm');
+
+    if (passwordControl?.value === confirmPasswordControl?.value) {
+      confirmPasswordControl?.setErrors(null);
+    } else {
+      confirmPasswordControl?.setErrors({ mismatch: true });
+    }
   }
 
   signUp(): void {
@@ -47,15 +60,15 @@ export class SignUpComponent {
     // Disable the form
     this.signUpForm.disable();
 
-    // this._authService.signIn(this.signInForm.value)
-    //   .subscribe({
-    //     next: () => {
-    //       this._alertService.success("Logged in successfully");
-    //       this._navigationService.navigateToHome();
-    //     },
-    //     error: () => {
-    //       this.signInForm.enable(); // Re-enable the form
-    //     }
-    //   });
+    this._myArtistService.createArtist(this.signUpForm.value)
+      .subscribe({
+        next: () => {
+          this._alertService.success("Registration successfully");
+          this._navigationService.navigateToSignIn();
+        },
+        error: () => {
+          this.signUpForm.enable(); // Re-enable the form
+        }
+      });
   }
 }

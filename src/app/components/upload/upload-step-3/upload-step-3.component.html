@@ -6,6 +6,7 @@
                 [fileDropzoneExternalLink]="UploadFileTextDetails[2].fileDropzoneExternalLink"
                 [existingFiles]="[form.get('snippet')?.value]"
                 [allowExtensions]="['mp3']"
+                [accept]="'.mp3'"
                 (uploadedFileList)="setUploadFile('snippet', $event)"></acrylic-file-dropzone>
         </div>
         <div class="col-12">
@@ -13,6 +14,7 @@
                 [fileDropzoneHeader]="UploadFileTextDetails[0].fileDropzoneHeader"
                 [existingFiles]="[form.get('file_wav')?.value]"
                 [allowExtensions]="['wav']"
+                [accept]="'.wav'"
                 (uploadedFileList)="setUploadFile('file_wav', $event)"></acrylic-file-dropzone>
         </div>
         <div class="col-12">
@@ -21,6 +23,7 @@
                 [fileDropzoneSize]="UploadFileTextDetails[1].fileDropzoneSize"
                 [existingFiles]="[form.get('cover_image')?.value]"
                 [allowExtensions]="['jpg']"
+                [accept]="'.jpg'"
                 (uploadedFileList)="setUploadFile('cover_image', $event)"></acrylic-file-dropzone>
         </div>
     </div>
@@ -29,12 +32,12 @@
             <div class="col-12">
                 <div class="row justify-content-center gy-2">
                     <div class="col-md-5 col-12 text-end">
-                        <button class="btn-darkgrey radius-5 px-4 px-lg-5 py-2 light-gray-border"
+                        <button class="btn btn-darkgrey px-4 px-lg-5 py-2 light-gray-border"
                             (click)="nextUploadStepper(2)">Back</button>
                     </div>
                     <div class="col-md-5 col-12">
-                        <button class="btn-info radius-5 px-4 px-lg-5 py-2 light-gray-border acrylic-next-button"
-                            (click)="nextUploadStepper(4)">Next</button>
+                        <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border"
+                            (click)="nextUploadStepper(4)" [disabled]="!form.get('snippet')?.value || !form.get('file_wav')?.value || !form.get('cover_image')?.value">Next</button>
                     </div>
                 </div>
             </div>

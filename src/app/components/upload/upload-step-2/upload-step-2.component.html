@@ -77,12 +77,12 @@
             <div class="col-12">
                 <div class="row justify-content-center gy-2">
                     <div class="col-md-5 col-12 text-end">
-                        <button class="btn-darkgrey radius-5 px-4 px-lg-5 py-2 light-gray-border"
+                        <button class="btn btn-darkgrey px-4 px-lg-5 py-2 light-gray-border"
                             (click)="nextUploadStepper(1)">Back</button>
                     </div>
                     <div class="col-md-5 col-12">
-                        <button class="btn-info radius-5 px-4 px-lg-5 py-2 light-gray-border acrylic-next-button"
-                            (click)="nextUploadStepper(3)">Next</button>
+                        <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border"
+                            (click)="nextUploadStepper(3)" [disabled]="!form.get('isrc')?.value || form.get('isrc')?.errors?.['pattern']">Next</button>
                     </div>
                 </div>
             </div>

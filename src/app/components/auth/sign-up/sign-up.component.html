@@ -53,26 +53,19 @@
                 </div>
             </div>
         </div>
-
-        <div class="acr-input-label mb-3 small">
-            <div
-                [ngClass]="signUpForm.get('password')?.errors?.['invalidPassword']?.requiredLength ? 'text-danger': 'text-success'">
-                Your password must contain at least 8 characters.
+        @if(signUpForm.get('password')?.invalid && (signUpForm.get('password')?.dirty || signUpForm.get('password')?.touched)) {
+            <div class="acr-input-label mb-3 small text-danger">
+                @if(signUpForm.get('password')?.errors?.['invalidPassword']?.requiredLength) {
+                    <div> Your password must contain at least 8 characters. </div>
+                }@else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasLetter) {
+                    <div> Your password must contain at least one letter. </div>
+                }@else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasNumber) {
+                    <div> Your password must contain at least one number. </div>
+                }@else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasSpecialChar) {
+                    <div> Your password must contain at least one special character (example: # ? ! & ). </div>
+                }
             </div>
-            <div
-                [ngClass]="signUpForm.get('password')?.errors?.['invalidPassword']?.hasLetter ? 'text-danger': 'text-success'">
-                Your password must contain at least one letter.
-            </div>
-            <div
-                [ngClass]="signUpForm.get('password')?.errors?.['invalidPassword']?.hasNumber ? 'text-danger': 'text-success'">
-                Your password must contain at least one number.
-            </div>
-            <div
-                [ngClass]="signUpForm.get('password')?.errors?.['invalidPassword']?.hasSpecialChar ? 'text-danger': 'text-success'">
-                Your password must contain at least one special character (example: # ? ! & ).
-            </div>
-        </div>
-
+        }
         <div>
             <button type="button" class="btn w-100 btn-main fw-bold h-50px" [disabled]="signUpForm.invalid"
                 (click)="signUp()">Sign Up

@@ -42,9 +42,9 @@ export class UploadComponent implements OnInit {
       is_explicit: [false],
       bpm: [1],
       lyrics: [null],
-      cover_image: [null],
-      snippet: [null],
-      file_wav: [null],
+      cover_image: [null, Validators.required],
+      snippet: [null, Validators.required],
+      file_wav: [null, Validators.required],
       file_mp3: [null],
       distributor: [null],
       tags: [],
@@ -96,7 +96,8 @@ export class UploadComponent implements OnInit {
     Object.keys(this.uploadTrackForm.value).forEach(item => {
       formData.append(item, this.uploadTrackForm.value[item]);
     })
-    this._myArtistService.updateTracks(formData, this.uploadTrackForm.value.id).subscribe({
+    const uploadType = this.uploadTrackForm.value.id ? this._myArtistService.updateTracks(formData, this.uploadTrackForm.value.id) : this._myArtistService.createTracks(formData)
+    uploadType.subscribe({
       next: response => {
         this._modalService.showModal('live-upload')
       }
