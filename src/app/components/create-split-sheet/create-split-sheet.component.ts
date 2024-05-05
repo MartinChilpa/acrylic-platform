@@ -1,13 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NavigationService } from '../../services/navigation.service';
-import { NgFor } from '@angular/common';
 import { AlertService } from '../../services/alert.service';
+import { IDistributorsResult } from '../../interfaces/response/distributor.response';
+import { DistributorsService } from '../../services/distributors.service';
+import { CustomDropdownComponent } from '../shared/custom-dropdown/custom-dropdown.component';
 
 @Component({
   selector: 'acrylic-create-split-sheet',
   standalone: true,
-  imports: [ReactiveFormsModule, NgFor],
+  imports: [ReactiveFormsModule, CustomDropdownComponent],
   templateUrl: './create-split-sheet.component.html',
   styleUrl: './create-split-sheet.component.scss'
 })
@@ -21,10 +23,12 @@ export class CreateSplitSheetComponent implements OnInit {
   totalPublishingPercentage: number = 100;
   totalMasteringPercentage: number = 100;
   reviewObject: any = {};
+  distributors!: IDistributorsResult[]
 
   private _fb = inject(FormBuilder);
   public _navigationService = inject(NavigationService);
   private _alertService = inject(AlertService);
+  private _distributorService = inject(DistributorsService)
 
 
   ngOnInit(): void {
@@ -46,8 +50,19 @@ export class CreateSplitSheetComponent implements OnInit {
         })
       ])
     });
+    this.getDistributors()
+  }
 
-    console.log(this.createSplitSheetForm);
+  getDistributors() {
+    this._distributorService.getDistributorList().subscribe({
+      next: response => {
+        this.distributors = response.results
+      }
+    })
+  }
+
+  dropdownSelected($event: any) {
+    this.createSplitSheetForm.get('email')?.setValue($event.uuid);
   }
 
   get publishing(): FormArray {
