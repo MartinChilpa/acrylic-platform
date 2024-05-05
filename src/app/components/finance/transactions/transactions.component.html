@@ -1,15 +1,15 @@
 <div>
-    <div class="transaction my-transaction w-100">
+    <div class="transaction my-transaction">
         <div class="default-tab d-inline-flex">
             <ul class="nav nav-pills">
                 <li class="nav-item">
-                  <a class=" btn btn-main" aria-current="page" href="#">All Transactions</a>
+                  <a class="btn btn-main h-100 d-flex-center fw-bold" href="#">All Transactions</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Payout</a>
+                  <a class="nav-link fw-bold" href="#">Payout</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Fees</a>
+                  <a class="nav-link fw-bold" href="#">Fees</a>
                 </li>
               </ul>
         </div>
@@ -21,7 +21,7 @@
                         <span>Jan 22, 2023 - </span>
                         <span>Mar 1, 2024 </span>
                     </div>
-                    <div class="d-flex mt-2">
+                    <div class="d-flex mt-1">
                         <span class="h3 fw-bold">$549K</span>
                         <span class="text-success ps-1">+47.3%</span>
                     </div>
@@ -34,7 +34,7 @@
                         <span>Jan 22, 2023 - </span>
                         <span>Mar 1, 2024 </span>
                     </div>
-                    <div class="d-flex mt-2">
+                    <div class="d-flex mt-1">
                         <span class="h3 fw-bold">$549K</span>
                         <span class="text-success ps-1">+47.3%</span>
                     </div>
@@ -47,7 +47,7 @@
                         <span>Jan 22, 2023 - </span>
                         <span>Mar 1, 2024 </span>
                     </div>
-                    <div class="d-flex mt-2">
+                    <div class="d-flex mt-1">
                         <span class="h3 fw-bold">$549K</span>
                         <span class="text-success ps-1">+47.3%</span>
                     </div>
@@ -60,7 +60,7 @@
                         <span>Jan 22, 2023 - </span>
                         <span>Mar 1, 2024 </span>
                     </div>
-                    <div class="d-flex mt-2">
+                    <div class="d-flex mt-1">
                         <span class="h3 fw-bold">$549K</span>
                         <span class="text-success ps-1">+47.3%</span>
                     </div>
@@ -87,7 +87,7 @@
                 </div>
                 
                 <div class="offset-xl-1 col d-flex gap-2 align-self-center justify-content-end">
-                    <button class="btn btn-info px-4">Export</button>
+                    <button class="btn btn-sm btn-info px-4">Export</button>
                 </div>
             </div>
             <div class="light-gray-table-border rounded-2 table-responsive mt-4 mt-xl-0">
@@ -95,7 +95,7 @@
                     <thead>
                         <tr>
                             <th scope="col" width="290">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex-align-center">
                                     <span class="me-3"><input type="checkbox" class="acrylic-checkbox"></span>
                                     <span>Amount</span>
                                 </div>
@@ -105,12 +105,15 @@
                             <th scope="col">Date</th>
                         </tr>
                     </thead>
-                    <tbody class=" font-size14 font-weight-400">
+                    <tbody>
                         <tr>
                             <td class="text-nowrap">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex-align-center">
                                     <span class="me-3"><input type="checkbox" class="acrylic-checkbox"></span>
-                                    <span class="text-success me-3 font-weight-600 currency">-$12337.3 USD</span>
+                                    <div class="me-3">
+                                        <span class="text-success fw-semibold">-$12337.3</span>
+                                        <span class="text-light-gray ps-1">USD</span>
+                                    </div>
                                     <span class="tb-pill pending">Pending</span>
                                 </div>
                             </td>
@@ -126,9 +129,12 @@
                         </tr>
                         <tr>
                             <td class="text-nowrap">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex-align-center">
                                     <span class="me-3"><input type="checkbox" class="acrylic-checkbox"></span>
-                                    <span class="text-danger me-3 font-weight-600 currency">-$37.3 USD</span>
+                                    <div class="me-3">
+                                        <span class="text-danger fw-semibold">-$37.3</span>
+                                        <span class="text-light-gray ps-1">USD</span>
+                                    </div>
                                     <span class="tb-pill pending">Pending</span>
                                 </div>
                             </td>
@@ -144,9 +150,12 @@
                         </tr>
                         <tr>
                             <td class="text-nowrap">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex-align-center">
                                     <span class="pe-3"><input type="checkbox" class="acrylic-checkbox"></span>
-                                    <span class="me-3 font-weight-600 currency">-$37.3 USD</span>
+                                    <div class="me-3">
+                                        <span class="text-danger fw-semibold">-$37.3</span>
+                                        <span class="text-light-gray ps-1">USD</span>
+                                    </div>
                                     <span class="tb-pill text-success info-bg-success">Succeeded</span>
                                 </div>
                             </td>
@@ -162,9 +171,12 @@
                         </tr>
                         <tr>
                             <td class="text-nowrap">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex-align-center">
                                     <span class="pe-3"><input type="checkbox" class="acrylic-checkbox"></span>
-                                    <span class="text-success me-3 font-weight-600 currency">-$1137.3 USD</span>
+                                    <div class="me-3">
+                                        <span class="text-success fw-semibold">-$12337.3</span>
+                                        <span class="text-light-gray ps-1">USD</span>
+                                    </div>
                                     <span class="tb-pill pending">Pending</span>
                                 </div>
                             </td>

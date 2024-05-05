@@ -133,6 +133,10 @@ body {
     background: var(--sub-box-color) !important;
 }
 
+.resize-none {
+    resize: none;
+}
+
 /**** Input with label ***/
 .input-with-lbl {
     position: relative;
@@ -169,7 +173,7 @@ body {
 }
 
 .height-115px {
-    height: 115px;
+    height: 115px !important;
 }
 
 .clip-path-tag {
@@ -224,10 +228,6 @@ body {
     height: 36px;
 }
 
-.min-height-52 {
-    min-height: 52px;
-}
-
 .min-height-50 {
     min-height: 50px;
 }
@@ -258,11 +258,6 @@ body {
     border-radius: 5px;
     padding: 2px 6px 2px 6px;
     background-color: var(--light-gray-table-border-color);
-}
-
-.currency {
-    min-width: 105px;
-    text-align: right;
 }
 
 @media(max-width:1024px) {
