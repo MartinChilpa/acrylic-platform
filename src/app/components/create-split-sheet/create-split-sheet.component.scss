@@ -1,84 +1,9 @@
 @use '../../styles/overrides/input';
 
-.transp-btn {
-	background: transparent !important;
-	border: 1px solid rgba(255,255,255,0.3);
+.right-10 {
+    right: 10%;
 }
 
-.max-width-560{
-	max-width:560px;
-}
-.mb-20{
-	margin-bottom:20px !important;
-}
-
-.pr-104{
-	padding-right:104px;
-}
-
-.progress {
-    background:var(--info-color);
-    height: 1px;
-    overflow: visible;
-}
-.progress-bar {
-    background:var(--info-color);
-    overflow: visible;
-}
-
-.progress-bar .plus-icon span{
-    background: var(--info-color);
-    border-radius: 50%;
-    display: inline-flex;
-    height: 36px;
-    width: 36px;
-    cursor: pointer;
-    align-content: center;
-    justify-content: center;
-}
-
-.progress-bar .plus-icon span img{
-    margin-top: 8px;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-}
-
-
-.split-pnct-box{
-    background-color: var(--darkgrey-color);
-    min-width:80px;
-    border-radius: 5px;
-}
-.split-pnct-box input {
-    width: 33%;
-    font-size: 14px;
-    padding: 0 !important;
-}
-
-.review-btn .btn{
-    width: 209px;
-    padding: 18px 20px 18px 20px;
-    border-radius: 5px;
-}
-
-.track-img{
-    background-position: center center;
-    background-size: cover;
-    width: 72px;
-    height: 72px;
-    overflow: hidden;
-    margin-right: 12px;
-}
-
-.form-input input[type="text"]
-{
-    border: 0;
-    height: 50px;
-    background-color: var(--darkgrey-color);
-    padding-left: 16px;
-    box-shadow: none;
-    color: var(--text-color);
+.top-25 {
+    top: 25%;
 }

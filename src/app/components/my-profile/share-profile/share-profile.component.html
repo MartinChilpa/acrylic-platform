@@ -28,12 +28,12 @@
                     <button class="bg-orange border-0 radius-5 rounded-start-0 w-25 text-primary">Copy Link</button>
                 </div>
             </div>
-            <div class="bg-lght-gray-500 py-3 text-center">
+            <div class="bg-lightgray-border py-3 text-center">
                 <span>Or Share Via</span>
                 <div class="d-flex justify-content-center gap-2 pt-2">
                     @for (item of profileBioTrack; track item.icon) {
                         @if(item.link){
-                            <a class="side-icon bg-lght-gray-500 light-gray-border rounded-2 p-1 align-self-center" [href]="item.link" target="_blank">
+                            <a class="side-icon bg-lightgray-border light-gray-border rounded-2 p-1 align-self-center" [href]="item.link" target="_blank">
                                 <img [src]="item.icon" alt="side_icon" width="22" height="22" />
                             </a>
                         }
