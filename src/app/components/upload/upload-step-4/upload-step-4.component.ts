@@ -15,7 +15,7 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
 
-  @ViewChild("videoSnippet") videoSnippet!: ElementRef<HTMLVideoElement>
+  @ViewChild("audioSnippet") audioSnippet!: ElementRef<HTMLAudioElement>
 
   snippet: string = ''
   coverImage: string = ''
@@ -53,14 +53,18 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   }
 
   playSnippet() {
-    if (this.videoSnippet) {
-      this.videoSnippet.nativeElement.play()
+    if (this.audioSnippet) {
+      if (this.audioSnippet.nativeElement.paused) {
+        this.audioSnippet.nativeElement.play()
+      } else {
+        this.audioSnippet.nativeElement.pause()
+      }
     }
   }
 
   pauseSnippet() {
-    if (this.videoSnippet) {
-      this.videoSnippet.nativeElement.pause()
+    if (this.audioSnippet) {
+      this.audioSnippet.nativeElement.pause()
     }
   }
 
@@ -86,8 +90,8 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.videoSnippet) {
-      this.videoSnippet.nativeElement.remove()
+    if (this.audioSnippet) {
+      this.audioSnippet.nativeElement.remove()
     }
   }
 }

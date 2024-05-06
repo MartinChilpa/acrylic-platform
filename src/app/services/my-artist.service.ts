@@ -70,7 +70,7 @@ export class MyArtistService {
   }
 
   removeSynclistTrack(synclistId: string, trackId: string): Observable<Object> {
-    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/remove-track/`, [
+    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/remove-tracks/`, [
       {
         track_uuid: trackId
       }
