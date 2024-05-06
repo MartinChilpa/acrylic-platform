@@ -42,7 +42,7 @@ export const routes: Routes = [
       },
       {
         path: routesNames.SPLITSHEET,
-        loadComponent: () => import('./components/create-split-sheet/create-split-sheet.component').then((c) => c.CreateSplitSheetComponent),
+        loadComponent: () => import('./components/my-split-sheets/manage-split-sheet/manage-split-sheet.component').then((c) => c.ManageSplitSheetComponent),
       },
       {
         path: routesNames.EDIT_UPLOAD,

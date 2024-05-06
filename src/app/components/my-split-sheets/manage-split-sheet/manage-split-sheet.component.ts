@@ -1,20 +1,20 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NavigationService } from '../../services/navigation.service';
-import { AlertService } from '../../services/alert.service';
-import { IDistributorsResult } from '../../interfaces/response/distributor.response';
-import { DistributorsService } from '../../services/distributors.service';
-import { CustomDropdownComponent } from '../shared/custom-dropdown/custom-dropdown.component';
-import { MyArtistService } from '../../services/my-artist.service';
+import { NavigationService } from '../../../services/navigation.service';
+import { AlertService } from '../../../services/alert.service';
+import { IDistributorsResult } from '../../../interfaces/response/distributor.response';
+import { DistributorsService } from '../../../services/distributors.service';
+import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
+import { MyArtistService } from '../../../services/my-artist.service';
 
 @Component({
-  selector: 'acrylic-create-split-sheet',
+  selector: 'acrylic-manage-split-sheet',
   standalone: true,
   imports: [ReactiveFormsModule, CustomDropdownComponent],
-  templateUrl: './create-split-sheet.component.html',
-  styleUrl: './create-split-sheet.component.scss'
+  templateUrl: './manage-split-sheet.component.html',
+  styleUrl: './manage-split-sheet.component.scss'
 })
-export class CreateSplitSheetComponent implements OnInit {
+export class ManageSplitSheetComponent implements OnInit {
 
   createSplitSheetForm!: FormGroup;
   reveiwBtnClick: boolean = false;
