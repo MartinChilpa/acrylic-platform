@@ -37,16 +37,16 @@ export class CreateSplitSheetComponent implements OnInit {
       email: ['', Validators.required],
       publishing_splits: new FormArray([
         new FormGroup({
-          name: new FormControl(''),
-          email: new FormControl(''),
-          percent: new FormControl(100)
+          name: new FormControl('', [Validators.required]),
+          email: new FormControl('', [Validators.required]),
+          percent: new FormControl(100, [Validators.required])
         })
       ]),
       master_splits: new FormArray([
         new FormGroup({
-          name: new FormControl(''),
-          email: new FormControl(''),
-          percent: new FormControl(100)
+          name: new FormControl('', [Validators.required]),
+          email: new FormControl('', [Validators.required]),
+          percent: new FormControl(100, [Validators.required])
         })
       ])
     });
@@ -116,9 +116,9 @@ export class CreateSplitSheetComponent implements OnInit {
       percent.forEach(item => {
         this.publishing_splits.push(
           new FormGroup({
-            name: new FormControl(item.name),
-            email: new FormControl(item.email),
-            percent: new FormControl(parseFloat(parseFloat(`${item.percent}`).toFixed(2)))
+            name: new FormControl(item.name, [Validators.required]),
+            email: new FormControl(item.email, [Validators.required]),
+            percent: new FormControl(parseFloat(parseFloat(`${item.percent}`).toFixed(2)), [Validators.required])
           })
         );
       });
@@ -135,9 +135,9 @@ export class CreateSplitSheetComponent implements OnInit {
       percent.forEach(item => {
         this.master_splits.push(
           new FormGroup({
-            name: new FormControl(item.name),
-            email: new FormControl(item.email),
-            percent: new FormControl(parseFloat(parseFloat(`${item.percent}`).toFixed(2)))
+            name: new FormControl(item.name, [Validators.required]),
+            email: new FormControl(item.email, [Validators.required]),
+            percent: new FormControl(parseFloat(parseFloat(`${item.percent}`).toFixed(2)), [Validators.required])
           })
         );
       });
@@ -186,9 +186,9 @@ export class CreateSplitSheetComponent implements OnInit {
       data.forEach((item: any) => {
         this.publishing_splits.push(
           new FormGroup({
-            name: new FormControl(item.name),
-            email: new FormControl(item.email),
-            percent: new FormControl(percent)
+            name: new FormControl(item.name, [Validators.required]),
+            email: new FormControl(item.email, [Validators.required]),
+            percent: new FormControl(percent, [Validators.required])
           })
         );
       });
@@ -206,9 +206,9 @@ export class CreateSplitSheetComponent implements OnInit {
       data.forEach((item: any) => {
         this.master_splits.push(
           new FormGroup({
-            name: new FormControl(item.name),
-            email: new FormControl(item.email),
-            percent: new FormControl(percent)
+            name: new FormControl(item.name, [Validators.required]),
+            email: new FormControl(item.email, [Validators.required]),
+            percent: new FormControl(percent, [Validators.required])
           })
         );
       });
