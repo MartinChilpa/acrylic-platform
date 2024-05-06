@@ -49,7 +49,7 @@ export class UploadStep4Component implements OnInit, OnDestroy {
       }
     }
 
-    this.videoInit()
+    this.audioInit()
   }
 
   playSnippet() {
@@ -72,15 +72,15 @@ export class UploadStep4Component implements OnInit, OnDestroy {
     this.nextStepper.emit(count);
   }
 
-  videoInit() {
-    const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.onloadedmetadata = () => {
-      URL.revokeObjectURL(video.src);
-      this.form.get('duration')?.setValue(parseInt(`${video.duration}`));
-      this.formatTime(video.duration)
+  audioInit() {
+    const audio = document.createElement('audio');
+    audio.preload = 'metadata';
+    audio.onloadedmetadata = () => {
+      URL.revokeObjectURL(audio.src);
+      this.form.get('duration')?.setValue(parseInt(`${audio.duration}`));
+      this.formatTime(audio.duration)
     };
-    video.src = this.snippet;
+    audio.src = this.snippet;
   }
 
   formatTime(seconds: number) {
