@@ -5,6 +5,7 @@ import { AlertService } from '../../services/alert.service';
 import { IDistributorsResult } from '../../interfaces/response/distributor.response';
 import { DistributorsService } from '../../services/distributors.service';
 import { CustomDropdownComponent } from '../shared/custom-dropdown/custom-dropdown.component';
+import { MyArtistService } from '../../services/my-artist.service';
 
 @Component({
   selector: 'acrylic-create-split-sheet',
@@ -29,6 +30,7 @@ export class CreateSplitSheetComponent implements OnInit {
   public _navigationService = inject(NavigationService);
   private _alertService = inject(AlertService);
   private _distributorService = inject(DistributorsService)
+  private _myArtistService = inject(MyArtistService)
 
 
   ngOnInit(): void {
@@ -165,6 +167,11 @@ export class CreateSplitSheetComponent implements OnInit {
 
   sendRequestToCreateSheet() {
     console.log(this.reviewObject);
+    this._myArtistService.createSplitSheet(this.reviewObject).subscribe({
+      next: response => {
+        this._alertService.success("Split sheet created successfully")
+      }
+    })
   }
 
   navigateToHome() {
