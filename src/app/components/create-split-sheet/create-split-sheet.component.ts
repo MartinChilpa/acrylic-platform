@@ -35,18 +35,18 @@ export class CreateSplitSheetComponent implements OnInit {
     this.createSplitSheetForm = this._fb.group({
       isrcCode: ['', Validators.required],
       email: ['', Validators.required],
-      publishing: new FormArray([
+      publishing_splits: new FormArray([
         new FormGroup({
           name: new FormControl(''),
           email: new FormControl(''),
-          percentage: new FormControl('100')
+          percent: new FormControl(100)
         })
       ]),
-      mastering: new FormArray([
+      master_splits: new FormArray([
         new FormGroup({
           name: new FormControl(''),
           email: new FormControl(''),
-          percentage: new FormControl(100)
+          percent: new FormControl(100)
         })
       ])
     });
@@ -65,32 +65,34 @@ export class CreateSplitSheetComponent implements OnInit {
     this.createSplitSheetForm.get('email')?.setValue($event.uuid);
   }
 
-  get publishing(): FormArray {
-    return this.createSplitSheetForm.get('publishing') as FormArray;
+  get publishing_splits(): FormArray {
+    return this.createSplitSheetForm.get('publishing_splits') as FormArray;
   }
 
-  get mastering(): FormArray {
-    return this.createSplitSheetForm.get('mastering') as FormArray;
+  get master_splits(): FormArray {
+    return this.createSplitSheetForm.get('master_splits') as FormArray;
   }
 
   calculatePercentage(object: [any]) {
     let result: any[] = [];
     if (object.length > 0) {
-      let percentage = object.map(x => x.percentage).map(val => parseFloat(val));
-      if (percentage.some(val => { return val != 0 })) {
+      let percent = object.map(x => x.percent).map(val => parseFloat(val));
+      if (percent.some(val => { return val != 0 })) {
         let sum = 0
         let count = 1;
 
-        percentage.forEach(item => {
+        percent.forEach(item => {
           sum = sum + item;
           count += 1;
         });
-
         let r = 0;
-        if (sum > 0 && sum === this.total) {
+        if (sum > 0 && sum <= this.total) {
           r = sum / count
+          if (percent.length == 5) {
+            return result;
+          }
           object.forEach(item => {
-            item.percentage = r;
+            item.percent = r;
           });
         } else if (sum > this.total) {
           return result;
@@ -98,7 +100,7 @@ export class CreateSplitSheetComponent implements OnInit {
         else {
           r = this.total - sum;
         }
-        object.push({ name: '', email: '', percentage: r });
+        object.push({ name: '', email: '', percent: r });
         result = object;
       }
 
@@ -107,37 +109,35 @@ export class CreateSplitSheetComponent implements OnInit {
   }
 
   addPublishingSheet() {
-    let publishingArray = this.createSplitSheetForm.controls['publishing'].value;
-    let percentage: any[] = this.calculatePercentage(publishingArray);
-    if (percentage.length > 0) {
-      this.publishing.clear();
-      percentage.forEach(item => {
-        this.publishing.push(
+    let publishingArray = this.createSplitSheetForm.controls['publishing_splits'].value;
+    let percent: any[] = this.calculatePercentage(publishingArray);
+    if (percent.length > 0) {
+      this.publishing_splits.clear();
+      percent.forEach(item => {
+        this.publishing_splits.push(
           new FormGroup({
             name: new FormControl(item.name),
             email: new FormControl(item.email),
-            percentage: new FormControl(item.percentage)
+            percent: new FormControl(parseFloat(parseFloat(`${item.percent}`).toFixed(2)))
           })
         );
       });
     } else {
       this._alertService.error("Cannot split more");
     }
-
-
   }
 
   addMasterSheet() {
-    let masterArray = this.createSplitSheetForm.controls['mastering'].value;
-    let percentage: any[] = this.calculatePercentage(masterArray);
-    if (percentage.length > 0) {
-      this.mastering.clear();
-      percentage.forEach(item => {
-        this.mastering.push(
+    let masterArray = this.createSplitSheetForm.controls['master_splits'].value;
+    let percent: any[] = this.calculatePercentage(masterArray);
+    if (percent.length > 0) {
+      this.master_splits.clear();
+      percent.forEach(item => {
+        this.master_splits.push(
           new FormGroup({
             name: new FormControl(item.name),
             email: new FormControl(item.email),
-            percentage: new FormControl(item.percentage)
+            percent: new FormControl(parseFloat(parseFloat(`${item.percent}`).toFixed(2)))
           })
         );
       });
@@ -153,8 +153,8 @@ export class CreateSplitSheetComponent implements OnInit {
     this.reviewObject = {
       isrcCode: controls['isrcCode'].value,
       email: controls['email'].value,
-      publishing: controls['publishing'].value,
-      mastering: controls['mastering'].value
+      publishing_splits: controls['publishing_splits'].value,
+      master_splits: controls['master_splits'].value
     };
     this.reveiwBtnClick = true;
   }
@@ -169,5 +169,49 @@ export class CreateSplitSheetComponent implements OnInit {
 
   navigateToHome() {
     this._navigationService.navigateToHome();
+  }
+
+  distributorName() {
+    return this.distributors?.find(x => x.uuid == this.reviewObject?.email)?.name
+  }
+
+  removePublishSplits(index: number) {
+    let dataArray = Array.from(this.publishing_splits as any);
+    const dataIndex = dataArray.findIndex((x: any, i: number) => i == index)
+    if (dataIndex >= 0) {
+      this.publishing_splits.removeAt(dataIndex)
+      const percent = parseFloat(parseFloat(`${100 / Array.from(this.publishing_splits as any).length}`).toFixed(2))
+      const data = Array.from(this.publishing_splits.controls as any).map((x: any) => x.value)
+      this.publishing_splits.clear();
+      data.forEach((item: any) => {
+        this.publishing_splits.push(
+          new FormGroup({
+            name: new FormControl(item.name),
+            email: new FormControl(item.email),
+            percent: new FormControl(percent)
+          })
+        );
+      });
+    }
+  }
+
+  removeMasterSplits(index: number) {
+    let dataArray = Array.from(this.master_splits as any);
+    const dataIndex = dataArray.findIndex((x: any, i: number) => i == index)
+    if (dataIndex >= 0) {
+      this.master_splits.removeAt(dataIndex)
+      const percent = parseFloat(parseFloat(`${100 / Array.from(this.master_splits as any).length}`).toFixed(2))
+      const data = Array.from(this.master_splits.controls as any).map((x: any) => x.value)
+      this.master_splits.clear();
+      data.forEach((item: any) => {
+        this.master_splits.push(
+          new FormGroup({
+            name: new FormControl(item.name),
+            email: new FormControl(item.email),
+            percent: new FormControl(percent)
+          })
+        );
+      });
+    }
   }
 }

@@ -213,10 +213,18 @@ p {
         height: 33px;
     }
 }
+
 /**Custom Select Override Css**/
 
 /**Custom Menu List Override Css**/
 .menu-list:nth-child(even) {
     background: var(--lightgrey-color);
 }
+
 /**Custom Menu List Override Css**/
+
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
