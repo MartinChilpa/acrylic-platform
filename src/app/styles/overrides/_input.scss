@@ -8,6 +8,12 @@
     color: currentColor !important;
 }
 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
 .acr-input-group {
     display: flex;
     align-items: center;
@@ -145,35 +151,4 @@ input[type=radio].acrylic-radio {
         scrollbar-width: none;
     }
 
-}
-
-/* TextArea */
-textarea.textarea-input{
-	border:0;
-	height:52px;
-	background-color:var(--darkgrey-color);
-	padding:16px;
-	box-shadow:none;
-	color:var(--text-color);
-	height:36px;
-	outline:0;
-	box-shadow:none;
-	resize:none;
-	border-radius:5px;
-	height:120px;
-}
-input.acr-input::placeholder,
-textarea.textarea-input::placeholder {
-  color: var(--text-color);
-  opacity:0.3;
-  font-size:14px;  
-}
-textarea.textarea-input.form-control:focus{
-	background-color:var(--darkgrey-color);
-	box-shadow:none;
-}
-input.acr-input:hover::placeholder,
-textarea.textarea-input:hover::placeholder{
-	opacity:1;
-	background-color:var(--darkgrey-color);
 }

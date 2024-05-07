@@ -37,7 +37,7 @@
                 <div class="d-flex gap-2">
                     @for (item of profileBioTrack; track item.icon) {
                         @if(item.link){
-                            <a class="btn btn-darkgrey p-1" [href]="item.link" target="_blank">
+                            <a class="btn btn-darkgrey light-gray-border p-1" [href]="item.link" target="_blank">
                                 <img [src]="item.icon" alt="side_icon" width="22" height="22" />
                             </a>
                         }

@@ -1,83 +1,80 @@
-<div class="d-flex w-100">    
-    <div class="transaction my-subscriptions w-100">
-        <div class="acr-box mb-20">
-            <div class="d-flex align-items-center justify-content-between">
+<section>    
+    <div class="transaction my-subscriptions">
+        <div class="acr-box mb-4">
+            <div class="d-flex-between">
                 <div>
-                    <div class="font-size16 font-weight-400 mb-2">You are currently on Monthly package</div>
-                    <div class="font-size14 font-weight-400 mb-2 max-width-560">Lorem ipsum dolor sit amet consectetur.
+                    <p class="h6">You are currently on Monthly package</p>
+                    <p class="mb-2 max-width-560">Lorem ipsum dolor sit amet consectetur.
                         A dictum eget vitae neque nisl feugiat tincidunt dignissim. Lorem ipsum dolor sit amet
-                        consectetur.</div>
+                        consectetur.</p>
 
-                    <div class="d-inline-block font-size14 font-weight-400 card-beige-color cursor-pointer">Switch to
-                        Annual Package</div>
+                    <p class="mb-0 text-beige cursor-pointer">Switch to
+                        Annual Package</p>
                 </div>
                 <div><img src="assets/images/others/Colita.png" /></div>
             </div>
         </div>
-        <div class="acr-box mb-20">
-            <div class="d-flex align-items-center justify-content-between  mb-2">
-                <div class="font-size16 font-weight-400">Invoice Settings</div>
-                <div class="btn btn-sm btn-darkgrey light-gray-bordermn-width-auto"><span>Save</span></div>
+        <div class="acr-box mb-4">
+            <div class="d-flex-between mb-2">
+                <p class="h6 mb-0">Invoice Settings</p>
+                <button class="btn btn-sm btn-darkgrey light-gray-border">Save</button>
             </div>
             <div class="max-width-560">
                 <div class="mb-3">
-                    <input type="text" class="form-control acr-input min-height-52" placeholder="Billing Email">
-                    <span class="acr-input-label">Invoices and receipts will be sent to this email address</span>
+                    <input type="text" class="form-control acr-input mb-0" placeholder="Billing Email">
+                    <span class="text-light-gray small m-1">Invoices and receipts will be sent to this email address</span>
                 </div>
                 <div class="mb-3">
-                    <textarea placeholder="Company Billing Profile" class="form-control textarea-input"></textarea>
-                    <span class="acr-input-label">Additional company information to be shown on invoices; e. g. address, PO
+                    <textarea placeholder="Company Billing Profile" class="form-control acr-input mb-0 height-115px resize-none"></textarea>
+                    <span class="text-light-gray small m-1">Additional company information to be shown on invoices; e. g. address, PO
                         number, etc.</span>
                 </div>
-                <div class="toggle-section my-3">
-                    <div class="font-size14 font-weight-400">Text notifications when payment fail</div>
-                    <div class="my-2 d-flex align-items-center">
+                <div class="toggle-section mb-3">
+                    <p class="mb-0">Text notifications when payment fail</p>
+                    <div class="my-2 d-flex-align-center">
                         <label class="switch" (click)="toggleSwitch()">
                             <input type="checkbox" checked>
                             <span class="slider round"></span>
                           </label>
                           <span id="toggleLabel" class="ps-2">Yes</span>
                     </div>
-                    <div class="acr-input-label">We’ll notify you about billing issues. We’ll never call or share your
+                    <div class="text-light-gray small m-1">We’ll notify you about billing issues. We’ll never call or share your
                         number.</div>
                 </div>
-                <div class="font-size14 font-weight-400 mb-2">Phone Number</div>
-                <div class="d-flex align-items-center mb-2">
-                    <div class="w-35 me-1">
-                        <input type="text" class="form-control acr-input min-height-52"
+                <p class="mb-2">Phone Number</p>
+                <div class="d-flex-align-center">
+                    <div class="me-1">
+                        <input type="text" class="form-control acr-input mb-0"
                             placeholder="United State [+1]"></div>
                     <div class="w-75">
-                        <input type="text" class="form-control acr-input min-height-52"
+                        <input type="text" class="form-control acr-input mb-0"
                             placeholder="Phone Number"></div>
                 </div>
-                <div class="acr-input-label">Be sure to include country code. Your wireless provider’s standard messaging
+                <div class="text-light-gray small m-1">Be sure to include country code. Your wireless provider’s standard messaging
                     rates apply.</div>
             </div>
-
         </div>
 
-        <div class="acr-box mb-20">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <div class="font-size16 font-weight-400">Additional billing info</div>
-                <div>
-                    <div class="btn btn-sm btn-darkgrey light-gray-border mn-width-auto"><span>Save</span></div>
-                </div>
+        <div class="acr-box mb-4">
+            <div class="d-flex-between mb-2">
+                <p class="h6 mb-0">Additional billing info</p>
+                <button class="btn btn-sm btn-darkgrey light-gray-border">Save</button>
             </div>
             <div class="max-width-560">
                 <div>
-                    <input type="text" class="form-control acr-input min-height-52" placeholder="Tax ID">
-                    <span class="acr-input-label">Business with a valid Tax ID will not be subject to tax on their Acrylic
+                    <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID">
+                    <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on their Acrylic
                         package purchases. </span>
                 </div>
             </div>
         </div>
 
         <div class="acr-box">
-            <div class="font-size16 font-weight-400 mb-2">All Invoices</div>
+            <p class="h6 mb-2">All Invoices</p>
             <div class="max-width-560">
                 <div>
-                    <input type="text" class="form-control acr-input min-height-52" placeholder="Tax ID">
-                    <span class="acr-input-label">Business with a valid Tax ID will not be subject to tax on their Acrylic
+                    <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID">
+                    <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on their Acrylic
                         package purchases. </span>
                 </div>
             </div>
@@ -105,9 +102,11 @@
                                     <span>$9.99</span>
                                 </td>
                                 <td class="text-nowrap">
-                                    <span><div><button type="button"
-                                        class="btn btn-info w-100 w-100 font-weight-600 font-size14 px-3">Download
-                                        PDF</button></div></span>
+                                    <div>
+                                        <button class="btn btn-sm btn-info px-3">
+                                                Download PDF
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             
@@ -117,4 +116,4 @@
             </div>
         </div>
     </div>
-</div>
+</section>

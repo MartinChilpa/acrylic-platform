@@ -46,8 +46,8 @@
 }
 
 .btn-lightgray {
-    background-color: var(--light-gray-border-color);
-    color: var(--text-color);
+    background-color: var(--light-gray-border-color) !important;
+    color: var(--text-color) !important;
 }
 
 .btn-orange {

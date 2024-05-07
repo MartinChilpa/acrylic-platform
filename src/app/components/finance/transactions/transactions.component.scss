@@ -1,26 +1,2 @@
 @use '../../../styles/overrides/tab' as *;
 @use '../../../styles/overrides/table' as *;
-
-
-.transaction .box-holder .data-box {
-    border-radius: 10px;
-    border:0;
-    min-width: 180px;
-  }
-
-.transaction .box-holder{
-    border:0
-}   
-.transaction .default-dropdown-toggle{
-    min-width: unset;
-}
-
-@media(max-width:768px){
-    .transaction .box-holder {
-        flex-wrap: wrap;
-    }
-    .transaction .box-holder .data-box{
-        margin-bottom: 8px;
-        width: 100%;
-    }
-}

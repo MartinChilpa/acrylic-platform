@@ -15,7 +15,7 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
 
-  @ViewChild("videoSnippet") videoSnippet!: ElementRef<HTMLVideoElement>
+  @ViewChild("audioSnippet") audioSnippet!: ElementRef<HTMLAudioElement>
 
   snippet: string = ''
   coverImage: string = ''
@@ -49,18 +49,22 @@ export class UploadStep4Component implements OnInit, OnDestroy {
       }
     }
 
-    this.videoInit()
+    this.audioInit()
   }
 
   playSnippet() {
-    if (this.videoSnippet) {
-      this.videoSnippet.nativeElement.play()
+    if (this.audioSnippet) {
+      if (this.audioSnippet.nativeElement.paused) {
+        this.audioSnippet.nativeElement.play()
+      } else {
+        this.audioSnippet.nativeElement.pause()
+      }
     }
   }
 
   pauseSnippet() {
-    if (this.videoSnippet) {
-      this.videoSnippet.nativeElement.pause()
+    if (this.audioSnippet) {
+      this.audioSnippet.nativeElement.pause()
     }
   }
 
@@ -68,15 +72,15 @@ export class UploadStep4Component implements OnInit, OnDestroy {
     this.nextStepper.emit(count);
   }
 
-  videoInit() {
-    const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.onloadedmetadata = () => {
-      URL.revokeObjectURL(video.src);
-      this.form.get('duration')?.setValue(parseInt(`${video.duration}`));
-      this.formatTime(video.duration)
+  audioInit() {
+    const audio = document.createElement('audio');
+    audio.preload = 'metadata';
+    audio.onloadedmetadata = () => {
+      URL.revokeObjectURL(audio.src);
+      this.form.get('duration')?.setValue(parseInt(`${audio.duration}`));
+      this.formatTime(audio.duration)
     };
-    video.src = this.snippet;
+    audio.src = this.snippet;
   }
 
   formatTime(seconds: number) {
@@ -86,8 +90,8 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.videoSnippet) {
-      this.videoSnippet.nativeElement.remove()
+    if (this.audioSnippet) {
+      this.audioSnippet.nativeElement.remove()
     }
   }
 }

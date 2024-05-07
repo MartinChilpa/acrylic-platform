@@ -21,6 +21,10 @@ body {
     overflow-x: hidden;
 }
 
+p {
+    margin-bottom: 0;
+}
+
 .bg-primary-gradient {
     background: var(--primary-radial-gradient-color);
 }
@@ -64,21 +68,21 @@ body {
 ::-webkit-scrollbar-track {
     border-radius: 10px;
     background-color: var(--secondary-color);
-  }
-  
-  ::-webkit-scrollbar-thumb {
+}
+
+::-webkit-scrollbar-thumb {
     border-radius: 10px;
     background-color: var(--warning-color);
-  }
-  
-  ::-webkit-scrollbar {
+}
+
+::-webkit-scrollbar {
     height: 5px;
     width: 5px;
     background-color: var(--secondary-color);
     margin-right: 5px;
     border-radius: 10px;
-  }
-  
+}
+
 
 .w-90 {
     width: 90%;
@@ -133,38 +137,28 @@ body {
     background: var(--sub-box-color) !important;
 }
 
-/**** Input with label ***/
-.input-with-lbl {
-    position: relative;
+.resize-none {
+    resize: none;
 }
-
-.input-lbl {
-    position: absolute;
-    color: var(--text-color);
-    font-size: 11px;
-    font-weight: 400;
-    left: 16px;
-    top: -8px;
-    line-height: normal;
-    letter-spacing: .5px;
-    opacity: 0.6;
-}
-/**** END ****/
 
 .p-12 {
-	padding: 12px !important;
+    padding: 12px !important;
 }
-.height-36{
-	height:36px;
+
+.height-1 {
+    height: 1px;
 }
-.min-height-52{
-	min-height:52px;
+
+.height-36 {
+    height: 36px;
 }
-.min-height-50{
-	min-height:50px;
+
+.width-36 {
+    width: 36px;
 }
+
 .height-115px {
-    height: 115px;
+    height: 115px !important;
 }
 
 .clip-path-tag {
@@ -179,134 +173,58 @@ body {
     width: 15px;
 }
 
-.width-80{
-    width: 80px;
+.height-40 {
+    height: 40px;
 }
 
-.font-weight-600{
-	font-weight:600 !important;
-}
-.font-size14 {
-	font-size:14px !important;
-}
-.font-size12 {
-	font-size:12px !important;
-}
-.font-size16 {
-	font-size:16px !important;
-}
-.font-size18 {
-	font-size:18px !important;
-}
-.font-size36 {
-	font-size:36px !important;
-}
-.p-12{
-	padding:12px !important;
-}
-.height-40{
-	height:40px;
-}
-.height-36{
-	height:36px;
-}
-.min-height-52{
-	min-height:52px;
-}
-.min-height-50{
-	min-height:50px;
-}
-.max-width-560{
-	max-width:560px;
-}
-.mb-20{
-	margin-bottom:20px !important;
-}
-/** Top tracks **/
-
-.top-tracks-box .col-md-6:first-child{
-    padding-right: 0.5rem ;
-}
-.top-tracks-box .col-md-6:last-child{
-    padding-left: 0.5rem ;
-}
-@media(max-width:768px){
-    .top-tracks-box .col-md-6{
-        padding-right: 0 !important;
-        padding-left: 0 !important;
-    }
-}
-.acr-track-menu-options{
-	padding: 12px 0 16px 0;
-	background: var(--secondary-color);
-	border-radius:5px;
-}
-
-/** Transaction **/
-
-.transaction .top-tracks-title {
-    min-height: 44px;
-    justify-content: space-between;
-    padding: 0px 14px;
-}
-
-.acr-track-menu-list{
-	padding: 11px 16px;
-	cursor: pointer !important;
-	position:relative;
-}
-
-.transaction .acr-track-menu-list {
-    cursor: default;
-}
-
-.transaction .acr-track-menu-list {
-    background: transparent;
-    color: #fff;
+.max-width-560 {
+    max-width: 560px;
 }
 
 /**Pill Chip**/
-.pill-count{
-	background:var(--danger-color);
-	font-size: 12px;
-	font-weight: 400;
-	padding:2.5px 6px;
+.pill-count {
+    background: var(--danger-color);
+    font-size: 12px;
+    font-weight: 400;
+    padding: 2.5px 6px;
 }
-.border-radius-5{
-	border-radius:5px;
-}
-.border-maroon{
-	border:1px solid var(--danger-color);	
-}
-.icon-box{
-	width: 36px;
-	height: 36px;
-	border-radius: 5px;
-	border:0.3px solid rgba(255,255,255,0.3);
-	background:rgba(255,255,255,0.1);
-	display:flex;
-	align-items:center;
-	justify-content:center;
-	color:var(--text-color);
-	cursor:pointer;
+
+.border-maroon {
+    border: 1px solid var(--danger-color);
 }
 
 // Pill of success, Pending
 
 .tb-pill {
     border-radius: 5px;
-    padding:2px 6px 2px 6px;
+    padding: 2px 6px 2px 6px;
     background-color: var(--light-gray-table-border-color);
-    width: 87px;
-    text-align: center;
-}
-.currency{
-    min-width: 105px;
-    text-align: right;
 }
 
-@media(max-width:1024px){
+@media(max-width:1024px) {
     .w-mobile-100 {
         width: 100% !important;
     }
+}
+
+/**Custom Select Override Css**/
+.my-track-select-box {
+    .select-btn {
+        height: 33px;
+    }
+}
+
+/**Custom Select Override Css**/
+
+/**Custom Menu List Override Css**/
+.menu-list:nth-child(even) {
+    background: var(--lightgrey-color);
+}
+
+/**Custom Menu List Override Css**/
+
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
 }

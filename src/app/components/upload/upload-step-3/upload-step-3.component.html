@@ -5,8 +5,9 @@
                 [fileDropzoneHeader]="UploadFileTextDetails[2].fileDropzoneHeader"
                 [fileDropzoneExternalLink]="UploadFileTextDetails[2].fileDropzoneExternalLink"
                 [existingFiles]="[form.get('snippet')?.value]"
-                [allowExtensions]="['mp4']"
-                [accept]="'.mp4'"
+                [allowExtensions]="['mp3']"
+                #snippetComponent
+                [accept]="'.mp3'"
                 (uploadedFileList)="setUploadFile('snippet', $event)"></acrylic-file-dropzone>
         </div>
         <div class="col-12">

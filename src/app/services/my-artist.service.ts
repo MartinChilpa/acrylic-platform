@@ -5,6 +5,7 @@ import { Observable, of, switchMap } from 'rxjs';
 import { IMyArtist } from '../interfaces/response/my-artist.response';
 import { IMyArtistSynclist, IMyArtistSynclistResult } from '../interfaces/response/my-artist-synclist.response';
 import { ICreateTracks } from '../interfaces/response/create-tracks.response';
+import { ISplitSheet } from '../interfaces/response/split-sheet.response';
 
 @Injectable({
   providedIn: 'root'
@@ -70,7 +71,7 @@ export class MyArtistService {
   }
 
   removeSynclistTrack(synclistId: string, trackId: string): Observable<Object> {
-    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/remove-track/`, [
+    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/remove-tracks/`, [
       {
         track_uuid: trackId
       }
@@ -79,5 +80,17 @@ export class MyArtistService {
 
   createArtist(request: FormData): Observable<any> {
     return this._http.post<any>(`${this.ARTIST_API_URL}/register/`, request);
+  }
+
+  getSplitSheet(): Observable<ISplitSheet> {
+    return this._http.get<ISplitSheet>(`${this.MY_ARTIST_API_URL}/split-sheets/`);
+  }
+
+  createSplitSheet(request: any): Observable<any> {
+    return this._http.post<any>(`${this.MY_ARTIST_API_URL}/split-sheets/`, request);
+  }
+
+  updateSplitSheet(request: any, uuid: string): Observable<any> {
+    return this._http.put<any>(`${this.MY_ARTIST_API_URL}/split-sheets/${uuid}/`, request);
   }
 }
