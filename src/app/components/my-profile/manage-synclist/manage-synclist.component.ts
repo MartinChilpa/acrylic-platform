@@ -82,8 +82,10 @@ export class ManageSynclistComponent implements OnInit {
   }
 
   manageStepper(index: number) {
-    if (this.activeStepper < index) {
-      return;
+    if (!(this.synclistForm.valid && this.synclistId)) {
+      if (this.activeStepper < index) {
+        return;
+      }
     }
     this.activeStepper = index;
   }
