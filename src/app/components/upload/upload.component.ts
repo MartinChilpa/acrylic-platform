@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, OnInit, ViewChild, ViewContainerRef, inject } from '@angular/core';
 import { UploadStep1Component } from './upload-step-1/upload-step-1.component';
 import { UploadStep2Component } from './upload-step-2/upload-step-2.component';
 import { UploadStep3Component } from './upload-step-3/upload-step-3.component';
@@ -17,7 +17,9 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './upload.component.html',
   styleUrl: './upload.component.scss'
 })
-export class UploadComponent implements OnInit {
+export class UploadComponent implements OnInit, AfterViewInit {
+  @ViewChild('acrylicUploadRef', { static: true, read: ViewContainerRef }) acrylicUploadRef!: ViewContainerRef;
+  componentRefs!: ComponentRef<UploadStep1Component | UploadStep2Component | UploadStep3Component | UploadStep4Component | UploadStep5Component >;
   activeStepper: number = 1;
   uploadStepperList = ['Connect split sheet', 'General Information', 'Upload assets', 'Preview & Confirm', 'Set your prices'];
   uploadTrackForm!: FormGroup;
@@ -32,7 +34,7 @@ export class UploadComponent implements OnInit {
     this.uploadTrackId = this._activatedRoute.snapshot.params['trackId'];
     this.uploadTrackForm = this._fb.group({
       id: [null],
-      isrc: ['DDD333333333', [Validators.required, Validators.pattern(/^[A-Z]{2}-?\w{3}-?\d{2}-?\d{5}$/)]],
+      isrc: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}-?\w{3}-?\d{2}-?\d{5}$/)]],
       name: ['', Validators.required],
       duration: [0],
       released: [new Date().toJSON().split('T')[0]],
@@ -52,6 +54,10 @@ export class UploadComponent implements OnInit {
     if (this.uploadTrackId) {
       this.getTrackById()
     }
+  }
+
+  ngAfterViewInit() {
+    this.loadComponent(this.activeStepper);
   }
 
   getTrackById() {
@@ -84,11 +90,46 @@ export class UploadComponent implements OnInit {
     if (this.activeStepper < index) {
       return;
     }
+    this.acrylicUploadRef.clear();
+    this.loadComponent(index);
     this.activeStepper = index;
   }
 
   stepperCount(step: number) {
+    this.acrylicUploadRef.clear();
+    this.loadComponent(step);
     this.activeStepper = step;
+  }
+
+  loadComponent(step: number) {
+    switch (step) {
+      case 1:
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep1Component);
+        break;
+      case 2:
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep2Component);
+        break;
+      case 3:
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep3Component);
+        break;
+      case 4:
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep4Component);
+        break;
+      case 5:
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep5Component);
+        const step5Instance = this.componentRefs.instance as UploadStep5Component;
+        step5Instance.uploadAction.subscribe(() => {
+          this.publishTrack();
+        });
+  
+        break;
+      default:
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep1Component);
+    }
+    this.componentRefs.instance.form = this.uploadTrackForm;
+    this.componentRefs.instance.nextStepper.subscribe((count: number) => {
+      this.stepperCount(count);
+    });    
   }
 
   publishTrack() {

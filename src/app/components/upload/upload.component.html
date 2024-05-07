@@ -2,28 +2,7 @@
     <form [formGroup]="uploadTrackForm">
         <div class="row gy-3">
             <div class="col-lg-7 col-12 order-2 order-lg-1">
-                @switch (activeStepper) {
-                @case(1) {
-                <acrylic-upload-step-1 [form]="uploadTrackForm"
-                    (nextStepper)="stepperCount($event)"></acrylic-upload-step-1>
-                }
-                @case(2) {
-                <acrylic-upload-step-2 [form]="uploadTrackForm"
-                    (nextStepper)="stepperCount($event)"></acrylic-upload-step-2>
-                }
-                @case(3) {
-                <acrylic-upload-step-3 [form]="uploadTrackForm"
-                    (nextStepper)="stepperCount($event)"></acrylic-upload-step-3>
-                }
-                @case(4) {
-                <acrylic-upload-step-4 [form]="uploadTrackForm"
-                    (nextStepper)="stepperCount($event)"></acrylic-upload-step-4>
-                }
-                @case(5) {
-                <acrylic-upload-step-5 [form]="uploadTrackForm" (nextStepper)="stepperCount($event)"
-                    (uploadAction)="publishTrack()"></acrylic-upload-step-5>
-                }
-                }
+                <ng-container #acrylicUploadRef></ng-container>
             </div>
             <div class="col-lg-5 col-12 order-1 order-lg-2">
                 <div class="acr-box">
