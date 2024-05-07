@@ -133,7 +133,8 @@
                                 placeholder="Email" autocomplete="off">
                         </div>
                         <div class="small position-relative">
-                            <input type="text" formControlName="percent" class="form-control acr-input mb-2" step=".01">
+                            <input type="number" formControlName="percent" class="form-control acr-input mb-2" step=".01"
+                            (input)="onPercentChange($event.target, i, 'publishing_splits')">
                             <span class="text-info position-absolute top-25 right-10">%</span>
                         </div>
                         <button class="btn btn-sm btn-darkgrey py-2 ms-2" [class.hidden]="i == 0"
@@ -176,7 +177,9 @@
                                 placeholder="Email" autocomplete="off">
                         </div>
                         <div class="small position-relative">
-                            <input type="text" formControlName="percent" class="form-control acr-input mb-2" step=".01">
+                            <input type="number" formControlName="percent" class="form-control acr-input mb-2" step=".01"
+                            min="1" max="100"
+                            (input)="onPercentChange($event.target, i, 'master_splits')">
                             <span class="text-info position-absolute top-25 right-10">%</span>
                         </div>
                         <button class="btn btn-sm btn-darkgrey py-2 ms-2" [class.hidden]="i == 0"

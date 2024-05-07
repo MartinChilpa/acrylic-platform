@@ -8,6 +8,12 @@
     color: currentColor !important;
 }
 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
 .acr-input-group {
     display: flex;
     align-items: center;

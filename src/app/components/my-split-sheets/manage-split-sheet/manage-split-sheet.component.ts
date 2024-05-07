@@ -75,10 +75,59 @@ export class ManageSplitSheetComponent implements OnInit {
     return this.createSplitSheetForm.get('master_splits') as FormArray;
   }
 
+  onPercentChange(event: any, index: number, controlName: string) {
+    const newPercentValue = isNaN(parseFloat(event.value)) ? 0 : parseFloat(event.value);
+    const publishingSplitsArray = this.createSplitSheetForm.get(controlName) as FormArray;
+    const controls = publishingSplitsArray.controls;
+
+    controls.forEach((control, i) => {
+      const percentValue = parseFloat(control.get('percent')!.value || 0);
+      if (i === index && (isNaN(percentValue) || percentValue < 1 || percentValue > 100 )) {
+        control.get('percent')!.setValue(1);
+      }
+    });
+
+    let totalPercentage = 0;
+
+    controls.forEach((control, i) => {
+      const percentValue = parseFloat(control.get('percent')!.value || 0);
+      if (i !== index) {
+        totalPercentage += percentValue;
+      }
+    });
+
+    if (newPercentValue !== 0) {
+      const remainingPercentage = 100 - newPercentValue;
+      const equalPercentage = remainingPercentage / (controls.length - 1);
+
+      controls.forEach((control, i) => {
+        if (i !== index) {
+          control.get('percent')!.setValue(this.formatPercent(equalPercentage));
+        }
+      });
+    } else {
+      const equalPercentage = 100 / (controls.length);
+
+      controls.forEach((control, i) => {
+        control.get('percent')!.setValue(this.formatPercent(equalPercentage));
+      });
+    }
+  }
+
+  formatPercent(value: number) {
+    const formattedValue = value.toFixed(2);
+    const integerPart = Math.floor(parseFloat(formattedValue));
+    const decimalPart = parseFloat(formattedValue) - integerPart;
+    return decimalPart === 0 ? integerPart.toString() : formattedValue;
+  }
+
   calculatePercentage(object: [any]) {
     let result: any[] = [];
     if (object.length > 0) {
       let percent = object.map(x => x.percent).map(val => parseFloat(val));
+      if (percent.length === 1) {
+        percent[0] = 100;
+      }
       if (percent.some(val => { return val != 0 })) {
         let sum = 0
         let count = 1;
@@ -113,6 +162,7 @@ export class ManageSplitSheetComponent implements OnInit {
   addPublishingSheet() {
     let publishingArray = this.createSplitSheetForm.controls['publishing_splits'].value;
     let percent: any[] = this.calculatePercentage(publishingArray);
+
     if (percent.length > 0) {
       this.publishing_splits.clear();
       percent.forEach(item => {
