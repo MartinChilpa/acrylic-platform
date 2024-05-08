@@ -1,0 +1,32 @@
+<section>
+    <div class="row gy-3">
+        <div class="col-lg-7 col-12">
+           <div class="overflow-auto suggestion-box-container p-1">
+            @for(item of suggestionBox; track item) {
+                <div class="acr-box mb-2">
+                    <div class="d-flex-justify-between ">
+                        <span class="bg-light-gray px-2 py-1 radius-5">Suggestion type</span>
+                        <div>
+                            <span>102 votes</span>
+                            <button class="btn btn-sm btn-darkgrey light-gray-border ms-2">Upvote</button>
+                        </div>
+                    </div>
+                    <h6 class="text-beige fw-semibold my-3">Lorem ipsum dolor sit amet consectetur?</h6>
+                    <p class="text-light-gray">
+                        Lorem ipsum dolor sit amet consectetur. A dictum eget vitae neque nisl feugiat tincidunt dignissim. Lorem ipsum dolor sit amet consectetur. A dictum eget vitae neque nisl feugiat tincidunt dignissim.
+                    </p>
+                    <div>
+                        <img ngSrc="/assets/images/others/falling.png" height="28" width="28" class="radius-5 me-2" />
+                        <span>Username</span>
+                    </div>
+                    <p class="text-light-gray mt-2 mb-0">Feb 24, 2024, 1:24 PM</p>
+                </div>
+            }
+           </div>
+        </div>
+        <div class="col-lg-5 col-12">
+            <acrylic-inquiry [inquiryTitle]="'Suggest us!'" [inquirySelect]="inquirySelect" [inquiryTextArea]="'Message'"
+            [inquiryButton]="'Send Suggestion'"></acrylic-inquiry>
+        </div>
+    </div>
+</section>

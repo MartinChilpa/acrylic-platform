@@ -25,7 +25,7 @@
     background-color: var(--darkgrey-color) !important;
 }
 
-.bg-invert{
+.bg-invert {
     background-color: var(--text-color) !important;
 }
 
@@ -33,7 +33,43 @@
     background-color: var(--lightgrey-color) !important;
 }
 
+.bg-lightgray-border {
+    background-color: var(--light-gray-border-color) !important;
+}
+
+.bg-switch-off {
+    background-color: var(--switch-off-container-color);
+}
+
+.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.info-bg-success {
+    background-color: var(--info-bg-color) !important;
+}
+
+.info-bg-danger {
+    background-color: var(--danger-bg-color) !important;
+}
+
+.bg-blue {
+  background-color: var(--blue-color) !important;
+}
+
+.bg-gray {
+    background-color: var(--gray-color) !important;
+}
+
+.bg-auth-gradiant {
+    background: var(--default-gradiant-auth-background-color);
+}
+
 // Text Colors
+.text-success{
+    color: var(--success-color) !important;
+}
+
 .text-primary {
     color: var(--text-color) !important;
 }
@@ -51,10 +87,10 @@
 }
 
 .text-info {
-    color: var(--info-color) !important;
+    color: var(--text-info-color) !important;
 }
 
-.a-blue{
+.a-blue {
     color: var(--blue-color) !important;
     text-decoration: none;
     cursor: pointer;
@@ -62,4 +98,39 @@
 
 .text-info-success {
     color: var(--info-success-color) !important;
+}
+
+.bg-linear-gray {
+    background-color: var(--default-gradient-gray-background-color) !important;
+}
+
+.bg-light-gray {
+    background-color: var(--light-gray-background-color) !important;
+}
+
+.bg-orange {
+    background-color: var(--warning-color) !important;
+}
+
+.bg-linear-blue {
+    background-color: var(--default-gradient-background-color) !important;
+}
+
+.text-orange {
+    color: var(--warning-color) !important;
+}
+
+.text-secondary {
+    color: var(--secondary-color) !important;
+}
+
+.text-light-gray {
+    color: var(--light-gray-text-color) !important;
+}
+
+.text-beige {
+    color: var(--beige-color) !important;
+}
+.text-info {
+    color:var(--info-color);
 }

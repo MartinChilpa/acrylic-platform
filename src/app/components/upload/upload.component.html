@@ -1,0 +1,23 @@
+<section>
+    <form [formGroup]="uploadTrackForm">
+        <div class="row gy-3">
+            <div class="col-lg-7 col-12 order-2 order-lg-1">
+                <ng-container #acrylicUploadRef></ng-container>
+            </div>
+            <div class="col-lg-5 col-12 order-1 order-lg-2">
+                <div class="acr-box">
+                    <ul class="list-group acrylic-stepper">
+                        @for(item of uploadStepperList; track item) {
+                        <li class="list-group-item bg-transparent light-gray-border d-flex-align-center gap-2 cursor-pointer"
+                            (click)="uploadStepper($index + 1)"
+                            [ngClass]="{'current-active-stepper': activeStepper === $index + 1, 'completed-step': activeStepper > $index + 1}">
+                            <span class="d-flex-center text-secondary fw-bold">{{ $index + 1 }}</span>
+                            {{ item }}
+                        </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

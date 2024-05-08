@@ -2,18 +2,18 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { of, switchMap } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { NavigationService } from '../services/navigation.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const router = inject(Router);
+  const _navigationService = inject(NavigationService);
   return inject(AuthService).check()
     .pipe(
       switchMap((authenticated) => {
-
         // If the user is not authenticated...
         if (!authenticated) {
 
-          // Redirect to the login page
-          router.navigate(['auth/sign-in']);
+          // Redirect to the sign in page
+          _navigationService.navigateToSignIn();
 
           // Prevent the access
           return of(false);
@@ -23,8 +23,6 @@ export const authGuard: CanActivateFn = (route, state) => {
         return of(true);
       })
     );
-
-  // return inject(AuthService).IsLoggedIn() ? true : inject(Router).createUrlTree(['/auth/sign-in']);
 };
 
 // TODO: Need to Implement CanActivateChildFn

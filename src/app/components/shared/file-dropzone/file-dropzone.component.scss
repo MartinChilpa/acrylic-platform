@@ -1,0 +1,18 @@
+.dropped-image-area {
+    min-height: 200px;
+
+    span {
+        opacity: 0.5;
+        font-size: 12px
+    }
+}
+
+.upload-wrapper {
+    border-radius: 5px;
+    grid-template-columns: 90% 10%;
+    display: grid;
+}
+
+.required {
+    border: 1px solid var(--danger-color);
+}

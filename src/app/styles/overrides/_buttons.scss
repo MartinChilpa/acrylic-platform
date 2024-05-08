@@ -3,6 +3,7 @@
 .btn{
     font-size: 14px;
 	border-radius: 5px;
+    border: none;
 }
 
 .btn-warning{
@@ -32,4 +33,29 @@
 
 .btn-main:focus {
 	background: var(--default-gradient-focus-color);
+}
+
+.btn-blue-grey {
+    background: var(--blue-grey-color) !important;
+    color: var(--text-color) !important;
+}
+
+.acrylic-next-button:disabled {
+    background-color: var(--darkgrey-color) !important;
+    color: var(--light-gray-table-border-color) !important;
+}
+
+.btn-lightgray {
+    background-color: var(--light-gray-border-color) !important;
+    color: var(--text-color) !important;
+}
+
+.btn-orange {
+    background-color: var(--warning-color) !important;
+    color: var(--text-color) !important;
+}
+
+.btn-warning-outline {
+    border-color: var(--warning-color) !important;
+    color: var(--warning-color) !important;
 }

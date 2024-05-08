@@ -1,0 +1,18 @@
+<div class="acr-box">
+    <div class="d-flex-justify-between align-items-center">
+        <h6 class="text-beige">{{ inquiryTitle }}</h6>
+        <img ngSrc="/assets/images/others/beat.png" height="25" width="20" />
+    </div>
+    <div>
+        @if(inquirySelect.title) {
+            <p>{{ inquirySelect.title }}</p>
+        }
+        <acrylic-custom-dropdown [placeholder]="inquirySelect?.label" class="my-track-select-box"></acrylic-custom-dropdown>
+        <div class="text-light-gray small m-1">Lorem ipsum dolor sit amet consectetur.</div>
+        <div>
+            <textarea rows="5" class="form-control acr-input mt-3 mb-4"
+            [placeholder]="inquiryTextArea"></textarea>
+        </div>
+        <button class="btn w-100 btn-main fw-bold h-50px">{{ inquiryButton }}</button>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+.split-list {
+    list-style: none;
+    padding: 0;
+    background-color: var(--default-gradient-split-background-color);
+    .list-group-item:nth-child(4n+2) {
+        background-color: var(--light-bg-first-color);
+    }
+    .list-group-item:nth-child(4n+3) {
+        background-color: var(--light-bg-second-color);
+    }
+    .list-group-item:nth-child(4n+4) {
+        background-color: var(--light-bg-thired-color);
+    }
+    .list-group-item:nth-child(4n+5) {
+        background-color: var(--light-gray-table-border-color);
+    }
+    .list-group-item.selected {
+        background-color: var(--light-gray-border-color) !important;
+        color: var(--warning-color) !important;
+    }
+}
+

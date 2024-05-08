@@ -1,0 +1,18 @@
+.diego-img {
+    top: calc(-100% + 60%);
+}
+
+.pinned-sync-box {
+    height: 175px;
+    .pinned-sync-back {
+        background-repeat: no-repeat;
+        background-size: cover;
+        .pinned-sync-gradient-layer {
+            background: var(--default-gradient-gray-background-color);
+        }
+        .pinned-sync-content {
+            position: relative;
+            z-index: 1;
+        }
+    }
+}

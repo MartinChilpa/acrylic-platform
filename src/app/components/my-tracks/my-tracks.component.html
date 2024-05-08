@@ -1,0 +1,205 @@
+<section>
+    <div class="row row-cols-xxl-5 row-cols-lg-3 row-cols-md-2 row-cols-1 g-3">
+        <div class="col">
+            <div class="acr-box height-115px">
+                <h6>Most Used Track</h6>
+                <div>
+                    <img ngSrc="/assets/images/others/falling.png" height="36" width="36" class="radius-5" />
+                    <span class="ms-2">Falling</span>
+                </div>
+                <div class="mt-2">
+                    <span>45,567 Uses</span>
+                    <span class="text-success ps-1">+11.43%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="acr-box height-115px">
+                <h6>Most Used Track</h6>
+                <div class="d-flex gap-2">
+                    <span class="bg-light-gray px-2 py-1 radius-5">Lo-Fi</span>
+                    <span class="bg-light-gray px-2 py-1 radius-5">Happy</span>
+                    <span class="bg-light-gray px-2 py-1 radius-5">Cooking</span>
+                </div>
+                <div class="mt-2">
+                    <span>34,756 searches</span>
+                    <span class="text-success ps-1">+8.34%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="acr-box height-115px">
+                <h6>Total All Time Uses</h6>
+                <div class="text-light-gray">
+                    <span>Jan 22, 2023 - </span>
+                    <span>Mar 1, 2024 </span>
+                </div>
+                <div class="mt-2">
+                    <span class="h5 fw-bold">549K</span>
+                    <span class="text-success ps-1">+0.23%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="acr-box height-115px">
+                <h6>Total Monthly Uses</h6>
+                <div class="text-light-gray">
+                    <span>Jan 22, 2023 - </span>
+                    <span>Mar 1, 2024 </span>
+                </div>
+                <div class="mt-2">
+                    <span class="h5 fw-bold">47,8</span>
+                    <span class="text-success ps-1">+5.7%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="acr-box height-115px">
+                <h6>Total All Time Uses</h6>
+                <div class="text-light-gray">
+                    <span>Feb 29 - </span>
+                    <span>Mar 1, 2024 </span>
+                </div>
+                <div class="mt-2">
+                    <span class="h5 fw-bold">11,2K</span>
+                    <span class="text-success ps-1">+34.9%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="acr-box mt-4">
+        <div class="row g-2 mb-2 align-items-center">
+            <div class="col">
+                <acrylic-custom-dropdown placeholder="Release Date" class="my-track-select-box"></acrylic-custom-dropdown>
+            </div>
+            <div class="col">
+                <acrylic-custom-dropdown placeholder="Assigned Tags" class="my-track-select-box"></acrylic-custom-dropdown>
+            </div>
+            <div class="col-xxl-4 col-xl-3">
+                <div class="acr-input-group">
+                    <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
+                    <input type="text" placeholder="Search for a specific track">
+                </div>
+            </div>
+            <div class="offset-xl-1 col d-flex gap-2 text-nowrap">
+                <button class="btn btn-lg btn-orange">Assign Prices</button>
+                <button class="btn btn-lg btn-info">Upload Track</button>
+            </div>
+        </div>
+        <div class="light-gray-table-border rounded-2 table-responsive mt-4 mt-xl-0">
+            <table class="acrylic-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Track Name</th>
+                        <th scope="col">Total Track Uses</th>
+                        <th scope="col">Assigned Tags</th>
+                        <th scope="col" class="price-tag">Price Tag</th>
+                        <th scope="col">Popular Tags</th>
+                        <th scope="col">Release Date</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <!-- <tbody>
+                        @for(item of myTracksTableList; track item) {
+                            <tr>
+                                <td>
+                                    <div class="d-flex-align-center gap-2">
+                                        <img [ngSrc]="item.trackImage" height="36" width="36" class="radius-5" />
+                                        <span>{{ item.name }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="mt-2">
+                                        <span>{{ item.totalTrack.totalUsers }}</span>
+                                        <span class="text-success ps-1">{{ item.totalTrack.totalPercentage }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        @for(assignedTag of item.assignedTags; track assignedTag) {
+                                        <span class="bg-light-gray px-2 py-1 radius-5">{{ assignedTag }}</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="text-nowrap">
+                                    <div class="mt-2">
+                                        <div class="clip-path-tag radius-5 p-2 d-flex-align-center gap-2" [ngClass]="item.priceTag.bgClass">
+                                            <img [ngSrc]="item.priceTag.picture" height="20" width="15"/>
+                                            <span>{{ item.priceTag.priceTageName }}</span>
+                                            <span class="d-inline-block height-15px width-15px bg-primary rounded-circle"></span>
+                                        </div>
+                                        <span class="text-light-gray small">{{ item.priceTag.priceStartDate }} - </span>
+                                        <span class="text-light-gray small">{{ item.priceTag.priceEndDate }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        @for(popularTag of item.popularTags; track popularTag) {
+                                        <span class="bg-light-gray px-2 py-1 radius-5">{{ popularTag }}</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="text-nowrap">
+                                    <span>{{ item.releaseDate }}</span>
+                                </td>
+                                <td class="text-nowrap">
+                                    <button class="btn btn-sm btn-darkgrey light-gray-border">{{ item.trackStatus }}</button>
+                                </td>
+                            </tr>
+                        }
+                </tbody> -->
+                <tbody>
+                    @for(item of trackList; track item) {
+                    <tr>
+                        <td>
+                            <div class="d-flex-align-center gap-2">
+                                <img [src]="item.cover_image" height="36" width="36" class="radius-5" />
+                                <span>{{ item.name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="mt-2">
+                                <span>{{ 0 }}</span>
+                                <span class="text-success ps-1">{{ '+1%' }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                @for(assignedTag of item.tags; track assignedTag) {
+                                <span class="bg-light-gray px-2 py-1 radius-5">{{ assignedTag.name }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td class="text-nowrap">
+                            <div class="mt-2">
+                                <div class="clip-path-tag radius-5 p-2 d-flex-align-center gap-2" [ngClass]="'bg-info'">
+                                    <img [ngSrc]="'assets/images/others/beat.png'" height="20" width="15" />
+                                    <span>{{ 'Basic' }}</span>
+                                    <span
+                                        class="d-inline-block height-15px width-15px bg-primary rounded-circle"></span>
+                                </div>
+                                <span class="text-light-gray small">{{ 'Feb 6, 2024' }} - </span>
+                                <span class="text-light-gray small">{{ 'Feb 6, 2024' }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                @for(popularTag of item.genres; track popularTag) {
+                                <span class="bg-light-gray px-2 py-1 radius-5">{{ popularTag.name }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td class="text-nowrap">
+                            <span>{{ item.released }}</span>
+                        </td>
+                        <td class="text-nowrap">
+                            <button class="btn btn-sm btn-darkgrey light-gray-border" (click)="openTrack(item.uuid)">{{
+                                'Open Track' }}</button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

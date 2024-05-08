@@ -1,0 +1,119 @@
+<section>
+
+    <div class="row gy-3">
+        <div class="col-lg-7 col-12 order-2 order-lg-1">
+            <div>
+                @if(activeStepper === 1) {
+                <ng-container>
+                    <p class="fs-6 mb-2">Synclist Details</p>
+                    <form [formGroup]="synclistForm" class="row gy-3 gx-2">
+                        <div class="acr-box">
+                            <div class="acr-input-label">Your Synclist Name</div>
+                            <input type="text" class="form-control acr-input mb-2" formControlName="name"
+                                placeholder="Synclist Name">
+                        </div>
+
+                        <div class="acr-box">
+                            <div class="acr-input-label">Your Synclist Description</div>
+                            <textarea rows="5" class="form-control acr-input mb-2" formControlName="description"
+                                placeholder="Synclist Description">
+                            </textarea>
+                        </div>
+                        @if (!isLoading) {
+                        <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
+                            [fileDropzoneHeader]="fileDropzoneHeader" [fileDropzoneSize]="fileDropzoneSize"
+                            [existingFiles]="[synclistForm.get('cover_image')?.value]" [allowExtensions]="['jpg']"
+                            (uploadedFileList)="setUploadFile('cover_image', $event)"
+                            [accept]="'.jpg'"></acrylic-file-dropzone>
+                        <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
+                            [fileDropzoneHeader]="'Drop your Background Image File here or upload it manually'"
+                            [fileDropzoneSize]="fileDropzoneSize" [allowExtensions]="['jpg']"
+                            [existingFiles]="[synclistForm.get('background_image')?.value]"
+                            (uploadedFileList)="setUploadFile('background_image', $event)"
+                            [accept]="'.jpg'"></acrylic-file-dropzone>
+                        }
+                    </form>
+                </ng-container>
+                }
+                <!-- For Edit -->
+                @if (activeStepper === 2) {
+                <ng-container>
+                    <p class="fs-6 mb-2">Add Tracks</p>
+                    <ng-container>
+                        <div class="acr-input-group">
+                            <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
+                            <input type="text" placeholder="Search" class="w-100">
+                        </div>
+                    </ng-container>
+                    <div class="mt-2">
+                        <div class="light-gray-table-border rounded-2 table-responsive">
+                            <table class="acrylic-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Track Name</th>
+                                        <th scope="col">Tags</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for(item of trackList; track item) {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex-align-center gap-2">
+                                                <img [src]="item.cover_image" height="36" width="36" class="radius-5" />
+                                                <span>{{ item.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                @for(tag of item.tags; track tag) {
+                                                <span class="bg-light-gray px-2 py-1 radius-5">{{ tag.name }}</span>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex-center">
+                                                <input type="checkbox" (change)="manageTags($event.target, item.uuid)"
+                                                    [checked]="synclistChecked(item.uuid)" class="acrylic-checkbox">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </ng-container>
+                }
+            </div>
+        </div>
+        <div class="col-lg-5 col-12 order-1 order-lg-2">
+            <div class="acr-box">
+                <ul class="list-group acrylic-stepper">
+                    @for(item of manageStepperList; track item) {
+                    <li class="list-group-item bg-transparent light-gray-border d-flex-align-center gap-2 cursor-pointer"
+                        (click)="manageStepper($index + 1)"
+                        [ngClass]="{ 'current-edit-stepper': synclistForm.valid && synclistId, 'current-active-stepper': activeStepper === $index + 1, 'completed-step': activeStepper > $index + 1}">
+                        <span class="d-flex-center text-secondary fw-bold">{{ $index + 1 }}</span>
+                        {{ item }}
+                    </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="my-4">
+        <div class="row gap-2">
+            <div class="col-lg-6 col-12">
+                <div class="d-flex-center">
+                    <button class="btn btn-darkgrey px-4 px-lg-5 py-2 me-3" (click)="backProfile()">Back</button>
+                    @if (activeStepper == 1) {
+                    <button class="btn btn-info px-4 px-lg-5 py-2" [disabled]="!synclistForm.valid"
+                        (click)="saveSynclist()">Publish</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,7 +1,7 @@
-<nav class="navbar acr-box navbar-expand-md p-2">
+<nav class="navbar navbar-expand-md" [ngClass]="_authService.IsLoggedIn() ? 'acr-box p-2':'auth-box'">
     <div class="container-fluid ">
         <a class="navbar-brand">
-            <img ngSrc="assets/images/logos/acrylic-white.png" width="125" height="30">
+            <img ngSrc="assets/images/logos/acrylic-white.png" width="125" height="30" priority="true">
         </a>
         <button class="navbar-toggler bg-invert" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbar-collapse">
@@ -10,18 +10,18 @@
         <div class="collapse navbar-collapse" id="navbar-collapse">
             <div class="row w-100 mt-md-0 mt-3">
                 @if(_authService.IsLoggedIn()){
-                    <div class="acr-input-group col-lg-5 col-12">
+                    <div class="acr-input-group col-lg-5 col-md-6 col-12">
                         <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
                         <input type="text" placeholder="Search">
                     </div>
-                    <div class="col-lg-7 col-12 d-flex justify-content-end align-items-center p-0 mt-lg-0 mt-2">
+                    <div class="col-lg-7 col-md-6 col-12 d-flex justify-content-end align-items-center p-0 mt-lg-0 mt-2">
                         <!-- <div class="switch" title="Theme">
                             <input type="checkbox" id="custom-switch" (change)="toggleTheme()" [checked]="isDarkTheme">
                             <label for="custom-switch" class="slider"></label>
                         </div> -->
                         <!-- <span class="mx-2">|</span> -->
                         @if(_myArtistService.myArtist()?.image){
-                            <button class="btn btn-sm btn-darkgrey p-0" title="Profile">
+                            <button class="btn btn-sm btn-darkgrey p-0" [routerLink]="['/my-profile']" title="Profile">
                                 <img [ngSrc]="_myArtistService.myArtist()!.image" width="30" height="30">
                             </button>
                             <span class="mx-2">|</span>
@@ -32,11 +32,11 @@
                     </div>   
                 }
                 @else{
-                    <div class="col-12 d-flex justify-content-end align-items-center p-0">
-                        <button class="btn btn-darkgrey" (click)="_navigationService.navigateToSignUp();">
+                    <div class="col-12 d-flex-align-center justify-content-end p-0">
+                        <button class="btn btn-blue-grey px-md-4" (click)="_navigationService.navigateToSignUp();">
                             Sign Up
                         </button>
-                        <button class="btn btn-main ms-2" (click)="_navigationService.navigateToSignIn();">
+                        <button class="btn btn-main ms-2 px-md-4" (click)="_navigationService.navigateToSignIn();">
                             Sign In
                         </button>
                     </div>   

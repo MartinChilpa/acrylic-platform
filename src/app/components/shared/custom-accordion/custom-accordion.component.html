@@ -1,0 +1,17 @@
+<div class="acr-box cursor-pointer mb-2" [ngClass]="{'bg-darkgrey': isOpen}" (click)="clickedAccordion()">
+    <div class="d-flex-between">
+        <h6 class="mb-0" [ngClass]="{'text-beige': isOpen}">Lorem ipsum dolor sit amet consectetur?</h6>
+        <span>
+            @if(!isOpen) {
+                <img ngSrc="/assets/images/icons/down-arrow-white.svg" height="15" width="15" />
+            }@else {
+                <img ngSrc="/assets/images/icons/up-arrow-white.svg" height="15" width="15" />
+            }
+        </span>
+    </div>
+    <p class="mb-0 acrylic-accordion-content text-light-gray" [ngClass]="{'open': isOpen, 'closed': !isOpen}">
+        Lorem ipsum dolor sit amet consectetur. A dictum eget vitae neque nisl feugiat tincidunt
+        dignissim. Lorem ipsum dolor sit amet consectetur. A dictum eget vitae neque nisl feugiat
+        tincidunt dignissim.
+    </p>
+</div>

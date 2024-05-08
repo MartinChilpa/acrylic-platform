@@ -1,0 +1,22 @@
+.acrylic-table {
+    width: 100%;
+}
+
+.acrylic-table th,
+.acrylic-table td {
+    border: 1px solid var(--light-gray-table-border-color);
+    padding: 12px;
+}
+
+.acrylic-table thead {
+    background-color: var(--light-gray-border-color);
+    color: var(--beige-color);
+    font-size: 12px;
+    th{
+        font-weight: normal;
+    }
+}
+
+.acrylic-table tbody tr:nth-child(even) td {
+    background-color: var(--light-gray-background-color);
+}

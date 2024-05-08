@@ -1,0 +1,13 @@
+<section>
+    <div class="row gy-2">
+        <div class="col-lg-7 col-12">
+            @for(item of faqAccordionBox; track item) {
+            <acrylic-custom-accordion [isOpen]="item.isOpen" (click)="toggleAccordion($index)"></acrylic-custom-accordion>
+            }
+        </div>
+        <div class="col-lg-5 col-12">
+            <acrylic-inquiry [inquiryTitle]="'Still Need Help?'" [inquirySelect]="inquirySelect"
+                [inquiryTextArea]="'Inquiry'" [inquiryButton]="'Send Inquiry'"></acrylic-inquiry>
+        </div>
+    </div>
+</section>

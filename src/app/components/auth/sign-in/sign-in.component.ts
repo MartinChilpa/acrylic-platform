@@ -45,7 +45,6 @@ export class SignInComponent implements OnInit {
           this._navigationService.navigateToHome();
         },
         error: () => {
-          this._alertService.error("Invalid Email or Password");
           this.signInForm.enable(); // Re-enable the form
         }
       });

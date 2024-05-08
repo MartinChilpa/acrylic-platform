@@ -1,9 +1,34 @@
-@use '../../../styles/variables/variables' as *;
-
-.sidenav-item{
+.sidenav-item {
     padding: 10px;
     width: 100%;
     display: inline-flex;
+    align-items: center;
     text-decoration: none;
     color: var(--text-color);
+}
+
+.active-route {
+    border-left: 2px solid var(--text-info-color);
+
+    img {
+        filter: invert(70%) sepia(40%) saturate(550%) hue-rotate(128deg) brightness(300%) contrast(100%);
+    }
+
+    span {
+        color: var(--text-info-color);
+    }
+}
+
+.acr-submenu {
+    transition: all 0.3s ease-in-out;
+}
+
+.open {
+    height: auto;
+}
+
+.closed {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
 }

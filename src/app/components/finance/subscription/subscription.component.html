@@ -1,0 +1,119 @@
+<section>    
+    <div class="transaction my-subscriptions">
+        <div class="acr-box mb-4">
+            <div class="d-flex-between">
+                <div>
+                    <p class="h6">You are currently on Monthly package</p>
+                    <p class="mb-2 max-width-560">Lorem ipsum dolor sit amet consectetur.
+                        A dictum eget vitae neque nisl feugiat tincidunt dignissim. Lorem ipsum dolor sit amet
+                        consectetur.</p>
+
+                    <p class="mb-0 text-beige cursor-pointer">Switch to
+                        Annual Package</p>
+                </div>
+                <div><img src="assets/images/others/Colita.png" /></div>
+            </div>
+        </div>
+        <div class="acr-box mb-4">
+            <div class="d-flex-between mb-2">
+                <p class="h6 mb-0">Invoice Settings</p>
+                <button class="btn btn-sm btn-darkgrey light-gray-border">Save</button>
+            </div>
+            <div class="max-width-560">
+                <div class="mb-3">
+                    <input type="text" class="form-control acr-input mb-0" placeholder="Billing Email">
+                    <span class="text-light-gray small m-1">Invoices and receipts will be sent to this email address</span>
+                </div>
+                <div class="mb-3">
+                    <textarea placeholder="Company Billing Profile" class="form-control acr-input mb-0 height-115px resize-none"></textarea>
+                    <span class="text-light-gray small m-1">Additional company information to be shown on invoices; e. g. address, PO
+                        number, etc.</span>
+                </div>
+                <div class="toggle-section mb-3">
+                    <p class="mb-0">Text notifications when payment fail</p>
+                    <div class="my-2 d-flex-align-center">
+                        <label class="switch" (click)="toggleSwitch()">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                          </label>
+                          <span id="toggleLabel" class="ps-2">Yes</span>
+                    </div>
+                    <div class="text-light-gray small m-1">We’ll notify you about billing issues. We’ll never call or share your
+                        number.</div>
+                </div>
+                <p class="mb-2">Phone Number</p>
+                <div class="d-flex-align-center">
+                    <div class="me-1">
+                        <input type="text" class="form-control acr-input mb-0"
+                            placeholder="United State [+1]"></div>
+                    <div class="w-75">
+                        <input type="text" class="form-control acr-input mb-0"
+                            placeholder="Phone Number"></div>
+                </div>
+                <div class="text-light-gray small m-1">Be sure to include country code. Your wireless provider’s standard messaging
+                    rates apply.</div>
+            </div>
+        </div>
+
+        <div class="acr-box mb-4">
+            <div class="d-flex-between mb-2">
+                <p class="h6 mb-0">Additional billing info</p>
+                <button class="btn btn-sm btn-darkgrey light-gray-border">Save</button>
+            </div>
+            <div class="max-width-560">
+                <div>
+                    <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID">
+                    <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on their Acrylic
+                        package purchases. </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="acr-box">
+            <p class="h6 mb-2">All Invoices</p>
+            <div class="max-width-560">
+                <div>
+                    <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID">
+                    <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on their Acrylic
+                        package purchases. </span>
+                </div>
+            </div>
+            <div class="mt-2">
+                <div class="light-gray-table-border rounded-2 table-responsive mt-4 mt-xl-0">
+                    <table class="acrylic-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Invoice Date</th>
+                                <th scope="col">Invoice Details</th>
+                                <th scope="col">Total Charged</th>
+                                <th scope="col">Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td class="text-nowrap">
+                                    <span>Dec 2, 2024, 3:45 PM</span>
+                                </td>
+                                <td class="text-nowrap">
+                                    <span>Fan package</span>
+                                </td>
+                                <td class="text-nowrap">
+                                    <span>$9.99</span>
+                                </td>
+                                <td class="text-nowrap">
+                                    <div>
+                                        <button class="btn btn-sm btn-info px-3">
+                                                Download PDF
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

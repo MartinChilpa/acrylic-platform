@@ -1,7 +1,5 @@
-@use '../../styles/variables/variables' as *;
-
 .bg-primary {
-    border-radius: 80px 0px 80px 0px;
+    border-radius: 80px 5px 80px 5px;
 }
 
 .slider {
@@ -9,4 +7,22 @@
     height: 550px;
     object-fit: cover;
     border-radius: 80px 0px 80px 0px;
+}
+
+#auth-carousel {
+    .carousel-indicators {
+        height: 5px;
+        button {
+            &.active {
+                background-color: var(--beige-color);
+            }
+            &:not(.active) {
+                opacity: 0.2;
+            }
+        }
+    }
+}
+
+.auth-section {
+    height: calc(100vh - 70px);
 }

@@ -11,8 +11,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     if (error.error instanceof ErrorEvent) {
       errorMessage = `Error: ${error.error.message}`; // Client-side error
     }
-    else if(error.error?.password){ //Password related error
-      errorMessage = `Error: ${error.error.password}`;
+    else if(error.error?.detail){
+      errorMessage = `${error.error.detail}`;
     }
     else {
       switch (error.status) { // Server-side error
