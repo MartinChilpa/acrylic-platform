@@ -2,9 +2,17 @@
     <h1 class="auth-tagline">Welcome Back</h1>
     <ng-container>
         <div>
-            <div class="acr-input-label">Username</div>
-            <input type="text" [formControlName]="'username'" class="form-control acr-input"
-                placeholder="Enter Username" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+            <div class="acr-input-label">Email</div>
+            <input type="text" [formControlName]="'username'" class="form-control acr-input" placeholder="Enter email"
+                autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+            @if(signInForm.get('username')?.invalid && (signInForm.get('username')?.dirty ||
+            signInForm.get('username')?.touched)) {
+            <div class="acr-input-label small text-danger">
+                @if(signInForm.get('username')?.errors?.['email']) {
+                <div> Please enter valid email. </div>
+                }
+            </div>
+            }
         </div>
 
         <div class="my-3">

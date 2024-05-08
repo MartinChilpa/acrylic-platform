@@ -27,8 +27,8 @@
                                         class="radius-5" />
                                 </div>
                                 <div class="ms-2">
-                                    <span class="d-block">track1</span>
-                                    <span class="text-light-gray small">track1</span>
+                                    <span class="d-block">{{ item.track_name }}</span>
+                                    <span class="text-light-gray small"></span>
                                 </div>
                             </div>
                         </td>
@@ -40,6 +40,12 @@
                                 <img src="assets/images/icons/eye.svg" alt="side_icon" width="16" height="16">
                             </button>
                         </td>
+                        </tr>
+                    } @empty {
+                        <tr>
+                            <td class="text-center" colspan="3">
+                                No data available
+                            </td>
                         </tr>
                     }
                     <!-- <tr>

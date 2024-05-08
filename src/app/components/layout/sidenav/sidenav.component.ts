@@ -18,6 +18,11 @@ import { NgClass, NgOptimizedImage } from '@angular/common';
 export class SidenavComponent implements OnInit {
   private router = inject(Router);
   sidenavItems = sidenavItems;
+  userTrackList = [
+    { picture: '/assets/images/others/artist.png', nama: 'Piano Bar' },
+    { picture: '/assets/images/others/kenzie.png', nama: 'Rainbow Road' },
+    { picture: '/assets/images/others/force.png', nama: 'Multicolor' },
+  ]
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
