@@ -93,7 +93,7 @@
                     @for(item of manageStepperList; track item) {
                     <li class="list-group-item bg-transparent light-gray-border d-flex-align-center gap-2 cursor-pointer"
                         (click)="manageStepper($index + 1)"
-                        [ngClass]="{'current-active-stepper': activeStepper === $index + 1, 'completed-step': activeStepper > $index + 1}">
+                        [ngClass]="{ 'current-edit-stepper': synclistForm.valid && synclistId, 'current-active-stepper': activeStepper === $index + 1, 'completed-step': activeStepper > $index + 1}">
                         <span class="d-flex-center text-secondary fw-bold">{{ $index + 1 }}</span>
                         {{ item }}
                     </li>

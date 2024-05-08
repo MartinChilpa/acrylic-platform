@@ -7,6 +7,16 @@
             border-radius: 50%;
             background-color: var(--light-gray-border-color);
         }
+
+        &.current-edit-stepper {
+            background: transparent !important;
+            color: var(--beige-color);
+            font-weight: 600;
+
+            span {
+                background-color: var(--beige-color);
+             }
+        }
         
         &.current-active-stepper {
             background-color: var(--light-gray-border-color) !important;

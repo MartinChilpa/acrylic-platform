@@ -63,19 +63,23 @@ export class MyArtistService {
   }
 
   addSynclistTrack(synclistId: string, trackId: string): Observable<Object> {
-    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/add-tracks/`, [
-      {
-        track_uuid: trackId
-      }
-    ]);
+    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/add-tracks/`, {
+      tracks: [
+        {
+          track_uuid: trackId
+        }
+      ]
+    });
   }
 
   removeSynclistTrack(synclistId: string, trackId: string): Observable<Object> {
-    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/remove-tracks/`, [
-      {
-        track_uuid: trackId
-      }
-    ]);
+    return this._http.post<Object>(`${this.MY_ARTIST_API_URL}/synclists/${synclistId}/remove-tracks/`, {
+      tracks: [
+        {
+          track_uuid: trackId
+        }
+      ]
+    });
   }
 
   createArtist(request: FormData): Observable<any> {
