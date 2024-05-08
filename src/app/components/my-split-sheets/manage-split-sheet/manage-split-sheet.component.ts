@@ -6,16 +6,17 @@ import { IDistributorsResult } from '../../../interfaces/response/distributor.re
 import { DistributorsService } from '../../../services/distributors.service';
 import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
 import { MyArtistService } from '../../../services/my-artist.service';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'acrylic-manage-split-sheet',
   standalone: true,
-  imports: [ReactiveFormsModule, CustomDropdownComponent],
+  imports: [ReactiveFormsModule, CustomDropdownComponent, NgClass],
   templateUrl: './manage-split-sheet.component.html',
   styleUrl: './manage-split-sheet.component.scss'
 })
 export class ManageSplitSheetComponent implements OnInit {
-
+  activeStepper: number = 1;
   createSplitSheetForm!: FormGroup;
   reveiwBtnClick: boolean = false;
   publishingSheetForms: any[] = [{}];
@@ -25,7 +26,7 @@ export class ManageSplitSheetComponent implements OnInit {
   totalMasteringPercentage: number = 100;
   reviewObject: any = {};
   distributors!: IDistributorsResult[]
-
+  manageSplitStepperList = ['Create a sign in split sheet', 'Preview split sheet'];
   private _fb = inject(FormBuilder);
   public _navigationService = inject(NavigationService);
   private _alertService = inject(AlertService);
@@ -63,6 +64,13 @@ export class ManageSplitSheetComponent implements OnInit {
     })
   }
 
+  manageSplitStepper(index: number) {
+    if (this.activeStepper < index) {
+      return;
+    }
+    this.activeStepper = index;
+  }
+
   dropdownSelected($event: any) {
     this.createSplitSheetForm.get('email')?.setValue($event.uuid);
   }
@@ -82,7 +90,7 @@ export class ManageSplitSheetComponent implements OnInit {
 
     controls.forEach((control, i) => {
       const percentValue = parseFloat(control.get('percent')!.value || 0);
-      if (i === index && (isNaN(percentValue) || percentValue < 1 || percentValue > 100 )) {
+      if (i === index && (isNaN(percentValue) || percentValue < 1 || percentValue > 100)) {
         control.get('percent')!.setValue(1);
       }
     });
@@ -209,10 +217,12 @@ export class ManageSplitSheetComponent implements OnInit {
       master_splits: controls['master_splits'].value
     };
     this.reveiwBtnClick = true;
+    this.activeStepper = 2;
   }
 
   backToSplitSheetForm() {
     this.reveiwBtnClick = false;
+    this.activeStepper = 1;
   }
 
   sendRequestToCreateSheet() {
