@@ -13,7 +13,7 @@ img {
 }
 
 body {
-    font-family: 'Inter';
+    font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 10px;
     font-size: 14px;
@@ -34,6 +34,11 @@ p {
     border-radius: 5px;
     color: var(--text-color);
     padding: 12px;
+}
+
+.acr-ibox {
+    height: 120px !important;
+    padding: 15px !important;
 }
 
 .center {
@@ -155,10 +160,6 @@ p {
 
 .width-36 {
     width: 36px;
-}
-
-.height-115px {
-    height: 115px !important;
 }
 
 .clip-path-tag {

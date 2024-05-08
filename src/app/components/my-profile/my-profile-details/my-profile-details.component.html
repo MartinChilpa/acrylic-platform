@@ -19,7 +19,7 @@
                             data-bs-target="#profile-share">Share</button>
                     </div>
                     @if(artistLocation){
-                        <p class="mb-0 fw-lighter">ARTIST from {{ artistLocation }}</p>
+                        <h6>ARTIST from {{ artistLocation }}</h6>
                     }
                 </div>
             </div>
@@ -32,7 +32,7 @@
                         <img ngSrc="assets/images/icons/three-dots.svg" alt="side_icon" width="20" height="20" />
                     </button>
                 </div>
-                <p class="pt-2">{{ myArtist.bio }}</p>
+                <p class="my-2">{{ myArtist.bio }}</p>
                 @if(myArtist){
                 <div class="d-flex gap-2">
                     @for (item of profileBioTrack; track item.icon) {
@@ -49,7 +49,7 @@
     </div>
     <div class="p-3 bg-secondary mx-1 mt-3 radius-5 mb-5">
         <div class="px-0">
-            <p class="fs-6">Pinned Synclists</p>
+            <h6>Pinned Synclists</h6>
         </div>
         <div class="row g-2">
             @for (item of artistSynclist; track item) {
@@ -70,7 +70,7 @@
             }
             <div class="col-lg-4 col-md-6 col-12 pinned-sync-box" (click)="addSync()">
                 <div class="d-flex-center flex-column h-100 light-gray-border radius-5 cursor-pointer">
-                    <img ngSrc="assets/images/icons/vector.svg" alt="plus-circle" width="20" height="20" />
+                    <img ngSrc="assets/images/icons/plus-circle.svg" alt="plus-circle" width="20" height="20" />
                     <p class="mb-0 pt-1">Add a Synclist</p>
                 </div>
             </div>

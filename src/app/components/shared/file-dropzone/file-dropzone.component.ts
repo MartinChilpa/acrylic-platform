@@ -2,6 +2,7 @@ import { NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, inject } from '@angular/core';
 import { FileDragDropDirective } from '../../../directives/file-drag-drop.directive';
 import { AlertService } from '../../../services/alert.service';
+import { ExtractFileNameDirective } from '../../../directives/extract-file-name.directive';
 
 @Component({
   selector: 'acrylic-file-dropzone',
@@ -9,7 +10,8 @@ import { AlertService } from '../../../services/alert.service';
   imports: [
     NgOptimizedImage,
     FileDragDropDirective,
-    NgClass
+    NgClass,
+    ExtractFileNameDirective
   ],
   templateUrl: './file-dropzone.component.html',
   styleUrl: './file-dropzone.component.scss'

@@ -88,7 +88,7 @@
             <div class="acr-box mb-3">
                 <div class="max-width-560">
                     <label class="acr-input-label">Your Track ISRC Code</label>
-                    <input type="text" [formControlName]="'isrcCode'" class="form-control acr-input mb-2"
+                    <input type="text" [formControlName]="'isrcCode'" class="form-control acr-input"
                         placeholder="ISRC Code" autocomplete="off">
                     <div class="acr-box bg-darkgrey p-3 mb-3">
                         <div class="d-flex-align-center">
@@ -120,20 +120,20 @@
             @if (publishing_splits) {
             <div class="acr-box mb-3" formArrayName="publishing_splits">
                 <div class="max-width-560">
-                    <h6 class="fw-semibold mb-2">Publishing Splits</h6>
+                    <label class="acr-input-label">Publishing Splits</label>
                     @for (publishingGroup of publishing_splits.controls; let i = $index; track publishingGroup)
                     {
                     <div class="d-flex align-items-center" [formGroupName]="i">
                         <div class="me-2">
-                            <input type="text" formControlName="name" class="form-control acr-input mb-2"
+                            <input type="text" formControlName="name" class="form-control acr-input"
                                 placeholder="Full Name" autocomplete="off">
                         </div>
                         <div class="w-50 me-2">
-                            <input type="text" formControlName="email" class="form-control acr-input mb-2"
+                            <input type="text" formControlName="email" class="form-control acr-input"
                                 placeholder="Email" autocomplete="off">
                         </div>
                         <div class="small position-relative">
-                            <input type="number" formControlName="percent" class="form-control acr-input mb-2" step=".01"
+                            <input type="number" formControlName="percent" class="form-control acr-input" step=".01"
                             (input)="onPercentChange($event.target, i, 'publishing_splits')">
                             <span class="text-info position-absolute top-25 right-10">%</span>
                         </div>
@@ -164,20 +164,20 @@
             @if (master_splits) {
             <div class="acr-box mb-3" formArrayName="master_splits">
                 <div class="max-width-560">
-                    <h6 class="fw-semibold mb-2">Masters Splits</h6>
+                    <label class="acr-input-label">Masters Splits</label>
                     @for (masteringGroup of master_splits.controls; let i = $index; track masteringGroup)
                     {
                     <div class="d-flex align-items-center" [formGroupName]="i">
                         <div class="me-2">
-                            <input type="text" formControlName="name" class="form-control acr-input mb-2"
+                            <input type="text" formControlName="name" class="form-control acr-input"
                                 placeholder="Full Name" autocomplete="off">
                         </div>
                         <div class="w-50 me-2">
-                            <input type="text" formControlName="email" class="form-control acr-input mb-2"
+                            <input type="text" formControlName="email" class="form-control acr-input"
                                 placeholder="Email" autocomplete="off">
                         </div>
                         <div class="small position-relative">
-                            <input type="number" formControlName="percent" class="form-control acr-input mb-2" step=".01"
+                            <input type="number" formControlName="percent" class="form-control acr-input" step=".01"
                             min="1" max="100"
                             (input)="onPercentChange($event.target, i, 'master_splits')">
                             <span class="text-info position-absolute top-25 right-10">%</span>
