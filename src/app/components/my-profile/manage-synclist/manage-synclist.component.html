@@ -5,17 +5,16 @@
             <div>
                 @if(activeStepper === 1) {
                 <ng-container>
-                    <p class="fs-6 mb-2">Synclist Details</p>
                     <form [formGroup]="synclistForm" class="row gy-3 gx-2">
                         <div class="acr-box">
-                            <div class="acr-input-label">Your Synclist Name</div>
-                            <input type="text" class="form-control acr-input mb-2" formControlName="name"
+                            <div class="acr-input-label">Synclist Name</div>
+                            <input type="text" class="form-control acr-input" formControlName="name"
                                 placeholder="Synclist Name">
                         </div>
 
                         <div class="acr-box">
-                            <div class="acr-input-label">Your Synclist Description</div>
-                            <textarea rows="5" class="form-control acr-input mb-2" formControlName="description"
+                            <div class="acr-input-label">Synclist Description</div>
+                            <textarea rows="5" class="form-control acr-input pt-2" rows="5" formControlName="description"
                                 placeholder="Synclist Description">
                             </textarea>
                         </div>
@@ -37,8 +36,8 @@
                 }
                 <!-- For Edit -->
                 @if (activeStepper === 2) {
-                <ng-container>
-                    <p class="fs-6 mb-2">Add Tracks</p>
+                <div class="acr-box p-3">
+                    <h6>Add Tracks</h6>
                     <ng-container>
                         <div class="acr-input-group">
                             <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
@@ -83,7 +82,7 @@
                             </table>
                         </div>
                     </div>
-                </ng-container>
+                </div>
                 }
             </div>
         </div>

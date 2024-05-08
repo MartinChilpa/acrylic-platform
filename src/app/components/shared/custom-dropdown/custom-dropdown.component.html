@@ -2,7 +2,7 @@
     @if (title) {
         <div class="acr-input-label">{{ title }}</div>
     }
-    <div class="acrylic-select w-100 cursor-pointer position-relative" [class.mt-2]="title" (click)="isActive = !isActive">
+    <div class="acrylic-select w-100 cursor-pointer position-relative" (click)="isActive = !isActive">
         <div class="select-btn d-flex-between bg-darkgrey h-50px px-3 radius-5"
             [ngClass]="{'rounded-bottom-0': isActive}">
             <span [ngClass]="{'text-light-gray': !selectedValue}">{{ selectedValue ? selectedValue : placeholder }}</span>
