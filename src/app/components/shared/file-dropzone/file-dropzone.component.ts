@@ -65,7 +65,7 @@ export class FileDropzoneComponent implements OnInit {
       })
     }
     if (canUpload) {
-      this.uploadedFiles = this.uploadedFiles.concat(files)
+      this.uploadedFiles = [files[0]].filter(x => x)
       this.uploadedFileList.emit(this.uploadedFiles);
     }
   }
