@@ -2,16 +2,16 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NavigationService } from '../../../services/navigation.service';
 import { AlertService } from '../../../services/alert.service';
-import { IDistributorsResult } from '../../../interfaces/response/distributor.response';
-import { DistributorsService } from '../../../services/distributors.service';
 import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
 import { MyArtistService } from '../../../services/my-artist.service';
 import { NgClass } from '@angular/common';
+import { CreateSplitSheetComponent } from '../create-split-sheet/create-split-sheet.component';
+import { PreviewSplitSheetComponent } from '../preview-split-sheet/preview-split-sheet.component';
 
 @Component({
   selector: 'acrylic-manage-split-sheet',
   standalone: true,
-  imports: [ReactiveFormsModule, CustomDropdownComponent, NgClass],
+  imports: [ReactiveFormsModule, CustomDropdownComponent, NgClass, CreateSplitSheetComponent, PreviewSplitSheetComponent],
   templateUrl: './manage-split-sheet.component.html',
   styleUrl: './manage-split-sheet.component.scss'
 })
@@ -25,14 +25,12 @@ export class ManageSplitSheetComponent implements OnInit {
   totalPublishingPercentage: number = 100;
   totalMasteringPercentage: number = 100;
   reviewObject: any = {};
-  distributors!: IDistributorsResult[]
+  
   manageSplitStepperList = ['Create a sign in split sheet', 'Preview split sheet'];
   private _fb = inject(FormBuilder);
   public _navigationService = inject(NavigationService);
   private _alertService = inject(AlertService);
-  private _distributorService = inject(DistributorsService)
   private _myArtistService = inject(MyArtistService)
-
 
   ngOnInit(): void {
     this.createSplitSheetForm = this._fb.group({
@@ -41,27 +39,18 @@ export class ManageSplitSheetComponent implements OnInit {
       publishing_splits: new FormArray([
         new FormGroup({
           name: new FormControl('', [Validators.required]),
-          email: new FormControl('', [Validators.required]),
+          email: new FormControl('', [Validators.required, Validators.email]),
           percent: new FormControl(100, [Validators.required])
         })
       ]),
       master_splits: new FormArray([
         new FormGroup({
           name: new FormControl('', [Validators.required]),
-          email: new FormControl('', [Validators.required]),
+          email: new FormControl('', [Validators.required, Validators.email]),
           percent: new FormControl(100, [Validators.required])
         })
       ])
     });
-    this.getDistributors()
-  }
-
-  getDistributors() {
-    this._distributorService.getDistributorList().subscribe({
-      next: response => {
-        this.distributors = response.results
-      }
-    })
   }
 
   manageSplitStepper(index: number) {
@@ -71,139 +60,17 @@ export class ManageSplitSheetComponent implements OnInit {
     this.activeStepper = index;
   }
 
-  dropdownSelected($event: any) {
-    this.createSplitSheetForm.get('email')?.setValue($event.uuid);
+  backToSplitSheetForm() {
+    this.reveiwBtnClick = false;
+    this.activeStepper = 1;
   }
 
-  get publishing_splits(): FormArray {
-    return this.createSplitSheetForm.get('publishing_splits') as FormArray;
-  }
-
-  get master_splits(): FormArray {
-    return this.createSplitSheetForm.get('master_splits') as FormArray;
-  }
-
-  onPercentChange(event: any, index: number, controlName: string) {
-    const newPercentValue = isNaN(parseFloat(event.value)) ? 0 : parseFloat(event.value);
-    const publishingSplitsArray = this.createSplitSheetForm.get(controlName) as FormArray;
-    const controls = publishingSplitsArray.controls;
-
-    controls.forEach((control, i) => {
-      const percentValue = parseFloat(control.get('percent')!.value || 0);
-      if (i === index && (isNaN(percentValue) || percentValue < 1 || percentValue > 100)) {
-        control.get('percent')!.setValue(1);
+  sendRequestToCreateSheet() {
+    this._myArtistService.createSplitSheet(this.reviewObject).subscribe({
+      next: response => {
+        this._alertService.success("Split sheet created successfully")
       }
-    });
-
-    let totalPercentage = 0;
-
-    controls.forEach((control, i) => {
-      const percentValue = parseFloat(control.get('percent')!.value || 0);
-      if (i !== index) {
-        totalPercentage += percentValue;
-      }
-    });
-
-    if (newPercentValue !== 0) {
-      const remainingPercentage = 100 - newPercentValue;
-      const equalPercentage = remainingPercentage / (controls.length - 1);
-
-      controls.forEach((control, i) => {
-        if (i !== index) {
-          control.get('percent')!.setValue(this.formatPercent(equalPercentage));
-        }
-      });
-    } else {
-      const equalPercentage = 100 / (controls.length);
-
-      controls.forEach((control, i) => {
-        control.get('percent')!.setValue(this.formatPercent(equalPercentage));
-      });
-    }
-  }
-
-  formatPercent(value: number) {
-    const formattedValue = value.toFixed(2);
-    const integerPart = Math.floor(parseFloat(formattedValue));
-    const decimalPart = parseFloat(formattedValue) - integerPart;
-    return decimalPart === 0 ? integerPart.toString() : formattedValue;
-  }
-
-  calculatePercentage(object: [any]) {
-    let result: any[] = [];
-    if (object.length > 0) {
-      let percent = object.map(x => x.percent).map(val => parseFloat(val));
-      if (percent.length === 1) {
-        percent[0] = 100;
-      }
-      if (percent.some(val => { return val != 0 })) {
-        let sum = 0
-        let count = 1;
-
-        percent.forEach(item => {
-          sum = sum + item;
-          count += 1;
-        });
-        let r = 0;
-        if (sum > 0 && sum <= this.total) {
-          r = sum / count
-          if (percent.length == 5) {
-            return result;
-          }
-          object.forEach(item => {
-            item.percent = r;
-          });
-        } else if (sum > this.total) {
-          return result;
-        }
-        else {
-          r = this.total - sum;
-        }
-        object.push({ name: '', email: '', percent: r });
-        result = object;
-      }
-
-    }
-    return result;
-  }
-
-  addPublishingSheet() {
-    let publishingArray = this.createSplitSheetForm.controls['publishing_splits'].value;
-    let percent: any[] = this.calculatePercentage(publishingArray);
-
-    if (percent.length > 0) {
-      this.publishing_splits.clear();
-      percent.forEach(item => {
-        this.publishing_splits.push(
-          new FormGroup({
-            name: new FormControl(item.name, [Validators.required]),
-            email: new FormControl(item.email, [Validators.required]),
-            percent: new FormControl(parseFloat(parseFloat(`${item.percent}`).toFixed(2)), [Validators.required])
-          })
-        );
-      });
-    } else {
-      this._alertService.error("Cannot split more");
-    }
-  }
-
-  addMasterSheet() {
-    let masterArray = this.createSplitSheetForm.controls['master_splits'].value;
-    let percent: any[] = this.calculatePercentage(masterArray);
-    if (percent.length > 0) {
-      this.master_splits.clear();
-      percent.forEach(item => {
-        this.master_splits.push(
-          new FormGroup({
-            name: new FormControl(item.name, [Validators.required]),
-            email: new FormControl(item.email, [Validators.required]),
-            percent: new FormControl(parseFloat(parseFloat(`${item.percent}`).toFixed(2)), [Validators.required])
-          })
-        );
-      });
-    } else {
-      this._alertService.error("Cannot split more");
-    }
+    })
   }
 
   reviewSheet() {
@@ -221,65 +88,4 @@ export class ManageSplitSheetComponent implements OnInit {
     this.activeStepper = 2;
   }
 
-  backToSplitSheetForm() {
-    this.reveiwBtnClick = false;
-    this.activeStepper = 1;
-  }
-
-  sendRequestToCreateSheet() {
-    console.log(this.reviewObject);
-    this._myArtistService.createSplitSheet(this.reviewObject).subscribe({
-      next: response => {
-        this._alertService.success("Split sheet created successfully")
-      }
-    })
-  }
-
-  navigateToHome() {
-    this._navigationService.navigateToHome();
-  }
-
-  distributorName() {
-    return this.distributors?.find(x => x.uuid == this.reviewObject?.email)?.name
-  }
-
-  removePublishSplits(index: number) {
-    let dataArray = Array.from(this.publishing_splits as any);
-    const dataIndex = dataArray.findIndex((x: any, i: number) => i == index)
-    if (dataIndex >= 0) {
-      this.publishing_splits.removeAt(dataIndex)
-      const percent = parseFloat(parseFloat(`${100 / Array.from(this.publishing_splits as any).length}`).toFixed(2))
-      const data = Array.from(this.publishing_splits.controls as any).map((x: any) => x.value)
-      this.publishing_splits.clear();
-      data.forEach((item: any) => {
-        this.publishing_splits.push(
-          new FormGroup({
-            name: new FormControl(item.name, [Validators.required]),
-            email: new FormControl(item.email, [Validators.required]),
-            percent: new FormControl(percent, [Validators.required])
-          })
-        );
-      });
-    }
-  }
-
-  removeMasterSplits(index: number) {
-    let dataArray = Array.from(this.master_splits as any);
-    const dataIndex = dataArray.findIndex((x: any, i: number) => i == index)
-    if (dataIndex >= 0) {
-      this.master_splits.removeAt(dataIndex)
-      const percent = parseFloat(parseFloat(`${100 / Array.from(this.master_splits as any).length}`).toFixed(2))
-      const data = Array.from(this.master_splits.controls as any).map((x: any) => x.value)
-      this.master_splits.clear();
-      data.forEach((item: any) => {
-        this.master_splits.push(
-          new FormGroup({
-            name: new FormControl(item.name, [Validators.required]),
-            email: new FormControl(item.email, [Validators.required]),
-            percent: new FormControl(percent, [Validators.required])
-          })
-        );
-      });
-    }
-  }
 }
