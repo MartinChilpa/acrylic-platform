@@ -5,7 +5,7 @@ import { Observable, of, switchMap } from 'rxjs';
 import { IMyArtist } from '../interfaces/response/my-artist.response';
 import { IMyArtistSynclist, IMyArtistSynclistResult } from '../interfaces/response/my-artist-synclist.response';
 import { ICreateTracks } from '../interfaces/response/create-tracks.response';
-import { ISplitSheet } from '../interfaces/response/split-sheet.response';
+import { ISplitSheet, ISplitSheetResult } from '../interfaces/response/split-sheet.response';
 
 @Injectable({
   providedIn: 'root'
@@ -88,6 +88,10 @@ export class MyArtistService {
 
   getSplitSheet(): Observable<ISplitSheet> {
     return this._http.get<ISplitSheet>(`${this.MY_ARTIST_API_URL}/split-sheets/`);
+  }
+
+  getSplitSheetById(id: string): Observable<ISplitSheetResult> {
+    return this._http.get<ISplitSheetResult>(`${this.MY_ARTIST_API_URL}/split-sheets/${id}/`);
   }
 
   createSplitSheet(request: any): Observable<any> {

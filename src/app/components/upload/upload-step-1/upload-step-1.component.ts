@@ -1,7 +1,8 @@
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
 import { FormGroup } from '@angular/forms';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'acrylic-upload-step-1',
@@ -13,6 +14,7 @@ import { FormGroup } from '@angular/forms';
 export class UploadStep1Component {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
+  public _navigationService = inject(NavigationService)
   splitNames: any[] = [
     { name: "Track Name 1", text: 'Dec 25, 2024, 6:44 PM' },
     { name: "Track Name 2", text: 'Dec 25, 2024, 6:44 PM' },

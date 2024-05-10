@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { MyArtistService } from '../../services/my-artist.service';
 import { ISplitSheetResult } from '../../interfaces/response/split-sheet.response';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'acrylic-my-split-sheets',
@@ -14,6 +15,7 @@ export class MySplitSheetsComponent implements OnInit {
   splitSheets!: ISplitSheetResult[]
 
   private _myArtistService = inject(MyArtistService)
+  private _navigationService = inject(NavigationService)
 
   ngOnInit(): void {
     this.getSplitSheets()
@@ -25,5 +27,9 @@ export class MySplitSheetsComponent implements OnInit {
         this.splitSheets = response.results
       }
     })
+  }
+
+  goToPreview(id: string) {
+    this._navigationService.navigateToPreviewSplitSheet(id)
   }
 }

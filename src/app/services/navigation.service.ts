@@ -63,4 +63,16 @@ export class NavigationService {
   navigateToMyTransaction() {
     this._router.navigateByUrl(`/my-finances/my-transactions`);
   }
+
+  navigateToPreviewSplitSheet(id: string) {
+    this._router.navigateByUrl(`/my-split-sheets/review/${id}`);
+  }
+
+  navigateToMySplitSheet() {
+    this._router.navigateByUrl(`/my-split-sheets`);
+  }
+
+  navigateToUploadTrack() {
+    this._router.navigate(['upload']);
+  }
 }
