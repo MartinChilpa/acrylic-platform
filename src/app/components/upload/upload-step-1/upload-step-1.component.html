@@ -53,7 +53,7 @@
     <div class="col-12">
         <div class="row justify-content-center gy-2">
             <div class="col-lg-4 col-md-5 col-12 text-end">
-                <button class="btn btn-darkgrey px-4 px-lg-5 py-2 light-gray-border">Cancel</button>
+                <button class="btn btn-darkgrey px-4 px-lg-5 py-2 light-gray-border" (click)="_navigationService.navigateToMyTracks()">Cancel</button>
             </div>
             <div class="col-lg-4 col-md-5 col-12">
                 <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" [disabled]="!form.get('name')?.value" (click)="nextUploadStepper(2)">Next</button>

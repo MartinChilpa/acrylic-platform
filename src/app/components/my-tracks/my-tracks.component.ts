@@ -22,7 +22,7 @@ export class MyTracksComponent implements OnInit {
   ]
   trackList: ICreateTracks[] = []
   private _myArtistService = inject(MyArtistService);
-  private _navigationService = inject(NavigationService);
+  public _navigationService = inject(NavigationService);
 
   ngOnInit(): void {
     this.getTracks()
