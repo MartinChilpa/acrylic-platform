@@ -6,6 +6,7 @@ import { ICommonResponse } from '../interfaces/response/common.response';
 import { IResetPasswordRequest } from '../interfaces/request/reset-password.request';
 import { IForgotPasswordRequest } from '../interfaces/request/forgot-password.request';
 import { ISubscription } from '../interfaces/response/subscription.response';
+import { IDocuments } from '../interfaces/response/document.response';
 
 @Injectable({
   providedIn: 'root'
@@ -29,5 +30,9 @@ export class AccountService {
 
   updaeSubscription(request: FormData): Observable<ISubscription> {
     return this.http.put<ISubscription>(`${this.ACCOUNT_API_URL}/profile/`, request);
+  }
+
+  getDocuments(): Observable<IDocuments> {
+    return this.http.get<IDocuments>(`${this.ACCOUNT_API_URL}/documents/`);
   }
 }
