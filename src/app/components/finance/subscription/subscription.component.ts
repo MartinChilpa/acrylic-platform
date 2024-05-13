@@ -49,6 +49,7 @@ export class SubscriptionComponent {
     this._accountService.updaeSubscription(this.subscriptionForm.value)
       .subscribe({
         next: () => {
+          this.subscriptionForm.enable();
         },
         error: () => {
           this.subscriptionForm.enable();

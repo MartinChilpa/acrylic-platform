@@ -5,7 +5,8 @@ export const authRoutesNames = {
     SIGNIN: 'sign-in',
     SIGNUP: 'sign-up',
     FORGOT_PASSWORD: 'forgot-password',
-    RESET_PASSWORD: 'reset-password'
+    RESET_PASSWORD: 'reset-password',
+    VERIFY_USER: 'verify-user'
 };
 
 export const AUTH_ROUTES: Routes = [
@@ -17,6 +18,10 @@ export const AUTH_ROUTES: Routes = [
                 path: authRoutesNames.EMPTY,
                 redirectTo: authRoutesNames.SIGNIN,
                 pathMatch: 'full',
+            },
+            {
+                path: authRoutesNames.VERIFY_USER,
+                loadComponent: () => import('./verify-user/verify-user.component').then((mod) => mod.VerifyUserComponent),
             },
             {
                 path: authRoutesNames.SIGNIN,

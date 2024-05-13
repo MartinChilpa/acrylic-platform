@@ -1,5 +1,4 @@
-<section>
-    <div class="transaction my-subscriptions" [formGroup]="subscriptionForm">
+    <ng-container [formGroup]="subscriptionForm">
         <div class="acr-box mb-4">
             <div class="row d-flex-between">
                 <div class="col-lg-6 col-10">
@@ -73,13 +72,11 @@
             </div>
             <div class="row">
                 <div class="col-lg-6 col-12">
-                    <div>
                         <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID"
                             [formControlName]="'tax_id'">
                         <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on
                             their Acrylic
                             package purchases. </span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -88,12 +85,10 @@
             <p class="h6 mb-2">All Invoices</p>
             <div class="row">
                 <div class="col-lg-6 col-12">
-                    <div>
                         <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID">
                         <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on
                             their Acrylic package purchases. 
                         </span>
-                    </div>
                 </div>
             </div>
             <div class="mt-2">
@@ -133,5 +128,4 @@
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </ng-container>

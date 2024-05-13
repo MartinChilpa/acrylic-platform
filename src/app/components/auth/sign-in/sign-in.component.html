@@ -1,19 +1,17 @@
 <form [formGroup]="signInForm">
     <h1 class="auth-tagline">Welcome Back</h1>
     <ng-container>
-        <div>
-            <div class="acr-input-label">Email</div>
-            <input type="text" [formControlName]="'username'" class="form-control acr-input" placeholder="Enter email"
-                autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
-            @if(signInForm.get('username')?.invalid && (signInForm.get('username')?.dirty ||
-            signInForm.get('username')?.touched)) {
-            <div class="acr-input-label small text-danger">
-                @if(signInForm.get('username')?.errors?.['email']) {
-                <div> Please enter valid email. </div>
-                }
-            </div>
+        <div class="acr-input-label">Email</div>
+        <input type="text" [formControlName]="'username'" class="form-control acr-input" placeholder="Enter email"
+            autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+        @if(signInForm.get('username')?.invalid && (signInForm.get('username')?.dirty ||
+        signInForm.get('username')?.touched)) {
+        <div class="acr-input-label small text-danger">
+            @if(signInForm.get('username')?.errors?.['email']) {
+            <div> Please enter valid email. </div>
             }
         </div>
+        }
 
         <div class="my-3">
             <div class="d-flex-between">
@@ -25,7 +23,7 @@
                 </a>
             </div>
 
-            <div class="acr-password">
+            <div class="position-relative">
                 <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'"
                     class="form-control acr-input" placeholder="Enter Password" autocomplete="off" readonly
                     onfocus="this.removeAttribute('readonly');">
@@ -34,11 +32,9 @@
             </div>
         </div>
 
-        <div>
-            <button type="button" class="btn w-100 btn-main fw-bold h-50px" [disabled]="signInForm.invalid"
-                (click)="signIn()">Sign In
-            </button>
-        </div>
+        <button type="button" class="btn w-100 btn-main fw-bold h-50px" [disabled]="signInForm.invalid"
+            (click)="signIn()">Sign In
+        </button>
     </ng-container>
 
     <div class="d-flex-center my-3">

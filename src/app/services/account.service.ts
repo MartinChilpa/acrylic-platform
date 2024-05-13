@@ -7,6 +7,7 @@ import { IResetPasswordRequest } from '../interfaces/request/reset-password.requ
 import { IForgotPasswordRequest } from '../interfaces/request/forgot-password.request';
 import { ISubscription } from '../interfaces/response/subscription.response';
 import { IDocuments } from '../interfaces/response/document.response';
+import { IVerifyUserRequest } from '../interfaces/request/verify-user.request';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,10 @@ export class AccountService {
     return this.http.post<ICommonResponse>(this.ACCOUNT_API_URL + '/reset-password/', resetPasswordRequest);
   }
 
+  verifyUser(verifyUserRequest: IVerifyUserRequest): Observable<IVerifyUserRequest> {
+    return this.http.post<IVerifyUserRequest>(`${this.ACCOUNT_API_URL}/verify-email/`, verifyUserRequest);
+  }
+
   getSubscription(): Observable<ISubscription> {
     return this.http.get<ISubscription>(`${this.ACCOUNT_API_URL}/profile`);
   }
@@ -35,4 +40,5 @@ export class AccountService {
   getDocuments(): Observable<IDocuments> {
     return this.http.get<IDocuments>(`${this.ACCOUNT_API_URL}/documents/`);
   }
+
 }
