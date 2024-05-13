@@ -34,7 +34,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
     this.uploadTrackForm = this._fb.group({
       id: [null],
       isrc: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}-?\w{3}-?\d{2}-?\d{5}$/)]],
-      name: [''],
+      name: ['Test ' + new Date().toLocaleDateString()],
       duration: [0],
       released: [new Date().toJSON().split('T')[0]],
       is_cover: [false],
