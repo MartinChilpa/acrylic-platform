@@ -71,7 +71,6 @@ export class AuthService {
     }
     return this._http.post<ISignInResponse>(this.AUTH_API_URL + '/token/refresh/', { refresh: this.refreshToken }).pipe(
       switchMap((response: ISignInResponse) => {
-        console.log('refresh token generated');
         this.setSignInResponse(response);
         return of(true);
       }),

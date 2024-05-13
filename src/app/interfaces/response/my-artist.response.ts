@@ -3,6 +3,7 @@ export interface IMyArtist {
     created: string;
     updated: string;
     name: string;
+    slug: string;
     bio: string;
     hometown: string;
     country: string;

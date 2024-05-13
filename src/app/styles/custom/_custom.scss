@@ -25,6 +25,11 @@ p {
     margin-bottom: 0;
 }
 
+::selection {
+    color: var(--primary-color);
+    background-color: var(--info-color);
+}
+
 .bg-primary-gradient {
     background: var(--primary-radial-gradient-color);
 }
