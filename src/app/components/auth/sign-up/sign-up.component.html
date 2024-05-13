@@ -1,4 +1,3 @@
-<div class="sign-up-scroll">
     <form [formGroup]="signUpForm">
         <h1 class="auth-tagline">Create an Account</h1>
         <div class="row">
@@ -32,7 +31,7 @@
                 <div class="d-flex-between">
                     <div class="acr-input-label">Password</div>
                 </div>
-                <div class="acr-password">
+                <div class="position-relative">
                     <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'"
                         class="form-control acr-input" placeholder="Enter Password" acrylicPasswordValidator="password" autocomplete="off" readonly
                         onfocus="this.removeAttribute('readonly');">
@@ -44,7 +43,7 @@
                 <div class="d-flex-between">
                     <div class="acr-input-label">Confirm Password</div>
                 </div>
-                <div class="acr-password">
+                <div class="position-relative">
                     <input [type]="showConfirmPassword ? 'text' : 'password'" [formControlName]="'password_confirm'"
                     class="form-control acr-input" placeholder="Confirm Password" autocomplete="off" readonly
                     onfocus="this.removeAttribute('readonly');">
@@ -88,5 +87,3 @@
         <span>Already have an account?</span>
         <a class="a-blue ms-2" (click)="_navigationService.navigateToSignIn();">Sign In</a>
     </div>
-    
-</div>

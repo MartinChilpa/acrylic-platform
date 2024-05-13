@@ -1,5 +1,4 @@
 @if(myArtist){
-<section>
     <div class="row me-1 gx-4 gy-2">
         <div class="col-lg-7 col-12 pe-0">
             <div class="p-3 flex-column radius-5 bg-img" acrylicBackgroundImage [backgroundImage]="myArtist.background_image">
@@ -59,7 +58,7 @@
                     <div class="pinned-sync-gradient-layer position-absolute top-0 start-0 h-100 w-100"></div>
                     <div class="d-flex-align-center gap-3 pinned-sync-content">
                         <img [ngSrc]="item.cover_image" alt="pinned-img" width="60" height="60"
-                            class="radius-5 pinned-sunc-front" />
+                            class="radius-5" />
                         <div class="d-flex flex-column">
                             <h6 class="mb-1">{{ item.name }}</h6>
                             <small>Rock, Rap</small>
@@ -76,7 +75,6 @@
             </div>
         </div>
     </div>
-</section>
 <div class="modal fade" id="profile-share" data-bs-backdrop="static">
     <acrylic-share-profile [myArtist]="myArtist" [profileBioTrack]="profileBioTrack"></acrylic-share-profile>
 </div>
