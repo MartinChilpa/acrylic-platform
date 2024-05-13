@@ -12,14 +12,14 @@
         @for (item of sidenavItems; track item) {
         @if (!item.submenu) {
         <li>
-            <a class="sidenav-item" (click)="collapseMenu()" [routerLink]="[item.routerLink]" routerLinkActive="active-route">
+            <a class="p-2 w-100 d-inline-flex align-items-center text-primary text-decoration-none" (click)="collapseMenu()" [routerLink]="[item.routerLink]" routerLinkActive="active-route">
                 <img [ngSrc]="'assets/images/icons/' + item.icon + '.svg'" alt="Icon" width="16" height="16">
                 <span class="ms-2">{{item.label}}</span>
             </a>
         </li>
         }@else {
         <li (click)="toggleSubMenu(item)">
-            <a class="sidenav-item cursor-pointer">
+            <a class="p-2 w-100 d-inline-flex align-items-center text-primary text-decoration-none cursor-pointer">
                 <img [ngSrc]="'assets/images/icons/' + item.icon + '.svg'" alt="Icon" width="16" height="16">
                 <span class="ms-2">{{item.label}}</span>
             </a>
@@ -29,7 +29,7 @@
             <ul class="ps-0 pe-0 p-2 bg-gray rounded-3">
                 @for (sub of item.submenu; track sub  ) {
                 <li class="list-unstyled bg-light-gray mb-0">
-                    <a class="sidenav-item" [routerLink]="[sub.routerLink]" routerLinkActive="active-route">
+                    <a class="p-2 w-100 d-inline-flex align-items-center text-primary text-decoration-none" [routerLink]="[sub.routerLink]" routerLinkActive="active-route">
                         <span class="ms-2">{{sub.label}}</span>
                     </a>
                 </li>
@@ -45,7 +45,7 @@
     <ul class="list-unstyled mb-0">
         @for (userTrack of userTrackList; track userTrack) {
             <li>
-                <a class="sidenav-item">
+                <a class="p-2 w-100 d-inline-flex align-items-center text-primary text-decoration-none">
                     <img [ngSrc]="userTrack.picture"  height="36" width="36" class="radius-5"/>
                     <span class="ms-2">{{ userTrack.nama }}</span>
                 </a>

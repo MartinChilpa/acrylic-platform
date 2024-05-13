@@ -20,6 +20,14 @@ export class CreateSplitSheetComponent implements OnInit {
   @Output() reviewSheetData = new EventEmitter()
   total: number = 100;
 
+  splitNames: any[] = [
+    { name: "Track Name 1", text: 'Dec 25, 2024, 6:44 PM' },
+    { name: "Track Name 2", text: 'Dec 25, 2024, 6:44 PM' },
+    { name: "Track Name 3", text: 'Dec 25, 2024, 6:44 PM' },
+    { name: "Track Name 4", text: 'Dec 25, 2024, 6:44 PM' },
+    { name: "Track Name 5", text: 'Dec 25, 2024, 6:44 PM' },
+  ]
+
   distributors!: IDistributorsResult[];
 
   private _alertService = inject(AlertService);
@@ -40,6 +48,10 @@ export class CreateSplitSheetComponent implements OnInit {
 
   dropdownSelected($event: any) {
     this.createSplitSheetForm.get('email')?.setValue($event.uuid);
+  }
+
+  splitSheetSelected($event: any) {
+    this.createSplitSheetForm.get('name')?.setValue($event.name);
   }
 
   getDistributors() {

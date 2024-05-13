@@ -1,81 +1,94 @@
-<section>    
-    <div class="transaction my-subscriptions">
+    <ng-container [formGroup]="subscriptionForm">
         <div class="acr-box mb-4">
-            <div class="d-flex-between">
-                <div>
+            <div class="row d-flex-between">
+                <div class="col-lg-6 col-10">
                     <p class="h6">You are currently on Monthly package</p>
-                    <p class="mb-2 max-width-560">Lorem ipsum dolor sit amet consectetur.
+                    <p class="mb-2">Lorem ipsum dolor sit amet consectetur.
                         A dictum eget vitae neque nisl feugiat tincidunt dignissim. Lorem ipsum dolor sit amet
                         consectetur.</p>
 
                     <p class="mb-0 text-beige cursor-pointer">Switch to
                         Annual Package</p>
                 </div>
-                <div><img src="assets/images/others/Colita.png" /></div>
+                <div class="col-lg-6 col-2 text-end"><img src="assets/images/others/Colita.png" /></div>
             </div>
         </div>
         <div class="acr-box mb-4">
             <div class="d-flex-between mb-2">
                 <p class="h6 mb-0">Invoice Settings</p>
-                <button class="btn btn-sm btn-darkgrey light-gray-border">Save</button>
+                <button class="btn btn-sm btn-darkgrey light-gray-border px-4" [disabled]="subscriptionForm.invalid"
+                    (click)="saveSubscription()">Save</button>
             </div>
-            <div class="max-width-560">
-                <div class="mb-3">
-                    <input type="text" class="form-control acr-input mb-0" placeholder="Billing Email">
-                    <span class="text-light-gray small m-1">Invoices and receipts will be sent to this email address</span>
-                </div>
-                <div class="mb-3">
-                    <textarea placeholder="Company Billing Profile" class="form-control acr-input mb-0 resize-none"></textarea>
-                    <span class="text-light-gray small m-1">Additional company information to be shown on invoices; e. g. address, PO
-                        number, etc.</span>
-                </div>
-                <div class="toggle-section mb-3">
-                    <p class="mb-0">Text notifications when payment fail</p>
-                    <div class="my-2 d-flex-align-center">
-                        <label class="switch" (click)="toggleSwitch()">
-                            <input type="checkbox" checked>
-                            <span class="slider round"></span>
-                          </label>
-                          <span id="toggleLabel" class="ps-2">Yes</span>
+            <div class="row">
+                <div class="col-lg-6 col-12">
+                    <div class="mb-3">
+                        <input type="text" class="form-control acr-input mb-0" placeholder="Billing Email"
+                            [formControlName]="'billing_email'">
+                        <span class="text-light-gray small m-1">Invoices and receipts will be sent to this email
+                            address</span>
                     </div>
-                    <div class="text-light-gray small m-1">We’ll notify you about billing issues. We’ll never call or share your
-                        number.</div>
+                    <div class="mb-3">
+                        <textarea placeholder="Company Billing Profile" class="form-control acr-input mb-0 resize-none"
+                            [formControlName]="'billing_details'"></textarea>
+                        <span class="text-light-gray small m-1">Additional company information to be shown on invoices;
+                            e. g. address, PO
+                            number, etc.</span>
+                    </div>
+                    <div class="toggle-section mb-3">
+                        <p class="mb-0">Text notifications when payment fail</p>
+                        <div class="my-2 d-flex-align-center">
+                            <label class="switch" (click)="toggleSwitch()">
+                                <input type="checkbox" [formControlName]="'failed_payment_notifications'" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            <span id="toggleLabel" class="ps-2">Yes</span>
+                        </div>
+                        <div class="text-light-gray small m-1">We’ll notify you about billing issues. We’ll never call
+                            or share your
+                            number.</div>
+                    </div>
+                    <p class="mb-2">Phone Number</p>
+                    <div class="d-flex-align-center">
+                        <div class="me-1">
+                            <input type="text" class="form-control acr-input mb-0" placeholder="United State [+1]"
+                                [formControlName]="'country_code'">
+                        </div>
+                        <div class="w-75">
+                            <input type="number" class="form-control acr-input mb-0" placeholder="Phone Number"
+                                [formControlName]="'phone'">
+                        </div>
+                    </div>
+                    <div class="text-light-gray small m-1">Be sure to include country code. Your wireless provider’s
+                        standard messaging
+                        rates apply.</div>
                 </div>
-                <p class="mb-2">Phone Number</p>
-                <div class="d-flex-align-center">
-                    <div class="me-1">
-                        <input type="text" class="form-control acr-input mb-0"
-                            placeholder="United State [+1]"></div>
-                    <div class="w-75">
-                        <input type="text" class="form-control acr-input mb-0"
-                            placeholder="Phone Number"></div>
-                </div>
-                <div class="text-light-gray small m-1">Be sure to include country code. Your wireless provider’s standard messaging
-                    rates apply.</div>
             </div>
         </div>
 
         <div class="acr-box mb-4">
             <div class="d-flex-between mb-2">
                 <p class="h6 mb-0">Additional billing info</p>
-                <button class="btn btn-sm btn-darkgrey light-gray-border">Save</button>
+                <button class="btn btn-sm btn-darkgrey light-gray-border px-4">Save</button>
             </div>
-            <div class="max-width-560">
-                <div>
-                    <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID">
-                    <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on their Acrylic
-                        package purchases. </span>
+            <div class="row">
+                <div class="col-lg-6 col-12">
+                        <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID"
+                            [formControlName]="'tax_id'">
+                        <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on
+                            their Acrylic
+                            package purchases. </span>
                 </div>
             </div>
         </div>
 
         <div class="acr-box">
             <p class="h6 mb-2">All Invoices</p>
-            <div class="max-width-560">
-                <div>
-                    <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID">
-                    <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on their Acrylic
-                        package purchases. </span>
+            <div class="row">
+                <div class="col-lg-6 col-12">
+                        <input type="text" class="form-control acr-input mb-0" placeholder="Tax ID">
+                        <span class="text-light-gray small m-1">Business with a valid Tax ID will not be subject to tax on
+                            their Acrylic package purchases. 
+                        </span>
                 </div>
             </div>
             <div class="mt-2">
@@ -90,7 +103,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                             <tr>
                                 <td class="text-nowrap">
                                     <span>Dec 2, 2024, 3:45 PM</span>
@@ -104,16 +117,15 @@
                                 <td class="text-nowrap">
                                     <div>
                                         <button class="btn btn-sm btn-info px-3">
-                                                Download PDF
+                                            Download PDF
                                         </button>
                                     </div>
                                 </td>
                             </tr>
-                            
+
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </ng-container>

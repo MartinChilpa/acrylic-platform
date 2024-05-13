@@ -1,7 +1,7 @@
 <div class="split-sheet edit-view-mode">
     <form [formGroup]="createSplitSheetForm">
         <!-- ISRC -->
-        <div class="acr-box mb-3">
+        <!-- <div class="acr-box mb-3">
             <div>
                 <label class="acr-input-label">Your Track ISRC Code</label>
                 <input type="text" [formControlName]="'isrcCode'" class="form-control acr-input" placeholder="ISRC Code"
@@ -26,15 +26,18 @@
                 </div>
 
             </div>
+        </div> -->
+
+        <div class="acr-box mb-3">
+            <acrylic-custom-dropdown [title]="'Tracks'" [inputValue]="createSplitSheetForm.get('name')?.value"
+                [values]="splitNames" (dropdownSelected)="splitSheetSelected($event)"></acrylic-custom-dropdown>
         </div>
 
         <!-- EMail -->
         <div class="acr-box mb-3">
-            <div>
-                <acrylic-custom-dropdown [title]="'Name Of Distributor Or Label Contact'"
-                    [inputValue]="createSplitSheetForm.get('email')?.value" [values]="distributors"
-                    (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
-            </div>
+            <acrylic-custom-dropdown [title]="'Name Of Distributor Or Label Contact'"
+                [inputValue]="createSplitSheetForm.get('email')?.value" [values]="distributors"
+                (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
         </div>
 
         <!-- Publish -->

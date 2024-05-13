@@ -25,7 +25,7 @@
                 </a>
             </div>
 
-            <div class="acr-password">
+            <div class="position-relative">
                 <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'"
                     class="form-control acr-input" placeholder="Enter Password" autocomplete="off" readonly
                     onfocus="this.removeAttribute('readonly');">
@@ -34,11 +34,9 @@
             </div>
         </div>
 
-        <div>
-            <button type="button" class="btn w-100 btn-main fw-bold h-50px" [disabled]="signInForm.invalid"
-                (click)="signIn()">Sign In
-            </button>
-        </div>
+        <button type="button" class="btn w-100 btn-main fw-bold h-50px" [disabled]="signInForm.invalid"
+            (click)="signIn()">Sign In
+        </button>
     </ng-container>
 
     <div class="d-flex-center my-3">

@@ -3,6 +3,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DistributorsService } from '../../../services/distributors.service';
 import { IDistributorsResult } from '../../../interfaces/response/distributor.response';
 import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'acrylic-upload-step-2',
@@ -14,6 +15,8 @@ import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dro
 export class UploadStep2Component implements OnInit {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
+
+  public _navigationService = inject(NavigationService)
 
   private _distributorService = inject(DistributorsService)
   distributors!: IDistributorsResult[]
