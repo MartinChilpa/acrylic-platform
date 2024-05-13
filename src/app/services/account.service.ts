@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { ICommonResponse } from '../interfaces/response/common.response';
 import { IResetPasswordRequest } from '../interfaces/request/reset-password.request';
 import { IForgotPasswordRequest } from '../interfaces/request/forgot-password.request';
+import { ISubscription } from '../interfaces/response/subscription.response';
 
 @Injectable({
   providedIn: 'root'
@@ -20,5 +21,13 @@ export class AccountService {
 
   resetPassword(resetPasswordRequest: IResetPasswordRequest): Observable<ICommonResponse> {
     return this.http.post<ICommonResponse>(this.ACCOUNT_API_URL + '/reset-password/', resetPasswordRequest);
+  }
+
+  getSubscription(): Observable<ISubscription> {
+    return this.http.get<ISubscription>(`${this.ACCOUNT_API_URL}/profile`);
+  }
+
+  updaeSubscription(request: FormData): Observable<ISubscription> {
+    return this.http.put<ISubscription>(`${this.ACCOUNT_API_URL}/profile/`, request);
   }
 }
