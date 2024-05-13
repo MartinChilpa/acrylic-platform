@@ -1,6 +1,7 @@
 export const environment = {
     production: false,
     NAME: 'development',
+    APP_URL: 'http://localhost:4200',
     API_URL: 'https://platform.acrylic.la/api',
     VERSION: 'v1',
     SENTRY: {
@@ -11,5 +12,5 @@ export const environment = {
             /^https:\/\/app\.acrylic\.la\//,
             '127.0.0.1:8080'
         ]
-    }
+    },
 };

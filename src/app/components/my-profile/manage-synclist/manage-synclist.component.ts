@@ -153,4 +153,13 @@ export class ManageSynclistComponent implements OnInit {
       }
     });
   }
+
+  publish(){
+    if(this.activeStepper == 1){
+      this.saveSynclist();
+    }
+    else{
+      this._navigationService.navigateToMyProfile();
+    }
+  }
 }

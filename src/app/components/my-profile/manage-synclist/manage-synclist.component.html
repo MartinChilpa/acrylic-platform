@@ -11,8 +11,8 @@
 
                         <div class="acr-box">
                             <div class="acr-input-label">Synclist Description</div>
-                            <textarea rows="5" class="form-control acr-input pt-2" rows="5" formControlName="description"
-                                placeholder="Synclist Description">
+                            <textarea rows="5" class="form-control acr-input pt-2" rows="5"
+                                formControlName="description" placeholder="Synclist Description">
                             </textarea>
                         </div>
                         @if (!isLoading) {
@@ -103,10 +103,8 @@
             <div class="col-lg-6 col-12">
                 <div class="d-flex-center">
                     <button class="btn btn-darkgrey px-4 px-lg-5 py-2 me-3" (click)="backProfile()">Back</button>
-                    @if (activeStepper == 1) {
-                    <button class="btn btn-info px-4 px-lg-5 py-2" [disabled]="!synclistForm.valid"
-                        (click)="saveSynclist()">Publish</button>
-                    }
+                    <button class="btn btn-info px-4 px-lg-5 py-2"
+                        [disabled]="activeStepper == 1 && !synclistForm.valid" (click)="publish()">Publish</button>
                 </div>
             </div>
         </div>

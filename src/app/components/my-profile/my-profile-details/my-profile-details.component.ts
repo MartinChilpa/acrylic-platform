@@ -81,4 +81,22 @@ export class MyProfileDetailsComponent {
   public get artistLocation() {
     return [this.myArtist?.hometown, this.myArtist?.country].filter(a => a).join(', ')
   }
+
+  getGenres(): string {
+    let genresString = '';
+    if (this.artistSynclist) {
+      this.artistSynclist.forEach((item, index) => {
+        if (item.genres) {
+          item.genres.forEach((genre, genreIndex) => {
+            genresString += genre.name;
+            if (genreIndex !== item.genres.length - 1) {
+              genresString += ', ';
+            }
+          });
+        }
+      });
+    }
+    return genresString;
+  }
+
 }
