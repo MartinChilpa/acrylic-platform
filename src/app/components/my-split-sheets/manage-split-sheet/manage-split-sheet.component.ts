@@ -34,7 +34,7 @@ export class ManageSplitSheetComponent implements OnInit {
 
   ngOnInit(): void {
     this.createSplitSheetForm = this._fb.group({
-      isrcCode: [''],
+      track: [''],
       email: ['', Validators.required],
       name: [''],
       publishing_splits: new FormArray([
@@ -70,6 +70,7 @@ export class ManageSplitSheetComponent implements OnInit {
     this._myArtistService.createSplitSheet(this.reviewObject).subscribe({
       next: response => {
         this._alertService.success("Split sheet created successfully")
+        this._navigationService.navigateToMySplitSheet();
       }
     })
   }
@@ -79,8 +80,7 @@ export class ManageSplitSheetComponent implements OnInit {
       return;
     let controls = this.createSplitSheetForm.controls;
     this.reviewObject = {
-      isrcCode: controls['isrcCode'].value,
-      track: controls['isrcCode'].value,
+      track: controls['track'].value,
       email: controls['email'].value,
       publishing_splits: controls['publishing_splits'].value,
       master_splits: controls['master_splits'].value

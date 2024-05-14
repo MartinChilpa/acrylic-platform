@@ -86,8 +86,8 @@ export class MyArtistService {
     return this._http.post<any>(`${this.ARTIST_API_URL}/register/`, request);
   }
 
-  getSplitSheet(): Observable<ISplitSheet> {
-    return this._http.get<ISplitSheet>(`${this.MY_ARTIST_API_URL}/split-sheets/`);
+  getSplitSheet(searchText: string = ''): Observable<ISplitSheet> {
+    return this._http.get<ISplitSheet>(`${this.MY_ARTIST_API_URL}/split-sheets/?search=${searchText}`);
   }
 
   getSplitSheetById(id: string): Observable<ISplitSheetResult> {
@@ -100,5 +100,9 @@ export class MyArtistService {
 
   updateSplitSheet(request: any, uuid: string): Observable<any> {
     return this._http.put<any>(`${this.MY_ARTIST_API_URL}/split-sheets/${uuid}/`, request);
+  }
+
+  searchTracks(searchText: string): Observable<ICreateTracks[]> {
+    return this._http.get<ICreateTracks[]>(`${this.MY_ARTIST_API_URL}/tracks/?search=${searchText}`);
   }
 }

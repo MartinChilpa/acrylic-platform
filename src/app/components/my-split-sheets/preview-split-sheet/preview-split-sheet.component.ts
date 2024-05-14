@@ -31,6 +31,10 @@ export class PreviewSplitSheetComponent implements OnInit {
     if (this.splitSheetId) {
       this.reviewObject = {}
       this.getSplitSheetDetail()
+      this.getTrackById();
+    }
+    if (this.reviewObject.track) {
+      this.getTrackById();
     }
     this.getDistributors()
   }
@@ -51,8 +55,19 @@ export class PreviewSplitSheetComponent implements OnInit {
   getSplitSheetDetail() {
     this._myArtistService.getSplitSheetById(this.splitSheetId).subscribe(response => {
       this.reviewObject = {
+        ...this.reviewObject,
         publishing_splits: response.publishing_splits,
         master_splits: response.master_splits
+      }
+    })
+  }
+
+  getTrackById() {
+    this._myArtistService.getTrackById(this.reviewObject.track ? this.reviewObject.track : this.splitSheetId).subscribe(response => {
+      this.reviewObject = {
+        ...this.reviewObject,
+        track: response.uuid,
+        trackData: response
       }
     })
   }
@@ -63,6 +78,12 @@ export class PreviewSplitSheetComponent implements OnInit {
         this.distributors = response.results
       }
     })
+  }
+
+  formatTime(seconds: number) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
 
   distributorName() {

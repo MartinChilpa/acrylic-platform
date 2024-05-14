@@ -3,6 +3,7 @@ import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, On
 import { SearchFilterPipe } from '../../../pipes/search-filter.pipe';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HighLightDirective } from '../../../directives/high-light.directive';
+import { Subject, debounce, debounceTime } from 'rxjs';
 
 @Component({
   selector: 'acrylic-custom-dropdown',
@@ -17,18 +18,30 @@ export class CustomDropdownComponent implements OnInit, OnChanges {
   @Input() placeholder: string = 'Choose or search'
   @Input() values: any[] = []
   @Input() showSearch: boolean = true
+  @Input() loading: boolean = false
   @Output() dropdownSelected = new EventEmitter();
+  @Output() searchChanged = new EventEmitter<string>();
 
   isActive: boolean = false;
   selectedValue: string = '';
   searchForm!: FormGroup;
   private _fb = inject(FormBuilder);
   private _elementRef = inject(ElementRef);
+  private debounceSubject: Subject<void> = new Subject<void>();
 
   ngOnInit(): void {
     this.searchForm = this._fb.group({
       searchText: ['']
     });
+    this.debounceSubject.pipe(
+      debounceTime(500)
+    ).subscribe(() => {
+      this.searchChanged.emit(this.searchForm.get('searchText')?.value)
+    });
+  }
+
+  searchChanges() {
+    this.debounceSubject.next();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

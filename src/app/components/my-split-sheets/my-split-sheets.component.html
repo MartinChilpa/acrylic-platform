@@ -2,9 +2,9 @@
     <div class="acr-box mt-4">
         <div class="row g-2 mb-2">
             <div class="col-xxl-4 col-xl-3">
-                <div class="acr-input-group">
+                <div class="acr-input-group" [formGroup]="searchForm">
                     <img src="assets/images/icons/search-info.svg" width="16" height="16">
-                    <input type="text" placeholder="Search for a specific track">
+                    <input type="text" formControlName="searchText" class="w-100" placeholder="Search for a specific split sheet" (input)="searchChanges()">
                 </div>
             </div>
         </div>
@@ -18,33 +18,43 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (item of splitSheets; track item) {
-                        <tr>
-                        <td>
-                            <div class="d-flex-align-center">
-                                <div>
-                                    <img src="assets/images/others/track-bg.jpg" height="36" width="36"
-                                        class="radius-5" />
+                    @if (!sheetLoading) {
+                        @for (item of splitSheets; track item) {
+                            <tr>
+                            <td>
+                                <div class="d-flex-align-center">
+                                    <div>
+                                        <img src="assets/images/others/track-bg.jpg" height="36" width="36"
+                                            class="radius-5" />
+                                    </div>
+                                    <div class="ms-2">
+                                        <span class="d-block">{{ item.track_name }}</span>
+                                        <span class="text-light-gray small"></span>
+                                    </div>
                                 </div>
-                                <div class="ms-2">
-                                    <span class="d-block">{{ item.track_name }}</span>
-                                    <span class="text-light-gray small"></span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="tb-pill">Pending</span>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-darkgrey light-gray-border" (click)="goToPreview(item.track)">
-                                <img src="assets/images/icons/eye.svg" alt="side_icon" width="16" height="16">
-                            </button>
-                        </td>
-                        </tr>
-                    } @empty {
+                            </td>
+                            <td>
+                                <span class="tb-pill">Pending</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-darkgrey light-gray-border" (click)="goToPreview(item.track)">
+                                    <img src="assets/images/icons/eye.svg" alt="side_icon" width="16" height="16">
+                                </button>
+                            </td>
+                            </tr>
+                        } @empty {
+                            <tr>
+                                <td class="text-center" colspan="3">
+                                    No data available
+                                </td>
+                            </tr>
+                        }
+                    }  @else {
                         <tr>
-                            <td class="text-center" colspan="3">
-                                No data available
+                            <td colspan="7">
+                                <div class="d-flex-center">
+                                    <div class="loader"></div>
+                                </div>
                             </td>
                         </tr>
                     }

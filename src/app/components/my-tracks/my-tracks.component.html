@@ -76,9 +76,9 @@
                 <acrylic-custom-dropdown placeholder="Assigned Tags" class="my-track-select-box"></acrylic-custom-dropdown>
             </div>
             <div class="col-xxl-4 col-xl-3">
-                <div class="acr-input-group">
+                <div class="acr-input-group" [formGroup]="searchForm">
                     <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
-                    <input type="text" placeholder="Search for a specific track">
+                    <input type="text" formControlName="searchText" class="w-100" placeholder="Search for a specific track" (input)="searchChanges()">
                 </div>
             </div>
             <div class="offset-xl-1 col d-flex gap-2 text-nowrap">
@@ -148,6 +148,7 @@
                             </tr>
                         }
                 </tbody> -->
+                @if (!trackLoading) {
                 <tbody>
                     @for(item of trackList; track item) {
                     <tr>
@@ -205,6 +206,15 @@
                         </tr>
                     }
                 </tbody>
+                } @else {
+                    <tr>
+                        <td colspan="7">
+                            <div class="d-flex-center">
+                                <div class="loader"></div>
+                            </div>
+                        </td>
+                    </tr>
+                }
             </table>
         </div>
     </div>
