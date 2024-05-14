@@ -1,21 +1,22 @@
+@if (reviewObject) {
 <div class="split-sheet w-100 send-mode">
     <div class="acr-box mb-3">
         <div>
             <div class="mb-3">
                 <p class="mb-1 text-light-gray">ISRC Code:</p>
-                <p class="mb-0">{{reviewObject.isrcCode}}</p>
+                <p class="mb-0">{{reviewObject.trackData?.isrc}}</p>
             </div>
 
             <div class="acr-box bg-darkgrey p-3 mb-3">
                 <div class="d-flex-align-center">
                     <div>
-                        <img src="assets/images/others/track-bg.jpg" height="70" width="70" alt="track-img"
+                        <img [src]="reviewObject.trackData?.cover_image" height="70" width="70" alt="track-img"
                             class="radius-5 me-2" />
                     </div>
                     <div>
-                        <p class="fw-semibold mb-0">Track Name</p>
-                        <p class="mb-0">Artist Name</p>
-                        <p class="small text-light-gray mb-0">2:43</p>
+                        <p class="fw-semibold mb-0">{{ reviewObject.trackData?.name }}</p>
+                        <p class="mb-0">{{ reviewObject.trackData?.artist }}</p>
+                        <p class="small text-light-gray mb-0">{{ formatTime(reviewObject.trackData?.duration) }}</p>
                     </div>
                 </div>
             </div>
@@ -79,3 +80,4 @@
     </div>
 
 </div>
+}

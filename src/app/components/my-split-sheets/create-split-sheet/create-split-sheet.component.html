@@ -1,36 +1,8 @@
 <div class="split-sheet edit-view-mode">
     <form [formGroup]="createSplitSheetForm">
-        <!-- ISRC -->
-        <!-- <div class="acr-box mb-3">
-            <div>
-                <label class="acr-input-label">Your Track ISRC Code</label>
-                <input type="text" [formControlName]="'isrcCode'" class="form-control acr-input" placeholder="ISRC Code"
-                    autocomplete="off">
-                @if (createSplitSheetForm.get('isrcCode')?.errors?.['pattern']) {
-                <div class="text-danger mb-1">
-                    Please enter valid ISRC code.
-                </div>
-                }
-                <div class="acr-box bg-darkgrey p-3 mb-3">
-                    <div class="d-flex-align-center">
-                        <div>
-                            <img src="assets/images/others/track-bg.jpg" height="70" width="70" alt="track-img"
-                                class="radius-5 me-2" />
-                        </div>
-                        <div>
-                            <p class="fw-semibold mb-0">Track Name</p>
-                            <p class="mb-0">Artist Name</p>
-                            <p class="small text-light-gray mb-0">2:43</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div> -->
-
         <div class="acr-box mb-3">
-            <acrylic-custom-dropdown [title]="'Tracks'" [inputValue]="createSplitSheetForm.get('name')?.value"
-                [values]="splitNames" (dropdownSelected)="splitSheetSelected($event)"></acrylic-custom-dropdown>
+            <acrylic-custom-dropdown [loading]="trackLoading" [title]="'Tracks'" [inputValue]="createSplitSheetForm.get('name')?.value"
+                [values]="splitNames" (searchChanged)="searchTrack($event)" (dropdownSelected)="splitSheetSelected($event)"></acrylic-custom-dropdown>
         </div>
 
         <!-- EMail -->
