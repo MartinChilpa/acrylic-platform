@@ -13,3 +13,11 @@
 .card-beige-border {
     border: 1px solid var(--beige-color);
 }
+
+.bl-info{
+    border-left: 3px solid var(--info-color);
+}
+
+.bl-danger{
+    border-left: 3px solid var(--danger-color);
+}

@@ -1,5 +1,5 @@
     <div class="acr-box">
-            <h5 class="fw-semibold mb-2">My Documents</h5>
+            <h6 class="mb-3">My Documents</h6>
             <!-- <div class="bg-darkgrey p-3">
                 <h5 class="fw-semibold mb-2 d-flex-align-center"><span>Documents Required</span>
                     <span class="ms-2 pill-count radius-5">2</span>
@@ -16,19 +16,29 @@
                     <button class="btn btn-lg btn-lightgray light-gray-border">Upload Document</button>
                 </div>
             </div> -->
-            @for (item of documents; track item) {
-                <div class="bg-darkgrey acr-box mb-2 mt-2">
-                    <div class="d-flex-between">
-                        <p>{{ item.name }}</p>
-                        <div class="d-flex">
-                            <a [href]="item.document" target="_blank" class="btn btn-sm btn-darkgrey light-gray-border">
-                                <img src="assets/images/icons/eye.svg" alt="side_icon" width="16" height="16">
-                            </a>
-                            <button acrylicFileDownload [appFileDownload]="item.document" class="btn btn-sm btn-darkgrey light-gray-border ms-2">
-                                <img src="assets/images/icons/download.svg" alt="side_icon" width="16" height="16">
-                            </button>
+            @if(documents && documents.length > 0){
+                @for (item of documents; track item) {
+                    <div class="bg-darkgrey acr-box mb-2 mt-2 bl-info">
+                        <div class="d-flex-between">
+                            <p>{{ item.name }}</p>
+                            <div class="d-flex">
+                                <a [href]="item.document" target="_blank" class="btn btn-sm btn-darkgrey light-gray-border">
+                                    <img src="assets/images/icons/eye.svg" alt="side_icon" width="16" height="16">
+                                </a>
+                                <button acrylicFileDownload [appFileDownload]="item.document" class="btn btn-sm btn-darkgrey light-gray-border mx-2">
+                                    <img src="assets/images/icons/download.svg" alt="side_icon" width="16" height="16">
+                                </button>
+                                <button class="btn btn-sm btn-darkgrey light-gray-border" (click)="deleteDocument(item.uuid)">
+                                    <img [src]="'assets/images/icons/delete.svg'" height="15" width="15" />
+                                </button>
+                            </div>
                         </div>
                     </div>
+                }
+            }
+            @else {
+                <div class="bg-darkgrey acr-box mb-2 mt-2 bl-danger">
+                    <p>No documents were found.</p>
                 </div>
             }
     </div>

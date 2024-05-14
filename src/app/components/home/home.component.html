@@ -5,12 +5,14 @@
                 @for(item of homeDataList; track item) {
                     <div class="col-12" [ngClass]="['col-md-' + calculateColumnSizes(homeDataList.length)[$index]]">
                         <div>
-                            <a [href]="item.url">
+                            <a [href]="item.url" target="_blank">
                                 <img [src]="item.image" class="img-card object-fit-cover" height="200"/>
                             </a>
                             <div class="my-md-3 my-2">
                                 <div>{{ item.title }}</div>
-                                <small class="text-info-success pt-2">{{ item.link_text }}</small>
+                                <a [href]="item.url" target="_blank" class="text-decoration-none">
+                                    <small class="text-info-success pt-2">{{ item.link_text }}</small>
+                                </a>
                             </div>
                         </div>
                     </div>
