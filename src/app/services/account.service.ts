@@ -41,4 +41,7 @@ export class AccountService {
     return this.http.get<IDocuments>(`${this.ACCOUNT_API_URL}/documents/`);
   }
 
+  deleteDocument(uuid: string) {
+    return this.http.delete(`${this.ACCOUNT_API_URL}/documents/${uuid}`);
+  }
 }
