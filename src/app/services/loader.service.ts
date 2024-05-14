@@ -5,4 +5,5 @@ import { Injectable, signal } from '@angular/core';
 })
 export class LoaderService {
   public isLoading = signal(false);
+  public hideLoading = signal(false);
 }

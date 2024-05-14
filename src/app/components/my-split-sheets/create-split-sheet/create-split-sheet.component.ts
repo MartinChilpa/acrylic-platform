@@ -6,6 +6,8 @@ import { IDistributorsResult } from '../../../interfaces/response/distributor.re
 import { AlertService } from '../../../services/alert.service';
 import { NavigationService } from '../../../services/navigation.service';
 import { DistributorsService } from '../../../services/distributors.service';
+import { MyArtistService } from '../../../services/my-artist.service';
+import { LoaderService } from '../../../services/loader.service';
 
 @Component({
   selector: 'acrylic-create-split-sheet',
@@ -20,19 +22,17 @@ export class CreateSplitSheetComponent implements OnInit {
   @Output() reviewSheetData = new EventEmitter()
   total: number = 100;
 
-  splitNames: any[] = [
-    { name: "Track Name 1", text: 'Dec 25, 2024, 6:44 PM' },
-    { name: "Track Name 2", text: 'Dec 25, 2024, 6:44 PM' },
-    { name: "Track Name 3", text: 'Dec 25, 2024, 6:44 PM' },
-    { name: "Track Name 4", text: 'Dec 25, 2024, 6:44 PM' },
-    { name: "Track Name 5", text: 'Dec 25, 2024, 6:44 PM' },
-  ]
+  trackLoading: boolean = false
+
+  splitNames: any[] = []
 
   distributors!: IDistributorsResult[];
 
   private _alertService = inject(AlertService);
   private _navigationService = inject(NavigationService)
   private _distributorService = inject(DistributorsService)
+  private _myArtistService = inject(MyArtistService)
+  private _loadingService = inject(LoaderService);
 
   get publishing_splits(): FormArray {
     return this.createSplitSheetForm.get('publishing_splits') as FormArray;
@@ -46,12 +46,35 @@ export class CreateSplitSheetComponent implements OnInit {
     this.getDistributors()
   }
 
+  searchTrack(searchString: string) {
+    if (!searchString) {
+      this.splitNames = []
+      return;
+    }
+    this._loadingService.hideLoading.set(true)
+    this.trackLoading = true
+    this._myArtistService.searchTracks(searchString).subscribe({
+      next: response => {
+        this.splitNames = response.map(x => ({
+          name: x.name,
+          text: x.released,
+          uuid: x.uuid
+        }))
+      },
+      complete: () => {
+        this.trackLoading = false
+        this._loadingService.hideLoading.set(false)
+      }
+    })
+  }
+
   dropdownSelected($event: any) {
     this.createSplitSheetForm.get('email')?.setValue($event.uuid);
   }
 
   splitSheetSelected($event: any) {
     this.createSplitSheetForm.get('name')?.setValue($event.name);
+    this.createSplitSheetForm.get('track')?.setValue($event.uuid);
   }
 
   getDistributors() {
