@@ -3,6 +3,8 @@ import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, 
 import { FormGroup } from '@angular/forms';
 import { MyArtistService } from '../../../services/my-artist.service';
 import { IMyArtist } from '../../../interfaces/response/my-artist.response';
+import { SpotifyService } from '../../../services/spotify.service';
+import { ISpotify } from '../../../interfaces/response/spotify.response';
 
 @Component({
   selector: 'acrylic-upload-step-4',
@@ -21,6 +23,9 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   coverImage: string = ''
   duration: string = ''
 
+  trackInfo!: ISpotify
+
+  private _spotifyService = inject(SpotifyService)
   private _myArtistService = inject(MyArtistService);
   myArtist: IMyArtist | undefined | null;
 
@@ -48,8 +53,17 @@ export class UploadStep4Component implements OnInit, OnDestroy {
         this.coverImage = URL.createObjectURL(coverImage)
       }
     }
-
+    this.getTrackPreview()
     this.audioInit()
+  }
+
+  getTrackPreview() {
+    this._spotifyService.getTrack(this.form.get('isrc')?.value).subscribe({
+      next: response => {
+        this.trackInfo = response
+        this.formatTime(this.trackInfo.duration)
+      }
+    })
   }
 
   playSnippet() {
@@ -78,7 +92,7 @@ export class UploadStep4Component implements OnInit, OnDestroy {
     audio.onloadedmetadata = () => {
       URL.revokeObjectURL(audio.src);
       this.form.get('duration')?.setValue(parseInt(`${audio.duration}`));
-      this.formatTime(audio.duration)
+      // this.formatTime(audio.duration)
     };
     audio.src = this.snippet;
   }

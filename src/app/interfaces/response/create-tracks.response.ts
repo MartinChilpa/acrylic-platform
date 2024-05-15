@@ -25,4 +25,5 @@ export interface ICreateTracks {
     file_wav: any
     file_mp3: any
     distributor: any
+    other_distributor: string
 }

@@ -27,18 +27,20 @@ export class UploadStep3Component {
   private _myArtistService = inject(MyArtistService)
 
   nextUploadStepper(count: number) {
-    if (typeof this.form.get('snippet')?.value == 'string') {
-      this.nextStepper.emit(count);
-    } else {
-      this.addUpdateTracks(count);
-    }
+    this.addUpdateTracks(count);
   }
 
   addUpdateTracks(count: number) {
+    const data = this.form.value
+    if (data.other_distributor) {
+      data.distributor = ''
+    } else {
+      data.other_distributor = ''
+    }
     const formData = new FormData();
     const fileKeys = ['cover_image', 'file_mp3', 'file_wav', 'snippet']
-    Object.keys(this.form.value).forEach(item => {
-      const value = this.form.value[item]
+    Object.keys(data).forEach(item => {
+      const value = data[item]
       if (!fileKeys.includes(item)) {
         formData.append(item, value);
       }

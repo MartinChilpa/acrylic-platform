@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="light-gray-table-border rounded-2 table-responsive mt-4">
-            <table class="acrylic-table">
+            <table class="acrylic-table" >
                 <thead>
                     <tr>
                         <th scope="col">Track Name</th>
@@ -50,6 +50,8 @@
                     } 
                 </tbody>
             </table>
+            <acrylic-pagination [tableData]="splitSheets" [totalPages]="totalCount" (pageChange)="onPageChange($event)">
+              </acrylic-pagination>
         </div>
     </div>
 </section>

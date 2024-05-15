@@ -34,15 +34,16 @@ export class UploadStep2Component implements OnInit {
       next: response => {
         this.distributors = response.results;
         this.distributors.push({
-          name: "Other"
+          name: "Other",
+          uuid: "Other"
         });
       }
     })
   }
 
   dropdownSelected($event: any) {
-    if($event.name == "Other"){
-      
+    if ($event.name != "Other") {
+      this.form.get('other_distributor')?.setValue('');
     }
     this.form.get('distributor')?.setValue($event.uuid);
   }

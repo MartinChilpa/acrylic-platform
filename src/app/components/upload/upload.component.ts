@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ComponentRef, OnInit, ViewChild, ViewContainerRef, inject } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, OnInit, ViewChild, ViewContainerRef, inject, ChangeDetectorRef } from '@angular/core';
 import { UploadStep2Component } from './upload-step-2/upload-step-2.component';
 import { UploadStep3Component } from './upload-step-3/upload-step-3.component';
 import { UploadStep4Component } from './upload-step-4/upload-step-4.component';
@@ -14,7 +14,7 @@ import { ActivatedRoute } from '@angular/router';
   standalone: true,
   imports: [NgClass, NgOptimizedImage, ReactiveFormsModule, UploadStep2Component, UploadStep3Component, UploadStep4Component, UploadStep5Component],
   templateUrl: './upload.component.html',
-  styleUrl: './upload.component.scss'
+  styleUrl: './upload.component.scss',
 })
 export class UploadComponent implements OnInit, AfterViewInit {
   @ViewChild('acrylicUploadRef', { static: true, read: ViewContainerRef }) acrylicUploadRef!: ViewContainerRef;
@@ -22,6 +22,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
   activeStepper: number = 1;
   uploadStepperList = ['General Information', 'Upload assets', 'Preview & Confirm', 'Set your prices'];
   uploadTrackForm!: FormGroup;
+  private _changeDetector: ChangeDetectorRef = inject(ChangeDetectorRef);
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   private _modalService = inject(ModalService);
@@ -47,8 +48,9 @@ export class UploadComponent implements OnInit, AfterViewInit {
       snippet: ['', Validators.required],
       file_wav: ['', Validators.required],
       file_mp3: [''],
-      distributor: ['', Validators.required],
+      distributor: [''],
       tags: [],
+      other_distributor: ['']
     });
     if (this.uploadTrackId) {
       this.getTrackById()
@@ -57,6 +59,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.loadComponent(this.activeStepper);
+    this._changeDetector.detectChanges();
   }
 
   getTrackById() {
@@ -80,7 +83,11 @@ export class UploadComponent implements OnInit, AfterViewInit {
           file_mp3: response.file_mp3,
           distributor: response.distributor,
           tags: response.tags,
+          other_distributor: response.other_distributor
         })
+        if (response.other_distributor) {
+          this.uploadTrackForm.get('distributor')?.setValue('Other');
+        }
       }
     })
   }
