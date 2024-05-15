@@ -68,100 +68,36 @@
         </div>
     </div>
     <div class="acr-box mt-4">
-        <div class="row g-2 mb-2 align-items-center">
-            <div class="col">
-                <acrylic-custom-dropdown placeholder="Release Date" class="my-track-select-box"></acrylic-custom-dropdown>
-            </div>
-            <div class="col">
-                <acrylic-custom-dropdown placeholder="Assigned Tags" class="my-track-select-box"></acrylic-custom-dropdown>
-            </div>
-            <div class="col-xxl-4 col-xl-3">
+        <div class="row mb-3">
+            <div class="col-xxl-4 col-xl-3 col-md-6">
                 <div class="acr-input-group" [formGroup]="searchForm">
                     <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
                     <input type="text" formControlName="searchText" class="w-100" placeholder="Search for a specific track" (input)="searchChanges()">
                 </div>
             </div>
-            <div class="offset-xl-1 col d-flex gap-2 text-nowrap">
-                <button class="btn btn-lg btn-warning">Assign Prices</button>
-                <button class="btn btn-lg btn-info" (click)="_navigationService.navigateToUploadTrack()">Upload Track</button>
+            <div class="col-xxl-8 col-xl-9 col-md-6 d-flex justify-content-end">
+                <button class="btn me-1 btn-info" (click)="_navigationService.navigateToUploadTrack()">Upload Track</button>
             </div>
         </div>
-        <div class="light-gray-table-border rounded-2 table-responsive mt-4 mt-xl-0">
+        <div class="light-gray-table-border rounded-2 table-responsive">
             <table class="acrylic-table">
                 <thead>
                     <tr>
                         <th scope="col">Track Name</th>
-                        <th scope="col">Total Track Uses</th>
                         <th scope="col">Assigned Tags</th>
-                        <th scope="col" class="price-tag">Price Tag</th>
+                        <th scope="col">Price Tag</th>
                         <th scope="col">Popular Tags</th>
                         <th scope="col">Release Date</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
-                <!-- <tbody>
-                        @for(item of myTracksTableList; track item) {
-                            <tr>
-                                <td>
-                                    <div class="d-flex-align-center gap-2">
-                                        <img [ngSrc]="item.trackImage" height="36" width="36" class="radius-5" />
-                                        <span>{{ item.name }}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="mt-2">
-                                        <span>{{ item.totalTrack.totalUsers }}</span>
-                                        <span class="text-success ps-1">{{ item.totalTrack.totalPercentage }}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        @for(assignedTag of item.assignedTags; track assignedTag) {
-                                        <span class="bg-light-gray px-2 py-1 radius-5">{{ assignedTag }}</span>
-                                        }
-                                    </div>
-                                </td>
-                                <td class="text-nowrap">
-                                    <div class="mt-2">
-                                        <div class="clip-path-tag radius-5 p-2 d-flex-align-center gap-2" [ngClass]="item.priceTag.bgClass">
-                                            <img [ngSrc]="item.priceTag.picture" height="20" width="15"/>
-                                            <span>{{ item.priceTag.priceTageName }}</span>
-                                            <span class="d-inline-block height-15px width-15px bg-primary rounded-circle"></span>
-                                        </div>
-                                        <span class="text-light-gray small">{{ item.priceTag.priceStartDate }} - </span>
-                                        <span class="text-light-gray small">{{ item.priceTag.priceEndDate }}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        @for(popularTag of item.popularTags; track popularTag) {
-                                        <span class="bg-light-gray px-2 py-1 radius-5">{{ popularTag }}</span>
-                                        }
-                                    </div>
-                                </td>
-                                <td class="text-nowrap">
-                                    <span>{{ item.releaseDate }}</span>
-                                </td>
-                                <td class="text-nowrap">
-                                    <button class="btn btn-sm btn-darkgrey light-gray-border">{{ item.trackStatus }}</button>
-                                </td>
-                            </tr>
-                        }
-                </tbody> -->
-                @if (!trackLoading) {
                 <tbody>
                     @for(item of trackList; track item) {
                     <tr>
                         <td>
-                            <div class="d-flex-align-center gap-2">
+                            <div class="d-md-flex align-items-md-center gap-2">
                                 <img [src]="item.cover_image" height="36" width="36" class="radius-5" />
-                                <span>{{ item.name }}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="mt-2">
-                                <span>{{ 0 }}</span>
-                                <span class="text-success ps-1">{{ '+1%' }}</span>
+                                <div>{{ item.name }}</div>
                             </div>
                         </td>
                         <td>
@@ -172,15 +108,10 @@
                             </div>
                         </td>
                         <td class="text-nowrap">
-                            <div class="mt-2">
-                                <div class="clip-path-tag radius-5 p-2 d-flex-align-center gap-2" [ngClass]="'bg-info'">
-                                    <img [ngSrc]="'assets/images/others/beat.png'" height="20" width="15" />
-                                    <span>{{ 'Basic' }}</span>
-                                    <span
-                                        class="d-inline-block height-15px width-15px bg-primary rounded-circle"></span>
-                                </div>
-                                <span class="text-light-gray small">{{ 'Feb 6, 2024' }} - </span>
-                                <span class="text-light-gray small">{{ 'Feb 6, 2024' }}</span>
+                            <div class="clip-path-tag radius-5 p-2 d-flex-align-center gap-2" [ngClass]="'bg-lightgray-border'">
+                                <img [ngSrc]="'assets/images/others/beat.png'" height="20" width="15" />
+                                <span>{{ 'Basic' }}</span>
+                                <span class="d-inline-block height-15px width-15px bg-secondary rounded-circle"></span>
                             </div>
                         </td>
                         <td>
@@ -190,12 +121,12 @@
                                 }
                             </div>
                         </td>
-                        <td class="text-nowrap">
+                        <td>
                             <span>{{ item.released }}</span>
                         </td>
-                        <td class="text-nowrap">
-                            <button class="btn btn-sm btn-darkgrey light-gray-border" (click)="openTrack(item.uuid)">{{
-                                'Open Track' }}</button>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-warning me-md-3 me-2" (click)="openTrack(item.uuid)">Assign Price</button>
+                            <button class="btn btn-sm btn-acrylic" (click)="openTrack(item.uuid)">Edit Track</button>
                         </td>
                     </tr>
                     }  @empty {
@@ -206,15 +137,6 @@
                         </tr>
                     }
                 </tbody>
-                } @else {
-                    <tr>
-                        <td colspan="7">
-                            <div class="d-flex-center">
-                                <div class="loader"></div>
-                            </div>
-                        </td>
-                    </tr>
-                }
             </table>
         </div>
     </div>

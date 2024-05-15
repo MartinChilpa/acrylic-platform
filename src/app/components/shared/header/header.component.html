@@ -21,13 +21,13 @@
                         </div> -->
                         <!-- <span class="mx-2">|</span> -->
                         @if(_myArtistService.myArtist()?.image){
-                            <button class="btn btn-sm btn-darkgrey p-0" [routerLink]="['/my-profile']" title="Profile">
-                                <img [ngSrc]="_myArtistService.myArtist()!.image" width="30" height="30">
-                            </button>
+                            <a [routerLink]="['/my-profile']" title="Profile">
+                                <img [ngSrc]="_myArtistService.myArtist()!.image" width="36" height="36">
+                            </a>
                             <span class="mx-2">|</span>
                         }
-                        <button class="btn btn-sm btn-darkgrey" title="Sign Out" (click)="signOut();">
-                            <img ngSrc="assets/images/icons/signout.svg" width="17" height="17">
+                        <button class="btn btn-sm btn-acrylic" title="Sign Out" (click)="signOut();">
+                            <img ngSrc="assets/images/icons/signout.svg" width="16" height="16">
                         </button>
                     </div>   
                 }

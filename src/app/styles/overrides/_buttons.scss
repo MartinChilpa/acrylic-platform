@@ -6,6 +6,16 @@
     border: none;
 }
 
+.btn-sm{
+    font-size: 13px !important;
+}
+
+.btn-acrylic {
+    background: var(--darkgrey-color) !important;
+    color: var(--text-color) !important;
+    border: 0.3px solid var(--light-gray-border-color) !important;
+}
+
 .btn-warning{
     background: var(--warning-color) !important;
     color: var(--text-color) !important;
@@ -16,7 +26,7 @@
     color: var(--text-color) !important;
 }
 
-.btn-darkgrey{
+.btn-darkgrey {
     background: var(--darkgrey-color) !important;
     color: var(--text-color) !important;
 }

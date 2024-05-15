@@ -32,12 +32,18 @@ export class UploadStep2Component implements OnInit {
   getDistributors() {
     this._distributorService.getDistributorList().subscribe({
       next: response => {
-        this.distributors = response.results
+        this.distributors = response.results;
+        this.distributors.push({
+          name: "Other"
+        });
       }
     })
   }
 
   dropdownSelected($event: any) {
+    if($event.name == "Other"){
+      
+    }
     this.form.get('distributor')?.setValue($event.uuid);
   }
 }

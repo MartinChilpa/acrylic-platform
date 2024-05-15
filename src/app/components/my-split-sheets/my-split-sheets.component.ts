@@ -17,7 +17,6 @@ export class MySplitSheetsComponent implements OnInit {
 
   splitSheets!: ISplitSheetResult[]
   searchForm!: FormGroup;
-  sheetLoading: boolean = false;
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService)
   private _navigationService = inject(NavigationService)
@@ -37,15 +36,9 @@ export class MySplitSheetsComponent implements OnInit {
   }
 
   getSplitSheets() {
-    this.sheetLoading = true
-    this._loadingService.hideLoading.set(true)
     this._myArtistService.getSplitSheet(this.searchForm.get('searchText')?.value).subscribe({
       next: response => {
         this.splitSheets = response.results
-      },
-      complete: () => {
-        this.sheetLoading = false
-        this._loadingService.hideLoading.set(false)
       }
     })
   }

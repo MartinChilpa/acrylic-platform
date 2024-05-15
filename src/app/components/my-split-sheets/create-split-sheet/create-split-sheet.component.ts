@@ -1,11 +1,9 @@
 import { NgClass } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
-import { IDistributorsResult } from '../../../interfaces/response/distributor.response';
 import { AlertService } from '../../../services/alert.service';
 import { NavigationService } from '../../../services/navigation.service';
-import { DistributorsService } from '../../../services/distributors.service';
 import { MyArtistService } from '../../../services/my-artist.service';
 import { LoaderService } from '../../../services/loader.service';
 
@@ -16,21 +14,17 @@ import { LoaderService } from '../../../services/loader.service';
   templateUrl: './create-split-sheet.component.html',
   styleUrl: './create-split-sheet.component.scss'
 })
-export class CreateSplitSheetComponent implements OnInit {
+export class CreateSplitSheetComponent {
   @Input() createSplitSheetForm!: FormGroup;
   @Input() reviewObject!: any;
   @Output() reviewSheetData = new EventEmitter()
+
   total: number = 100;
-
   trackLoading: boolean = false
-
   splitNames: any[] = []
-
-  distributors!: IDistributorsResult[];
 
   private _alertService = inject(AlertService);
   private _navigationService = inject(NavigationService)
-  private _distributorService = inject(DistributorsService)
   private _myArtistService = inject(MyArtistService)
   private _loadingService = inject(LoaderService);
 
@@ -42,16 +36,12 @@ export class CreateSplitSheetComponent implements OnInit {
     return this.createSplitSheetForm.get('master_splits') as FormArray;
   }
 
-  ngOnInit(): void {
-    this.getDistributors()
-  }
-
   searchTrack(searchString: string) {
     if (!searchString) {
       this.splitNames = []
       return;
     }
-    this._loadingService.hideLoading.set(true)
+    this._loadingService.hideLoading.set(true);
     this.trackLoading = true
     this._myArtistService.searchTracks(searchString).subscribe({
       next: response => {
@@ -62,8 +52,7 @@ export class CreateSplitSheetComponent implements OnInit {
         }))
       },
       complete: () => {
-        this.trackLoading = false
-        this._loadingService.hideLoading.set(false)
+        this.trackLoading = false;
       }
     })
   }
@@ -75,14 +64,6 @@ export class CreateSplitSheetComponent implements OnInit {
   splitSheetSelected($event: any) {
     this.createSplitSheetForm.get('name')?.setValue($event.name);
     this.createSplitSheetForm.get('track')?.setValue($event.uuid);
-  }
-
-  getDistributors() {
-    this._distributorService.getDistributorList().subscribe({
-      next: response => {
-        this.distributors = response.results
-      }
-    })
   }
 
   onPercentChange(event: any, index: number, controlName: string) {
