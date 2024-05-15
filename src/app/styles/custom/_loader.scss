@@ -1,28 +1,16 @@
 .loader {
-    border: 5px solid var(--light-gray-table-border-color);
+    border: 3px solid var(--warning-color);
     border-radius: 50%;
-    border-top: 5px solid var(--light-gray-border-color);
-    width: 20px;
-    height: 20px;
-    -webkit-animation: spin 2s linear infinite;
-    animation: spin 2s linear infinite;
-}
-
-@-webkit-keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
+    border-top: 3px solid transparent;
+    width: 18px;
+    height: 18px;
+    animation: spin .7s linear infinite;
 }
 
 @keyframes spin {
     0% {
         transform: rotate(0deg);
     }
-
     100% {
         transform: rotate(360deg);
     }

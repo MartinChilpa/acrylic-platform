@@ -1,15 +1,8 @@
 <div class="split-sheet edit-view-mode">
     <form [formGroup]="createSplitSheetForm">
         <div class="acr-box mb-3">
-            <acrylic-custom-dropdown [loading]="trackLoading" [title]="'Tracks'" [inputValue]="createSplitSheetForm.get('name')?.value"
+            <acrylic-custom-dropdown [loading]="trackLoading" [title]="'Your Track'" [placeholder]="'Track'" [noDataLabel]="'No matching tracks found'" [inputValue]="createSplitSheetForm.get('name')?.value"
                 [values]="splitNames" (searchChanged)="searchTrack($event)" (dropdownSelected)="splitSheetSelected($event)"></acrylic-custom-dropdown>
-        </div>
-
-        <!-- EMail -->
-        <div class="acr-box mb-3">
-            <acrylic-custom-dropdown [title]="'Name Of Distributor Or Label Contact'"
-                [inputValue]="createSplitSheetForm.get('email')?.value" [values]="distributors"
-                (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
         </div>
 
         <!-- Publish -->
@@ -42,7 +35,7 @@
                         </div>
                     </div>
                     <div class="col-md-1 col-3 d-flex-center" [ngClass]="{'d-none': i == 0}">
-                        <button class="btn btn-sm btn-darkgrey py-2" (click)="removePublishSplits(i)">
+                        <button class="btn btn-sm btn-acrylic py-2" (click)="removePublishSplits(i)">
                             <img [src]="'assets/images/icons/delete.svg'" height="20" width="20" />
                         </button>
                     </div>
@@ -99,7 +92,7 @@
                         </div>
                     </div>
                     <div class="col-md-1 col-3 d-flex-center" [ngClass]="{'d-none': i == 0}">
-                        <button class="btn btn-sm btn-darkgrey py-2" (click)="removeMasterSplits(i)">
+                        <button class="btn btn-sm btn-acrylic py-2" (click)="removeMasterSplits(i)">
                             <img [src]="'assets/images/icons/delete.svg'" height="20" width="20" />
                         </button>
 
@@ -132,7 +125,7 @@
         <!-- Review -->
         <div class="mb-4">
             <div class="d-flex-center gap-2">
-                <button class="btn btn-darkgrey px-4 px-lg-5 py-2 light-gray-border" (click)="navigateToHome()">
+                <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border" (click)="navigateToHome()">
                     Back
                 </button>
                 <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" (click)="reviewSheet()"

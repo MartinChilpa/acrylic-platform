@@ -6,7 +6,6 @@ import { NavigationService } from '../../services/navigation.service';
 import { CustomDropdownComponent } from '../shared/custom-dropdown/custom-dropdown.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subject, debounceTime } from 'rxjs';
-import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'acrylic-my-tracks',
@@ -25,11 +24,9 @@ export class MyTracksComponent implements OnInit {
   ]
   trackList: ICreateTracks[] = []
   searchForm!: FormGroup;
-  trackLoading: boolean = false;
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   public _navigationService = inject(NavigationService);
-  private _loadingService = inject(LoaderService);
   private debounceSubject: Subject<void> = new Subject<void>();
 
   ngOnInit(): void {
@@ -49,17 +46,11 @@ export class MyTracksComponent implements OnInit {
   }
 
   getTracks() {
-    this.trackLoading = true
-    this._loadingService.hideLoading.set(true)
     this._myArtistService.searchTracks(this.searchForm.get('searchText')?.value).subscribe({
       next: response => {
         this.trackList = response
-      },
-      complete: () => {
-        this.trackLoading = false
-        this._loadingService.hideLoading.set(false)
       }
-    })
+    });
   }
 
   openTrack(id: string) {

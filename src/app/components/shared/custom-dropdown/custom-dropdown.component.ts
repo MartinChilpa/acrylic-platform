@@ -13,12 +13,13 @@ import { Subject, debounce, debounceTime } from 'rxjs';
   styleUrl: './custom-dropdown.component.scss'
 })
 export class CustomDropdownComponent implements OnInit, OnChanges {
-  @Input() inputValue: string = ''
-  @Input() title: string = ''
-  @Input() placeholder: string = 'Choose or search'
-  @Input() values: any[] = []
-  @Input() showSearch: boolean = true
-  @Input() loading: boolean = false
+  @Input() inputValue: string = '';
+  @Input() title: string = '';
+  @Input() placeholder: string = 'Choose or search';
+  @Input() values: any[] = [];
+  @Input() showSearch: boolean = true;
+  @Input() loading: boolean = false;
+  @Input() noDataLabel: string = "No data available";
   @Output() dropdownSelected = new EventEmitter();
   @Output() searchChanged = new EventEmitter<string>();
 

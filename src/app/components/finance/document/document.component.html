@@ -22,13 +22,13 @@
                         <div class="d-flex-between">
                             <p>{{ item.name }}</p>
                             <div class="d-flex">
-                                <a [href]="item.document" target="_blank" class="btn btn-sm btn-darkgrey light-gray-border">
+                                <a [href]="item.document" target="_blank" class="btn btn-sm btn-acrylic">
                                     <img src="assets/images/icons/eye.svg" alt="side_icon" width="16" height="16">
                                 </a>
-                                <button acrylicFileDownload [appFileDownload]="item.document" class="btn btn-sm btn-darkgrey light-gray-border mx-2">
+                                <button acrylicFileDownload [appFileDownload]="item.document" class="btn btn-sm btn-acrylic mx-2">
                                     <img src="assets/images/icons/download.svg" alt="side_icon" width="16" height="16">
                                 </button>
-                                <button class="btn btn-sm btn-darkgrey light-gray-border" (click)="deleteDocument(item.uuid)">
+                                <button class="btn btn-sm btn-acrylic" (click)="deleteDocument(item.uuid)">
                                     <img [src]="'assets/images/icons/delete.svg'" height="15" width="15" />
                                 </button>
                             </div>
