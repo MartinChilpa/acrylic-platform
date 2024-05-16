@@ -27,11 +27,17 @@
                     @for (item of reviewObject.publishing_splits; let i = $index; track item)
                     {
                     <div class="row small mb-1">
-                        <div class="col-5">
+                        <div class="col-3">
                             {{item.name}}
                         </div>
-                        <div class="col-5">
+                        <div class="col-3">
                             {{item.email}}
+                        </div>
+                        <div class="col-2">
+                            {{item.legal_name}}
+                        </div>
+                        <div class="col-2">
+                            {{item.role}}
                         </div>
                         <div class="col-2 text-info">
                             {{item.percent}}%
@@ -46,11 +52,17 @@
                     @for (item of reviewObject.master_splits; let i = $index; track item)
                     {
                     <div class="row small mb-1">
-                        <div class="col-5">
+                        <div class="col-3">
                             {{item.name}}
                         </div>
-                        <div class="col-5">
+                        <div class="col-3">
                             {{item.email}}
+                        </div>
+                        <div class="col-2">
+                            {{item.legal_name}}
+                        </div>
+                        <div class="col-2">
+                            {{item.role}}
                         </div>
                         <div class="col-2 text-info">
                             {{item.percent}}%

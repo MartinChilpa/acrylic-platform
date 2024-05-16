@@ -1,3 +1,5 @@
+import { ICreateTracks } from "./create-tracks.response"
+
 export interface ISplitSheet {
     count: number
     next: any
@@ -6,7 +8,7 @@ export interface ISplitSheet {
 }
 
 export interface ISplitSheetResult {
-    track: string
+    track: ICreateTracks
     track_name: string
     signed: any
     signature_request_id: string

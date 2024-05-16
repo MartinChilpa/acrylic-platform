@@ -13,11 +13,11 @@
                 @for (publishingGroup of publishing_splits.controls; let i = $index; track publishingGroup)
                 {
                 <div class="row g-2" [formGroupName]="i">
-                    <div class="col-md-3 col-12">
+                    <div class="col-md-2 col-12">
                         <input type="text" formControlName="name" class="form-control acr-input" placeholder="Full Name"
                             autocomplete="off">
                     </div>
-                    <div class="col-md-6 col-12">
+                    <div class="col-md-2 col-12">
                         <input type="text" formControlName="email" class="form-control acr-input" placeholder="Email"
                             autocomplete="off">
                         @if(publishingGroup.get('email')?.invalid && (publishingGroup.get('email')?.dirty ||
@@ -27,14 +27,25 @@
                         </div>
                         }
                     </div>
+                    <div class="col-md-2 col-12">
+                        <input type="text" formControlName="legal_name" class="form-control acr-input" placeholder="Legal Name"
+                            autocomplete="off">
+                    </div>
+                    <div class="col-md-3 col-12">
+                        <acrylic-custom-dropdown
+                         [values]="publishing_splits_role"
+                        (dropdownSelected)="publishingSplitsRole($event, i)"></acrylic-custom-dropdown>
+                    </div>
                     <div class="col-md-2" [ngClass]="{'col-12': i == 0, 'col-9': i !== 0}">
                         <div class="small position-relative">
                             <input type="number" formControlName="percent" class="form-control acr-input" step=".01"
-                                (input)="onPercentChange($event.target, i, 'publishing_splits')">
+                            (input)="onPercentChange('publishing_splits')">
+                            <!-- <input type="number" formControlName="percent" class="form-control acr-input" step=".01"
+                                (input)="onPercentChange($event.target, i, 'publishing_splits')"> -->
                             <span class="text-info position-absolute top-35 right-10">%</span>
                         </div>
                     </div>
-                    <div class="col-md-1 col-3 d-flex-center" [ngClass]="{'d-none': i == 0}">
+                    <div class="col-md-1 col-3 d-flex-center align-items-start pt-1" [ngClass]="{'d-none': i == 0}">
                         <button class="btn btn-sm btn-acrylic py-2" (click)="removePublishSplits(i)">
                             <img [src]="'assets/images/icons/delete.svg'" height="20" width="20" />
                         </button>
@@ -58,7 +69,7 @@
                         </div>
                     </div>
                 </div>
-                <div><span class="text-light-gray me-1">Total:</span> <span>{{total}}%</span></div>
+                <div><span class="text-light-gray me-1">Total:</span> <span>{{totalPublishingSplits}}%</span></div>
             </div>
         </div>
         }
@@ -70,11 +81,11 @@
                 @for (masteringGroup of master_splits.controls; let i = $index; track masteringGroup)
                 {
                 <div class="row g-2" [formGroupName]="i">
-                    <div class="col-md-3 col-12">
+                    <div class="col-md-2 col-12">
                         <input type="text" formControlName="name" class="form-control acr-input" placeholder="Full Name"
                             autocomplete="off">
                     </div>
-                    <div class="col-md-6 col-12">
+                    <div class="col-md-2 col-12">
                         <input type="text" formControlName="email" class="form-control acr-input" placeholder="Email"
                             autocomplete="off">
                         @if(masteringGroup.get('email')?.invalid && (masteringGroup.get('email')?.dirty ||
@@ -84,14 +95,25 @@
                         </div>
                         }
                     </div>
+                    <div class="col-md-2 col-12">
+                        <input type="text" formControlName="legal_name" class="form-control acr-input" placeholder="Legal Name"
+                            autocomplete="off">
+                    </div>
+                    <div class="col-md-3 col-12">
+                        <acrylic-custom-dropdown
+                         [values]="master_splits_role"
+                        (dropdownSelected)="masterSplitsRole($event, i)"></acrylic-custom-dropdown>
+                    </div>
                     <div class="col-md-2" [ngClass]="{'col-12': i == 0, 'col-9': i !== 0}">
                         <div class="small position-relative">
                             <input type="number" formControlName="percent" class="form-control acr-input" step=".01"
-                                min="1" max="100" (input)="onPercentChange($event.target, i, 'master_splits')">
+                                min="1" max="100" (input)="onPercentChange('master_splits')">
+                            <!-- <input type="number" formControlName="percent" class="form-control acr-input" step=".01"
+                                min="1" max="100" (input)="onPercentChange($event.target, i, 'master_splits')"> -->
                             <span class="text-info position-absolute top-35 right-10">%</span>
                         </div>
                     </div>
-                    <div class="col-md-1 col-3 d-flex-center" [ngClass]="{'d-none': i == 0}">
+                    <div class="col-md-1 col-3 d-flex-center align-items-start pt-1" [ngClass]="{'d-none': i == 0}">
                         <button class="btn btn-sm btn-acrylic py-2" (click)="removeMasterSplits(i)">
                             <img [src]="'assets/images/icons/delete.svg'" height="20" width="20" />
                         </button>
@@ -117,7 +139,7 @@
                     </div>
                 </div>
 
-                <div><span class="text-light-gray me-1">Total:</span> <span>{{total}}%</span></div>
+                <div><span class="text-light-gray me-1">Total:</span> <span>{{totalMasterSplits}}%</span></div>
             </div>
         </div>
         }
