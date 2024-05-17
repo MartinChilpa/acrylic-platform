@@ -5,11 +5,15 @@ import { NavigationService } from '../../services/navigation.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LoaderService } from '../../services/loader.service';
 import { Subject, debounceTime } from 'rxjs';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 @Component({
   selector: 'acrylic-my-split-sheets',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    PaginationComponent
+  ],
   templateUrl: './my-split-sheets.component.html',
   styleUrl: './my-split-sheets.component.scss'
 })
@@ -17,11 +21,15 @@ export class MySplitSheetsComponent implements OnInit {
 
   splitSheets!: ISplitSheetResult[]
   searchForm!: FormGroup;
+  pageSize: number = 5;
+  pageNumber: number = 1;
+  totalCount: number = 10;
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService)
   private _navigationService = inject(NavigationService)
   private _loadingService = inject(LoaderService);
   private debounceSubject: Subject<void> = new Subject<void>();
+
 
   ngOnInit(): void {
     this.searchForm = this._fb.group({
@@ -36,9 +44,10 @@ export class MySplitSheetsComponent implements OnInit {
   }
 
   getSplitSheets() {
-    this._myArtistService.getSplitSheet(this.searchForm.get('searchText')?.value).subscribe({
+    this._myArtistService.getSplitSheet(this.prepareRequest()).subscribe({
       next: response => {
-        this.splitSheets = response.results
+        this.splitSheets = response.results;
+        this.totalCount = response.count;
       }
     })
   }
@@ -47,7 +56,22 @@ export class MySplitSheetsComponent implements OnInit {
     this.debounceSubject.next();
   }
 
-  goToPreview(id: string) {
-    this._navigationService.navigateToPreviewSplitSheet(id)
+  goToPreview(track: any) {
+    this._navigationService.navigateToPreviewSplitSheet(track.uuid)
+  }
+
+  prepareRequest() {
+    const request = {
+      page: this.pageNumber,
+      page_size: this.pageSize,
+      search: this.searchForm.get('searchText')?.value,
+    }
+    return request;
+  }
+
+  onPageChange(request: any) {
+    this.pageSize = request.pageSize;
+    this.pageNumber = request.pageNumber;
+    this.getSplitSheets();
   }
 }

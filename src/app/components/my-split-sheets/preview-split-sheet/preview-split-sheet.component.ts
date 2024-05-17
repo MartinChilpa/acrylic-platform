@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MyArtistService } from '../../../services/my-artist.service';
-import { DistributorsService } from '../../../services/distributors.service';
-import { IDistributorsResult } from '../../../interfaces/response/distributor.response';
 import { NavigationService } from '../../../services/navigation.service';
+import { SpotifyService } from '../../../services/spotify.service';
+import { ISpotify } from '../../../interfaces/response/spotify.response';
 
 @Component({
   selector: 'acrylic-preview-split-sheet',
@@ -17,14 +17,14 @@ export class PreviewSplitSheetComponent implements OnInit {
   @Output() backToSplitSheetForm = new EventEmitter();
   @Output() sendRequestToCreateSheet = new EventEmitter();
 
-  distributors!: IDistributorsResult[];
-
   private _activatedRoute = inject(ActivatedRoute)
   private _myArtistService = inject(MyArtistService)
-  private _distributorService = inject(DistributorsService)
   private _navigationService = inject(NavigationService)
+  private _spotifyService = inject(SpotifyService)
 
   splitSheetId: string = ''
+  trackInfo!: ISpotify
+  duration: string = ''
 
   ngOnInit(): void {
     this.splitSheetId = this._activatedRoute.snapshot.params['splitSheetId'];
@@ -36,7 +36,6 @@ export class PreviewSplitSheetComponent implements OnInit {
     if (this.reviewObject.track) {
       this.getTrackById();
     }
-    this.getDistributors()
   }
 
   backToSplitSheet() {
@@ -69,24 +68,22 @@ export class PreviewSplitSheetComponent implements OnInit {
         track: response.uuid,
         trackData: response
       }
+      this.getTrackPreview()
     })
   }
 
-  getDistributors() {
-    this._distributorService.getDistributorList().subscribe({
+  getTrackPreview() {
+    this._spotifyService.getTrack(this.reviewObject.trackData.isrc).subscribe({
       next: response => {
-        this.distributors = response.results
+        this.trackInfo = response
+        this.formatTime(this.trackInfo.duration)
       }
     })
   }
 
   formatTime(seconds: number) {
-    const minutes = Math.floor(seconds / 60);
+    const minutes = Math.floor(seconds / 60 / 60);
     const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-  }
-
-  distributorName() {
-    return this.distributors?.find(x => x.uuid == this.reviewObject?.email)?.name
+    this.duration = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
 }

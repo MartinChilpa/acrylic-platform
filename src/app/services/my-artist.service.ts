@@ -1,6 +1,6 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
 import { IMyArtist } from '../interfaces/response/my-artist.response';
 import { IMyArtistSynclist, IMyArtistSynclistResult } from '../interfaces/response/my-artist-synclist.response';
@@ -17,6 +17,19 @@ export class MyArtistService {
 
   private _http = inject(HttpClient);
   public myArtist: WritableSignal<IMyArtist | null> = signal(null);
+
+  buildQueryParams(params: any): HttpParams {
+    let queryParams = new HttpParams();
+
+    // Loop through the provided parameters and add them to the HttpParams object
+    Object.keys(params).forEach(key => {
+      if (params[key]) {
+        queryParams = queryParams.set(key, params[key]);
+      }
+    });
+
+    return queryParams;
+  }
 
   getMyArtist() {
     return this._http.get(`${this.MY_ARTIST_API_URL}/profile/`).pipe(
@@ -86,8 +99,9 @@ export class MyArtistService {
     return this._http.post<any>(`${this.ARTIST_API_URL}/register/`, request);
   }
 
-  getSplitSheet(searchText: string = ''): Observable<ISplitSheet> {
-    return this._http.get<ISplitSheet>(`${this.MY_ARTIST_API_URL}/split-sheets/?search=${searchText}`);
+  getSplitSheet(queryParams: any = {}): Observable<ISplitSheet> {
+    let params = this.buildQueryParams(queryParams)
+    return this._http.get<ISplitSheet>(`${this.MY_ARTIST_API_URL}/split-sheets/`, { params });
   }
 
   getSplitSheetById(id: string): Observable<ISplitSheetResult> {

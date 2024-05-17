@@ -71,13 +71,15 @@
                     (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
             </div>
         </div>
-        <div class="col-12">
-            <div class="acr-box">
-                <div class="acr-input-label">Enter Name Of Distributor Or Label Contact</div>
-                <input type="text" class="form-control acr-input"
-                    placeholder="Distributor Or Label Contact" autocomplete="off">
+       @if(form.get('distributor')?.value == 'Other') {
+            <div class="col-12">
+                <div class="acr-box">
+                    <div class="acr-input-label">Enter Name Of Distributor Or Label Contact</div>
+                    <input type="text" formControlName="other_distributor" class="form-control acr-input"
+                        placeholder="Distributor Or Label Contact" autocomplete="off">
+                </div>
             </div>
-        </div>
+       }
     </form>
     <div class="my-4">
         <div class="row gap-2">
@@ -89,7 +91,7 @@
                     </div>
                     <div class="col-md-5 col-12">
                         <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" (click)="nextUploadStepper(2)"
-                            [disabled]="!form.get('distributor')?.value || !form.get('isrc')?.value || form.get('isrc')?.errors?.['pattern']">Next</button>
+                            [disabled]="!form.get('isrc')?.value || form.get('isrc')?.errors?.['pattern']">Next</button>
                     </div>
                 </div>
             </div>

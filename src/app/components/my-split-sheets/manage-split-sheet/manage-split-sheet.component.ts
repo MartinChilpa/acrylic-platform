@@ -35,12 +35,13 @@ export class ManageSplitSheetComponent implements OnInit {
   ngOnInit(): void {
     this.createSplitSheetForm = this._fb.group({
       track: [''],
-      email: ['', Validators.required],
       name: [''],
       publishing_splits: new FormArray([
         new FormGroup({
           name: new FormControl('', [Validators.required]),
           email: new FormControl('', [Validators.required, Validators.email]),
+          legal_name: new FormControl('', [Validators.required]),
+          role: new FormControl('', [Validators.required]),
           percent: new FormControl(100, [Validators.required])
         })
       ]),
@@ -48,6 +49,8 @@ export class ManageSplitSheetComponent implements OnInit {
         new FormGroup({
           name: new FormControl('', [Validators.required]),
           email: new FormControl('', [Validators.required, Validators.email]),
+          legal_name: new FormControl('', [Validators.required]),
+          role: new FormControl('', [Validators.required]),
           percent: new FormControl(100, [Validators.required])
         })
       ])
@@ -81,7 +84,6 @@ export class ManageSplitSheetComponent implements OnInit {
     let controls = this.createSplitSheetForm.controls;
     this.reviewObject = {
       track: controls['track'].value,
-      email: controls['email'].value,
       publishing_splits: controls['publishing_splits'].value,
       master_splits: controls['master_splits'].value
     };

@@ -1,0 +1,14 @@
+<div class="d-flex justify-content-between p-2">
+    <div>
+        <button class="btn bg-light-gray text-primary" (click)="previousPage()">&lt;</button>
+        <span class="p-2"> {{ totalPage ? currentPage : 0 }} of {{ totalPage }}</span>
+        <button class="btn bg-light-gray text-primary" (click)="nextPage()">&gt;</button>
+    </div>
+    <ng-container>
+        <select class="btn bg-light-gray text-primary" (change)="onPageChange($event.target)">
+            @for(item of paginationOptions; track item) {
+                <option class="bg-switch-off" [value]="item">{{ item }}</option>
+            }
+        </select>
+    </ng-container>
+</div>

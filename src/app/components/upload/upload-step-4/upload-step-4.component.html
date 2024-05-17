@@ -1,14 +1,15 @@
 <section>
+    @if (trackInfo) {
     <div class="row">
         <div class="col-12">
             <div class="acr-box">
                 <p class="mb-2">Preview Your Track</p>
                 <div class="d-flex gap-2">
-                    <img [src]="coverImage" (click)="playSnippet()" height="110" width="110"
+                    <img [src]="trackInfo.image" (click)="playSnippet()" height="110" width="110"
                         class="radius-5 cursor-pointer" />
                     <div class="d-flex flex-column">
-                        <span>{{ form.get('name')?.value }}</span>
-                        <span>{{ myArtist?.name }}</span>
+                        <span>{{ trackInfo.name }}</span>
+                        <span>{{ trackInfo.artist }}</span>
                         <span>{{ duration }}</span>
                         @if (snippet) {
                         <div class="text-center">
@@ -29,6 +30,7 @@
             </div>
         </div>
     </div>
+    }
     <div class="my-4">
         <div class="row gap-2">
             <div class="col-12">
