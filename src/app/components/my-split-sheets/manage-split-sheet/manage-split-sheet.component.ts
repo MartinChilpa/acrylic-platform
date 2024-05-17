@@ -34,7 +34,7 @@ export class ManageSplitSheetComponent implements OnInit {
 
   ngOnInit(): void {
     this.createSplitSheetForm = this._fb.group({
-      track: [''],
+      track: ['', [Validators.required]],
       name: [''],
       publishing_splits: new FormArray([
         new FormGroup({

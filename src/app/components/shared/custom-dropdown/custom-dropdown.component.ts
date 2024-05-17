@@ -3,7 +3,7 @@ import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, On
 import { SearchFilterPipe } from '../../../pipes/search-filter.pipe';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HighLightDirective } from '../../../directives/high-light.directive';
-import { Subject, debounce, debounceTime } from 'rxjs';
+import { Subject, debounceTime } from 'rxjs';
 
 @Component({
   selector: 'acrylic-custom-dropdown',
@@ -20,6 +20,7 @@ export class CustomDropdownComponent implements OnInit, OnChanges {
   @Input() showSearch: boolean = true;
   @Input() loading: boolean = false;
   @Input() noDataLabel: string = "No data available";
+  @Input() className: string = "";
   @Output() dropdownSelected = new EventEmitter();
   @Output() searchChanged = new EventEmitter<string>();
 

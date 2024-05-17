@@ -23,6 +23,7 @@
                     </div>
                     <div class="col-xl-2 col-sm-4 col-12">
                         <acrylic-custom-dropdown
+                         [inputValue]="publishingGroup.get('role')?.value" 
                          [values]="publishing_splits_role"
                          [placeholder]="'Role'"
                         (dropdownSelected)="publishingSplitsRole($event, i)"></acrylic-custom-dropdown>
@@ -92,6 +93,7 @@
 
                     <div class="col-xl-2 col-sm-4 col-12">
                         <acrylic-custom-dropdown
+                        [inputValue]="masteringGroup.get('role')?.value" 
                          [values]="master_splits_role"
                          [placeholder]="'Role'"
                         (dropdownSelected)="masterSplitsRole($event, i)"></acrylic-custom-dropdown>
@@ -111,7 +113,7 @@
                     <div class="col-xl-2 col-sm-4" [ngClass]="{'col-12': i == 0, 'col-9': i !== 0}">
                         <div class="small position-relative">
                             <input type="number" formControlName="percent" class="form-control acr-input" step=".01"
-                                min="1" max="100" (input)="onPercentChange('master_splits')">
+                             (input)="onPercentChange('master_splits')">
                             <span class="text-info position-absolute top-35 right-10">%</span>
                         </div>
                     </div>

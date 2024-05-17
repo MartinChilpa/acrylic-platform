@@ -4,6 +4,7 @@ import { MyArtistService } from '../../../services/my-artist.service';
 import { NavigationService } from '../../../services/navigation.service';
 import { SpotifyService } from '../../../services/spotify.service';
 import { ISpotify } from '../../../interfaces/response/spotify.response';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'acrylic-preview-split-sheet',
@@ -21,7 +22,9 @@ export class PreviewSplitSheetComponent implements OnInit {
   private _myArtistService = inject(MyArtistService)
   private _navigationService = inject(NavigationService)
   private _spotifyService = inject(SpotifyService)
+  private _alertService = inject(AlertService)
 
+  previewFound: boolean = true
   splitSheetId: string = ''
   trackInfo!: ISpotify
   duration: string = ''
@@ -73,10 +76,17 @@ export class PreviewSplitSheetComponent implements OnInit {
   }
 
   getTrackPreview() {
+    this._alertService.ignoreAlert.set(true);
     this._spotifyService.getTrack(this.reviewObject.trackData.isrc).subscribe({
       next: response => {
         this.trackInfo = response
         this.formatTime(this.trackInfo.duration)
+      },
+      complete: () => {
+        if (!this.trackInfo) {
+          this.previewFound = false;
+        }
+        this._alertService.ignoreAlert.set(false);
       }
     })
   }
