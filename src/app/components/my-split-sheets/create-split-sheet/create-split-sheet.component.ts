@@ -85,6 +85,7 @@ export class CreateSplitSheetComponent {
       },
       complete: () => {
         this.trackLoading = false;
+        this._loadingService.hideLoading.set(false);
       }
     })
   }
