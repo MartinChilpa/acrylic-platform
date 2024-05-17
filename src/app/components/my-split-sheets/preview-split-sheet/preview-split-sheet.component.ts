@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MyArtistService } from '../../../services/my-artist.service';
-import { DistributorsService } from '../../../services/distributors.service';
-import { IDistributorsResult } from '../../../interfaces/response/distributor.response';
 import { NavigationService } from '../../../services/navigation.service';
+import { SpotifyService } from '../../../services/spotify.service';
+import { ISpotify } from '../../../interfaces/response/spotify.response';
 
 @Component({
   selector: 'acrylic-preview-split-sheet',
@@ -17,22 +17,25 @@ export class PreviewSplitSheetComponent implements OnInit {
   @Output() backToSplitSheetForm = new EventEmitter();
   @Output() sendRequestToCreateSheet = new EventEmitter();
 
-  distributors!: IDistributorsResult[];
-
   private _activatedRoute = inject(ActivatedRoute)
   private _myArtistService = inject(MyArtistService)
-  private _distributorService = inject(DistributorsService)
   private _navigationService = inject(NavigationService)
+  private _spotifyService = inject(SpotifyService)
 
   splitSheetId: string = ''
+  trackInfo!: ISpotify
+  duration: string = ''
 
   ngOnInit(): void {
     this.splitSheetId = this._activatedRoute.snapshot.params['splitSheetId'];
     if (this.splitSheetId) {
       this.reviewObject = {}
       this.getSplitSheetDetail()
+      this.getTrackById();
     }
-    this.getDistributors()
+    if (this.reviewObject.track) {
+      this.getTrackById();
+    }
   }
 
   backToSplitSheet() {
@@ -51,21 +54,36 @@ export class PreviewSplitSheetComponent implements OnInit {
   getSplitSheetDetail() {
     this._myArtistService.getSplitSheetById(this.splitSheetId).subscribe(response => {
       this.reviewObject = {
+        ...this.reviewObject,
         publishing_splits: response.publishing_splits,
         master_splits: response.master_splits
       }
     })
   }
 
-  getDistributors() {
-    this._distributorService.getDistributorList().subscribe({
+  getTrackById() {
+    this._myArtistService.getTrackById(this.reviewObject.track ? this.reviewObject.track : this.splitSheetId).subscribe(response => {
+      this.reviewObject = {
+        ...this.reviewObject,
+        track: response.uuid,
+        trackData: response
+      }
+      this.getTrackPreview()
+    })
+  }
+
+  getTrackPreview() {
+    this._spotifyService.getTrack(this.reviewObject.trackData.isrc).subscribe({
       next: response => {
-        this.distributors = response.results
+        this.trackInfo = response
+        this.formatTime(this.trackInfo.duration)
       }
     })
   }
 
-  distributorName() {
-    return this.distributors?.find(x => x.uuid == this.reviewObject?.email)?.name
+  formatTime(seconds: number) {
+    const minutes = Math.floor(seconds / 60 / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    this.duration = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
 }

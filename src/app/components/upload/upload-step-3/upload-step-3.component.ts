@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, ViewChild, inject } from '@angu
 import { FileDropzoneComponent } from '../../shared/file-dropzone/file-dropzone.component';
 import { FormGroup } from '@angular/forms';
 import { AlertService } from '../../../services/alert.service';
+import { MyArtistService } from '../../../services/my-artist.service';
 
 @Component({
   selector: 'acrylic-upload-step-3',
@@ -23,8 +24,44 @@ export class UploadStep3Component {
     { fileDropzoneIcon: '/assets/images/icons/file.svg', fileDropzoneHeader: 'Drop your snippets here or upload them manually', fileDropzoneSize: '', fileDropzoneExternalLink: '' },
   ]
 
+  private _myArtistService = inject(MyArtistService)
+
   nextUploadStepper(count: number) {
-    this.nextStepper.emit(count);
+    this.addUpdateTracks(count);
+  }
+
+  addUpdateTracks(count: number) {
+    const data = this.form.value
+    if (data.other_distributor) {
+      data.distributor = ''
+    } else {
+      data.other_distributor = ''
+    }
+    const formData = new FormData();
+    const fileKeys = ['cover_image', 'file_mp3', 'file_wav', 'snippet']
+    Object.keys(data).forEach(item => {
+      const value = data[item]
+      if (!fileKeys.includes(item)) {
+        formData.append(item, value);
+      }
+      else if (value && typeof value !== 'string') {
+        formData.append(item, value);
+      }
+    })
+    const uploadType = this.form.value.id ? this._myArtistService.updateTracks(formData, this.form.value.id) : this._myArtistService.createTracks(formData)
+    uploadType.subscribe({
+      next: response => {
+        this.form.patchValue({
+          id: response.uuid,
+          cover_image: response.cover_image,
+          snippet: response.snippet,
+          file_wav: response.file_wav,
+          file_mp3: response.file_mp3,
+          tags: response.tags
+        })
+        this.nextStepper.emit(count);
+      }
+    })
   }
 
   setUploadFile(key: string, $event: File[]) {

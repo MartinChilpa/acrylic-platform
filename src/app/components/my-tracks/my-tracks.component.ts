@@ -4,11 +4,13 @@ import { MyArtistService } from '../../services/my-artist.service';
 import { ICreateTracks } from '../../interfaces/response/create-tracks.response';
 import { NavigationService } from '../../services/navigation.service';
 import { CustomDropdownComponent } from '../shared/custom-dropdown/custom-dropdown.component';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Subject, debounceTime } from 'rxjs';
 
 @Component({
   selector: 'acrylic-my-tracks',
   standalone: true,
-  imports: [NgOptimizedImage, NgClass, CustomDropdownComponent],
+  imports: [NgOptimizedImage, NgClass, CustomDropdownComponent, ReactiveFormsModule],
   templateUrl: './my-tracks.component.html',
   styleUrl: './my-tracks.component.scss'
 })
@@ -21,19 +23,34 @@ export class MyTracksComponent implements OnInit {
     { trackImage: 'assets/images/others/sundown.png', name: 'Sundown', totalTrack: { totalUsers: '45,567', totalPercentage: '+11.43%' }, assignedTags: ['Indie Pop', 'Happy', 'Cooking', 'Shopping'], priceTag: { picture: 'assets/images/others/beat.png', priceTageName: 'Basic', priceStartDate: 'Feb 6, 2024', priceEndDate: 'Feb 6, 2024', bgClass: 'bg-lightgray-border' }, popularTags: ['Indie Pop', 'Happy', 'Cooking'], releaseDate: 'Oct 4, 2023', trackStatus: 'Open Track' },
   ]
   trackList: ICreateTracks[] = []
+  searchForm!: FormGroup;
+  private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   public _navigationService = inject(NavigationService);
+  private debounceSubject: Subject<void> = new Subject<void>();
 
   ngOnInit(): void {
+    this.searchForm = this._fb.group({
+      searchText: ['']
+    });
     this.getTracks()
+    this.debounceSubject.pipe(
+      debounceTime(500)
+    ).subscribe(() => {
+      this.getTracks()
+    });
+  }
+
+  searchChanges() {
+    this.debounceSubject.next();
   }
 
   getTracks() {
-    this._myArtistService.getTracks().subscribe({
+    this._myArtistService.searchTracks(this.searchForm.get('searchText')?.value).subscribe({
       next: response => {
         this.trackList = response
       }
-    })
+    });
   }
 
   openTrack(id: string) {

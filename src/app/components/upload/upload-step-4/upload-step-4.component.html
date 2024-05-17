@@ -1,14 +1,15 @@
 <section>
+    @if (trackInfo) {
     <div class="row">
         <div class="col-12">
             <div class="acr-box">
                 <p class="mb-2">Preview Your Track</p>
                 <div class="d-flex gap-2">
-                    <img [src]="coverImage" (click)="playSnippet()" height="110" width="110"
+                    <img [src]="trackInfo.image" (click)="playSnippet()" height="110" width="110"
                         class="radius-5 cursor-pointer" />
                     <div class="d-flex flex-column">
-                        <span>{{ form.get('name')?.value }}</span>
-                        <span>{{ myArtist?.name }}</span>
+                        <span>{{ trackInfo.name }}</span>
+                        <span>{{ trackInfo.artist }}</span>
                         <span>{{ duration }}</span>
                         @if (snippet) {
                         <div class="text-center">
@@ -21,25 +22,26 @@
                             <span class="bg-light-gray px-2 py-1 radius-5">{{ item }}</span>
                             }
                         </div>
+                        <!-- <a href="javascript: void(0);" class="a-blue mt-2">Feel like the tags don’t match to the
+                            track?</a> -->
                         }
-                        <a href="javascript: void(0);" class="a-blue mt-2">Feel like the tags don’t match to the
-                            track?</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    }
     <div class="my-4">
         <div class="row gap-2">
             <div class="col-12">
                 <div class="row justify-content-center gy-2">
                     <div class="col-md-5 col-12 text-end">
-                        <button class="btn btn-darkgrey px-4 px-lg-5 py-2 light-gray-border"
-                            (click)="nextUploadStepper(3)">Back</button>
+                        <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border"
+                            (click)="nextUploadStepper(2)">Back</button>
                     </div>
                     <div class="col-md-5 col-12">
                         <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border"
-                            (click)="nextUploadStepper(5)">Next</button>
+                            (click)="nextUploadStepper(4)">Next</button>
                     </div>
                 </div>
             </div>

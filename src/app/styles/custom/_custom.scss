@@ -25,6 +25,11 @@ p {
     margin-bottom: 0;
 }
 
+::selection {
+    color: var(--text-color);
+    background-color: var(--info-color);
+}
+
 .bg-primary-gradient {
     background: var(--primary-radial-gradient-color);
 }
@@ -163,6 +168,7 @@ p {
 }
 
 .clip-path-tag {
+    width: 150px;
     clip-path: var(--clip-path-tag-shap);
 }
 
@@ -176,10 +182,6 @@ p {
 
 .height-40 {
     height: 40px;
-}
-
-.max-width-560 {
-    max-width: 560px;
 }
 
 /**Pill Chip**/

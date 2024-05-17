@@ -14,7 +14,9 @@ export interface IMyArtistSynclistResult {
     description: string
     order: number
     pinned: boolean
-    tracks: Track[]
+    tracks: Track[],
+    genres: Genre[],
+    tags: Tag[]
 }
 
 export interface Track {

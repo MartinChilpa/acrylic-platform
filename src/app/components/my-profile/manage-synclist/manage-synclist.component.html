@@ -1,8 +1,5 @@
-<section>
-
     <div class="row gy-3">
         <div class="col-lg-7 col-12 order-2 order-lg-1">
-            <div>
                 @if(activeStepper === 1) {
                 <ng-container>
                     <form [formGroup]="synclistForm" class="row gy-3 gx-2">
@@ -14,8 +11,8 @@
 
                         <div class="acr-box">
                             <div class="acr-input-label">Synclist Description</div>
-                            <textarea rows="5" class="form-control acr-input pt-2" rows="5" formControlName="description"
-                                placeholder="Synclist Description">
+                            <textarea rows="5" class="form-control acr-input pt-2" rows="5"
+                                formControlName="description" placeholder="Synclist Description">
                             </textarea>
                         </div>
                         @if (!isLoading) {
@@ -84,7 +81,6 @@
                     </div>
                 </div>
                 }
-            </div>
         </div>
         <div class="col-lg-5 col-12 order-1 order-lg-2">
             <div class="acr-box">
@@ -106,13 +102,10 @@
         <div class="row gap-2">
             <div class="col-lg-6 col-12">
                 <div class="d-flex-center">
-                    <button class="btn btn-darkgrey px-4 px-lg-5 py-2 me-3" (click)="backProfile()">Back</button>
-                    @if (activeStepper == 1) {
-                    <button class="btn btn-info px-4 px-lg-5 py-2" [disabled]="!synclistForm.valid"
-                        (click)="saveSynclist()">Publish</button>
-                    }
+                    <button class="btn btn-acrylic px-4 px-lg-5 py-2 me-3" (click)="backProfile()">Back</button>
+                    <button class="btn btn-info px-4 px-lg-5 py-2"
+                        [disabled]="activeStepper == 1 && !synclistForm.valid" (click)="publish()">Publish</button>
                 </div>
             </div>
         </div>
     </div>
-</section>

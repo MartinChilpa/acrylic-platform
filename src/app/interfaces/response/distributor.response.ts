@@ -6,6 +6,6 @@ export interface IDistributors {
 }
 
 export interface IDistributorsResult {
-    uuid: string
+    uuid?: string
     name: string
 }

@@ -3,6 +3,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DistributorsService } from '../../../services/distributors.service';
 import { IDistributorsResult } from '../../../interfaces/response/distributor.response';
 import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'acrylic-upload-step-2',
@@ -14,6 +15,8 @@ import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dro
 export class UploadStep2Component implements OnInit {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
+
+  public _navigationService = inject(NavigationService)
 
   private _distributorService = inject(DistributorsService)
   distributors!: IDistributorsResult[]
@@ -29,12 +32,19 @@ export class UploadStep2Component implements OnInit {
   getDistributors() {
     this._distributorService.getDistributorList().subscribe({
       next: response => {
-        this.distributors = response.results
+        this.distributors = response.results;
+        this.distributors.push({
+          name: "Other",
+          uuid: "Other"
+        });
       }
     })
   }
 
   dropdownSelected($event: any) {
+    if ($event.name != "Other") {
+      this.form.get('other_distributor')?.setValue('');
+    }
     this.form.get('distributor')?.setValue($event.uuid);
   }
 }

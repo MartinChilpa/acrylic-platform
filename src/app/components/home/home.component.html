@@ -1,63 +1,25 @@
 <section>
     <div class="row mt-3 mt-md-0">
-        <div class="col-lg-8 col-12">
-            <div>
-                <img [src]="mainImage" class="img-card" />
-                <div class="my-md-3 my-2">
-                    <div>Sync University</div>
-                    <small class="d-block">Learn about synchronization and how to promote your sync rights.</small>
-                    <small class="text-info-success pt-2">KAM feels lucky 🦎</small>
-                </div>
-            </div>
-
-            <div class="row my-3">
-                <div class="col-lg-6 col-12">
-                    <img [src]="mdCard1" class="img-card" />
-                    <div class="my-md-3 my-2">
-                        <div>The Acrylic Museum</div>
-                        <small class="d-block">Check out all the coolest syncs our ARTISTS have landed!</small>
-                        <small class="text-info-success pt-2">KAM's Top 10</small>
+         <div class="col-lg-8 col-12">
+            <div class="row">
+                @for(item of homeDataList; track item) {
+                    <div class="col-12" [ngClass]="['col-md-' + calculateColumnSizes(homeDataList.length)[$index]]">
+                        <div>
+                            <a [href]="item.url" target="_blank">
+                                <img [src]="item.image" class="img-card object-fit-cover" height="200"/>
+                            </a>
+                            <div class="my-md-3 my-2">
+                                <div>{{ item.title }}</div>
+                                <a [href]="item.url" target="_blank" class="text-decoration-none">
+                                    <small class="text-info-success pt-2">{{ item.link_text }}</small>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-6 col-12">
-                    <img [src]="mdCard2" class="img-card" />
-                    <div class="my-md-3 my-2">
-                        <div>My Art Studio</div>
-                        <small class="d-block">Create artwork and landing pages to promote your work on all
-                            stores.</small>
-                        <small class="text-info-success pt-2">The KAM Drop 🔥</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row my-3">
-                <div class="col-lg-4 col-12">
-                    <img [src]="smCard1" class="img-card" />
-                    <div class="my-md-3 my-2">
-                        <div>The Acrylic KAM-UNITY</div>
-                        <small class="d-block">Connect with other chameleons like you via our Discord channel.</small>
-                        <small class="text-info-success pt-2">"Just join." - KAM.</small>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-12">
-                    <img [src]="smCard2" class="img-card" />
-                    <div class="my-md-3 my-2">
-                        <div>Sync Secrets</div>
-                        <small class="d-block">Learn about best sync practices to maximize you success with us.</small>
-                        <small class="text-info-success pt-2">KAM's Sync Tip of Week</small>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-12">
-                    <img [src]="smCard3" class="img-card" />
-                    <div class="my-md-3 my-2">
-                        <div>Help the Acrylic Fam!</div>
-                        <small class="d-block">Help spread KAM's love and earn valuable treats along the way 🦎</small>
-                        <small class="text-info-success pt-2">KAM of the Week 🔥</small>
-                    </div>
-                </div>
+                }
             </div>
         </div>
-        <div class="col-lg-4 col-sm-5 col-12 d-flex flex-column gap-3">
+        <div class="col-lg-4 col-12 d-flex flex-column gap-3">
             @if (_myArtistService.myArtist()) {
             <div class="w-100">
                 <div class="radius-5 bg-img" acrylicBackgroundImage

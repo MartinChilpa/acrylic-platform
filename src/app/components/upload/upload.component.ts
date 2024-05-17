@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, ComponentRef, OnInit, ViewChild, ViewContainerRef, inject } from '@angular/core';
-import { UploadStep1Component } from './upload-step-1/upload-step-1.component';
+import { AfterViewInit, Component, ComponentRef, OnInit, ViewChild, ViewContainerRef, inject, ChangeDetectorRef } from '@angular/core';
 import { UploadStep2Component } from './upload-step-2/upload-step-2.component';
 import { UploadStep3Component } from './upload-step-3/upload-step-3.component';
 import { UploadStep4Component } from './upload-step-4/upload-step-4.component';
@@ -13,16 +12,17 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'acrylic-upload',
   standalone: true,
-  imports: [NgClass, NgOptimizedImage, ReactiveFormsModule, UploadStep1Component, UploadStep2Component, UploadStep3Component, UploadStep4Component, UploadStep5Component],
+  imports: [NgClass, NgOptimizedImage, ReactiveFormsModule, UploadStep2Component, UploadStep3Component, UploadStep4Component, UploadStep5Component],
   templateUrl: './upload.component.html',
-  styleUrl: './upload.component.scss'
+  styleUrl: './upload.component.scss',
 })
 export class UploadComponent implements OnInit, AfterViewInit {
   @ViewChild('acrylicUploadRef', { static: true, read: ViewContainerRef }) acrylicUploadRef!: ViewContainerRef;
-  componentRefs!: ComponentRef<UploadStep1Component | UploadStep2Component | UploadStep3Component | UploadStep4Component | UploadStep5Component >;
+  componentRefs!: ComponentRef<UploadStep2Component | UploadStep3Component | UploadStep4Component | UploadStep5Component >;
   activeStepper: number = 1;
-  uploadStepperList = ['Connect split sheet', 'General Information', 'Upload assets', 'Preview & Confirm', 'Set your prices'];
+  uploadStepperList = ['General Information', 'Upload assets', 'Preview & Confirm', 'Set your prices'];
   uploadTrackForm!: FormGroup;
+  private _changeDetector: ChangeDetectorRef = inject(ChangeDetectorRef);
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   private _modalService = inject(ModalService);
@@ -35,7 +35,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
     this.uploadTrackForm = this._fb.group({
       id: [null],
       isrc: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}-?\w{3}-?\d{2}-?\d{5}$/)]],
-      name: ['', Validators.required],
+      name: ['Test ' + new Date().toLocaleDateString()],
       duration: [0],
       released: [new Date().toJSON().split('T')[0]],
       is_cover: [false],
@@ -48,8 +48,9 @@ export class UploadComponent implements OnInit, AfterViewInit {
       snippet: ['', Validators.required],
       file_wav: ['', Validators.required],
       file_mp3: [''],
-      distributor: ['', Validators.required],
+      distributor: [''],
       tags: [],
+      other_distributor: ['']
     });
     if (this.uploadTrackId) {
       this.getTrackById()
@@ -58,6 +59,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.loadComponent(this.activeStepper);
+    this._changeDetector.detectChanges();
   }
 
   getTrackById() {
@@ -81,7 +83,11 @@ export class UploadComponent implements OnInit, AfterViewInit {
           file_mp3: response.file_mp3,
           distributor: response.distributor,
           tags: response.tags,
+          other_distributor: response.other_distributor
         })
+        if (response.other_distributor) {
+          this.uploadTrackForm.get('distributor')?.setValue('Other');
+        }
       }
     })
   }
@@ -103,28 +109,28 @@ export class UploadComponent implements OnInit, AfterViewInit {
 
   loadComponent(step: number) {
     switch (step) {
+      // case 1:
+      //   this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep1Component);
+      //   break;
       case 1:
-        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep1Component);
-        break;
-      case 2:
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep2Component);
         break;
-      case 3:
+      case 2:
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep3Component);
         break;
-      case 4:
+      case 3:
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep4Component);
         break;
-      case 5:
+      case 4:
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep5Component);
-        const step5Instance = this.componentRefs.instance as UploadStep5Component;
-        step5Instance.uploadAction.subscribe(() => {
+        const stepInstance = this.componentRefs.instance as UploadStep5Component;
+        stepInstance.uploadAction.subscribe(() => {
           this.publishTrack();
         });
   
         break;
       default:
-        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep1Component);
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep2Component);
     }
     this.componentRefs.instance.form = this.uploadTrackForm;
     this.componentRefs.instance.nextStepper.subscribe((count: number) => {

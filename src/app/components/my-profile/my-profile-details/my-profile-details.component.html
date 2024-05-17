@@ -1,16 +1,10 @@
 @if(myArtist){
-<section>
     <div class="row me-1 gx-4 gy-2">
         <div class="col-lg-7 col-12 pe-0">
-            <div class="p-3 flex-column radius-5 bg-img" acrylicBackgroundImage [backgroundImage]="myArtist.background_image">
-                <div class="mb-5 pb-5 d-flex justify-content-end px-0">
-                    <button class="btn btn-darkgrey p-1">
-                        <img ngSrc="assets/images/icons/three-dots.svg" alt="side_icon" width="20" height="20" />
-                    </button>
-                </div>
-                <div class="position-relative">
+            <div class="p-3 flex-column radius-5 bg-img h-bg-profile" acrylicBackgroundImage [backgroundImage]="myArtist.background_image">
+                <div class="position-absolute bottom-10px">
                     @if (myArtist.image) {
-                    <img [ngSrc]="myArtist.image" alt="diego" width="40" height="40"
+                    <img [ngSrc]="'assets/images/others/saludo.gif'" alt="diego" width="60" height="40"
                         class="position-absolute diego-img" />
                     }
                     <div class="d-flex gap-3">
@@ -28,7 +22,7 @@
             <div class="pb-5 acr-box h-100">
                 <div class="d-flex-justify-between">
                     <h6>Bio</h6>
-                    <button class="btn btn-darkgrey p-1">
+                    <button class="btn btn-acrylic p-1">
                         <img ngSrc="assets/images/icons/three-dots.svg" alt="side_icon" width="20" height="20" />
                     </button>
                 </div>
@@ -37,7 +31,7 @@
                 <div class="d-flex gap-2">
                     @for (item of profileBioTrack; track item.icon) {
                         @if(item.link){
-                            <a class="btn btn-darkgrey light-gray-border p-1" [href]="item.link" target="_blank">
+                            <a class="btn btn-acrylic p-1" [href]="item.link" target="_blank">
                                 <img [src]="item.icon" alt="side_icon" width="22" height="22" />
                             </a>
                         }
@@ -53,16 +47,21 @@
         </div>
         <div class="row g-2">
             @for (item of artistSynclist; track item) {
-            <div class="col-lg-4 col-md-6 col-12 pinned-sync-box cursor-pointer" (click)="editSynclist(item)">
+            <div class="col-lg-4 col-md-6 col-12 pinned-sync-box">
                 <div class="pinned-sync-back position-relative radius-5 p-3 h-100 d-flex align-items-end"
                     [style.backgroundImage]="'url(' + item.background_image + ')'">
                     <div class="pinned-sync-gradient-layer position-absolute top-0 start-0 h-100 w-100"></div>
+                    <div class="pinned-sync-edit">
+                        <button class="btn btn-acrylic pb-2 px-2" (click)="editSynclist(item)">
+                            <img ngSrc="assets/images/icons/edit.svg" alt="side_icon" width="16" height="16" />
+                        </button>
+                    </div>
                     <div class="d-flex-align-center gap-3 pinned-sync-content">
                         <img [ngSrc]="item.cover_image" alt="pinned-img" width="60" height="60"
-                            class="radius-5 pinned-sunc-front" />
+                            class="radius-5" />
                         <div class="d-flex flex-column">
                             <h6 class="mb-1">{{ item.name }}</h6>
-                            <small>Rock, Rap</small>
+                            <small>{{getGenres()}}</small>
                         </div>
                     </div>
                 </div>
@@ -76,7 +75,6 @@
             </div>
         </div>
     </div>
-</section>
 <div class="modal fade" id="profile-share" data-bs-backdrop="static">
     <acrylic-share-profile [myArtist]="myArtist" [profileBioTrack]="profileBioTrack"></acrylic-share-profile>
 </div>

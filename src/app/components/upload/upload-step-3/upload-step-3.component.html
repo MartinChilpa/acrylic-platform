@@ -33,12 +33,12 @@
             <div class="col-12">
                 <div class="row justify-content-center gy-2">
                     <div class="col-md-5 col-12 text-end">
-                        <button class="btn btn-darkgrey px-4 px-lg-5 py-2 light-gray-border"
-                            (click)="nextUploadStepper(2)">Back</button>
+                        <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border"
+                            (click)="nextUploadStepper(1)">Back</button>
                     </div>
                     <div class="col-md-5 col-12">
                         <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border"
-                            (click)="nextUploadStepper(4)" [disabled]="!form.get('snippet')?.value || !form.get('file_wav')?.value || !form.get('cover_image')?.value">Next</button>
+                            (click)="nextUploadStepper(3)" [disabled]="!form.get('snippet')?.value || !form.get('file_wav')?.value || !form.get('cover_image')?.value">Next</button>
                     </div>
                 </div>
             </div>

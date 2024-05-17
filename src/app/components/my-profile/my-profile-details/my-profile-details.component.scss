@@ -1,9 +1,18 @@
 .diego-img {
-    top: calc(-100% + 60%);
+    top: calc(-100% + 55%);
+    left: calc(-100% + 93%);
+}
+
+.h-bg-profile{
+    height: 230px;
+}
+
+.bottom-10px{
+    bottom: 10px;
 }
 
 .pinned-sync-box {
-    height: 175px;
+    height: 170px;
     .pinned-sync-back {
         background-repeat: no-repeat;
         background-size: cover;
@@ -13,6 +22,11 @@
         .pinned-sync-content {
             position: relative;
             z-index: 1;
+        }
+        .pinned-sync-edit {
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
     }
 }

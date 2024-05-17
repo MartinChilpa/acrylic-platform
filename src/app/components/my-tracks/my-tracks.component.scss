@@ -1,5 +1,2 @@
 @use '../../styles/overrides/table' as *;
-
-.price-tag {
-    width: 100px;
-}
+@use '../../styles/custom/loader' as *;
