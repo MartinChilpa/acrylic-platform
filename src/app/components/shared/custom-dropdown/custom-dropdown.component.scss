@@ -1,1 +1,6 @@
 @use '../../../styles/custom/loader' as *;
+
+.dropdown-placeholder{
+    color: var(--text-color);
+    opacity: 0.3;
+}

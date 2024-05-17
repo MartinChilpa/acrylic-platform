@@ -1,6 +1,6 @@
 <section>
     <div class="row gy-3">
-        <div class="col-lg-8 col-12 order-2 order-lg-1">
+        <div class="col-xl-8 col-12 order-2 order-xl-1">
             @if(activeStepper == 2) {
             <acrylic-preview-split-sheet [reviewObject]="reviewObject" (backToSplitSheetForm)="backToSplitSheetForm()"
                 (sendRequestToCreateSheet)="sendRequestToCreateSheet()">
@@ -11,7 +11,7 @@
             </acrylic-create-split-sheet>
             }
         </div>
-        <div class="col-lg-4 col-12 order-1 order-lg-2">
+        <div class="col-xl-4 col-12 order-1 order-xl-2">
             <div class="acr-box">
                 <ul class="list-group acrylic-stepper">
                     @for(item of manageSplitStepperList; track item) {
