@@ -7,6 +7,7 @@ import { AlertType } from '../enums/alert-type.enum';
 })
 export class AlertService {
   public alert = signal<Alert>({});
+  public ignoreAlert = signal<boolean>(false);
 
   showAlert(type: AlertType, message: string, title?: string) {
     this.alert.set({

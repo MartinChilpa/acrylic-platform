@@ -6,13 +6,15 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LoaderService } from '../../services/loader.service';
 import { Subject, debounceTime } from 'rxjs';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'acrylic-my-split-sheets',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    PaginationComponent
+    PaginationComponent,
+    DatePipe
   ],
   templateUrl: './my-split-sheets.component.html',
   styleUrl: './my-split-sheets.component.scss'

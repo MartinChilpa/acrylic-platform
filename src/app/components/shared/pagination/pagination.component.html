@@ -4,11 +4,8 @@
         <span class="p-2"> {{ totalPage ? currentPage : 0 }} of {{ totalPage }}</span>
         <button class="btn bg-light-gray text-primary" (click)="nextPage()">&gt;</button>
     </div>
-    <ng-container>
-        <select class="btn bg-light-gray text-primary" (change)="onPageChange($event.target)">
-            @for(item of paginationOptions; track item) {
-                <option class="bg-switch-off" [value]="item">{{ item }}</option>
-            }
-        </select>
-    </ng-container>
+    <div class="col-1">
+        <acrylic-custom-dropdown [showSearch]="false" inputValue="5"
+            [values]="paginationDrpOptions" (dropdownSelected)="onPageChange($event)" [className]="'h-35'"></acrylic-custom-dropdown>
+    </div>
 </div>

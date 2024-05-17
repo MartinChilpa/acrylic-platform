@@ -98,7 +98,7 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   }
 
   formatTime(seconds: number) {
-    const minutes = Math.floor(seconds / 60);
+    const minutes = Math.floor(seconds / 60 / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     this.duration = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
