@@ -5,7 +5,8 @@
                 <h6>Is it a cover or someone else’s song?</h6>
                 <div class="bg-darkgrey w-100 radius-5 p-1">
                     <input type="radio" class="btn-check acrylic-radio" id="cover-song" autocomplete="off"
-                        formControlName="is_cover" [value]="true">
+                        formControlName="is_cover" [value]="true" (change)="checkCover()" data-bs-toggle="modal"
+                        data-bs-target="#cover-popup">
                     <label class="btn w-50" for="cover-song">Yes</label>
                     <input type="radio" class="btn-check acrylic-radio " id="not-cover-song" autocomplete="off"
                         formControlName="is_cover" [value]="false">
@@ -71,15 +72,15 @@
                     (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
             </div>
         </div>
-       @if(form.get('distributor')?.value == 'Other') {
-            <div class="col-12">
-                <div class="acr-box">
-                    <div class="acr-input-label">Enter Name Of Distributor Or Label Contact</div>
-                    <input type="text" formControlName="other_distributor" class="form-control acr-input"
-                        placeholder="Distributor Or Label Contact" autocomplete="off">
-                </div>
+        @if(isDistributorNameRequired) {
+        <div class="col-12">
+            <div class="acr-box">
+                <div class="acr-input-label">Enter Name Of Distributor Or Label Contact</div>
+                <input type="text" formControlName="other_distributor" class="form-control acr-input"
+                    placeholder="Distributor Or Label Contact" autocomplete="off">
             </div>
-       }
+        </div>
+        }
     </form>
     <div class="my-4">
         <div class="row gap-2">
@@ -98,3 +99,23 @@
         </div>
     </div>
 </section>
+
+<div class="modal fade" id="cover-popup" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body bg-darkgrey radius-5 p-0">
+                <div class="p-3">
+                    <div class="d-flex-justify-between px-2">
+                        <h6>Notice</h6>
+                        <button class="bg-transparent border-0" data-bs-dismiss="modal">
+                            <img src="assets/images/icons/close.svg" alt="close" width="20" height="20" />
+                        </button>
+                    </div>
+                    <div class="bg-light-gray p-3 radius-5 mt-3 text-orange">
+                        Acrylic does not yet support covers
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

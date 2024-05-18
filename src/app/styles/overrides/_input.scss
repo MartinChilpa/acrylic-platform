@@ -39,7 +39,7 @@ input[type=number]::-webkit-outer-spin-button {
     color: var(--text-color);
     font-size: 14px;
     font-weight: 400;
-    margin-bottom: 10px;
+    // margin-bottom: 10px;
 }
 
 .acr-input::placeholder {
@@ -130,7 +130,7 @@ input[type=radio].acrylic-radio {
     }
         
     .content .acrylic-select-options {
-        max-height: 250px;
+        max-height: 200px;
     }
     
     .acrylic-select-options li:hover,

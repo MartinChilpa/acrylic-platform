@@ -2,7 +2,6 @@ import { Component, inject } from '@angular/core';
 import { AccountService } from '../../../services/account.service';
 import { ActivatedRoute } from '@angular/router';
 import { IVerifyUserRequest } from '../../../interfaces/request/verify-user.request';
-import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'acrylic-verify-user',
@@ -11,13 +10,15 @@ import { AlertService } from '../../../services/alert.service';
   templateUrl: './verify-user.component.html',
   styleUrl: './verify-user.component.scss'
 })
+
 export class VerifyUserComponent {
   private _accountService = inject(AccountService);
   private _route = inject(ActivatedRoute);
-  private _alertService = inject(AlertService);
 
   user!: IVerifyUserRequest;
+  message = "";
   errorMessage: string = '';
+  
   ngOnInit(): void {
     this._route.queryParams
     .subscribe((params) => {
@@ -29,10 +30,9 @@ export class VerifyUserComponent {
       this._accountService.verifyUser(this.user).subscribe({
         next: (response) => {
           if (response && response.user_id) {
-            this._alertService.success('Account verify. Login to continue');
+            this.message = "Verification successfull"
           }else {
             this.errorMessage = 'Failed to verify';
-            this._alertService.error('Failed to verify account');
           }
         },
         error: (err) => {

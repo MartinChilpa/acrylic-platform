@@ -13,8 +13,7 @@ import { ISplitSheet, ISplitSheetResult } from '../interfaces/response/split-she
 export class MyArtistService {
 
   MY_ARTIST_API_URL = `${environment.API_URL}/${environment.VERSION}/my-artist`;
-  ARTIST_API_URL = `${environment.API_URL}/${environment.VERSION}/artists`;
-
+  
   private _http = inject(HttpClient);
   public myArtist: WritableSignal<IMyArtist | null> = signal(null);
 
@@ -93,10 +92,6 @@ export class MyArtistService {
         }
       ]
     });
-  }
-
-  createArtist(request: FormData): Observable<any> {
-    return this._http.post<any>(`${this.ARTIST_API_URL}/register/`, request);
   }
 
   getSplitSheet(queryParams: any = {}): Observable<ISplitSheet> {
