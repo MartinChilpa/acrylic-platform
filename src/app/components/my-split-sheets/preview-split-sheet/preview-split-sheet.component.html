@@ -86,7 +86,7 @@
             <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border" (click)="backToSplitSheet()">
                 Back
             </button>
-            @if (!splitSheetId) {
+            @if (!splitSheetId && trackInfo) {
             <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" (click)="sendToCreateSheet()">
                 Send </button>
             }
