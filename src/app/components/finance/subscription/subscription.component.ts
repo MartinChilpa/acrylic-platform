@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AccountService } from '../../../services/account.service';
 import { COUNTRY_CODES } from '../../../utils/country-codes.utils';
 import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'acrylic-subscription',
@@ -17,6 +18,7 @@ import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dro
 export class SubscriptionComponent {
   private _fb = inject(FormBuilder);
   public _accountService = inject(AccountService);
+  public _alertService = inject(AlertService);
 
   subscriptionForm!: FormGroup;
   countryCodes = COUNTRY_CODES;
@@ -34,6 +36,7 @@ export class SubscriptionComponent {
   }
 
   getSubscription() {
+    this._alertService.ignoreAlert.set(true);
     this._accountService.getSubscription().subscribe({
       next: (response) => {
         this.subscriptionForm.patchValue({
@@ -44,6 +47,9 @@ export class SubscriptionComponent {
           tax_id: response.tax_id,
           failed_payment_notifications: response.failed_payment_notifications
         })
+      },
+      complete: () => {
+        this._alertService.ignoreAlert.set(false);
       }
     });
   }
