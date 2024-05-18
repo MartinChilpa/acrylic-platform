@@ -12,7 +12,7 @@
                 <label class="acr-input-label">Publishing Splits</label>
                 @for (publishingGroup of publishing_splits.controls; let i = $index; track publishingGroup)
                 {
-                <div class="row g-2" [formGroupName]="i">
+                <div class="row g-2 mb-2" [formGroupName]="i">
                     <div class="col-xl-2 col-sm-4 col-12">
                         <input type="text" formControlName="name" class="form-control acr-input" placeholder="Full Name"
                             autocomplete="off">
@@ -26,6 +26,7 @@
                          [inputValue]="publishingGroup.get('role')?.value" 
                          [values]="publishing_splits_role"
                          [placeholder]="'Role'"
+                         [showSearch]="false"
                         (dropdownSelected)="publishingSplitsRole($event, i)"></acrylic-custom-dropdown>
                     </div>
                     <div class="col-xl-3 col-sm-4 col-12">
@@ -72,7 +73,7 @@
                 <div><span class="text-light-gray me-1">Total:</span> 
                     <span>{{totalPublishingSplits}}%</span>
                     @if (totalPublishingSplits != 100) {
-                        <span class="text-danger ms-2">Percentage should be equals to 100</span>
+                        <small class="text-danger ms-2">*Percentage must be equal to 100.</small>
                     }
                 </div>
             </div>
@@ -85,7 +86,7 @@
                 <label class="acr-input-label">Masters Splits</label>
                 @for (masteringGroup of master_splits.controls; let i = $index; track masteringGroup)
                 {
-                <div class="row g-2" [formGroupName]="i">
+                <div class="row g-2 mb-2" [formGroupName]="i">
                     <div class="col-xl-2 col-sm-4 col-12">
                         <input type="text" formControlName="name" class="form-control acr-input" placeholder="Full Name"
                             autocomplete="off">
@@ -101,6 +102,7 @@
                         [inputValue]="masteringGroup.get('role')?.value" 
                          [values]="master_splits_role"
                          [placeholder]="'Role'"
+                         [showSearch]="false"
                         (dropdownSelected)="masterSplitsRole($event, i)"></acrylic-custom-dropdown>
                     </div>
 
@@ -151,7 +153,7 @@
                 <div><span class="text-light-gray me-1">Total:</span> 
                     <span>{{totalMasterSplits}}%</span>
                     @if (totalMasterSplits != 100) {
-                        <span class="text-danger ms-2">Percentage should be equals to 100</span>
+                        <small class="text-danger ms-2">*Percentage must be equal to 100.</small>
                     }
                 </div>
             </div>
