@@ -20,13 +20,13 @@
             </div>
         </div>
         <div class="col-lg-4 col-12 d-flex flex-column gap-3">
-            @if (_myArtistService.myArtist()) {
+            @if (myArtist) {
             <div class="w-100">
                 <div class="radius-5 bg-img" acrylicBackgroundImage
-                    [backgroundImage]="_myArtistService.myArtist()?.background_image">
+                    [backgroundImage]="myArtist.background_image">
                     <div class="position-relative d-flex-align-center">
-                        <img [src]="_myArtistService.myArtist()?.image" width="84" />
-                        <h5 class="fs-4 mb-0">{{ _myArtistService.myArtist()?.name }}</h5>
+                        <img [src]="myArtist.image" width="84" />
+                        <h5 class="fs-4 mb-0">{{ myArtist.name }}</h5>
                     </div>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                 <div class="bg-lightgrey">
                     <div class="d-flex-align-center p-3">
                         <img src="assets/images/others/beat.png" class="me-2" />
-                        <h6 class="mb-0">Top Synclists</h6>
+                        <h6 class="mb-0">Latest Syncs</h6>
                     </div>
                     <div class="d-flex-between py-2 px-3 bg-light-gray">
                         <small class="text-info-success">Synclist Name</small>
@@ -64,7 +64,7 @@
                 <div class="bg-lightgrey">
                     <div class="d-flex-align-center p-3">
                         <img src="assets/images/others/beat.png" class="me-2" />
-                        <h6 class="mb-0">Top Artists</h6>
+                        <h6 class="mb-0">New Artists</h6>
                     </div>
                     <div class="d-flex-between py-2 px-3 bg-light-gray">
                         <small class="text-info-success">Artist Name</small>
@@ -72,18 +72,32 @@
                     </div>
                 </div>
                 <ul class="ps-0 mb-0">
-                    @for (item of topArtist; track item) {
-                    <li class="menu-list list-group-item">
-                        <div class="d-flex-between py-2 px-3">
-                            <span class="d-flex-align-center">
-                                <span class="me-2">
-                                    <img src={{item.imageLink}} />
-                                </span>
-                                <span>{{item.name}}</span>
-                            </span>
-                            <span>{{item.price}}</span>
-                        </div>
-                    </li>
+                    @if(newArtists.length > 0){
+                        @for (item of newArtists; track item) {
+                            <li class="menu-list list-group-item">
+                                <div class="d-flex-between py-2 px-3">
+                                    <span class="d-flex-align-center">
+                                        <span class="me-2">
+                                            @if(item.image){
+                                                <img [src]="item.image" width="36" height="36"/>
+                                            }
+                                            @else {
+                                                <img src="assets/images/others/Colita.png" width="20" height="25" class="mx-2 my-1"/>
+                                            }
+                                        </span>
+                                        <span>{{item.name}}</span>
+                                    </span>
+                                    <div class="text-orange">N/A</div>
+                                </div>
+                            </li>
+                            }
+                    }
+                    @else{
+                        <li class="menu-list list-group-item">
+                            <div class="p-12 text-center text-orange">
+                                No new artists available.
+                            </div>
+                        </li>
                     }
                 </ul>
             </div>

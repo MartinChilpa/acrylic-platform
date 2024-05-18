@@ -1,5 +1,6 @@
 .active-route {
     border-left: 2px solid var(--text-info-color);
+    background-color: var(--light-gray-background-color);
 
     img {
         filter: invert(70%) sepia(40%) saturate(550%) hue-rotate(128deg) brightness(300%) contrast(100%);

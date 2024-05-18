@@ -24,7 +24,6 @@ export class PreviewSplitSheetComponent implements OnInit {
   private _spotifyService = inject(SpotifyService)
   private _alertService = inject(AlertService)
 
-  previewFound: boolean = true
   splitSheetId: string = ''
   trackInfo!: ISpotify
   duration: string = ''
@@ -80,12 +79,9 @@ export class PreviewSplitSheetComponent implements OnInit {
     this._spotifyService.getTrack(this.reviewObject.trackData.isrc).subscribe({
       next: response => {
         this.trackInfo = response
-        this.formatTime(this.trackInfo.duration)
+        this.formatTime(this.trackInfo.duration);
       },
       complete: () => {
-        if (!this.trackInfo) {
-          this.previewFound = false;
-        }
         this._alertService.ignoreAlert.set(false);
       }
     })

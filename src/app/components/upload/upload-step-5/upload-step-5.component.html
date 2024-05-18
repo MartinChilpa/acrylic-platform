@@ -3,42 +3,30 @@
         <div class="col-12">
             <div class="acr-box">
                 <h6>Assign Price to Your Track</h6>
-                <p class="mb-0">All tracks are assigned Basic by default</p>
-                <a href="" class="a-blue">How do prices work?</a>
-                <div class="row mt-3">
-                    <div class="col-lg-4 mb-2 px-1">
-                        <div class="bg-light-gray p-3 radius-5 cursor-pointer" (click)="priceType = 1" [class.card-beige-border]="priceType == 1">
-                            <h6 class="text-beige"><b>Basic</b></h6>
-                            <p class="mt-4">Lorem ipsum dolor sit amet consectetur.</p>
-                            <div class="line bg-lightgray-border"></div>
-                            <div class="d-flex-center flex-column bg-light-gray mt-4 p-2 radius-5">
+                <p>All tracks are assigned Basic by default</p>
+                <a class="a-blue small">How do prices work?</a>
+                <div class="row p-2 mt-2">
+                    @for(price of prices; track price){
+                    <div class="col-md-6 col-12 mb-2 px-1">
+                        <div class="bg-light-gray p-3 radius-5 cursor-pointer"
+                            [class.card-beige-border]="selectedPrice!.uuid === price.uuid"
+                            (click)="selectedPrice = price;">
+                            <h6 class="text-beige">{{price.name}}</h6>
+                            <p class="mt-3">{{price.description}}</p>
+                            <div class="line bg-lightgray-border my-3"></div>
+                            <div class="acr-box bg-light-gray text-center">
                                 <p class="mb-0 text-light-gray">Available:</p>
-                                <p class="mb-0">Unlimited</p>
+                                @if(price.max_artist_tracks === 0){
+                                <p>Unlimited</p>
+                                }
+                                @else {<p>{{price.max_artist_tracks}}</p>}
                             </div>
+                            <button class="btn btn-info mt-3 h-50px w-100">
+                                Price: $ {{price.single_use_price}}
+                            </button>
                         </div>
                     </div>
-                    <div class="col-lg-4 mb-2 px-1">
-                        <div class="bg-light-gray p-3 radius-5 cursor-pointer" (click)="priceType = 2" [class.card-beige-border]="priceType == 2">
-                            <h6 class="text-beige"><b>Premium</b></h6>
-                            <p class="mt-4">Lorem ipsum dolor sit amet consectetur.</p>
-                            <div class="line bg-lightgray-border"></div>
-                            <div class="d-flex-center flex-column bg-light-gray mt-4 p-2 radius-5">
-                                <p class="mb-0 text-light-gray">Available:</p>
-                                <p class="mb-0">1 / 3</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 mb-2 px-1">
-                        <div class="bg-light-gray p-3 radius-5 cursor-pointer" (click)="priceType = 3" [class.card-beige-border]="priceType == 3">
-                            <h6 class="text-beige"><b>Contact Us</b></h6>
-                            <p class="mt-4">Lorem ipsum dolor sit amet consectetur.</p>
-                            <div class="line bg-lightgray-border"></div>
-                            <div class="d-flex-center flex-column bg-light-gray mt-4 p-2 radius-5">
-                                <p class="mb-0 text-light-gray">Available:</p>
-                                <p class="mb-0">1 / 1</p>
-                            </div>
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
@@ -61,7 +49,7 @@
     </div>
 </section>
 <div class="modal fade" id="confirm-upload" data-bs-backdrop="static">
-    <acrylic-confirm-upload (actionTaken)="actionTaken($event)"></acrylic-confirm-upload>
+    <acrylic-confirm-upload [selectedPrice]="selectedPrice" (actionTaken)="actionTaken($event)"></acrylic-confirm-upload>
 </div>
 <div class="modal fade" id="live-upload" data-bs-backdrop="static">
     <acrylic-live-upload></acrylic-live-upload>

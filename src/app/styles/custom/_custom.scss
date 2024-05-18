@@ -99,7 +99,7 @@ p {
 }
 
 .h-50px {
-    height: 50px;
+    height: 50px !important;
 }
 
 .auth-tagline {
@@ -230,8 +230,14 @@ p {
 
 /**Custom Menu List Override Css**/
 
-
 .hidden {
     opacity: 0;
     pointer-events: none;
+}
+
+
+.modal-open .modal-backdrop {
+    backdrop-filter: blur(3px);
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 1 !important;
 }

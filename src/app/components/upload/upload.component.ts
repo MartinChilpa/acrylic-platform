@@ -1,33 +1,31 @@
 import { AfterViewInit, Component, ComponentRef, OnInit, ViewChild, ViewContainerRef, inject, ChangeDetectorRef } from '@angular/core';
-import { UploadStep2Component } from './upload-step-2/upload-step-2.component';
-import { UploadStep3Component } from './upload-step-3/upload-step-3.component';
-import { UploadStep4Component } from './upload-step-4/upload-step-4.component';
-import { UploadStep5Component } from './upload-step-5/upload-step-5.component';
-import { NgClass, NgOptimizedImage } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MyArtistService } from '../../services/my-artist.service';
 import { ModalService } from '../../services/modal.service';
 import { ActivatedRoute } from '@angular/router';
+import { IPrice } from '../../interfaces/response/price.response';
 
 @Component({
   selector: 'acrylic-upload',
   standalone: true,
-  imports: [NgClass, NgOptimizedImage, ReactiveFormsModule, UploadStep2Component, UploadStep3Component, UploadStep4Component, UploadStep5Component],
+  imports: [NgClass, ReactiveFormsModule],
   templateUrl: './upload.component.html',
   styleUrl: './upload.component.scss',
 })
 export class UploadComponent implements OnInit, AfterViewInit {
   @ViewChild('acrylicUploadRef', { static: true, read: ViewContainerRef }) acrylicUploadRef!: ViewContainerRef;
-  componentRefs!: ComponentRef<UploadStep2Component | UploadStep3Component | UploadStep4Component | UploadStep5Component >;
+
+  componentRefs!: ComponentRef<any>;
   activeStepper: number = 1;
   uploadStepperList = ['General Information', 'Upload assets', 'Preview & Confirm', 'Set your prices'];
   uploadTrackForm!: FormGroup;
+
   private _changeDetector: ChangeDetectorRef = inject(ChangeDetectorRef);
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   private _modalService = inject(ModalService);
   private _activatedRoute = inject(ActivatedRoute);
-
   uploadTrackId: string = ''
 
   ngOnInit(): void {
@@ -50,11 +48,15 @@ export class UploadComponent implements OnInit, AfterViewInit {
       file_mp3: [''],
       distributor: [''],
       tags: [],
-      other_distributor: ['']
+      other_distributor: [''],
+      price: []
     });
     if (this.uploadTrackId) {
       this.getTrackById()
     }
+
+    // Object.keys(this.uploadTrackForm.controls).forEach(key => this.uploadTrackForm.get(key)?.clearValidators());
+    // this.uploadTrackForm.updateValueAndValidity();
   }
 
   ngAfterViewInit() {
@@ -107,35 +109,37 @@ export class UploadComponent implements OnInit, AfterViewInit {
     this.activeStepper = step;
   }
 
-  loadComponent(step: number) {
+  async loadComponent(step: number) {
     switch (step) {
-      // case 1:
-      //   this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep1Component);
-      //   break;
       case 1:
+        const { UploadStep2Component } = await import('./upload-step-2/upload-step-2.component');
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep2Component);
         break;
       case 2:
+        const { UploadStep3Component } = await import('./upload-step-3/upload-step-3.component');
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep3Component);
         break;
       case 3:
+        const { UploadStep4Component } = await import('./upload-step-4/upload-step-4.component');
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep4Component);
         break;
       case 4:
+        const { UploadStep5Component } = await import('./upload-step-5/upload-step-5.component');
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep5Component);
-        const stepInstance = this.componentRefs.instance as UploadStep5Component;
-        stepInstance.uploadAction.subscribe(() => {
+        const stepInstance = this.componentRefs.instance;
+        stepInstance.selectedPriceEvent.subscribe((price: IPrice) => {
+          this.uploadTrackForm.get('price')?.setValue(price);
           this.publishTrack();
         });
-  
         break;
       default:
-        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep2Component);
+        const { UploadStep2Component: DefaultComponent } = await import('./upload-step-2/upload-step-2.component');
+        this.componentRefs = this.acrylicUploadRef.createComponent(DefaultComponent);
     }
     this.componentRefs.instance.form = this.uploadTrackForm;
     this.componentRefs.instance.nextStepper.subscribe((count: number) => {
       this.stepperCount(count);
-    });    
+    });
   }
 
   publishTrack() {
@@ -149,7 +153,8 @@ export class UploadComponent implements OnInit, AfterViewInit {
       else if (value && typeof value !== 'string') {
         formData.append(item, value);
       }
-    })
+    });
+    console.log(formData);
     const uploadType = this.uploadTrackForm.value.id ? this._myArtistService.updateTracks(formData, this.uploadTrackForm.value.id) : this._myArtistService.createTracks(formData)
     uploadType.subscribe({
       next: response => {
