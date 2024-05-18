@@ -70,6 +70,26 @@ export class ManageSplitSheetComponent implements OnInit {
   }
 
   sendRequestToCreateSheet() {
+    if (this.reviewObject.publishing_splits) {
+      this.reviewObject.publishing_splits.forEach((item: any) => {
+        if (!item.legal_name) {
+          delete item.legal_name
+        }
+        if (!item.role) {
+          delete item.role
+        }
+      })
+    }
+    if (this.reviewObject.master_splits) {
+      this.reviewObject.master_splits.forEach((item: any) => {
+        if (!item.legal_name) {
+          delete item.legal_name
+        }
+        if (!item.role) {
+          delete item.role
+        }
+      })
+    }
     this._myArtistService.createSplitSheet(this.reviewObject).subscribe({
       next: response => {
         this._alertService.success("Split sheet created successfully")

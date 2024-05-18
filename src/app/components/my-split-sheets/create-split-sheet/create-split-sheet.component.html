@@ -69,7 +69,12 @@
                         </div>
                     </div>
                 </div>
-                <div><span class="text-light-gray me-1">Total:</span> <span>{{totalPublishingSplits}}%</span></div>
+                <div><span class="text-light-gray me-1">Total:</span> 
+                    <span>{{totalPublishingSplits}}%</span>
+                    @if (totalPublishingSplits != 100) {
+                        <span class="text-danger ms-2">Percentage should be equals to 100</span>
+                    }
+                </div>
             </div>
         </div>
         }
@@ -143,7 +148,12 @@
                     </div>
                 </div>
 
-                <div><span class="text-light-gray me-1">Total:</span> <span>{{totalMasterSplits}}%</span></div>
+                <div><span class="text-light-gray me-1">Total:</span> 
+                    <span>{{totalMasterSplits}}%</span>
+                    @if (totalMasterSplits != 100) {
+                        <span class="text-danger ms-2">Percentage should be equals to 100</span>
+                    }
+                </div>
             </div>
         </div>
         }
@@ -155,7 +165,7 @@
                     Back
                 </button>
                 <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" (click)="reviewSheet()"
-                    [disabled]="createSplitSheetForm.invalid"> Review </button>
+                    [disabled]="createSplitSheetForm.invalid || totalMasterSplits != 100 || totalPublishingSplits != 100"> Review </button>
             </div>
         </div>
     </form>
