@@ -3,16 +3,17 @@ import { MyArtistService } from '../../services/my-artist.service';
 import { ISplitSheetResult } from '../../interfaces/response/split-sheet.response';
 import { NavigationService } from '../../services/navigation.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { LoaderService } from '../../services/loader.service';
 import { Subject, debounceTime } from 'rxjs';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'acrylic-my-split-sheets',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    PaginationComponent
+    PaginationComponent,
+    DatePipe
   ],
   templateUrl: './my-split-sheets.component.html',
   styleUrl: './my-split-sheets.component.scss'
@@ -27,9 +28,7 @@ export class MySplitSheetsComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService)
   private _navigationService = inject(NavigationService)
-  private _loadingService = inject(LoaderService);
   private debounceSubject: Subject<void> = new Subject<void>();
-
 
   ngOnInit(): void {
     this.searchForm = this._fb.group({
@@ -57,7 +56,7 @@ export class MySplitSheetsComponent implements OnInit {
   }
 
   goToPreview(track: any) {
-    this._navigationService.navigateToPreviewSplitSheet(track.uuid)
+    this._navigationService.navigateToPreviewSplitSheet(track.uuid);
   }
 
   prepareRequest() {

@@ -1,10 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ISplitSheetResult } from '../../../interfaces/response/split-sheet.response';
+import { CustomDropdownComponent } from '../custom-dropdown/custom-dropdown.component';
 
 @Component({
   selector: 'acrylic-pagination',
   standalone: true,
-  imports: [],
+  imports: [
+    CustomDropdownComponent
+  ],
   templateUrl: './pagination.component.html',
   styleUrl: './pagination.component.scss'
 })
@@ -14,6 +17,10 @@ export class PaginationComponent {
   @Input() tableData!: any[];
   @Output() pageChange: EventEmitter<any> = new EventEmitter<any>();
   paginationOptions: number[] = [5, 10, 15, 20]
+  paginationDrpOptions: any[] = [5, 10, 15, 20].map(x => ({
+    name: x,
+    uuid: x
+  }))
   pageSize: number = 5;
   pageNumber: number = 1;
 
@@ -22,7 +29,7 @@ export class PaginationComponent {
   }
 
    onPageChange(event: any) {
-    this.pageSize = parseInt(event.value, 10);
+    this.pageSize = parseInt(event.uuid, 10);
     this.applyRequestParams()
   }
   

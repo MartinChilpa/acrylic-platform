@@ -3,9 +3,9 @@
     <div class="acr-input-label">{{ title }}</div>
     }
     <div class="acrylic-select w-100 cursor-pointer position-relative" (click)="isActive = !isActive">
-        <div class="select-btn d-flex-between bg-darkgrey h-50px px-3 radius-5"
+        <div class="select-btn d-flex-between bg-darkgrey h-50px px-3 radius-5 " [class]="className"
             [ngClass]="{'rounded-bottom-0': isActive}">
-            <span [ngClass]="{'text-light-gray': !selectedValue}">{{ selectedValue ? selectedValue : placeholder
+            <span [ngClass]="{'dropdown-placeholder': !selectedValue}">{{ selectedValue ? selectedValue : placeholder
                 }}</span>
             <span class="select-down-arrow height-15px width-15px"></span>
         </div>
@@ -27,11 +27,11 @@
                 <div class="loader"></div>
             </div>
             } @else {
-            <ul class="acrylic-select-options overflow-y-auto p-0">
+            <ul class="acrylic-select-options overflow-y-auto p-0 mb-2">
                 <ng-container>
                     @for(item of values | acrylicSearchFilter: searchForm.value.searchText; track item.name) {
-                    <li (click)="updateName(item)" class="list-unstyled d-flex-between px-3 py-1"
-                        [class.selected]="item.name === selectedValue" [class.justify-content-start]="!item.text">
+                    <li (click)="updateName(item)" class="px-3 py-1" [ngClass]="{'list-unstyled d-flex-between' : item.text}"
+                        [class.selected]="item.name === selectedValue">
                         <span>{{ item.name }}</span>
                         @if (item.text) {
                         <span class="bg-light-gray px-2 py-1 radius-5 small">{{ item.text }}</span>

@@ -7,7 +7,7 @@
     </button>
 </div>
 
-<div class="acr-box my-2">
+<div class="acr-box mt-3">
     <ul class="list-unstyled mb-0">
         @for (item of sidenavItems; track item) {
         @if (!item.submenu) {
@@ -37,19 +37,6 @@
             </ul>
         </div>
         }
-        }
-    </ul>
-</div>
-<div class="acr-box">
-    <p class="fw-semibold">Top Tracks</p>
-    <ul class="list-unstyled mb-0">
-        @for (userTrack of userTrackList; track userTrack) {
-            <li>
-                <a class="p-2 w-100 d-inline-flex align-items-center text-primary text-decoration-none">
-                    <img [ngSrc]="userTrack.picture"  height="36" width="36" class="radius-5"/>
-                    <span class="ms-2">{{ userTrack.nama }}</span>
-                </a>
-            </li>
         }
     </ul>
 </div>

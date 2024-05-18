@@ -34,14 +34,14 @@ export class ManageSplitSheetComponent implements OnInit {
 
   ngOnInit(): void {
     this.createSplitSheetForm = this._fb.group({
-      track: [''],
+      track: ['', [Validators.required]],
       name: [''],
       publishing_splits: new FormArray([
         new FormGroup({
           name: new FormControl('', [Validators.required]),
           email: new FormControl('', [Validators.required, Validators.email]),
-          legal_name: new FormControl('', [Validators.required]),
-          role: new FormControl('', [Validators.required]),
+          legal_name: new FormControl(''),
+          role: new FormControl(''),
           percent: new FormControl(100, [Validators.required])
         })
       ]),
@@ -49,8 +49,8 @@ export class ManageSplitSheetComponent implements OnInit {
         new FormGroup({
           name: new FormControl('', [Validators.required]),
           email: new FormControl('', [Validators.required, Validators.email]),
-          legal_name: new FormControl('', [Validators.required]),
-          role: new FormControl('', [Validators.required]),
+          legal_name: new FormControl(''),
+          role: new FormControl(''),
           percent: new FormControl(100, [Validators.required])
         })
       ])
@@ -70,6 +70,26 @@ export class ManageSplitSheetComponent implements OnInit {
   }
 
   sendRequestToCreateSheet() {
+    if (this.reviewObject.publishing_splits) {
+      this.reviewObject.publishing_splits.forEach((item: any) => {
+        if (!item.legal_name) {
+          delete item.legal_name
+        }
+        if (!item.role) {
+          delete item.role
+        }
+      })
+    }
+    if (this.reviewObject.master_splits) {
+      this.reviewObject.master_splits.forEach((item: any) => {
+        if (!item.legal_name) {
+          delete item.legal_name
+        }
+        if (!item.role) {
+          delete item.role
+        }
+      })
+    }
     this._myArtistService.createSplitSheet(this.reviewObject).subscribe({
       next: response => {
         this._alertService.success("Split sheet created successfully")

@@ -16,10 +16,11 @@ export class UploadStep2Component implements OnInit {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
 
-  public _navigationService = inject(NavigationService)
+  public _navigationService = inject(NavigationService);
+  private _distributorService = inject(DistributorsService);
 
-  private _distributorService = inject(DistributorsService)
-  distributors!: IDistributorsResult[]
+  distributors!: IDistributorsResult[];
+  isDistributorNameRequired: boolean = false;
 
   ngOnInit(): void {
     this.getDistributors()
@@ -35,16 +36,24 @@ export class UploadStep2Component implements OnInit {
         this.distributors = response.results;
         this.distributors.push({
           name: "Other",
-          uuid: "Other"
+          uuid: null
         });
       }
     })
   }
 
   dropdownSelected($event: any) {
-    if ($event.name != "Other") {
+    if ($event.uuid) {
       this.form.get('other_distributor')?.setValue('');
+      this.form.get('distributor')?.setValue($event.uuid);
+      this.isDistributorNameRequired = false;
     }
-    this.form.get('distributor')?.setValue($event.uuid);
+    else {
+      this.isDistributorNameRequired = true;
+    }
+  }
+
+  checkCover(): void {
+    this.form.get('is_cover')?.setValue(false);
   }
 }

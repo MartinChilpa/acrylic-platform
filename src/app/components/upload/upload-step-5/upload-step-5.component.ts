@@ -1,7 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { ConfirmUploadComponent } from '../confirm-upload/confirm-upload.component';
 import { LiveUploadComponent } from '../live-upload/live-upload.component';
 import { FormGroup } from '@angular/forms';
+import { IPrice } from '../../../interfaces/response/price.response';
+import { PriceService } from '../../../services/price.service';
+import { ICommonSuccessResponse } from '../../../interfaces/response/common.response';
 
 @Component({
   selector: 'acrylic-upload-step-5',
@@ -13,15 +16,30 @@ import { FormGroup } from '@angular/forms';
 export class UploadStep5Component {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
-  @Output() uploadAction = new EventEmitter();
+  @Output() selectedPriceEvent = new EventEmitter();
 
-  priceType: number = 1
+  prices: IPrice[] = [];
+  private _priceService = inject(PriceService);
+  selectedPrice!: IPrice;
 
   nextUploadStepper(count: number) {
     this.nextStepper.emit(count);
   }
 
   actionTaken($event: boolean) {
-    this.uploadAction.emit($event)
+    if($event){
+      this.selectedPriceEvent.emit(this.selectedPrice);
+    }
+  }
+
+  ngOnInit(): void {
+    this.getPrices();
+  }
+
+  getPrices(): void {
+    this._priceService.getPrices().subscribe((response: ICommonSuccessResponse) => {
+      this.prices = response.results as IPrice[];
+      this.selectedPrice = this.prices?.find(x => x.default) ?? {} as IPrice;
+    })
   }
 }

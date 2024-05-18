@@ -1,5 +1,6 @@
 .active-route {
     border-left: 2px solid var(--text-info-color);
+    background-color: var(--light-gray-background-color);
 
     img {
         filter: invert(70%) sepia(40%) saturate(550%) hue-rotate(128deg) brightness(300%) contrast(100%);
@@ -23,3 +24,36 @@
     opacity: 0;
     overflow: hidden;
 }
+
+// /* Hide sidebar by default on small screens */
+// @media (max-width: 768px) {
+//     .sidebar-toggle {
+//         display: block;
+//         position: fixed;
+//         top: 10px;
+//         left: 10px;
+//         z-index: 1000;
+//         background: #000;
+//         color: #fff;
+//         padding: 10px;
+//         border-radius: 5px;
+//         cursor: pointer;
+//     }
+
+//     .sidebar-open {
+//         display: block;
+//         position: fixed;
+//         top: 0;
+//         left: 0;
+//         height: 100%;
+//         width: 250px;
+//         background: #fff;
+//         z-index: 999;
+//         transition: transform 0.3s ease-in-out;
+//         transform: translateX(0);
+//     }
+
+//     .sidebar-closed {
+//         transform: translateX(-100%);
+//     }
+// }

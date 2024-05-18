@@ -8,12 +8,13 @@
                 </div>
             </div>
         </div>
-        <div class="light-gray-table-border rounded-2 table-responsive mt-4">
+        <div class="light-gray-table-border rounded-2 mt-4">
             <table class="acrylic-table" >
                 <thead>
                     <tr>
                         <th scope="col">Track Name</th>
                         <th scope="col">Status</th>
+                        <th scope="col">Date</th>
                         <th scope="col" width="70"></th>
                     </tr>
                 </thead>
@@ -28,12 +29,19 @@
                                 </div>
                                 <div class="ms-2">
                                     <span class="d-block">{{ item.track.name }}</span>
-                                    <span class="text-light-gray small"></span>
+                                    <span class="text-light-gray small">{{ item.track.isrc }}</span>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <span class="tb-pill">Pending</span>
+                            @if (item.signed) {
+                                <span class="tb-pill success">Signed</span>
+                            } @else {
+                                <span class="tb-pill">Pending</span>
+                            }
+                        </td>
+                        <td>
+                            {{ (item.updated ? item.updated : item.created) | date:'MMM d, YYYY' }}
                         </td>
                         <td>
                             <button class="btn btn-sm btn-acrylic" (click)="goToPreview(item.track)">
@@ -43,7 +51,7 @@
                         </tr>
                     } @empty {
                         <tr>
-                            <td class="text-center" colspan="3">
+                            <td class="text-center" colspan="4">
                                 No data available
                             </td>
                         </tr>

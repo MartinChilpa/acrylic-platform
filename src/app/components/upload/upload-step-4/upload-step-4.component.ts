@@ -5,11 +5,13 @@ import { MyArtistService } from '../../../services/my-artist.service';
 import { IMyArtist } from '../../../interfaces/response/my-artist.response';
 import { SpotifyService } from '../../../services/spotify.service';
 import { ISpotify } from '../../../interfaces/response/spotify.response';
+import { AlertService } from '../../../services/alert.service';
+import { DurationPipe } from '../../../pipes/duration.pipe';
 
 @Component({
   selector: 'acrylic-upload-step-4',
   standalone: true,
-  imports: [NgOptimizedImage],
+  imports: [NgOptimizedImage, DurationPipe],
   templateUrl: './upload-step-4.component.html',
   styleUrl: './upload-step-4.component.scss'
 })
@@ -19,14 +21,14 @@ export class UploadStep4Component implements OnInit, OnDestroy {
 
   @ViewChild("audioSnippet") audioSnippet!: ElementRef<HTMLAudioElement>
 
-  snippet: string = ''
-  coverImage: string = ''
-  duration: string = ''
+  snippet: string = '';
+  coverImage: string = '';
+  trackInfo!: ISpotify;
 
-  trackInfo!: ISpotify
-
-  private _spotifyService = inject(SpotifyService)
+  private _spotifyService = inject(SpotifyService);
   private _myArtistService = inject(MyArtistService);
+  private _alertService = inject(AlertService);
+
   myArtist: IMyArtist | undefined | null;
 
   constructor() {
@@ -36,12 +38,12 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const snippet = this.form.get('snippet')?.value
+    const snippet = this.form.get('snippet')?.value;
     if (snippet) {
       if (typeof snippet == 'string') {
-        this.snippet = snippet
+        this.snippet = snippet;
       } else {
-        this.snippet = URL.createObjectURL(snippet)
+        this.snippet = URL.createObjectURL(snippet);
       }
     }
 
@@ -58,10 +60,13 @@ export class UploadStep4Component implements OnInit, OnDestroy {
   }
 
   getTrackPreview() {
+    this._alertService.ignoreAlert.set(true);
     this._spotifyService.getTrack(this.form.get('isrc')?.value).subscribe({
       next: response => {
-        this.trackInfo = response
-        this.formatTime(this.trackInfo.duration)
+        this.trackInfo = response;
+      },
+      complete: () => {
+        this._alertService.ignoreAlert.set(false);
       }
     })
   }
@@ -92,15 +97,8 @@ export class UploadStep4Component implements OnInit, OnDestroy {
     audio.onloadedmetadata = () => {
       URL.revokeObjectURL(audio.src);
       this.form.get('duration')?.setValue(parseInt(`${audio.duration}`));
-      // this.formatTime(audio.duration)
     };
     audio.src = this.snippet;
-  }
-
-  formatTime(seconds: number) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    this.duration = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
 
   ngOnDestroy(): void {

@@ -1,4 +1,4 @@
-import { Component, Input, effect, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { IMyArtist } from '../../../interfaces/response/my-artist.response';
 import { NgClass, NgOptimizedImage } from '@angular/common';
 import { environment } from '../../../../environments/environment';
@@ -21,7 +21,6 @@ export class ShareProfileComponent {
   isCopied: boolean = false;
 
   linkIcon = '/assets/images/icons/link.svg';
-  closeIcon = '/assets/images/icons/close.svg';
 
   profileShareList = [
     { picture: 'assets/images/others/jawima.png' },
