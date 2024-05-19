@@ -89,9 +89,6 @@ export class UploadComponent implements OnInit, AfterViewInit {
           tags: response.tags,
           other_distributor: response.other_distributor
         })
-        if (response.other_distributor) {
-          this.uploadTrackForm.get('distributor')?.setValue('Other');
-        }
       }
     })
   }
@@ -150,12 +147,10 @@ export class UploadComponent implements OnInit, AfterViewInit {
     const trackData = JSON.parse(JSON.stringify(this.uploadTrackForm.value))
     Object.keys(trackData).forEach(item => {
       const value = trackData[item]
-      if (item == 'price') {
-        if (value) {
+      if (item == 'price' && value) {
           formData.append(item, JSON.stringify(value));
-        }
       }
-      else if (!fileKeys.includes(item)) {
+      else if (!fileKeys.includes(item) && value) {
         formData.append(item, value);
       }
       else if (value && typeof value !== 'string') {

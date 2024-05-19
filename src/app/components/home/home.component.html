@@ -75,7 +75,7 @@
                     @if(newArtists.length > 0){
                         @for (item of newArtists; track item) {
                             <li class="menu-list list-group-item">
-                                <div class="d-flex-between py-2 px-3">
+                                <div class="d-flex-between py-2 ps-2 pe-3">
                                     <span class="d-flex-align-center">
                                         <span class="me-2">
                                             @if(item.image){
@@ -87,7 +87,7 @@
                                         </span>
                                         <span>{{item.name}}</span>
                                     </span>
-                                    <div class="text-orange">N/A</div>
+                                    <div>{{item.kamrank}}</div>
                                 </div>
                             </li>
                             }
