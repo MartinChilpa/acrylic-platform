@@ -3448,24 +3448,6 @@ textarea.form-control-lg {
 	.ps-lg-5 {
 		padding-left: 3rem !important;
 	}
-	.gap-lg-0 {
-		gap: 0 !important;
-	}
-	.gap-lg-1 {
-		gap: 0.25rem !important;
-	}
-	.gap-lg-2 {
-		gap: 0.5rem !important;
-	}
-	.gap-lg-3 {
-		gap: 1rem !important;
-	}
-	.gap-lg-4 {
-		gap: 1.5rem !important;
-	}
-	.gap-lg-5 {
-		gap: 3rem !important;
-	}
 	.text-lg-start {
 		text-align: left !important;
 	}
