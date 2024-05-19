@@ -53,7 +53,7 @@ export class MyTracksComponent implements OnInit {
     });
   }
 
-  openTrack(id: string) {
-    this._navigationService.navigateToEditTracks(id)
+  openTrack(id: string, assignPrice: boolean = false) {
+    this._navigationService.navigateToEditTracks(id, assignPrice)
   }
 }

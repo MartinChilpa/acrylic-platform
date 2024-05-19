@@ -26,7 +26,7 @@ export class UploadStep5Component {
   }
 
   actionTaken($event: boolean) {
-    if($event){
+    if ($event) {
       this.selectedPriceEvent.emit(this.selectedPrice);
     }
   }

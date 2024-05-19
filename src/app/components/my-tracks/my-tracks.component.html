@@ -72,11 +72,13 @@
             <div class="col-xxl-4 col-xl-3 col-md-6">
                 <div class="acr-input-group" [formGroup]="searchForm">
                     <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
-                    <input type="text" formControlName="searchText" class="w-100" placeholder="Search for a specific track" (input)="searchChanges()">
+                    <input type="text" formControlName="searchText" class="w-100"
+                        placeholder="Search for a specific track" (input)="searchChanges()">
                 </div>
             </div>
             <div class="col-xxl-8 col-xl-9 col-md-6 d-flex justify-content-end">
-                <button class="btn me-1 btn-info" (click)="_navigationService.navigateToUploadTrack()">Upload Track</button>
+                <button class="btn me-1 btn-info" (click)="_navigationService.navigateToUploadTrack()">Upload
+                    Track</button>
             </div>
         </div>
         <div class="light-gray-table-border rounded-2 table-responsive">
@@ -97,7 +99,10 @@
                         <td>
                             <div class="d-md-flex align-items-md-center gap-2">
                                 <img [src]="item.cover_image" height="36" width="36" class="radius-5" />
-                                <div>{{ item.name }}</div>
+                                <div>
+                                    <p class="m-0">{{ item.name }}</p>
+                                    <small>{{ item.isrc }}</small>
+                                </div>
                             </div>
                         </td>
                         <td>
@@ -108,11 +113,15 @@
                             </div>
                         </td>
                         <td class="text-nowrap">
-                            <div class="clip-path-tag radius-5 p-2 d-flex-align-center gap-2 bg-lightgray-border">
+                            @if (item.price) {
+                            <div class="clip-path-tag radius-5 p-2 d-flex-align-center gap-2"
+                                [class.bg-lightgray-border]="item.price.name == 'Basic'"
+                                [class.bg-blue]="item.price.name == 'Premium'">
                                 <img [ngSrc]="'assets/images/others/beat.png'" height="20" width="15" />
-                                <span>{{ 'Basic' }}</span>
+                                <span>{{ item.price.name }}</span>
                                 <span class="d-inline-block height-15px width-15px bg-secondary rounded-circle"></span>
                             </div>
+                            }
                         </td>
                         <td>
                             <div class="d-flex gap-2">
@@ -124,17 +133,20 @@
                         <td>
                             <span>{{ item.released }}</span>
                         </td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-warning me-md-3 me-2" (click)="openTrack(item.uuid)">Assign Price</button>
+                        <td class="text-end">
+                            @if (!item.price || (item.price && !item.price.active)) {
+                            <button class="btn btn-sm btn-warning me-md-3 me-2"
+                                (click)="openTrack(item.uuid, true)">Assign Price</button>
+                            }
                             <button class="btn btn-sm btn-acrylic" (click)="openTrack(item.uuid)">Edit Track</button>
                         </td>
                     </tr>
-                    }  @empty {
-                        <tr>
-                            <td class="text-center" colspan="7">
-                                No data available
-                            </td>
-                        </tr>
+                    } @empty {
+                    <tr>
+                        <td class="text-center" colspan="7">
+                            No data available
+                        </td>
+                    </tr>
                     }
                 </tbody>
             </table>

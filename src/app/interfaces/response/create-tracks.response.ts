@@ -1,3 +1,5 @@
+import { IPrice } from "./price.response"
+
 export interface ICreateTracks {
     id: number
     artist: string
@@ -26,4 +28,5 @@ export interface ICreateTracks {
     file_mp3: any
     distributor: any
     other_distributor: string
+    price: IPrice
 }
