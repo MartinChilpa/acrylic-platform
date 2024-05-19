@@ -5,9 +5,11 @@
             <a class="cursor-pointer" data-bs-toggle="offcanvas" data-bs-target="#acrylicOffcanvas">
                 <img ngSrc="assets/images/icons/down-arrow-white.svg" width="18" height="18"/>
             </a> 
-            <div class="offcanvas offcanvas-top mt-0 bg-primary"  tabindex="-1" id="acrylicOffcanvas">
+            <div class="offcanvas offcanvas-top mt-0 bg-primary" tabindex="-1" id="acrylicOffcanvas">
                 <div class="offcanvas-header pb-0 pt-4">
-                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+                  <button type="button" class="bg-transparent border-0" data-bs-dismiss="offcanvas">
+                    <img ngSrc="assets/images/icons/close.svg" alt="close" width="20" height="20" />
+                  </button>
                 </div>
                 <div class="offcanvas-body">
                     <acrylic-sidenav></acrylic-sidenav>

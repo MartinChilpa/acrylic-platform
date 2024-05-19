@@ -57,9 +57,9 @@ export class FileDropzoneComponent implements OnInit {
     if (this.allowExtensions && this.allowExtensions.length > 0) {
       files.forEach(item => {
         const extension = item.name.split('.')[item.name.split('.').length - 1]
-        if (this.allowExtensions.some(x => x.toLowerCase() != extension.toLowerCase())) {
+        if (this.allowExtensions.every(x => x.toLowerCase() != extension.toLowerCase())) {
           canUpload = false;
-          this._alertService.error(`Allowed file extensions are ${this.allowExtensions.join(',')} only.`)
+          this._alertService.error(`Allowed file extensions are ${this.allowExtensions.join(', ')} only.`)
           return;
         }
       })

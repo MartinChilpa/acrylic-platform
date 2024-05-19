@@ -9,6 +9,7 @@ export interface IMyArtist {
     country: string;
     image: string;
     background_image: string;
+    spotify_id: string;
     chartmetric_id: string;
     spotify_url: string | null;
     tiktok_url: string | null;
@@ -23,6 +24,12 @@ export interface IMyArtist {
     itunes_url: string | null;
     amazonmusic_url: string | null;
     deezer_url: string | null;
+    kamrank: number;
+    spotify_followers: number;
+    spotify_popularity: number;
+    spotify_monthly_listeners: number;
+    instagram_followers: number;
+    tiktok_followers: number;
+    tiktok_likes: number;
     is_active: boolean;
-    user: number;
 }

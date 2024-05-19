@@ -23,8 +23,8 @@
                 [fileDropzoneHeader]="UploadFileTextDetails[1].fileDropzoneHeader"
                 [fileDropzoneSize]="UploadFileTextDetails[1].fileDropzoneSize"
                 [existingFiles]="[form.get('cover_image')?.value]"
-                [allowExtensions]="['jpg']"
-                [accept]="'.jpg'"
+                [allowExtensions]="['jpg', 'jpeg']"
+                [accept]="'.jpg, .jpeg'"
                 (uploadedFileList)="setUploadFile('cover_image', $event)"></acrylic-file-dropzone>
         </div>
     </div>
