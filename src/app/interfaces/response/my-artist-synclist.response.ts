@@ -1,10 +1,3 @@
-export interface IMyArtistSynclist {
-    count: number
-    next: any
-    previous: any
-    results: IMyArtistSynclistResult[]
-}
-
 export interface IMyArtistSynclistResult {
     uuid: string
     artist: string

@@ -4,7 +4,6 @@ import { LiveUploadComponent } from '../live-upload/live-upload.component';
 import { FormGroup } from '@angular/forms';
 import { IPrice } from '../../../interfaces/response/price.response';
 import { PriceService } from '../../../services/price.service';
-import { ICommonSuccessResponse } from '../../../interfaces/response/common.response';
 
 @Component({
   selector: 'acrylic-upload-step-5',
@@ -37,8 +36,8 @@ export class UploadStep5Component {
   }
 
   getPrices(): void {
-    this._priceService.getPrices().subscribe((response: ICommonSuccessResponse) => {
-      this.prices = response.results as IPrice[];
+    this._priceService.getPrices().subscribe((response) => {
+      this.prices = response.results;
       this.selectedPrice = this.prices?.find(x => x.default) ?? {} as IPrice;
     })
   }

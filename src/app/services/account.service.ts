@@ -2,11 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ICommonResponse } from '../interfaces/response/common.response';
+import { ICommonResponse, ICommonSuccessResponse } from '../interfaces/response/common.response';
 import { IResetPasswordRequest } from '../interfaces/request/reset-password.request';
 import { IForgotPasswordRequest } from '../interfaces/request/forgot-password.request';
 import { ISubscription } from '../interfaces/response/subscription.response';
-import { IDocuments } from '../interfaces/response/document.response';
+import { IDocumentResults } from '../interfaces/response/document.response';
 import { IVerifyUserRequest } from '../interfaces/request/verify-user.request';
 
 @Injectable({
@@ -37,8 +37,8 @@ export class AccountService {
     return this.http.put<ISubscription>(`${this.ACCOUNT_API_URL}/profile/`, request);
   }
 
-  getDocuments(): Observable<IDocuments> {
-    return this.http.get<IDocuments>(`${this.ACCOUNT_API_URL}/documents/`);
+  getDocuments(): Observable<ICommonSuccessResponse<IDocumentResults[]>> {
+    return this.http.get<ICommonSuccessResponse<IDocumentResults[]>>(`${this.ACCOUNT_API_URL}/documents/`);
   }
 
   deleteDocument(uuid: string) {

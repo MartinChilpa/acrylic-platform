@@ -3,9 +3,10 @@ import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
 import { IMyArtist } from '../interfaces/response/my-artist.response';
-import { IMyArtistSynclist, IMyArtistSynclistResult } from '../interfaces/response/my-artist-synclist.response';
+import { IMyArtistSynclistResult } from '../interfaces/response/my-artist-synclist.response';
 import { ICreateTracks } from '../interfaces/response/create-tracks.response';
-import { ISplitSheet, ISplitSheetResult } from '../interfaces/response/split-sheet.response';
+import { ISplitSheetResult } from '../interfaces/response/split-sheet.response';
+import { ICommonSuccessResponse } from '../interfaces/response/common.response';
 
 @Injectable({
   providedIn: 'root'
@@ -42,8 +43,8 @@ export class MyArtistService {
     )
   }
 
-  getMyArtistSynclist(): Observable<IMyArtistSynclist> {
-    return this._http.get<IMyArtistSynclist>(`${this.MY_ARTIST_API_URL}/synclists/`);
+  getMyArtistSynclist(): Observable<ICommonSuccessResponse<IMyArtistSynclistResult[]>> {
+    return this._http.get<ICommonSuccessResponse<IMyArtistSynclistResult[]>>(`${this.MY_ARTIST_API_URL}/synclists/`);
   }
 
   getSynclistById(id: string): Observable<IMyArtistSynclistResult> {
@@ -94,9 +95,9 @@ export class MyArtistService {
     });
   }
 
-  getSplitSheet(queryParams: any = {}): Observable<ISplitSheet> {
+  getSplitSheet(queryParams: any = {}): Observable<ICommonSuccessResponse<ISplitSheetResult[]>> {
     let params = this.buildQueryParams(queryParams)
-    return this._http.get<ISplitSheet>(`${this.MY_ARTIST_API_URL}/split-sheets/`, { params });
+    return this._http.get<ICommonSuccessResponse<ISplitSheetResult[]>>(`${this.MY_ARTIST_API_URL}/split-sheets/`, { params });
   }
 
   getSplitSheetById(id: string): Observable<ISplitSheetResult> {
