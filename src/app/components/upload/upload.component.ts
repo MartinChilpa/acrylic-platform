@@ -27,9 +27,11 @@ export class UploadComponent implements OnInit, AfterViewInit {
   private _modalService = inject(ModalService);
   private _activatedRoute = inject(ActivatedRoute);
   uploadTrackId: string = ''
+  isAssignPrice: boolean = false
 
   ngOnInit(): void {
     this.uploadTrackId = this._activatedRoute.snapshot.params['trackId'];
+    this.isAssignPrice = this._activatedRoute.snapshot.queryParams['p'];
     this.uploadTrackForm = this._fb.group({
       id: [null],
       isrc: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}-?\w{3}-?\d{2}-?\d{5}$/)]],
@@ -53,10 +55,10 @@ export class UploadComponent implements OnInit, AfterViewInit {
     });
     if (this.uploadTrackId) {
       this.getTrackById()
+      if (this.isAssignPrice) {
+        this.activeStepper = 4
+      }
     }
-
-    // Object.keys(this.uploadTrackForm.controls).forEach(key => this.uploadTrackForm.get(key)?.clearValidators());
-    // this.uploadTrackForm.updateValueAndValidity();
   }
 
   ngAfterViewInit() {
@@ -87,9 +89,6 @@ export class UploadComponent implements OnInit, AfterViewInit {
           tags: response.tags,
           other_distributor: response.other_distributor
         })
-        if (response.other_distributor) {
-          this.uploadTrackForm.get('distributor')?.setValue('Other');
-        }
       }
     })
   }
@@ -145,16 +144,19 @@ export class UploadComponent implements OnInit, AfterViewInit {
   publishTrack() {
     const formData = new FormData();
     const fileKeys = ['cover_image', 'file_mp3', 'file_wav', 'snippet']
-    Object.keys(this.uploadTrackForm.value).forEach(item => {
-      const value = this.uploadTrackForm.value[item]
-      if (!fileKeys.includes(item)) {
+    const trackData = JSON.parse(JSON.stringify(this.uploadTrackForm.value))
+    Object.keys(trackData).forEach(item => {
+      const value = trackData[item]
+      if (item == 'price' && value) {
+          formData.append(item, JSON.stringify(value));
+      }
+      else if (!fileKeys.includes(item) && value) {
         formData.append(item, value);
       }
       else if (value && typeof value !== 'string') {
         formData.append(item, value);
       }
     });
-    console.log(formData);
     const uploadType = this.uploadTrackForm.value.id ? this._myArtistService.updateTracks(formData, this.uploadTrackForm.value.id) : this._myArtistService.createTracks(formData)
     uploadType.subscribe({
       next: response => {

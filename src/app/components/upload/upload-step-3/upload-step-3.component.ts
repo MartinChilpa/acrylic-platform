@@ -41,7 +41,12 @@ export class UploadStep3Component {
     const fileKeys = ['cover_image', 'file_mp3', 'file_wav', 'snippet']
     Object.keys(data).forEach(item => {
       const value = data[item]
-      if (!fileKeys.includes(item)) {
+      if (item == 'price') {
+        if (value) {
+          formData.append(item, JSON.stringify(value));
+        }
+      }
+      else if (!fileKeys.includes(item)) {
         formData.append(item, value);
       }
       else if (value && typeof value !== 'string') {

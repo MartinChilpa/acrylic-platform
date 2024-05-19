@@ -18,15 +18,15 @@
                         @if (!isLoading) {
                         <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
                             [fileDropzoneHeader]="fileDropzoneHeader" [fileDropzoneSize]="fileDropzoneSize"
-                            [existingFiles]="[synclistForm.get('cover_image')?.value]" [allowExtensions]="['jpg']"
+                            [existingFiles]="[synclistForm.get('cover_image')?.value]" [allowExtensions]="['jpg', 'jpeg']"
                             (uploadedFileList)="setUploadFile('cover_image', $event)"
-                            [accept]="'.jpg'"></acrylic-file-dropzone>
+                            [accept]="'.jpg, .jpeg'"></acrylic-file-dropzone>
                         <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
                             [fileDropzoneHeader]="'Drop your Background Image File here or upload it manually'"
-                            [fileDropzoneSize]="fileDropzoneSize" [allowExtensions]="['jpg']"
+                            [fileDropzoneSize]="fileDropzoneSize" [allowExtensions]="['jpg', 'jpeg']"
                             [existingFiles]="[synclistForm.get('background_image')?.value]"
                             (uploadedFileList)="setUploadFile('background_image', $event)"
-                            [accept]="'.jpg'"></acrylic-file-dropzone>
+                            [accept]="'.jpg, .jpeg'"></acrylic-file-dropzone>
                         }
                     </form>
                 </ng-container>
@@ -36,9 +36,9 @@
                 <div class="acr-box p-3">
                     <h6>Add Tracks</h6>
                     <ng-container>
-                        <div class="acr-input-group">
+                        <div class="acr-input-group" [formGroup]="searchForm">
                             <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
-                            <input type="text" placeholder="Search" class="w-100">
+                            <input type="text" formControlName="searchText" placeholder="Search" class="w-100" (input)="searchChanges()">
                         </div>
                     </ng-container>
                     <div class="mt-2">

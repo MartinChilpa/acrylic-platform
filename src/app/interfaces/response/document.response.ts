@@ -1,10 +1,3 @@
-export interface IDocuments {
-    count: number
-    next: any
-    previous: any
-    results: IDocumentResults[]
-}
-
 export interface IDocumentResults {
     uuid: string
     name: string

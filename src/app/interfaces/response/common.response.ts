@@ -2,9 +2,9 @@ export interface ICommonResponse {
     detail: string;
 }
 
-export interface ICommonSuccessResponse{
+export interface ICommonSuccessResponse<T> {
     count: number;
     next: any;
     previous: any;
-    results: [];
+    results: T;
 }
