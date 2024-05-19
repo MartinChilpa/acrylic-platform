@@ -40,8 +40,12 @@ export class NavigationService {
     this._router.navigateByUrl('/my-tracks');
   }
 
-  navigateToEditTracks(id: string) {
-    this._router.navigateByUrl(`/upload/${id}`);
+  navigateToEditTracks(id: string, assignPrice: boolean = false) {
+    let routeUrl = `/upload/${id}`
+    if (assignPrice) {
+      routeUrl += `?p=1`
+    }
+    this._router.navigateByUrl(routeUrl);
   }
 
   navigateToMyFinance() {

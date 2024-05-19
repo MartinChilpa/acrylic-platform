@@ -1,12 +1,5 @@
 import { ICreateTracks } from "./create-tracks.response"
 
-export interface ISplitSheet {
-    count: number
-    next: any
-    previous: any
-    results: ISplitSheetResult[]
-}
-
 export interface ISplitSheetResult {
     track: ICreateTracks
     track_name: string
