@@ -10,7 +10,7 @@ import { Subject, debounceTime } from 'rxjs';
 @Component({
   selector: 'acrylic-my-tracks',
   standalone: true,
-  imports: [NgOptimizedImage, NgClass, CustomDropdownComponent, ReactiveFormsModule],
+  imports: [NgOptimizedImage, CustomDropdownComponent, ReactiveFormsModule],
   templateUrl: './my-tracks.component.html',
   styleUrl: './my-tracks.component.scss'
 })
