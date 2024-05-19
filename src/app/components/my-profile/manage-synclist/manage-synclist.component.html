@@ -36,9 +36,9 @@
                 <div class="acr-box p-3">
                     <h6>Add Tracks</h6>
                     <ng-container>
-                        <div class="acr-input-group">
+                        <div class="acr-input-group" [formGroup]="searchForm">
                             <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
-                            <input type="text" placeholder="Search" class="w-100">
+                            <input type="text" formControlName="searchText" placeholder="Search" class="w-100" (input)="searchChanges()">
                         </div>
                     </ng-container>
                     <div class="mt-2">
