@@ -54,7 +54,7 @@
 }
 
 .bg-blue {
-  background-color: var(--blue-color) !important;
+    background-color: var(--blue-color) !important;
 }
 
 .bg-gray {
@@ -65,8 +65,12 @@
     background: var(--default-gradiant-auth-background-color);
 }
 
+.bg-transparent {
+    background-color: transparent !important;
+}
+
 // Text Colors
-.text-success{
+.text-success {
     color: var(--success-color) !important;
 }
 
@@ -127,6 +131,7 @@
 .text-beige {
     color: var(--beige-color) !important;
 }
+
 .text-info {
-    color:var(--info-color);
+    color: var(--info-color);
 }
