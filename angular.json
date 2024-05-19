@@ -30,10 +30,11 @@
               "src/assets"
             ],
             "styles": [
+              "src/assets/bootstrap/bootstrap.css",
               "src/styles.scss"
             ],
             "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "src/assets/bootstrap/bootstrap.bundle.min.js"
             ],
             "baseHref": "/"
           },
