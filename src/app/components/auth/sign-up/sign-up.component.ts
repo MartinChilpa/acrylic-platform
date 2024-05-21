@@ -3,6 +3,8 @@ import { NavigationService } from '../../../services/navigation.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PasswordValidatorDirective } from '../../../directives/password-validator.directive';
 import { NgClass } from '@angular/common';
+import { AlertService } from '../../../services/alert.service';
+import { AccountService } from '../../../services/account.service';
 
 @Component({
   selector: 'acrylic-sign-up',
@@ -23,6 +25,8 @@ export class SignUpComponent {
 
   private _fb = inject(FormBuilder);
   public _navigationService = inject(NavigationService);
+  public _accountService = inject(AccountService);
+  public _alertService = inject(AlertService);
 
   ngOnInit(): void {
     this.signUpForm = this._fb.group({
@@ -33,6 +37,7 @@ export class SignUpComponent {
       password: ['', Validators.required],
       password_confirm: ['', Validators.required],
       profile: [''],
+      type: ['artist']
     }, { validator: this.passwordMatchValidator });
   }
 
@@ -51,18 +56,17 @@ export class SignUpComponent {
     if (this.signUpForm.invalid)
       return;
 
-    // Disable the form
-    // this.signUpForm.disable();
+    this.signUpForm.disable();
 
-    // this._myArtistService.createArtist(this.signUpForm.value)
-    //   .subscribe({
-    //     next: () => {
-    //       this._alertService.success("Registration successfully");
-    //       this._navigationService.navigateToSignIn();
-    //     },
-    //     error: () => {
-    //       this.signUpForm.enable(); // Re-enable the form
-    //     }
-    //   });
+    this._accountService.registration(this.signUpForm.value)
+      .subscribe({
+        next: () => {
+          this._alertService.success("Registration successfully");
+          this._navigationService.navigateToSignIn();
+        },
+        error: () => {
+          this.signUpForm.enable();
+        }
+      });
   }
 }
