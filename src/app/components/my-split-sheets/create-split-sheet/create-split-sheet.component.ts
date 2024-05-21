@@ -68,36 +68,36 @@ export class CreateSplitSheetComponent {
     return total;
   }
 
-  searchTrack(searchString: string) {
-    if (!searchString) {
-      this.splitNames = []
-      return;
-    }
-    this._loadingService.hideLoading.set(true);
-    this.trackLoading = true
-    this._myArtistService.searchTracks(searchString).subscribe({
-      next: response => {
-        this.splitNames = response.map(x => ({
-          name: x.name,
-          text: x.released,
-          uuid: x.uuid
-        }))
-      },
-      complete: () => {
-        this.trackLoading = false;
-        this._loadingService.hideLoading.set(false);
-      }
-    })
-  }
+  // searchTrack(searchString: string) {
+  //   if (!searchString) {
+  //     this.splitNames = []
+  //     return;
+  //   }
+  //   this._loadingService.hideLoading.set(true);
+  //   this.trackLoading = true
+  //   this._myArtistService.searchTracks(searchString).subscribe({
+  //     next: response => {
+  //       this.splitNames = response.map(x => ({
+  //         name: x.name,
+  //         text: x.released,
+  //         uuid: x.uuid
+  //       }))
+  //     },
+  //     complete: () => {
+  //       this.trackLoading = false;
+  //       this._loadingService.hideLoading.set(false);
+  //     }
+  //   })
+  // }
 
-  dropdownSelected($event: any) {
-    this.createSplitSheetForm.get('email')?.setValue($event.uuid);
-  }
+  // dropdownSelected($event: any) {
+  //   this.createSplitSheetForm.get('email')?.setValue($event.uuid);
+  // }
 
-  splitSheetSelected($event: any) {
-    this.createSplitSheetForm.get('name')?.setValue($event.name);
-    this.createSplitSheetForm.get('track')?.setValue($event.uuid);
-  }
+  // splitSheetSelected($event: any) {
+  //   this.createSplitSheetForm.get('name')?.setValue($event.name);
+  //   this.createSplitSheetForm.get('track')?.setValue($event.uuid);
+  // }
 
   onPercentChange(controlName: string) {
     if(controlName == 'publishing_splits') {
