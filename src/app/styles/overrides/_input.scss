@@ -152,3 +152,7 @@ input[type=radio].acrylic-radio {
 textarea{
     height: 100px !important;
 }
+
+input:disabled {
+    background-color: var(--darkgrey-color) !important;
+}
