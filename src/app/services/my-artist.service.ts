@@ -34,7 +34,6 @@ export class MyArtistService {
   getMyArtist() {
     return this._http.get(`${this.MY_ARTIST_API_URL}/profile/`).pipe(
       switchMap((response: any) => {
-console.log(response)
         this.myArtist.set(response);
 
         // Return a new observable with the response

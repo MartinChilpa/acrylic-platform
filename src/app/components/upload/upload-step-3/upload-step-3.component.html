@@ -1,32 +1,36 @@
-<section>
+<section [formGroup]="form">
     <div class="row gy-3">
+        @if (!form.get('track_found')?.value) {
+        <div class="col-12">
+            <div class="acr-box">
+                <div class="acr-input-label">Track Name</div>
+                <input type="text" class="form-control acr-input" formControlName="name">
+            </div>
+        </div>
         <div class="col-12">
             <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[2].fileDropzoneIcon"
                 [fileDropzoneHeader]="UploadFileTextDetails[2].fileDropzoneHeader"
                 [fileDropzoneExternalLink]="UploadFileTextDetails[2].fileDropzoneExternalLink"
-                [existingFiles]="[form.get('snippet')?.value]"
-                [allowExtensions]="['mp3']"
-                #snippetComponent
-                [accept]="'.mp3'"
-                (uploadedFileList)="setUploadFile('snippet', $event)"></acrylic-file-dropzone>
+                [existingFiles]="[form.get('snippet')?.value]" [allowExtensions]="['mp3']" #snippetComponent
+                [accept]="'.mp3'" (uploadedFileList)="setUploadFile('snippet', $event)"></acrylic-file-dropzone>
         </div>
+        }
         <div class="col-12">
             <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[0].fileDropzoneIcon"
                 [fileDropzoneHeader]="UploadFileTextDetails[0].fileDropzoneHeader"
-                [existingFiles]="[form.get('file_wav')?.value]"
-                [allowExtensions]="['wav']"
-                [accept]="'.wav'"
+                [existingFiles]="[form.get('file_wav')?.value]" [allowExtensions]="['wav']" [accept]="'.wav'"
                 (uploadedFileList)="setUploadFile('file_wav', $event)"></acrylic-file-dropzone>
         </div>
+        @if (!form.get('track_found')?.value) {
         <div class="col-12">
             <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[1].fileDropzoneIcon"
                 [fileDropzoneHeader]="UploadFileTextDetails[1].fileDropzoneHeader"
                 [fileDropzoneSize]="UploadFileTextDetails[1].fileDropzoneSize"
-                [existingFiles]="[form.get('cover_image')?.value]"
-                [allowExtensions]="['jpg', 'jpeg']"
+                [existingFiles]="[form.get('cover_image')?.value]" [allowExtensions]="['jpg', 'jpeg']"
                 [accept]="'.jpg, .jpeg'"
                 (uploadedFileList)="setUploadFile('cover_image', $event)"></acrylic-file-dropzone>
         </div>
+        }
     </div>
     <div class="my-4">
         <div class="row gap-2">
@@ -34,11 +38,13 @@
                 <div class="row justify-content-center gy-2">
                     <div class="col-md-5 col-12 text-end">
                         <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border"
-                            (click)="nextUploadStepper(1)">Back</button>
+                            (click)="nextUploadStepper(3)">Back</button>
                     </div>
                     <div class="col-md-5 col-12">
-                        <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border"
-                            (click)="nextUploadStepper(3)" [disabled]="!form.get('snippet')?.value || !form.get('file_wav')?.value || !form.get('cover_image')?.value">Next</button>
+                        <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" (click)="nextUploadStepper(5)"
+                            [disabled]="
+                            !form.get('track_found')?.value ?
+                            (!form.get('name')?.value || !form.get('snippet')?.value || !form.get('file_wav')?.value || !form.get('cover_image')?.value) : !form.get('file_wav')?.value">Next</button>
                     </div>
                 </div>
             </div>

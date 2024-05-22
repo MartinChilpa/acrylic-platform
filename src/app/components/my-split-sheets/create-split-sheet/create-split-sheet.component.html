@@ -1,8 +1,14 @@
 <div class="split-sheet edit-view-mode">
     <form [formGroup]="createSplitSheetForm">
         <div class="acr-box mb-3">
-            <acrylic-custom-dropdown [loading]="trackLoading" [title]="'Your Track'" [placeholder]="'Track'" [noDataLabel]="'No matching tracks found'" [inputValue]="createSplitSheetForm.get('name')?.value"
-                [values]="splitNames" (searchChanged)="searchTrack($event)" (dropdownSelected)="splitSheetSelected($event)"></acrylic-custom-dropdown>
+            <div class="acr-input-label">Your Track ISRC Code</div>
+            <input type="text" id="isrc-code" formControlName="isrc" class="form-control acr-input"
+                placeholder="ISRC Code" autocomplete="off">
+            @if (createSplitSheetForm.get('isrc')?.errors?.['pattern']) {
+            <div class="text-danger mt-1">
+                Please enter valid ISRC code.
+            </div>
+            }
         </div>
 
         <!-- Publish -->

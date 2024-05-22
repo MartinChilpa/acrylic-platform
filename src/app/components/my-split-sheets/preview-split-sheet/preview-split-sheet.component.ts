@@ -35,8 +35,8 @@ export class PreviewSplitSheetComponent implements OnInit {
       this.getSplitSheetDetail()
       this.getTrackById();
     }
-    if (this.reviewObject.track) {
-      this.getTrackById();
+    if (this.reviewObject.isrc) {
+      this.getTrackPreview();
     }
   }
 
@@ -75,8 +75,9 @@ export class PreviewSplitSheetComponent implements OnInit {
   }
 
   getTrackPreview() {
+    const isrc = this.reviewObject.trackData ? this.reviewObject.trackData.isrc : this.reviewObject.isrc
     this._alertService.ignoreAlert.set(true);
-    this._spotifyService.getTrack(this.reviewObject.trackData.isrc).subscribe({
+    this._spotifyService.getTrack(isrc).subscribe({
       next: response => {
         this.trackInfo = response
         this.formatTime(this.trackInfo.duration);

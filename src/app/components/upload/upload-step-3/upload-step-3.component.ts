@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, Output, ViewChild, inject } from '@angular/core';
 import { FileDropzoneComponent } from '../../shared/file-dropzone/file-dropzone.component';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AlertService } from '../../../services/alert.service';
 import { MyArtistService } from '../../../services/my-artist.service';
 
 @Component({
   selector: 'acrylic-upload-step-3',
   standalone: true,
-  imports: [FileDropzoneComponent],
+  imports: [FileDropzoneComponent, ReactiveFormsModule],
   templateUrl: './upload-step-3.component.html',
   styleUrl: './upload-step-3.component.scss'
 })
@@ -37,6 +37,7 @@ export class UploadStep3Component {
     } else {
       data.other_distributor = ''
     }
+    data.isrc = this.form.get('isrc')?.value
     const formData = new FormData();
     const fileKeys = ['cover_image', 'file_mp3', 'file_wav', 'snippet']
     Object.keys(data).forEach(item => {

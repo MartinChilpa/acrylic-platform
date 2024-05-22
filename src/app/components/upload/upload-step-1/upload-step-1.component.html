@@ -1,9 +1,13 @@
 <div>
-    <acrylic-custom-dropdown [title]="'Split Sheet'" [inputValue]="form.get('name')?.value" [values]="splitNames" (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
+    <acrylic-custom-dropdown [loading]="splitSheetLoading" [title]="'My Split Sheet'" [placeholder]="'Split Sheet'"
+        [noDataLabel]="'No matching split sheet found'" [applyLocalFilter]="false" [inputValue]="form.get('isrc')?.value"
+        [values]="splitNames" (searchChanged)="searchTrack($event)"
+        (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
 </div>
 <div class="mt-2">
-    <p class="small">Don’t have a split sheet?  <span class="text-orange">Create one here</span></p>
+    <p class="small">Don’t have a split sheet? <span (click)="_navigationService.navigateToMySplitSheet()" class="text-orange cursor-pointer">Create one here</span></p>
 </div>
+@if (selectedSplitSheet) {
 <div class="acr-box mt-4">
     <div class="row">
         <div class="col-12">
@@ -13,18 +17,19 @@
             <div class="acr-box acr-sub-box">
                 <p class="m-1">Publishing Splits</p>
                 <div>
-                   <ul class="split-list list-group">
+                    <ul class="split-list list-group">
                         <li class="list-group-item border-0 text-info-success d-flex-justify-between bg-light-gray p-3">
                             <small>Name</small>
                             <small>%</small>
                         </li>
-                        @for(item of connectSplit; let i = $index; track item) {
-                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary" [class.selected]="i == 0">
-                                <span>{{ item.Name }}</span>
-                                <span>{{ item.percentage }}</span>
-                            </li>
+                        @for(item of selectedSplitSheet.publishing_splits; let i = $index; track item) {
+                        <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary"
+                            [class.selected]="i == 0">
+                            <span>{{ item.name }}</span>
+                            <span>{{ item.percent }}</span>
+                        </li>
                         }
-                   </ul>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -32,31 +37,35 @@
             <div class="acr-box acr-sub-box">
                 <p class="m-1">Master Splits</p>
                 <div>
-                   <ul class="split-list list-group">
+                    <ul class="split-list list-group">
                         <li class="list-group-item border-0 text-info-success d-flex-justify-between bg-light-gray p-3">
                             <small>Name</small>
                             <small>%</small>
                         </li>
-                        @for(item of connectSplit; let i = $index; track item) {
-                            <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary" [class.selected]="i == 0">
-                                <span>{{ item.Name }}</span>
-                                <span>{{ item.percentage }}</span>
-                            </li>
+                        @for(item of selectedSplitSheet.master_splits; let i = $index; track item) {
+                        <li class="list-group-item border-0 d-flex-justify-between p-3 text-primary"
+                            [class.selected]="i == 0">
+                            <span>{{ item.name }}</span>
+                            <span>{{ item.percent }}</span>
+                        </li>
                         }
-                   </ul>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
+}
 <div class="row gap-2 mt-4">
     <div class="col-12">
         <div class="row justify-content-center gy-2">
             <div class="col-lg-4 col-md-5 col-12 text-end">
-                <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border" (click)="_navigationService.navigateToMyTracks()">Cancel</button>
+                <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border"
+                    (click)="_navigationService.navigateToMyTracks()">Cancel</button>
             </div>
             <div class="col-lg-4 col-md-5 col-12">
-                <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" [disabled]="!form.get('name')?.value" (click)="nextUploadStepper(2)">Next</button>
+                <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" [disabled]="!form.get('isrc')?.value"
+                    (click)="nextUploadStepper(2)">Next</button>
             </div>
         </div>
     </div>

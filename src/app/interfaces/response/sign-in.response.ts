@@ -1,4 +1,4 @@
-export interface ISignInResponse{
+export interface ISignInResponse {
     access: string;
     refresh: string;
 }

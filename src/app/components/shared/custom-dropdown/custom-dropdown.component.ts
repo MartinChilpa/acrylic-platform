@@ -19,6 +19,7 @@ export class CustomDropdownComponent implements OnInit, OnChanges {
   @Input() values: any[] = [];
   @Input() showSearch: boolean = true;
   @Input() loading: boolean = false;
+  @Input() applyLocalFilter: boolean = true;
   @Input() noDataLabel: string = "No data available";
   @Input() className: string = "";
   @Output() dropdownSelected = new EventEmitter();

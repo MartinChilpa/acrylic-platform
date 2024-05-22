@@ -8,6 +8,7 @@ import { IForgotPasswordRequest } from '../interfaces/request/forgot-password.re
 import { ISubscription } from '../interfaces/response/subscription.response';
 import { IDocumentResults } from '../interfaces/response/document.response';
 import { IVerifyUserRequest } from '../interfaces/request/verify-user.request';
+import { ISignupResponse } from '../interfaces/response/sign-up.response';
 
 @Injectable({
   providedIn: 'root'
@@ -43,5 +44,9 @@ export class AccountService {
 
   deleteDocument(uuid: string) {
     return this.http.delete(`${this.ACCOUNT_API_URL}/documents/${uuid}`);
+  }
+
+  registration(register: ISignupResponse): Observable<ISignupResponse> {
+    return this.http.post<ISignupResponse>(`${this.ACCOUNT_API_URL}/register/`, register);
   }
 }
