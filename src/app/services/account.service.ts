@@ -27,7 +27,7 @@ export class AccountService {
   }
 
   verifyUser(verifyUserRequest: IVerifyUserRequest): Observable<IVerifyUserRequest> {
-    return this.http.post<IVerifyUserRequest>(`${this.ACCOUNT_API_URL}/verify-email/`, verifyUserRequest);
+    return this.http.post<IVerifyUserRequest>(`${this.ACCOUNT_API_URL}/verify-user/`, verifyUserRequest);
   }
 
   getSubscription(): Observable<ISubscription> {

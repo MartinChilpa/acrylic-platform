@@ -9,3 +9,7 @@
 @else{
     <h3 class="text-orange">verification is in progress ...</h3>
 }
+
+@if (verified) {
+    <button class="btn btn-main w-25 fw-bold h-50px mt-2" (click)="_navigationService.navigateToSignIn()">Login</button>
+}

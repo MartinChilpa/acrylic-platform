@@ -5,6 +5,7 @@ import { PasswordValidatorDirective } from '../../../directives/password-validat
 import { NgClass } from '@angular/common';
 import { AlertService } from '../../../services/alert.service';
 import { AccountService } from '../../../services/account.service';
+import { SocialLoginButtonComponent } from '../social-login-button/social-login-button.component';
 
 @Component({
   selector: 'acrylic-sign-up',
@@ -12,7 +13,8 @@ import { AccountService } from '../../../services/account.service';
   imports: [
     ReactiveFormsModule,
     PasswordValidatorDirective,
-    NgClass
+    NgClass,
+    SocialLoginButtonComponent
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
@@ -61,7 +63,7 @@ export class SignUpComponent {
       .subscribe({
         next: () => {
           this._alertService.success("Registration successfully");
-          this._navigationService.navigateToSignIn();
+          this._navigationService.navigateToSignDocuments();
         },
         error: () => {
           this.signUpForm.enable();

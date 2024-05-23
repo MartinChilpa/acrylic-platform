@@ -6,7 +6,8 @@ export const authRoutesNames = {
     SIGNUP: 'sign-up',
     FORGOT_PASSWORD: 'forgot-password',
     RESET_PASSWORD: 'reset-password',
-    VERIFY_USER: 'verify-user'
+    VERIFY_USER: 'verify-user',
+    SIGN_DOCUMENT: 'sign-document'
 };
 
 export const AUTH_ROUTES: Routes = [
@@ -30,6 +31,10 @@ export const AUTH_ROUTES: Routes = [
             {
                 path: authRoutesNames.SIGNUP,
                 loadComponent: () => import('./sign-up/sign-up.component').then((mod) => mod.SignUpComponent),
+            },
+            {
+                path: authRoutesNames.SIGN_DOCUMENT,
+                loadComponent: () => import('./sign-document/sign-document.component').then((mod) => mod.SignDocumentComponent),
             },
             {
                 path: authRoutesNames.FORGOT_PASSWORD,

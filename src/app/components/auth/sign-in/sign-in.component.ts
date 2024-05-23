@@ -4,13 +4,15 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AuthService } from '../../../services/auth.service';
 import { AlertService } from '../../../services/alert.service';
 import { NavigationService } from '../../../services/navigation.service';
+import { SocialLoginButtonComponent } from '../social-login-button/social-login-button.component';
 
 @Component({
   selector: 'acrylic-sign-in',
   standalone: true,
   imports: [
     NgOptimizedImage,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SocialLoginButtonComponent
   ],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.scss'
