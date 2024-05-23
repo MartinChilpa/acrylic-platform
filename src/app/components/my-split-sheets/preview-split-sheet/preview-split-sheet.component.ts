@@ -33,8 +33,7 @@ export class PreviewSplitSheetComponent implements OnInit {
     this.splitSheetId = this._activatedRoute.snapshot.params['splitSheetId'];
     if (this.splitSheetId) {
       this.reviewObject = {}
-      this.getSplitSheetDetail()
-      this.getTrackById();
+      this.getSplitSheetDetail();
     }
     if (this.reviewObject.isrc) {
       this.getTrackPreview();
@@ -58,25 +57,32 @@ export class PreviewSplitSheetComponent implements OnInit {
     this._myArtistService.getSplitSheetById(this.splitSheetId).subscribe(response => {
       this.reviewObject = {
         ...this.reviewObject,
+        ...response,
         publishing_splits: response.publishing_splits,
         master_splits: response.master_splits
       }
+      this.getTrackById();
     })
   }
 
   getTrackById() {
-    this._myArtistService.getTrackById(this.reviewObject.track ? this.reviewObject.track : this.splitSheetId).subscribe(response => {
-      this.reviewObject = {
-        ...this.reviewObject,
-        track: response.uuid,
-        trackData: response
+    this._myArtistService.getTrackById(this.reviewObject.track ? this.reviewObject.track : this.splitSheetId).subscribe({
+      next: response => {
+        this.reviewObject = {
+          ...this.reviewObject,
+          track: response.uuid,
+          trackData: response
+        }
+        this.getTrackPreview()
+      },
+      error: () => {
+        this.getTrackPreview()
       }
-      this.getTrackPreview()
     })
   }
 
   getTrackPreview() {
-    const isrc = this.reviewObject.trackData ? this.reviewObject.trackData.isrc : this.reviewObject.isrc
+    const isrc = this.reviewObject.isrc ? this.reviewObject.isrc : this.reviewObject.trackData ? this.reviewObject.trackData.isrc : this.reviewObject.isrc
     this._alertService.ignoreAlert.set(true);
     this._spotifyService.getTrack(isrc).subscribe({
       next: response => {

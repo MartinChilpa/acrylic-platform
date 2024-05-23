@@ -3,6 +3,8 @@ import { ICreateTracks } from "./create-tracks.response"
 export interface ISplitSheetResult {
     track: ICreateTracks
     track_name: string
+    uuid: string
+    isrc: string
     signed: any
     signature_request_id: string
     created: string

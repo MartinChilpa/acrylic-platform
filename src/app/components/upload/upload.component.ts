@@ -153,12 +153,12 @@ export class UploadComponent implements OnInit, AfterViewInit {
   publishTrack() {
     const formData = new FormData();
     const fileKeys = ['cover_image', 'file_mp3', 'file_wav', 'snippet']
-    const trackData = JSON.parse(JSON.stringify(this.uploadTrackForm.value))
+    const trackData = this.uploadTrackForm.value
     trackData.isrc = this.uploadTrackForm.get('isrc')?.value
     Object.keys(trackData).forEach(item => {
       const value = trackData[item]
       if (item == 'price' && value) {
-        formData.append('price_uuid', value.uuid);
+        formData.append('price', value.uuid);
       }
       else if (!fileKeys.includes(item) && value) {
         formData.append(item, value);

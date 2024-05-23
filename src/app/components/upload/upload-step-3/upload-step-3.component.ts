@@ -46,7 +46,7 @@ export class UploadStep3Component {
       const value = data[item]
       if (item == 'price') {
         if (value) {
-          formData.append('price_uuid', value.uuid);
+          formData.append('price', value.uuid);
         }
       }
       else if (!fileKeys.includes(item)) {
@@ -86,10 +86,9 @@ export class UploadStep3Component {
       };
       audio.src = URL.createObjectURL($event[0]);
     }
-    console.log($event[0])
     this.form.get(key)?.setValue($event[0])
-    if (key == 'file_wav') {
-      this.form.get('file_mp3')?.setValue($event[0])
-    }
+    // if (key == 'file_wav') {
+    //   this.form.get('file_mp3')?.setValue($event[0])
+    // }
   }
 }
