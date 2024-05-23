@@ -4,11 +4,12 @@ import { DistributorsService } from '../../../services/distributors.service';
 import { IDistributorsResult } from '../../../interfaces/response/distributor.response';
 import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
 import { NavigationService } from '../../../services/navigation.service';
+import { PreventTypingIfDisabledDirective } from '../../../directives/prevent-typing-if-disabled.directive';
 
 @Component({
   selector: 'acrylic-upload-step-2',
   standalone: true,
-  imports: [ReactiveFormsModule, CustomDropdownComponent],
+  imports: [ReactiveFormsModule, CustomDropdownComponent, PreventTypingIfDisabledDirective],
   templateUrl: './upload-step-2.component.html',
   styleUrl: './upload-step-2.component.scss'
 })
@@ -45,6 +46,7 @@ export class UploadStep2Component implements OnInit {
   dropdownSelected($event: any) {
     if ($event.uuid) {
       this.form.get('other_distributor')?.setValue('');
+      this.form.get('other_distributor_email')?.setValue('');
       this.form.get('distributor')?.setValue($event.uuid);
       this.isDistributorNameRequired = false;
     }

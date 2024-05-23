@@ -50,6 +50,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
       file_mp3: [''],
       distributor: [''],
       tags: [],
+      other_distributor_email: [''],
       other_distributor: [''],
       price: [],
       track_found: [0]
@@ -90,6 +91,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
           distributor: response.distributor,
           tags: response.tags,
           other_distributor: response.other_distributor,
+          other_distributor_email: response.other_distributor_email,
           track_found: 0
         })
       }
@@ -156,7 +158,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
     Object.keys(trackData).forEach(item => {
       const value = trackData[item]
       if (item == 'price' && value) {
-        formData.append(item, JSON.stringify(value));
+        formData.append('price_uuid', value.uuid);
       }
       else if (!fileKeys.includes(item) && value) {
         formData.append(item, value);

@@ -5,11 +5,12 @@ import { NavigationService } from '../../../services/navigation.service';
 import { SpotifyService } from '../../../services/spotify.service';
 import { ISpotify } from '../../../interfaces/response/spotify.response';
 import { AlertService } from '../../../services/alert.service';
+import { DurationPipe } from '../../../pipes/duration.pipe';
 
 @Component({
   selector: 'acrylic-preview-split-sheet',
   standalone: true,
-  imports: [],
+  imports: [DurationPipe],
   templateUrl: './preview-split-sheet.component.html',
   styleUrl: './preview-split-sheet.component.scss'
 })
@@ -26,7 +27,7 @@ export class PreviewSplitSheetComponent implements OnInit {
 
   splitSheetId: string = ''
   trackInfo!: ISpotify
-  duration: string = ''
+  duration: number = 0
 
   ngOnInit(): void {
     this.splitSheetId = this._activatedRoute.snapshot.params['splitSheetId'];
@@ -80,17 +81,11 @@ export class PreviewSplitSheetComponent implements OnInit {
     this._spotifyService.getTrack(isrc).subscribe({
       next: response => {
         this.trackInfo = response
-        this.formatTime(this.trackInfo.duration);
+        this.duration = this.trackInfo.duration
       },
       complete: () => {
         this._alertService.ignoreAlert.set(false);
       }
     })
-  }
-
-  formatTime(seconds: number) {
-    const minutes = Math.floor(seconds / 60 / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    this.duration = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
 }

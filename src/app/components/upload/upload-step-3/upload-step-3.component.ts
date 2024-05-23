@@ -27,7 +27,8 @@ export class UploadStep3Component {
   private _myArtistService = inject(MyArtistService)
 
   nextUploadStepper(count: number) {
-    this.addUpdateTracks(count);
+    // this.addUpdateTracks(count);
+    this.nextStepper.emit(count);
   }
 
   addUpdateTracks(count: number) {
@@ -36,6 +37,7 @@ export class UploadStep3Component {
       data.distributor = ''
     } else {
       data.other_distributor = ''
+      data.other_distributor_email = ''
     }
     data.isrc = this.form.get('isrc')?.value
     const formData = new FormData();
@@ -44,7 +46,7 @@ export class UploadStep3Component {
       const value = data[item]
       if (item == 'price') {
         if (value) {
-          formData.append(item, JSON.stringify(value));
+          formData.append('price_uuid', value.uuid);
         }
       }
       else if (!fileKeys.includes(item)) {
@@ -84,6 +86,7 @@ export class UploadStep3Component {
       };
       audio.src = URL.createObjectURL($event[0]);
     }
+    console.log($event[0])
     this.form.get(key)?.setValue($event[0])
     if (key == 'file_wav') {
       this.form.get('file_mp3')?.setValue($event[0])

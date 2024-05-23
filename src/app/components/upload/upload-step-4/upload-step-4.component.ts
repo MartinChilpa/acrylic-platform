@@ -65,7 +65,8 @@ export class UploadStep4Component implements OnInit, OnDestroy {
       next: response => {
         this.form.patchValue({
           track_found: 1,
-          name: response.name
+          name: response.name,
+          duration: response.duration
         })
         this.trackInfo = response;
       },
