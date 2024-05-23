@@ -5,7 +5,7 @@ import { NavigationService } from '../../services/navigation.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subject, debounceTime } from 'rxjs';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'acrylic-my-split-sheets',
@@ -13,7 +13,8 @@ import { DatePipe } from '@angular/common';
   imports: [
     ReactiveFormsModule,
     PaginationComponent,
-    DatePipe
+    DatePipe,
+    NgOptimizedImage
   ],
   templateUrl: './my-split-sheets.component.html',
   styleUrl: './my-split-sheets.component.scss'

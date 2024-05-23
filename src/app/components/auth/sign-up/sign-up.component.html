@@ -1,28 +1,28 @@
     <form [formGroup]="signUpForm">
         <h1 class="auth-tagline">Create an Account</h1>
-        <div class="row mb-3">
-            <div class="col-md-6 col-12">
+        <div class="row">
+            <div class="col-md-6 col-12 mb-3">
                 <div class="acr-input-label">First Name</div>
                 <input type="text" [formControlName]="'first_name'" class="form-control acr-input"
                     placeholder="Enter First Name" autocomplete="off">
             </div>
-            <div class="col-md-6 col-12">
+            <div class="col-md-6 col-12 mb-3">
                 <div class="acr-input-label">Last Name</div>
                 <input type="text" [formControlName]="'last_name'" class="form-control acr-input"
                     placeholder="Enter Last Name" autocomplete="off">
             </div>
         </div>
     
-        <div class="row mb-3">
-            <div class="col-md-12 col-12">
+        <div class="row">
+            <div class="col-md-12 col-12 mb-3">
                 <div class="acr-input-label">Email</div>
                 <input type="email" [formControlName]="'email'" class="form-control acr-input"
                 placeholder="Enter Email" autocomplete="off" onfocus="this.removeAttribute('readonly');">
             </div>
         </div>
     
-        <div class="row mb-3">
-            <div class="col-md-6 col-12">
+        <div class="row">
+            <div class="col-md-6 col-12 mb-3">
                 <div class="d-flex-between">
                     <div class="acr-input-label">Password</div>
                 </div>
@@ -34,7 +34,7 @@
                         width="16" height="16" (click)="showPassword = !showPassword">
                 </div>
             </div>
-            <div class="col-md-6 col-12">
+            <div class="col-md-6 col-12 mb-3">
                 <div class="d-flex-between">
                     <div class="acr-input-label">Confirm Password</div>
                 </div>
@@ -48,7 +48,7 @@
             </div>
         </div>
         @if(signUpForm.get('password')?.invalid && (signUpForm.get('password')?.dirty || signUpForm.get('password')?.touched)) {
-            <div class="acr-input-label small text-danger">
+            <div class="acr-input-label small text-danger mt-1">
                 @if(signUpForm.get('password')?.errors?.['invalidPassword']?.requiredLength) {
                     <div> Your password must contain at least 8 characters. </div>
                 }@else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasLetter) {
@@ -78,11 +78,12 @@
         <div class="line"></div>
     </div>
 
-    <div class="mt-2">
-        <acrylic-social-login-button></acrylic-social-login-button>
-    </div>
+    <!-- <button class="btn w-100 btn-acrylic light-gray-border h-50px">
+        <img src="assets/images/icons/google.svg"/>
+        <span class="ms-2">Sign up with Google</span>
+    </button> -->
     
-    <div class="mt-2">
+    <div class="mt-3">
         <span>Already have an account?</span>
         <a class="a-blue ms-2" (click)="_navigationService.navigateToSignIn();">Sign In</a>
     </div>

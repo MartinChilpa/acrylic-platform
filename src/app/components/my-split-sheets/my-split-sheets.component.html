@@ -24,12 +24,12 @@
                         <td>
                             <div class="d-flex-align-center">
                                 <div>
-                                    <img src="assets/images/others/track-bg.jpg" height="36" width="36"
+                                    <img [ngSrc]="item.track_cover_image ?? 'assets/images/others/top-track.png'" height="36" width="36"
                                         class="radius-5" />
                                 </div>
                                 <div class="ms-2">
                                     <span class="d-block">{{ item.track ? item.track.name : item.track_name }}</span>
-                                    <span class="text-light-gray small">{{ item.track ? item.track.isrc : item.isrc }}</span>
+                                    <span class="text-warning small">{{ item.track ? item.track.isrc : item.isrc }}</span>
                                 </div>
                             </div>
                         </td>

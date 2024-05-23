@@ -123,13 +123,16 @@
                                 <span class="d-inline-block height-15px width-15px bg-secondary rounded-circle"></span>
                             </div>
                             }
-                        </td>
-                        <td>
-                            @if (item.snippet) {
-                            <div class="d-flex gap-2">
-                                <audio [src]="item.snippet" controls></audio>
+                            @else{
+                                <div class="clip-path-tag radius-5 p-2 d-flex-align-center gap-2 bg-lightgray-border">
+                                <img [ngSrc]="'assets/images/others/beat.png'" height="20" width="15" />
+                                <span>Basic</span>
+                                <span class="d-inline-block height-15px width-15px bg-secondary rounded-circle"></span>
                             </div>
                             }
+                        </td>
+                        <td>
+                            <audio [src]="item.snippet ?? item.file_mp3" controls></audio>
                         </td>
                         <td>
                             <span>{{ item.released }}</span>

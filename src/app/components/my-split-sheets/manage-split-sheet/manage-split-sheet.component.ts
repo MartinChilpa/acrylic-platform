@@ -93,7 +93,7 @@ export class ManageSplitSheetComponent implements OnInit {
     this._myArtistService.createSplitSheet(this.reviewObject).subscribe({
       next: response => {
         this._alertService.success("Split sheet created successfully")
-        this.requestSignature(response.uuid)
+        this.requestSignature(response.uuid);
         this._navigationService.navigateToMySplitSheet();
       }
     })
