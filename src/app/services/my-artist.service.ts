@@ -107,6 +107,10 @@ export class MyArtistService {
     return this._http.post<any>(`${this.MY_ARTIST_API_URL}/split-sheets/`, request);
   }
 
+  requestSignature(uuid: string, request: any): Observable<any> {
+    return this._http.post<any>(`${this.MY_ARTIST_API_URL}/split-sheets/${uuid}/request-signatures/`, request);
+  }
+
   updateSplitSheet(request: any, uuid: string): Observable<any> {
     return this._http.put<any>(`${this.MY_ARTIST_API_URL}/split-sheets/${uuid}/`, request);
   }

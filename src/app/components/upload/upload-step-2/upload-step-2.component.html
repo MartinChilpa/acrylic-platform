@@ -56,8 +56,8 @@
         <div class="col-12">
             <div class="acr-box">
                 <div class="acr-input-label">Your Track ISRC Code</div>
-                <input type="text" id="isrc-code" formControlName="isrc" class="form-control acr-input"
-                    placeholder="ISRC Code" autocomplete="off">
+                <input type="text" id="isrc-code" formControlName="isrc" acrylicPreventTypingIfDisabled class="form-control acr-input"
+                    placeholder="ISRC Code" autocomplete="off" (keyup)="$event.preventDefault();">
                 @if (form.get('isrc')?.errors?.['pattern']) {
                 <div class="text-danger mt-1">
                     Please enter valid ISRC code.
@@ -78,6 +78,13 @@
                 <div class="acr-input-label">Enter Name Of Distributor Or Label Contact</div>
                 <input type="text" formControlName="other_distributor" class="form-control acr-input"
                     placeholder="Distributor Or Label Contact" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="acr-box">
+                <div class="acr-input-label">Enter Email Of Distributor</div>
+                <input type="text" formControlName="other_distributor_email" class="form-control acr-input"
+                    placeholder="Distributor Email" autocomplete="off">
             </div>
         </div>
         }

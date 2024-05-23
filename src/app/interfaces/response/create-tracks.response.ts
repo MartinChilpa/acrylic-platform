@@ -28,5 +28,6 @@ export interface ICreateTracks {
     file_mp3: any
     distributor: any
     other_distributor: string
+    other_distributor_email: string
     price: IPrice
 }

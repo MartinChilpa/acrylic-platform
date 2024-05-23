@@ -13,7 +13,7 @@
                     <div class="d-flex flex-column">
                         <span>{{ trackInfo.name }}</span>
                         <small>{{ trackInfo.artist }}</small>
-                        <small class="mt-1 text-beige">{{ trackInfo.duration| duration }}</small>
+                        <small class="mt-1 text-beige">{{ trackInfo.duration | duration }}</small>
                         @if (snippet) {
                         <div class="text-center">
                             <audio [src]="snippet" class="d-none hidden" #audioSnippet></audio>

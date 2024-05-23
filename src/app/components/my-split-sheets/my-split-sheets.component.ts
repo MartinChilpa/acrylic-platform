@@ -55,8 +55,8 @@ export class MySplitSheetsComponent implements OnInit {
     this.debounceSubject.next();
   }
 
-  goToPreview(track: any) {
-    this._navigationService.navigateToPreviewSplitSheet(track.uuid);
+  goToPreview(uuid: any) {
+    this._navigationService.navigateToPreviewSplitSheet(uuid);
   }
 
   prepareRequest() {
