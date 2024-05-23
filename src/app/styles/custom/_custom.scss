@@ -161,10 +161,11 @@ p {
 // Pill of success, Pending
 .tb-pill {
     border-radius: 5px;
-    padding: 2px 6px 2px 6px;
-    background-color: var(--light-gray-table-border-color);
+    padding: 2px 10px;
+    background-color: var(--light-gray-100);
     &.success {
-        background-color: var(--darkgreen-color);
+        background-color: var(--info-bg-color);
+        color: var(--success-color);
     }
 }
 @media(max-width:1024px) {

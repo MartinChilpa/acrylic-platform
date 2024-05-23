@@ -24,12 +24,12 @@
                         <td>
                             <div class="d-flex-align-center">
                                 <div>
-                                    <img src="assets/images/others/track-bg.jpg" height="36" width="36"
+                                    <img [ngSrc]="item.track_cover_image ?? 'assets/images/others/top-track.png'" height="36" width="36"
                                         class="radius-5" />
                                 </div>
                                 <div class="ms-2">
-                                    <span class="d-block">{{ item.track.name }}</span>
-                                    <span class="text-light-gray small">{{ item.track.isrc }}</span>
+                                    <span class="d-block">{{ item.track ? item.track.name : item.track_name }}</span>
+                                    <span class="text-warning small">{{ item.track ? item.track.isrc : item.isrc }}</span>
                                 </div>
                             </div>
                         </td>
@@ -44,7 +44,7 @@
                             {{ (item.updated ? item.updated : item.created) | date:'MMM d, YYYY' }}
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-acrylic" (click)="goToPreview(item.track)">
+                            <button class="btn btn-sm btn-acrylic" (click)="goToPreview(item.uuid)">
                                 <img src="assets/images/icons/eye.svg" alt="side_icon" width="16" height="16">
                             </button>
                         </td>

@@ -88,7 +88,7 @@
                         <th scope="col">Track Name</th>
                         <th scope="col">Assigned Tags</th>
                         <th scope="col">Price Tag</th>
-                        <th scope="col">Popular Tags</th>
+                        <th scope="col">Snippets</th>
                         <th scope="col">Release Date</th>
                         <th scope="col"></th>
                     </tr>
@@ -98,7 +98,8 @@
                     <tr>
                         <td>
                             <div class="d-md-flex align-items-md-center gap-2">
-                                <img [src]="item.cover_image" height="36" width="36" class="radius-5" />
+                                <img [src]="item.cover_image ? item.cover_image : 'assets/images/others/track-bg.jpg'"
+                                    height="36" width="36" class="radius-5" />
                                 <div>
                                     <p class="m-0">{{ item.name }}</p>
                                     <small>{{ item.isrc }}</small>
@@ -122,13 +123,16 @@
                                 <span class="d-inline-block height-15px width-15px bg-secondary rounded-circle"></span>
                             </div>
                             }
+                            @else{
+                                <div class="clip-path-tag radius-5 p-2 d-flex-align-center gap-2 bg-lightgray-border">
+                                <img [ngSrc]="'assets/images/others/beat.png'" height="20" width="15" />
+                                <span>Basic</span>
+                                <span class="d-inline-block height-15px width-15px bg-secondary rounded-circle"></span>
+                            </div>
+                            }
                         </td>
                         <td>
-                            <div class="d-flex gap-2">
-                                @for(popularTag of item.genres; track popularTag) {
-                                <span class="bg-light-gray px-2 py-1 radius-5">{{ popularTag.name }}</span>
-                                }
-                            </div>
+                            <audio [src]="item.snippet ?? item.file_mp3" controls></audio>
                         </td>
                         <td>
                             <span>{{ item.released }}</span>

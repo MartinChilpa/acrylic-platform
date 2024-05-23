@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, Output, ViewChild, inject } from '@angular/core';
 import { FileDropzoneComponent } from '../../shared/file-dropzone/file-dropzone.component';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AlertService } from '../../../services/alert.service';
 import { MyArtistService } from '../../../services/my-artist.service';
 
 @Component({
   selector: 'acrylic-upload-step-3',
   standalone: true,
-  imports: [FileDropzoneComponent],
+  imports: [FileDropzoneComponent, ReactiveFormsModule],
   templateUrl: './upload-step-3.component.html',
   styleUrl: './upload-step-3.component.scss'
 })
@@ -27,7 +27,8 @@ export class UploadStep3Component {
   private _myArtistService = inject(MyArtistService)
 
   nextUploadStepper(count: number) {
-    this.addUpdateTracks(count);
+    // this.addUpdateTracks(count);
+    this.nextStepper.emit(count);
   }
 
   addUpdateTracks(count: number) {
@@ -36,14 +37,16 @@ export class UploadStep3Component {
       data.distributor = ''
     } else {
       data.other_distributor = ''
+      data.other_distributor_email = ''
     }
+    data.isrc = this.form.get('isrc')?.value
     const formData = new FormData();
     const fileKeys = ['cover_image', 'file_mp3', 'file_wav', 'snippet']
     Object.keys(data).forEach(item => {
       const value = data[item]
       if (item == 'price') {
         if (value) {
-          formData.append(item, JSON.stringify(value));
+          formData.append('price', value.uuid);
         }
       }
       else if (!fileKeys.includes(item)) {
@@ -84,8 +87,8 @@ export class UploadStep3Component {
       audio.src = URL.createObjectURL($event[0]);
     }
     this.form.get(key)?.setValue($event[0])
-    if (key == 'file_wav') {
-      this.form.get('file_mp3')?.setValue($event[0])
-    }
+    // if (key == 'file_wav') {
+    //   this.form.get('file_mp3')?.setValue($event[0])
+    // }
   }
 }

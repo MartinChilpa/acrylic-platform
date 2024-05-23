@@ -34,7 +34,6 @@ export class MyArtistService {
   getMyArtist() {
     return this._http.get(`${this.MY_ARTIST_API_URL}/profile/`).pipe(
       switchMap((response: any) => {
-console.log(response)
         this.myArtist.set(response);
 
         // Return a new observable with the response
@@ -106,6 +105,10 @@ console.log(response)
 
   createSplitSheet(request: any): Observable<any> {
     return this._http.post<any>(`${this.MY_ARTIST_API_URL}/split-sheets/`, request);
+  }
+
+  requestSignature(uuid: string, request: any): Observable<any> {
+    return this._http.post<any>(`${this.MY_ARTIST_API_URL}/split-sheets/${uuid}/request-signatures/`, request);
   }
 
   updateSplitSheet(request: any, uuid: string): Observable<any> {

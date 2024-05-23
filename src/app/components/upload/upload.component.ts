@@ -18,7 +18,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
 
   componentRefs!: ComponentRef<any>;
   activeStepper: number = 1;
-  uploadStepperList = ['General Information', 'Upload assets', 'Preview & Confirm', 'Set your prices'];
+  uploadStepperList = ['Connect split sheet', 'General Information', 'Preview & Confirm', 'Upload assets', 'Set your prices'];
   uploadTrackForm!: FormGroup;
 
   private _changeDetector: ChangeDetectorRef = inject(ChangeDetectorRef);
@@ -44,19 +44,22 @@ export class UploadComponent implements OnInit, AfterViewInit {
       is_explicit: [false],
       bpm: [1],
       lyrics: [''],
-      cover_image: ['', Validators.required],
-      snippet: ['', Validators.required],
-      file_wav: ['', Validators.required],
+      cover_image: [''],
+      snippet: [''],
+      file_wav: [''],
       file_mp3: [''],
       distributor: [''],
       tags: [],
+      other_distributor_email: [''],
       other_distributor: [''],
-      price: []
+      price: [],
+      track_found: [0]
     });
+    this.uploadTrackForm.get('isrc')?.disable()
     if (this.uploadTrackId) {
       this.getTrackById()
       if (this.isAssignPrice) {
-        this.activeStepper = 4
+        this.activeStepper = 5
       }
     }
   }
@@ -87,7 +90,9 @@ export class UploadComponent implements OnInit, AfterViewInit {
           file_mp3: response.file_mp3,
           distributor: response.distributor,
           tags: response.tags,
-          other_distributor: response.other_distributor
+          other_distributor: response.other_distributor,
+          other_distributor_email: response.other_distributor_email,
+          track_found: 0
         })
       }
     })
@@ -111,18 +116,22 @@ export class UploadComponent implements OnInit, AfterViewInit {
   async loadComponent(step: number) {
     switch (step) {
       case 1:
-        const { UploadStep2Component } = await import('./upload-step-2/upload-step-2.component');
-        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep2Component);
+        const { UploadStep1Component } = await import('./upload-step-1/upload-step-1.component');
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep1Component);
         break;
       case 2:
-        const { UploadStep3Component } = await import('./upload-step-3/upload-step-3.component');
-        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep3Component);
+        const { UploadStep2Component } = await import('./upload-step-2/upload-step-2.component');
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep2Component);
         break;
       case 3:
         const { UploadStep4Component } = await import('./upload-step-4/upload-step-4.component');
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep4Component);
         break;
       case 4:
+        const { UploadStep3Component } = await import('./upload-step-3/upload-step-3.component');
+        this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep3Component);
+        break;
+      case 5:
         const { UploadStep5Component } = await import('./upload-step-5/upload-step-5.component');
         this.componentRefs = this.acrylicUploadRef.createComponent(UploadStep5Component);
         const stepInstance = this.componentRefs.instance;
@@ -132,7 +141,7 @@ export class UploadComponent implements OnInit, AfterViewInit {
         });
         break;
       default:
-        const { UploadStep2Component: DefaultComponent } = await import('./upload-step-2/upload-step-2.component');
+        const { UploadStep1Component: DefaultComponent } = await import('./upload-step-1/upload-step-1.component');
         this.componentRefs = this.acrylicUploadRef.createComponent(DefaultComponent);
     }
     this.componentRefs.instance.form = this.uploadTrackForm;
@@ -144,11 +153,12 @@ export class UploadComponent implements OnInit, AfterViewInit {
   publishTrack() {
     const formData = new FormData();
     const fileKeys = ['cover_image', 'file_mp3', 'file_wav', 'snippet']
-    const trackData = JSON.parse(JSON.stringify(this.uploadTrackForm.value))
+    const trackData = this.uploadTrackForm.value
+    trackData.isrc = this.uploadTrackForm.get('isrc')?.value
     Object.keys(trackData).forEach(item => {
       const value = trackData[item]
       if (item == 'price' && value) {
-          formData.append(item, JSON.stringify(value));
+        formData.append('price', value.uuid);
       }
       else if (!fileKeys.includes(item) && value) {
         formData.append(item, value);

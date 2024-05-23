@@ -5,11 +5,12 @@ import { NavigationService } from '../../../services/navigation.service';
 import { SpotifyService } from '../../../services/spotify.service';
 import { ISpotify } from '../../../interfaces/response/spotify.response';
 import { AlertService } from '../../../services/alert.service';
+import { DurationPipe } from '../../../pipes/duration.pipe';
 
 @Component({
   selector: 'acrylic-preview-split-sheet',
   standalone: true,
-  imports: [],
+  imports: [DurationPipe],
   templateUrl: './preview-split-sheet.component.html',
   styleUrl: './preview-split-sheet.component.scss'
 })
@@ -26,17 +27,16 @@ export class PreviewSplitSheetComponent implements OnInit {
 
   splitSheetId: string = ''
   trackInfo!: ISpotify
-  duration: string = ''
+  duration: number = 0
 
   ngOnInit(): void {
     this.splitSheetId = this._activatedRoute.snapshot.params['splitSheetId'];
     if (this.splitSheetId) {
       this.reviewObject = {}
-      this.getSplitSheetDetail()
-      this.getTrackById();
+      this.getSplitSheetDetail();
     }
-    if (this.reviewObject.track) {
-      this.getTrackById();
+    if (this.reviewObject.isrc) {
+      this.getTrackPreview();
     }
   }
 
@@ -57,39 +57,41 @@ export class PreviewSplitSheetComponent implements OnInit {
     this._myArtistService.getSplitSheetById(this.splitSheetId).subscribe(response => {
       this.reviewObject = {
         ...this.reviewObject,
+        ...response,
         publishing_splits: response.publishing_splits,
         master_splits: response.master_splits
       }
+      this.getTrackById();
     })
   }
 
   getTrackById() {
-    this._myArtistService.getTrackById(this.reviewObject.track ? this.reviewObject.track : this.splitSheetId).subscribe(response => {
-      this.reviewObject = {
-        ...this.reviewObject,
-        track: response.uuid,
-        trackData: response
+    this._myArtistService.getTrackById(this.reviewObject.track ? this.reviewObject.track : this.splitSheetId).subscribe({
+      next: response => {
+        this.reviewObject = {
+          ...this.reviewObject,
+          track: response.uuid,
+          trackData: response
+        }
+        this.getTrackPreview()
+      },
+      error: () => {
+        this.getTrackPreview()
       }
-      this.getTrackPreview()
     })
   }
 
   getTrackPreview() {
+    const isrc = this.reviewObject.isrc ? this.reviewObject.isrc : this.reviewObject.trackData ? this.reviewObject.trackData.isrc : this.reviewObject.isrc
     this._alertService.ignoreAlert.set(true);
-    this._spotifyService.getTrack(this.reviewObject.trackData.isrc).subscribe({
+    this._spotifyService.getTrack(isrc).subscribe({
       next: response => {
         this.trackInfo = response
-        this.formatTime(this.trackInfo.duration);
+        this.duration = this.trackInfo.duration
       },
       complete: () => {
         this._alertService.ignoreAlert.set(false);
       }
     })
-  }
-
-  formatTime(seconds: number) {
-    const minutes = Math.floor(seconds / 60 / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    this.duration = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
 }

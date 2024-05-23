@@ -1,4 +1,4 @@
-import { NgClass, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { MyArtistService } from '../../services/my-artist.service';
 import { ICreateTracks } from '../../interfaces/response/create-tracks.response';

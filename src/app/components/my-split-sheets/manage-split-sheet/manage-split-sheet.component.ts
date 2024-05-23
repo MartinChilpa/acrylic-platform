@@ -25,7 +25,7 @@ export class ManageSplitSheetComponent implements OnInit {
   totalPublishingPercentage: number = 100;
   totalMasteringPercentage: number = 100;
   reviewObject: any = {};
-  
+
   manageSplitStepperList = ['Create a sign in split sheet', 'Preview split sheet'];
   private _fb = inject(FormBuilder);
   public _navigationService = inject(NavigationService);
@@ -34,7 +34,7 @@ export class ManageSplitSheetComponent implements OnInit {
 
   ngOnInit(): void {
     this.createSplitSheetForm = this._fb.group({
-      track: ['', [Validators.required]],
+      isrc: ['', [Validators.pattern(/^[A-Z]{2}-?\w{3}-?\d{2}-?\d{5}$/)]],
       name: [''],
       publishing_splits: new FormArray([
         new FormGroup({
@@ -93,6 +93,15 @@ export class ManageSplitSheetComponent implements OnInit {
     this._myArtistService.createSplitSheet(this.reviewObject).subscribe({
       next: response => {
         this._alertService.success("Split sheet created successfully")
+        this.requestSignature(response.uuid);
+        this._navigationService.navigateToMySplitSheet();
+      }
+    })
+  }
+
+  requestSignature(uuid: string) {
+    this._myArtistService.requestSignature(uuid, this.reviewObject).subscribe({
+      next: response => {
         this._navigationService.navigateToMySplitSheet();
       }
     })
@@ -103,7 +112,7 @@ export class ManageSplitSheetComponent implements OnInit {
       return;
     let controls = this.createSplitSheetForm.controls;
     this.reviewObject = {
-      track: controls['track'].value,
+      isrc: controls['isrc'].value,
       publishing_splits: controls['publishing_splits'].value,
       master_splits: controls['master_splits'].value
     };

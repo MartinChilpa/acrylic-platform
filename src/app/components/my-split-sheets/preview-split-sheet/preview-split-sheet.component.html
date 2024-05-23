@@ -4,24 +4,24 @@
         <div>
             <div class="mb-3">
                 <p class="mb-1 text-light-gray">ISRC Code:</p>
-                <p class="mb-0">{{ trackInfo ? trackInfo.isrc : reviewObject.trackData?.isrc }}</p>
+                <p class="mb-0">{{ trackInfo ? trackInfo.isrc : reviewObject.trackData?.isrc ?? reviewObject.isrc}}</p>
             </div>
 
             <div class="acr-box bg-darkgrey p-3 mb-3">
                 <div class="d-flex-align-center">
                     <div>
-                        <img [src]="trackInfo ? trackInfo.image : 'assets/images/others/track-bg.jpg'" height="70"
+                        <img [src]="trackInfo ? trackInfo.image : 'assets/images/others/top-track.png'" height="70"
                             width="70" alt="track-img" class="radius-5 me-2" />
                     </div>
                     @if (trackInfo) {
                     <div>
                         <p class="fw-semibold mb-0">{{ trackInfo.name }}</p>
                         <p class="mb-0">{{ trackInfo.artist }}</p>
-                        <p class="small text-light-gray mb-0">{{ duration }}</p>
+                        <p class="small text-light-gray mb-0">{{ duration | duration }}</p>
                     </div>
                     }
                     @else {
-                    <div class="mb-0 mt-2 text-orange">
+                    <div class="mb-0 mt-2 text-warning">
                         The track is not available for the provided ISRC code.
                     </div>
                     }
@@ -89,7 +89,7 @@
             <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border" (click)="backToSplitSheet()">
                 Back
             </button>
-            @if (!splitSheetId && trackInfo) {
+            @if (!splitSheetId) {
             <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" (click)="sendToCreateSheet()">
                 Send </button>
             }

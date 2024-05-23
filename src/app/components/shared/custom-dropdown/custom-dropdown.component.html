@@ -29,7 +29,7 @@
             } @else {
             <ul class="acrylic-select-options overflow-y-auto p-0 mb-2">
                 <ng-container>
-                    @for(item of values | acrylicSearchFilter: searchForm.value.searchText; track item.name) {
+                    @for(item of values | acrylicSearchFilter: (applyLocalFilter ? searchForm.value.searchText : ''); track item.name) {
                     <li (click)="updateName(item)" class="px-3 py-1" [ngClass]="{'list-unstyled d-flex-between' : item.text}"
                         [class.selected]="item.name === selectedValue">
                         <span>{{ item.name }}</span>
@@ -40,7 +40,7 @@
                     }
                 </ng-container>
                 <ng-container>
-                    @if((values | acrylicSearchFilter: searchForm.value.searchText).length === 0) {
+                    @if((values | acrylicSearchFilter: (applyLocalFilter ? searchForm.value.searchText : '')).length === 0) {
                     <li class="list-unstyled ps-3 py-2 text-center">{{noDataLabel}}</li>
                     }
                 </ng-container>

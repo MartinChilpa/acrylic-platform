@@ -16,6 +16,10 @@ export class NavigationService {
     this._router.navigate(['auth/sign-in']);
   }
 
+  navigateToSignDocuments() {
+    this._router.navigate(['auth/sign-document']);
+  }
+
   navigateToSignUp() {
     this._router.navigate(['auth/sign-up']);
   }
