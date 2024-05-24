@@ -4,7 +4,7 @@
         <div>
             <div class="mb-3">
                 <p class="mb-1 text-light-gray">ISRC Code:</p>
-                <p class="mb-0">{{ trackInfo ? trackInfo.isrc : reviewObject.trackData?.isrc ?? reviewObject.isrc}}</p>
+                <p class="mb-0">{{ trackInfo ? trackInfo.isrc : reviewObject.isrc}}</p>
             </div>
 
             <div class="acr-box bg-darkgrey p-3 mb-3">
@@ -91,7 +91,7 @@
             </button>
             @if (!splitSheetId) {
             <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" (click)="sendToCreateSheet()">
-                Send </button>
+                Send and Request </button>
             }
         </div>
     </div>

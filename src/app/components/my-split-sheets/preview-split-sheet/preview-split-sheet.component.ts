@@ -61,28 +61,15 @@ export class PreviewSplitSheetComponent implements OnInit {
         publishing_splits: response.publishing_splits,
         master_splits: response.master_splits
       }
-      this.getTrackById();
-    })
-  }
-
-  getTrackById() {
-    this._myArtistService.getTrackById(this.reviewObject.track ? this.reviewObject.track : this.splitSheetId).subscribe({
-      next: response => {
-        this.reviewObject = {
-          ...this.reviewObject,
-          track: response.uuid,
-          trackData: response
-        }
-        this.getTrackPreview()
-      },
-      error: () => {
-        this.getTrackPreview()
+      if (!this.reviewObject.isrc) {
+        this.reviewObject.isrc = this.reviewObject.track?.isrc
       }
+      this.getTrackPreview();
     })
   }
 
   getTrackPreview() {
-    const isrc = this.reviewObject.isrc ? this.reviewObject.isrc : this.reviewObject.trackData ? this.reviewObject.trackData.isrc : this.reviewObject.isrc
+    const isrc = this.reviewObject.isrc
     this._alertService.ignoreAlert.set(true);
     this._spotifyService.getTrack(isrc).subscribe({
       next: response => {
