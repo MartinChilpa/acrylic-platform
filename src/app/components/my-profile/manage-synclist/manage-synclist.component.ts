@@ -87,7 +87,7 @@ export class ManageSynclistComponent implements OnInit {
   getSearchTracks() {
     this._myArtistService.searchTracks(this.searchForm.get('searchText')?.value).subscribe({
       next: response => {
-        const newTracks = response;
+        const newTracks = response.results;
         this.trackList = this.updateTrackList(newTracks);
       }
     });

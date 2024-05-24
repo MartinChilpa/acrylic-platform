@@ -73,8 +73,10 @@ export class PreviewSplitSheetComponent implements OnInit {
     this._alertService.ignoreAlert.set(true);
     this._spotifyService.getTrack(isrc).subscribe({
       next: response => {
-        this.trackInfo = response
-        this.duration = this.trackInfo.duration
+        if (response.name) {
+          this.trackInfo = response
+          this.duration = this.trackInfo.duration
+        }
       },
       complete: () => {
         this._alertService.ignoreAlert.set(false);

@@ -63,12 +63,14 @@ export class UploadStep4Component implements OnInit, OnDestroy {
     this._alertService.ignoreAlert.set(true);
     this._spotifyService.getTrack(this.form.get('isrc')?.value).subscribe({
       next: response => {
-        this.form.patchValue({
-          track_found: 1,
-          name: response.name,
-          duration: response.duration
-        })
-        this.trackInfo = response;
+        if (response.name) {
+          this.form.patchValue({
+            track_found: 1,
+            name: response.name,
+            duration: response.duration
+          })
+          this.trackInfo = response;
+        }
       },
       error: () => {
         this.form.get('track_found')?.setValue(0);

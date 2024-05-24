@@ -48,7 +48,7 @@ export class MyTracksComponent implements OnInit {
   getTracks() {
     this._myArtistService.searchTracks(this.searchForm.get('searchText')?.value).subscribe({
       next: response => {
-        this.trackList = response
+        this.trackList = response.results
       }
     });
   }

@@ -42,14 +42,14 @@ export class UploadStep1Component {
     this._loadingService.hideLoading.set(true);
     this.splitSheetLoading = true
     this._myArtistService.getSplitSheet({
-      search: searchString,
+      isrc: searchString,
       is_signed: true
     }).subscribe({
       next: response => {
         this.splitSheets = response.results;
         this.splitNames = response.results.map(x => ({
-          name: x.track?.name ? x.track?.name : x.track?.isrc,
-          isrc: x.track?.isrc,
+          name: x.track?.name ? x.track?.name : x.isrc,
+          isrc: x.track?.isrc ? x.track?.isrc : x.isrc,
           text: x.track?.released,
           uuid: x.track?.uuid
         }));
