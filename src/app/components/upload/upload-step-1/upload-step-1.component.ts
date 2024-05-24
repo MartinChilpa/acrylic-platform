@@ -42,7 +42,8 @@ export class UploadStep1Component {
     this._loadingService.hideLoading.set(true);
     this.splitSheetLoading = true
     this._myArtistService.getSplitSheet({
-      search: searchString
+      search: searchString,
+      is_signed: true
     }).subscribe({
       next: response => {
         this.splitSheets = response.results;

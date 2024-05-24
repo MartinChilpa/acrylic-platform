@@ -24,7 +24,7 @@
                         <td>
                             <div class="d-flex-align-center">
                                 <div>
-                                    <img [ngSrc]="item.track_cover_image ?? 'assets/images/others/top-track.png'" height="36" width="36"
+                                    <img [ngSrc]="item.track_cover_image ? item.track_cover_image : 'assets/images/others/top-track.png'" height="36" width="36"
                                         class="radius-5" />
                                 </div>
                                 <div class="ms-2">
