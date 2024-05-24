@@ -33,10 +33,10 @@ export class CreateSplitSheetComponent {
   ];
 
   master_splits_role = [
-      { name: 'artist', uuid: 1 },
-      { name: 'producer', uuid: 2 },
-      { name: 'label', uuid: 3 },
-      { name: 'other', uuid: 4 }
+    { name: 'artist', uuid: 1 },
+    { name: 'producer', uuid: 2 },
+    { name: 'label', uuid: 3 },
+    { name: 'other', uuid: 4 }
   ];
 
   private _alertService = inject(AlertService);
@@ -100,7 +100,7 @@ export class CreateSplitSheetComponent {
   // }
 
   onPercentChange(controlName: string) {
-    if(controlName == 'publishing_splits') {
+    if (controlName == 'publishing_splits') {
       this.totalPublishingSplits = this.publishing_splits_total_percent;
     }
     this.totalMasterSplits = this.master_splits_total_percent;
@@ -299,12 +299,22 @@ export class CreateSplitSheetComponent {
   }
 
   reviewSheet() {
-    if(this.totalPublishingSplits > 100) {
+    if (this.totalPublishingSplits > 100) {
       this._alertService.error("Publishing percentage can't be grater then 100");
-    }else if(this.totalMasterSplits > 100) {
+    } else if (this.totalMasterSplits > 100) {
       this._alertService.error("Master percentage can't be grater then 100");
     }
-    this.reviewSheetData.emit()
+    this._myArtistService.getSplitSheet({
+      isrc: this.createSplitSheetForm.get('isrc')?.value
+    }).subscribe({
+      next: response => {
+        if (response.results.length == 0) {
+          this.reviewSheetData.emit()
+        } else {
+          this._alertService.error("Track with above ISRC already exist");
+        }
+      }
+    })
   }
 
   navigateToHome() {
