@@ -81,7 +81,7 @@
                     Track</button>
             </div>
         </div>
-        <div class="light-gray-table-border rounded-2 table-responsive">
+        <div class="light-gray-table-border rounded-2">
             <table class="acrylic-table">
                 <thead>
                     <tr>
@@ -154,6 +154,8 @@
                     }
                 </tbody>
             </table>
+            <acrylic-pagination [tableData]="trackList" [totalPages]="totalCount" (pageChange)="onPageChange($event)">
+            </acrylic-pagination>
         </div>
     </div>
 </section>

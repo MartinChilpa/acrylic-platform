@@ -115,7 +115,8 @@ export class MyArtistService {
     return this._http.put<any>(`${this.MY_ARTIST_API_URL}/split-sheets/${uuid}/`, request);
   }
 
-  searchTracks(searchText: string): Observable<ICommonSuccessResponse<ICreateTracks[]>> {
-    return this._http.get<ICommonSuccessResponse<ICreateTracks[]>>(`${this.MY_ARTIST_API_URL}/tracks/?search=${searchText}`);
+  searchTracks(queryParams: any = {}): Observable<ICommonSuccessResponse<ICreateTracks[]>> {
+    let params = this.buildQueryParams(queryParams)
+    return this._http.get<ICommonSuccessResponse<ICreateTracks[]>>(`${this.MY_ARTIST_API_URL}/tracks/`, { params });
   }
 }
