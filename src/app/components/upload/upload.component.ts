@@ -94,6 +94,9 @@ export class UploadComponent implements OnInit, AfterViewInit {
           other_distributor_email: response.other_distributor_email,
           track_found: 0
         })
+        if (this.componentRefs.instance.getSplitSheetDetail) {
+          this.componentRefs.instance.getSplitSheetDetail();
+        }
       }
     })
   }

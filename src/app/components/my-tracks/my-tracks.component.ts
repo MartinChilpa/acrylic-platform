@@ -6,11 +6,12 @@ import { NavigationService } from '../../services/navigation.service';
 import { CustomDropdownComponent } from '../shared/custom-dropdown/custom-dropdown.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subject, debounceTime } from 'rxjs';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 @Component({
   selector: 'acrylic-my-tracks',
   standalone: true,
-  imports: [NgOptimizedImage, CustomDropdownComponent, ReactiveFormsModule],
+  imports: [NgOptimizedImage, CustomDropdownComponent, ReactiveFormsModule, PaginationComponent],
   templateUrl: './my-tracks.component.html',
   styleUrl: './my-tracks.component.scss'
 })
@@ -24,6 +25,9 @@ export class MyTracksComponent implements OnInit {
   ]
   trackList: ICreateTracks[] = []
   searchForm!: FormGroup;
+  pageSize: number = 5;
+  pageNumber: number = 1;
+  totalCount: number = 10;
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   public _navigationService = inject(NavigationService);
@@ -46,11 +50,27 @@ export class MyTracksComponent implements OnInit {
   }
 
   getTracks() {
-    this._myArtistService.searchTracks(this.searchForm.get('searchText')?.value).subscribe({
+    this._myArtistService.searchTracks(this.prepareRequest()).subscribe({
       next: response => {
-        this.trackList = response.results
+        this.trackList = response.results;
+        this.totalCount = response.count;
       }
     });
+  }
+
+  prepareRequest() {
+    const request = {
+      page: this.pageNumber,
+      page_size: this.pageSize,
+      search: this.searchForm.get('searchText')?.value,
+    }
+    return request;
+  }
+
+  onPageChange(request: any) {
+    this.pageSize = request.pageSize;
+    this.pageNumber = request.pageNumber;
+    this.getTracks();
   }
 
   openTrack(id: string, assignPrice: boolean = false) {
