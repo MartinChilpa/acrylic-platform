@@ -2,11 +2,12 @@
 <div class="split-sheet w-100 send-mode">
     <div class="acr-box mb-3">
         <div>
-            <div class="mb-3">
-                <p class="mb-1 text-light-gray">ISRC Code:</p>
-                <p class="mb-0">{{ trackInfo ? trackInfo.isrc : reviewObject.isrc}}</p>
-            </div>
-
+            @if(trackInfo){
+                <div class="mb-3">
+                    <p class="mb-1">ISRC Code: {{ trackInfo.isrc}}</p>
+                </div>
+            }
+            
             <div class="acr-box bg-darkgrey p-3 mb-3">
                 <div class="d-flex-align-center">
                     <div>
@@ -22,7 +23,7 @@
                     }
                     @else {
                     <div class="mb-0 mt-2 text-warning">
-                        The track is not available for the provided ISRC code.
+                        The track with ISRC {{reviewObject.isrc}} cannot be previewed.
                     </div>
                     }
                 </div>

@@ -11,5 +11,6 @@ export const environment = {
             /^https:\/\/[a-zA-Z0-9-]+\.herokuapp\.com\//,
             /^https:\/\/app\.acrylic\.la\//,
         ]
-    }
+    },
+    GOOGLE_CLIENT_ID: '395300880758-d1090s3eiq7bf2tgtsv2j8u101qkvnc5.apps.googleusercontent.com'
 };

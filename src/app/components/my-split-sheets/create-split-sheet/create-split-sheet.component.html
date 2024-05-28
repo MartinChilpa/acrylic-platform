@@ -1,7 +1,7 @@
 <div class="split-sheet edit-view-mode">
     <form [formGroup]="createSplitSheetForm">
         <div class="acr-box mb-3">
-            <div class="acr-input-label">Your Track ISRC Code</div>
+            <div class="acr-input-label required">Your Track ISRC Code</div>
             <input type="text" id="isrc-code" formControlName="isrc" class="form-control acr-input"
                 placeholder="ISRC Code" autocomplete="off">
             @if (createSplitSheetForm.get('isrc')?.errors?.['pattern']) {

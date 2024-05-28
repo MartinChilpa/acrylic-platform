@@ -14,6 +14,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     else if(error.error?.detail){
       errorMessage = `${error.error.detail}`;
     }
+    else if(error.error?.email){
+      errorMessage = `${error.error?.email}`;
+    }
     else {
       switch (error.status) { // Server-side error
         case 400:

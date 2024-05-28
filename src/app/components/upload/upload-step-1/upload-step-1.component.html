@@ -1,11 +1,12 @@
 <div>
-    <acrylic-custom-dropdown [loading]="splitSheetLoading" [title]="'My Split Sheet'" [placeholder]="'Split Sheet'"
+    <acrylic-custom-dropdown [loading]="splitSheetLoading" [title]="'My Split Sheet'" [placeholder]="'Search split sheet by name or ISRC'"
         [noDataLabel]="'No matching split sheet found'" [applyLocalFilter]="false" [inputValue]="form.get('isrc')?.value"
-        [values]="splitNames" (searchChanged)="searchTrack($event)"
+        [values]="splitNames" [required]="true"
+        (searchChanged)="searchTrack($event)"
         (dropdownSelected)="dropdownSelected($event)"></acrylic-custom-dropdown>
 </div>
 <div class="mt-2">
-    <p class="small">Don’t have a split sheet? <span (click)="_navigationService.navigateToMySplitSheet()" class="text-warning cursor-pointer">Create one here</span></p>
+    <p class="small">Don’t have a split sheet? <span (click)="_navigationService.navigateToCreateSplitSheet()" class="text-warning cursor-pointer">Create one here</span></p>
 </div>
 @if (selectedSplitSheet) {
 <div class="acr-box mt-4">

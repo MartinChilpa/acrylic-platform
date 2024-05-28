@@ -6,7 +6,7 @@
                 <p class="mb-2">Preview Your Track</p>
                 <div class="d-flex-align-center gap-2">
                     <div>
-                        <img [src]="trackInfo ? trackInfo.image : 'assets/images/others/track-bg.jpg'" height="70"
+                        <img [src]="trackInfo ? trackInfo.image : 'assets/images/others/top-track.png'" height="70"
                             width="70" alt="track-img" class="radius-5 me-2 cursor-pointer" (click)="playSnippet()" />
                     </div>
                     @if (trackInfo) {
@@ -30,9 +30,8 @@
                     }
                     @else {
                     <div>
-                        <div>ISRC Code: {{form.get('isrc')?.value}}</div>
                         <div class="mb-0 mt-2 text-warning">
-                            The track is not available for the provided ISRC code.
+                            The track with ISRC {{form.get('isrc')?.value}} cannot be previewed.
                         </div>
                     </div>
                     }

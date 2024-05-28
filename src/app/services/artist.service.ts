@@ -1,8 +1,9 @@
+import { IMyArtist } from './../interfaces/response/my-artist.response';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { IArtistResponse } from '../interfaces/response/artist.response';
 import { Observable } from 'rxjs';
+import { ICommonSuccessResponse } from '../interfaces/response/common.response';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class ArtistService {
 
   private _http = inject(HttpClient);
 
-  getNewArtists(): Observable<IArtistResponse> {
-    return this._http.get<IArtistResponse>(`${this.ARTIST_API_URL}/?ordering=created&page_size=5`);
+  getNewArtists(): Observable<ICommonSuccessResponse<IMyArtist[]>> {
+    return this._http.get<ICommonSuccessResponse<IMyArtist[]>>(`${this.ARTIST_API_URL}/?ordering=-created&page_size=5`);
   }
 }

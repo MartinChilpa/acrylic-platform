@@ -1,5 +1,5 @@
-import { NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { Component, EventEmitter, Input, Output, inject, OnInit } from '@angular/core';
 import { CustomDropdownComponent } from '../../shared/custom-dropdown/custom-dropdown.component';
 import { FormGroup } from '@angular/forms';
 import { NavigationService } from '../../../services/navigation.service';
@@ -59,14 +59,15 @@ export class UploadStep1Component implements OnInit {
     this._loadingService.hideLoading.set(true);
     this.splitSheetLoading = true
     this._myArtistService.getSplitSheet({
-      search: searchString
+      search: searchString,
+      is_signed: true
     }).subscribe({
       next: response => {
         this.splitSheets = response.results;
         this.splitNames = response.results.map(x => ({
           name: x.track?.name ? x.track?.name : x.isrc,
           isrc: x.track?.isrc ? x.track?.isrc : x.isrc,
-          text: x.track?.released ? x.track?.released : x.signed ? new Date().toJSON(x.signed).split('T')[0] : null,
+          text: x.signed ? new Date(x.signed).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null,
           uuid: x.track?.uuid,
           splitSheetId: x.uuid
         }));
