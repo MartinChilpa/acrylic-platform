@@ -14,7 +14,7 @@ import { ISplitSheetResult } from '../../../interfaces/response/split-sheet.resp
   templateUrl: './upload-step-1.component.html',
   styleUrl: './upload-step-1.component.scss'
 })
-export class UploadStep1Component {
+export class UploadStep1Component implements OnInit {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
   public _navigationService = inject(NavigationService);
@@ -25,12 +25,29 @@ export class UploadStep1Component {
   splitNames: any[] = [];
   splitSheetLoading: boolean = false;
 
+  ngOnInit(): void {
+    this.getSplitSheetDetail()
+  }
+
+  getSplitSheetDetail() {
+    const isrc = this.form.get('isrc')?.value;
+    if (isrc) {
+      this._myArtistService.getSplitSheet({
+        isrc: isrc
+      }).subscribe({
+        next: response => {
+          this.selectedSplitSheet = response.results[0]
+        }
+      })
+    }
+  }
+
   nextUploadStepper(count: number) {
     this.nextStepper.emit(count);
   }
 
   dropdownSelected($event: any) {
-    this.selectedSplitSheet = <ISplitSheetResult>this.splitSheets.find(x => x?.track?.uuid == $event.uuid);
+    this.selectedSplitSheet = <ISplitSheetResult>this.splitSheets.find(x => x.uuid == $event.splitSheetId);
     this.form.get('isrc')?.setValue($event.isrc);
   }
 
@@ -51,7 +68,8 @@ export class UploadStep1Component {
           name: x.track?.name ? x.track?.name : x.isrc,
           isrc: x.track?.isrc ? x.track?.isrc : x.isrc,
           text: x.signed ? new Date(x.signed).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null,
-          uuid: x.track?.uuid
+          uuid: x.track?.uuid,
+          splitSheetId: x.uuid
         }));
       },
       complete: () => {
