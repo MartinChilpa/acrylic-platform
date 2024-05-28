@@ -2,12 +2,12 @@
         <h1 class="auth-tagline">Create an Account</h1>
         <div class="row">
             <div class="col-md-6 col-12 mb-3">
-                <div class="acr-input-label">First Name</div>
+                <div class="acr-input-label required">First Name</div>
                 <input type="text" [formControlName]="'first_name'" class="form-control acr-input"
                     placeholder="Enter First Name" autocomplete="off">
             </div>
             <div class="col-md-6 col-12 mb-3">
-                <div class="acr-input-label">Last Name</div>
+                <div class="acr-input-label required">Last Name</div>
                 <input type="text" [formControlName]="'last_name'" class="form-control acr-input"
                     placeholder="Enter Last Name" autocomplete="off">
             </div>
@@ -15,7 +15,7 @@
     
         <div class="row">
             <div class="col-md-12 col-12 mb-3">
-                <div class="acr-input-label">Email</div>
+                <div class="acr-input-label required">Email</div>
                 <input type="email" [formControlName]="'email'" class="form-control acr-input"
                 placeholder="Enter Email" autocomplete="off" onfocus="this.removeAttribute('readonly');">
             </div>
@@ -24,7 +24,7 @@
         <div class="row">
             <div class="col-md-6 col-12 mb-3">
                 <div class="d-flex-between">
-                    <div class="acr-input-label">Password</div>
+                    <div class="acr-input-label required">Password</div>
                 </div>
                 <div class="position-relative">
                     <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'"
@@ -36,7 +36,7 @@
             </div>
             <div class="col-md-6 col-12 mb-3">
                 <div class="d-flex-between">
-                    <div class="acr-input-label">Confirm Password</div>
+                    <div class="acr-input-label required">Confirm Password</div>
                 </div>
                 <div class="position-relative">
                     <input [type]="showConfirmPassword ? 'text' : 'password'" [formControlName]="'password_confirm'"
@@ -50,13 +50,13 @@
         @if(signUpForm.get('password')?.invalid && (signUpForm.get('password')?.dirty || signUpForm.get('password')?.touched)) {
             <div class="acr-input-label small text-danger mt-1">
                 @if(signUpForm.get('password')?.errors?.['invalidPassword']?.requiredLength) {
-                    <div> Your password must contain at least 8 characters. </div>
+                    <div> Your password must contain at least 8 characters.</div>
                 }@else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasLetter) {
-                    <div> Your password must contain at least one letter. </div>
+                    <div> Your password must contain at least one letter.</div>
                 }@else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasNumber) {
-                    <div> Your password must contain at least one number. </div>
+                    <div> Your password must contain at least one number.</div>
                 }@else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasSpecialChar) {
-                    <div> Your password must contain at least one special character (example: # ? ! & ). </div>
+                    <div> Your password must contain at least one special character.</div>
                 }
             </div>
         }

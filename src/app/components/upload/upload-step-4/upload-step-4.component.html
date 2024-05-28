@@ -30,9 +30,8 @@
                     }
                     @else {
                     <div>
-                        <div>ISRC Code: {{form.get('isrc')?.value}}</div>
                         <div class="mb-0 mt-2 text-warning">
-                            The track is not available for the provided ISRC code.
+                            The track with ISRC {{form.get('isrc')?.value}} cannot be previewed.
                         </div>
                     </div>
                     }

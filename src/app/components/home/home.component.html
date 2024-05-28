@@ -1,29 +1,28 @@
 <section>
     <div class="row mt-3 mt-md-0">
-         <div class="col-lg-8 col-12">
+        <div class="col-lg-8 col-12">
             <div class="row">
                 @for(item of homeDataList; track item) {
-                    <div class="col-12" [ngClass]="['col-md-' + calculateColumnSizes(homeDataList.length)[$index]]">
-                        <div>
-                            <a [href]="item.url" target="_blank">
-                                <img [src]="item.image" class="img-card object-fit-cover" height="200"/>
+                <div class="col-12" [ngClass]="['col-md-' + calculateColumnSizes(homeDataList.length)[$index]]">
+                    <div>
+                        <a [href]="item.url" target="_blank">
+                            <img [src]="item.image" class="img-card object-fit-cover" height="200" />
+                        </a>
+                        <div class="my-md-3 my-2">
+                            <div>{{ item.title }}</div>
+                            <a [href]="item.url" target="_blank" class="text-decoration-none">
+                                <small class="text-info-success pt-2">{{ item.link_text }}</small>
                             </a>
-                            <div class="my-md-3 my-2">
-                                <div>{{ item.title }}</div>
-                                <a [href]="item.url" target="_blank" class="text-decoration-none">
-                                    <small class="text-info-success pt-2">{{ item.link_text }}</small>
-                                </a>
-                            </div>
                         </div>
                     </div>
+                </div>
                 }
             </div>
         </div>
         <div class="col-lg-4 col-12 d-flex flex-column gap-3">
             @if (myArtist) {
             <div class="w-100">
-                <div class="radius-5 bg-img" acrylicBackgroundImage
-                    [backgroundImage]="myArtist.background_image">
+                <div class="radius-5 bg-img" acrylicBackgroundImage [backgroundImage]="myArtist.background_image">
                     <div class="position-relative d-flex-align-center">
                         <img [src]="myArtist.image" width="84" />
                         <h5 class="fs-4 mb-0">{{ myArtist.name }}</h5>
@@ -32,80 +31,82 @@
             </div>
             }
 
-            <div class="acr-box p-0 overflow-hidden">
-                <div class="bg-lightgrey">
-                    <div class="d-flex-align-center p-3">
-                        <img src="assets/images/others/beat.png" class="me-2" />
-                        <h6 class="mb-0">Latest Syncs</h6>
-                    </div>
-                    <div class="d-flex-between py-2 px-3 bg-light-gray">
-                        <small class="text-info-success">Synclist Name</small>
-                        <small class="text-info-success">Total Uses</small>
-                    </div>
-                </div>
-                <ul class="ps-0 mb-0">
-                    @for (item of topTrack; track item) {
-                    <li class="menu-list list-group-item">
-                        <div class="d-flex-between py-2 px-3">
-                            <span class="d-flex-align-center">
-                                <span class="me-2">
-                                    <img src={{item.imageLink}} />
-                                </span>
-                                <span>{{item.name}}</span>
-                            </span>
-                            <span>{{item.price}}</span>
+            @if(latestSyncs.length > 0){
+                <div class="acr-box p-0 overflow-hidden">
+                    <div class="bg-lightgrey">
+                        <div class="d-flex-align-center p-3">
+                            <img src="assets/images/others/beat.png" class="me-2" />
+                            <h6 class="mb-0">Latest Syncs</h6>
                         </div>
-                    </li>
-                    }
-                </ul>
-            </div>
-
-            <div class="acr-box p-0 overflow-hidden">
-                <div class="bg-lightgrey">
-                    <div class="d-flex-align-center p-3">
-                        <img src="assets/images/others/beat.png" class="me-2" />
-                        <h6 class="mb-0">New Artists</h6>
+                        <div class="d-flex-between py-2 px-3 bg-light-gray">
+                            <small class="text-info-success">Synclist Name</small>
+                        </div>
                     </div>
-                    <div class="d-flex-between py-2 px-3 bg-light-gray">
-                        <small class="text-info-success">Artist Name</small>
-                        <small class="text-info-success">Total Uses</small>
-                    </div>
-                </div>
-                <ul class="ps-0 mb-0">
-                    @if(newArtists.length > 0){
-                        @for (item of newArtists; track item) {
-                            <li class="menu-list list-group-item">
-                                <div class="d-flex-between py-2 ps-2 pe-3">
-                                    <span class="d-flex-align-center">
+                    <ul class="ps-0 mb-0">
+                        @for (item of latestSyncs; track item) {
+                        <li class="menu-list list-group-item">
+                            <div class="py-2 px-3">
+                                <span class="d-flex-align-center">
+                                    <span class="me-2">
                                         <span class="me-2">
-                                            @if(item.image){
-                                                <img [src]="item.image" width="36" height="36"/>
+                                            @if(item.cover_image){
+                                            <img [src]="item.cover_image" width="36" height="36" />
                                             }
                                             @else {
-                                                <img src="assets/images/others/Colita.png" width="20" height="25" class="mx-2 my-1"/>
+                                            <img src="assets/images/others/top-track.png" width="20" height="25"
+                                                class="mx-2 my-1" />
                                             }
                                         </span>
-                                        @if(item.name){
-                                            <span>{{item.name}}</span>
-                                        }
-                                        @else{
-                                            <span class="text-warning">Not Available</span>
-                                        }
                                     </span>
-                                    <div>{{item.kamrank}}</div>
-                                </div>
-                            </li>
-                            }
-                    }
-                    @else{
-                        <li class="menu-list list-group-item">
-                            <div class="p-12 text-center text-warning">
-                                No new artists available.
+                                    <span>{{item.name}}</span>
+                                </span>
                             </div>
                         </li>
-                    }
-                </ul>
-            </div>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if(newArtists.length > 0){
+                <div class="acr-box p-0 overflow-hidden">
+                    <div class="bg-lightgrey">
+                        <div class="d-flex-align-center p-3">
+                            <img src="assets/images/others/beat.png" class="me-2" />
+                            <h6 class="mb-0">New Artists</h6>
+                        </div>
+                        <div class="d-flex-between py-2 px-3 bg-light-gray">
+                            <small class="text-info-success">Artist Name</small>
+                            <small class="text-info-success">Total Uses</small>
+                        </div>
+                    </div>
+                    <ul class="ps-0 mb-0">
+                        @for (item of newArtists; track item) {
+                        <li class="menu-list list-group-item">
+                            <div class="d-flex-between py-2 ps-2 pe-3">
+                                <span class="d-flex-align-center">
+                                    <span class="me-2">
+                                        @if(item.image){
+                                        <img [src]="item.image" width="36" height="36" />
+                                        }
+                                        @else {
+                                        <img src="assets/images/others/Colita.png" width="20" height="25"
+                                            class="mx-2 my-1" />
+                                        }
+                                    </span>
+                                    @if(item.name){
+                                    <span>{{item.name}}</span>
+                                    }
+                                    @else{
+                                    <span class="text-warning">Not Available</span>
+                                    }
+                                </span>
+                                <div>{{item.kamrank}}</div>
+                            </div>
+                        </li>
+                        }
+                    </ul>
+                </div>
+            }
         </div>
     </div>
 </section>

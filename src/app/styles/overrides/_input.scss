@@ -158,5 +158,6 @@ textarea{
 }
 
 input:disabled {
-    background-color: var(--darkgrey-color) !important;
+    background-color: var(--disable-color) !important;
+    cursor: not-allowed;
 }
