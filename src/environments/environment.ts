@@ -13,4 +13,5 @@ export const environment = {
             '127.0.0.1:8080'
         ]
     },
+    GOOGLE_CLIENT_ID: '718561277877-9aoajc2etskkmirb136ivgknuv2gjbsn.apps.googleusercontent.com',
 };

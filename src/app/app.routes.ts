@@ -7,7 +7,7 @@ export const routesNames = {
   AUTH: 'auth',
   MY_PROFILE: 'my-profile',
   UPLOAD: 'upload',
-  SPLITSHEET: 'my-split-sheets/create',
+  CREATE_SPLITSHEET: 'create-split-sheet',
   SPLITSHEET_REVIEW: 'my-split-sheets/review/:splitSheetId',
   EDIT_UPLOAD: 'upload/:trackId',
   TRACKS: 'my-tracks',
@@ -42,7 +42,7 @@ export const routes: Routes = [
         loadComponent: () => import('./components/upload/upload.component').then((c) => c.UploadComponent),
       },
       {
-        path: routesNames.SPLITSHEET,
+        path: routesNames.CREATE_SPLITSHEET,
         loadComponent: () => import('./components/my-split-sheets/manage-split-sheet/manage-split-sheet.component').then((c) => c.ManageSplitSheetComponent),
       },
       {

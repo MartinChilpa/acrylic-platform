@@ -85,7 +85,12 @@
                                                 <img src="assets/images/others/Colita.png" width="20" height="25" class="mx-2 my-1"/>
                                             }
                                         </span>
-                                        <span>{{item.name}}</span>
+                                        @if(item.name){
+                                            <span>{{item.name}}</span>
+                                        }
+                                        @else{
+                                            <span class="text-warning">Not Available</span>
+                                        }
                                     </span>
                                     <div>{{item.kamrank}}</div>
                                 </div>
