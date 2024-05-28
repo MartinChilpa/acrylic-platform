@@ -1,14 +1,11 @@
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef, inject } from '@angular/core';
 import { NavigationService } from '../../../services/navigation.service';
 import { FileDropzoneComponent } from '../../shared/file-dropzone/file-dropzone.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MyArtistService } from '../../../services/my-artist.service';
 import { ActivatedRoute } from '@angular/router';
-import { ICreateTracks } from '../../../interfaces/response/create-tracks.response';
 import { TrackDetail } from '../../../interfaces/response/my-artist-synclist.response';
-import { Subject, debounceTime } from 'rxjs';
-
 @Component({
   selector: 'acrylic-add-synclist',
   standalone: true,
@@ -22,17 +19,19 @@ import { Subject, debounceTime } from 'rxjs';
   styleUrl: './manage-synclist.component.scss'
 })
 export class ManageSynclistComponent implements OnInit {
+
+  @ViewChild('acrylicSynclistRef', { static: true, read: ViewContainerRef }) acrylicSynclistRef!: ViewContainerRef;
+
+  componentRefs!: ComponentRef<any>;
+
   activeStepper: number = 1;
-  fileDropzoneIcon = '/assets/images/icons/drop.svg'
-  fileDropzoneHeader = 'Drop your Cover Art File here or upload it manually';
-  fileDropzoneSize = 'JPG 1920px x 1080px';
   synclistForm!: FormGroup;
   isLoading: boolean = true
   private _navigationService = inject(NavigationService);
   private _fb = inject(FormBuilder);
   private _myArtistService = inject(MyArtistService);
   private _activatedRoute = inject(ActivatedRoute);
-  trackList: ICreateTracks[] = []
+
   manageStepperList = ['Create Synclist', 'Add Tracks'];
   trackSyncList = [
     { trackImage: 'assets/images/others/falling.png', name: 'Falling', tags: ['Lo-Fi', 'Pop'] },
@@ -43,13 +42,8 @@ export class ManageSynclistComponent implements OnInit {
   ]
   synclistId: string = ''
   synclistTracks!: TrackDetail[]
-  searchForm!: FormGroup;
-  private debounceSubject: Subject<void> = new Subject<void>();
 
   ngOnInit(): void {
-    this.searchForm = this._fb.group({
-      searchText: ['']
-    });
     this.synclistId = this._activatedRoute.snapshot.params['synclistId'];
     this.synclistForm = this._fb.group({
       id: [null],
@@ -59,38 +53,13 @@ export class ManageSynclistComponent implements OnInit {
       description: ['', Validators.required],
       pinned: [true],
     })
+    this.loadComponent(this.activeStepper)
     if (this.synclistId) {
       this.getSynclist();
     } else {
       this.isLoading = false
+      this.componentRefs.instance.isLoading = this.isLoading;
     }
-    this.getTracks()
-    this.debounceSubject.pipe(
-      debounceTime(500)
-    ).subscribe(() => {
-      this.getSearchTracks()
-    });
-  }
-
-  searchChanges() {
-    this.debounceSubject.next();
-  }
-
-  getTracks() {
-    this._myArtistService.getTracks().subscribe({
-      next: response => {
-        this.trackList = this.filterTracks(response);
-      }
-    })
-  }
-
-  getSearchTracks() {
-    this._myArtistService.searchTracks(this.searchForm.get('searchText')?.value).subscribe({
-      next: response => {
-        const newTracks = response.results;
-        this.trackList = this.updateTrackList(newTracks);
-      }
-    });
   }
 
   backProfile() {
@@ -98,6 +67,7 @@ export class ManageSynclistComponent implements OnInit {
       this._navigationService.navigateToMyProfile();
     } else {
       this.activeStepper = 1;
+      this.loadComponent(this.activeStepper);
     }
   }
 
@@ -112,6 +82,30 @@ export class ManageSynclistComponent implements OnInit {
       }
     }
     this.activeStepper = index;
+    this.loadComponent(this.activeStepper)
+  }
+
+  async loadComponent(step: number) {
+    this.acrylicSynclistRef.clear();
+    switch (step) {
+      case 1:
+        const { CreateSynclistComponent } = await import('./../create-synclist/create-synclist.component');
+        this.componentRefs = this.acrylicSynclistRef.createComponent(CreateSynclistComponent);
+        this.componentRefs.instance.isLoading = this.isLoading;
+        this.componentRefs.instance.synclistForm = this.synclistForm;
+        break;
+      case 2:
+        const { AddTrackComponent } = await import('./../add-track/add-track.component');
+        this.componentRefs = this.acrylicSynclistRef.createComponent(AddTrackComponent);
+        this.componentRefs.instance.synclistId = this.synclistId;
+        this.componentRefs.instance.synclistTracks = this.synclistTracks;
+        break;
+      default:
+        const { CreateSynclistComponent: DefaultComponent } = await import('./../create-synclist/create-synclist.component');
+        this.componentRefs = this.acrylicSynclistRef.createComponent(DefaultComponent);
+        this.componentRefs.instance.isLoading = this.isLoading;
+        this.componentRefs.instance.synclistForm = this.synclistForm;
+    }
   }
 
   getSynclist() {
@@ -127,6 +121,8 @@ export class ManageSynclistComponent implements OnInit {
         })
         this.synclistTracks = response.tracks.map(x => x.track)
         this.isLoading = false
+        this.componentRefs.instance.isLoading = this.isLoading;
+        this.componentRefs.instance.synclistTracks = this.synclistTracks;
       }
     })
   }
@@ -148,59 +144,18 @@ export class ManageSynclistComponent implements OnInit {
       next: response => {
         this.synclistForm.get('id')?.setValue(response.uuid);
         this.synclistId = response.uuid;
+        this.componentRefs.instance.synclistId = this.synclistId;
         this.activeStepper = 2;
+        this.loadComponent(this.activeStepper);
       }
     })
   }
 
-  synclistChecked(trackId: string) {
-    if (this.synclistTracks && Array.isArray(this.synclistTracks)) {
-      return this.synclistTracks.some(x => x.uuid == trackId)
-    }
-    return false;
-  }
-
-  filterTracks(tracks: any[]): any[] {
-    return tracks.filter(track => this.synclistChecked(track.uuid));
-  }
-
-  updateTrackList(newTracks: any[]) {
-    const matchedTracks = newTracks.filter(track => this.synclistChecked(track.uuid));
-    const unmatchedTracks = newTracks.filter(track => !this.synclistChecked(track.uuid));
-    const persistentMatchedTracks = this.trackList.filter(track => this.synclistChecked(track.uuid));
-    if(!this.searchForm.get('searchText')?.value) {
-      return persistentMatchedTracks;
-    }
-    const combinedMatchedTracks = [...persistentMatchedTracks, ...matchedTracks].filter((track, index, self) =>
-      index === self.findIndex(t => t.uuid === track.uuid)
-    );
-    return [...combinedMatchedTracks, ...unmatchedTracks];
-  }
-
-  manageTags($event: any, trackId: string) {
-    if (!this.synclistTracks) {
-      this.synclistTracks = []
-    }
-    const tagManageType = $event.checked ? this._myArtistService.addSynclistTrack(this.synclistId, trackId) : this._myArtistService.removeSynclistTrack(this.synclistId, trackId)
-    tagManageType.subscribe({
-      next: response => {
-        if ($event.checked) {
-          this.synclistTracks.push(this.trackList.find(x => x.uuid == trackId) as any)
-        } else {
-          this.synclistTracks = this.synclistTracks.filter(x => x.uuid != trackId);
-        }
-      },
-      error: () => {
-        $event.checked = false;
-      }
-    });
-  }
-
-  publish(){
-    if(this.activeStepper == 1){
+  publish() {
+    if (this.activeStepper == 1) {
       this.saveSynclist();
     }
-    else{
+    else {
       this._navigationService.navigateToMyProfile();
     }
   }

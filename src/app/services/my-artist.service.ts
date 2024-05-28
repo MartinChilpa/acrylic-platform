@@ -58,8 +58,8 @@ export class MyArtistService {
     return this._http.put<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/${id}/`, request);
   }
 
-  getTracks(): Observable<ICreateTracks[]> {
-    return this._http.get<ICreateTracks[]>(`${this.MY_ARTIST_API_URL}/tracks/`);
+  getTracks(): Observable<ICommonSuccessResponse<ICreateTracks[]>> {
+    return this._http.get<ICommonSuccessResponse<ICreateTracks[]>>(`${this.MY_ARTIST_API_URL}/tracks/`);
   }
 
   getTrackById(id: string): Observable<ICreateTracks> {

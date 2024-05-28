@@ -1,0 +1,48 @@
+<div class="acr-box p-3">
+    <h6>Add Tracks</h6>
+    <ng-container>
+        <div class="acr-input-group" [formGroup]="searchForm">
+            <img ngSrc="assets/images/icons/search-info.svg" width="20" height="20">
+            <input type="text" formControlName="searchText" placeholder="Search" class="w-100"
+                (input)="searchChanges()">
+        </div>
+    </ng-container>
+    <div class="mt-2">
+        <div class="light-gray-table-border rounded-2 table-responsive">
+            <table class="acrylic-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Track Name</th>
+                        <th scope="col">Tags</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(item of trackList; track item) {
+                    <tr>
+                        <td>
+                            <div class="d-flex-align-center gap-2">
+                                <img [src]="item.cover_image" height="36" width="36" class="radius-5" />
+                                <span>{{ item.name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                @for(tag of item.tags; track tag) {
+                                <span class="bg-light-gray px-2 py-1 radius-5">{{ tag.name }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex-center">
+                                <input type="checkbox" (change)="manageTags($event.target, item.uuid)"
+                                    [checked]="synclistChecked(item.uuid)" class="acrylic-checkbox">
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
