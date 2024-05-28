@@ -1,3 +1,5 @@
+import { IMyArtistSynclistResult } from './../../interfaces/response/my-artist-synclist.response';
+import { ICommonSuccessResponse } from './../../interfaces/response/common.response';
 import { IMyArtist } from './../../interfaces/response/my-artist.response';
 import { Component, effect, inject } from '@angular/core';
 import { MyArtistService } from '../../services/my-artist.service';
@@ -6,7 +8,7 @@ import { IAcrylicHomeResult } from '../../interfaces/response/home.response';
 import { NgClass } from '@angular/common';
 import { ArticlesService } from '../../services/articles.service';
 import { ArtistService } from '../../services/artist.service';
-import { IArtist, IArtistResponse } from '../../interfaces/response/artist.response';
+import { SynclistService } from '../../services/synclist.service';
 
 @Component({
   selector: 'acrylic-home',
@@ -20,17 +22,12 @@ export class HomeComponent {
   private _articlesService = inject(ArticlesService);
   private _myArtistService = inject(MyArtistService);
   private _artistService = inject(ArtistService);
+  private _synclistService = inject(SynclistService);
 
   myArtist: IMyArtist | undefined | null;
   homeDataList: IAcrylicHomeResult[] = [];
-  newArtists: IArtist[] = [];
-  topTrack = [
-    { name: 'Chill Vibes Café', price: '24,876', imageLink: 'assets/images/others/top-track.png' },
-    { name: 'Chill Vibes Café', price: '24,876', imageLink: 'assets/images/others/top-track.png' },
-    { name: 'Chill Vibes Café', price: '24,876', imageLink: 'assets/images/others/top-track.png' },
-    { name: 'Chill Vibes Café', price: '24,876', imageLink: 'assets/images/others/top-track.png' },
-    { name: 'Chill Vibes Café', price: '24,876', imageLink: 'assets/images/others/top-track.png' }
-  ];
+  newArtists: IMyArtist[] = [];
+  latestSyncs: IMyArtistSynclistResult[] = [];
 
   constructor() {
     effect(() => {
@@ -41,6 +38,7 @@ export class HomeComponent {
   ngOnInit() {
     this.getArticles();
     this.getNewArtists();
+    this.getLatestSyncs();
   }
 
   getArticles():void{
@@ -53,8 +51,16 @@ export class HomeComponent {
 
   getNewArtists():void{
     this._artistService.getNewArtists().subscribe({
-      next: (response: IArtistResponse) => {
+      next: (response: ICommonSuccessResponse<IMyArtist[]>) => {
         this.newArtists = response.results;
+      }
+    });
+  }
+
+  getLatestSyncs():void{
+    this._synclistService.getLatestSyncs().subscribe({
+      next: (response: ICommonSuccessResponse<IMyArtistSynclistResult[]>) => {
+        this.latestSyncs = response.results;
       }
     });
   }
