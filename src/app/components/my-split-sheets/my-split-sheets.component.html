@@ -34,10 +34,10 @@
                             </div>
                         </td>
                         <td>
-                            @if (item.signed) {
-                                <span class="tb-pill success">Signed</span>
+                            @if (item.status) {
+                                <small class="tb-pill" [ngClass]="item.status.toLowerCase().includes('signed') ? 'success':'created'">{{item.status}}</small>
                             } @else {
-                                <span class="tb-pill">Pending</span>
+                                <small class="tb-pill">PENDING</small>
                             }
                         </td>
                         <td>

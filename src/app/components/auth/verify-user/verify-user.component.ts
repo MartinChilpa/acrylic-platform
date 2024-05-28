@@ -33,7 +33,7 @@ export class VerifyUserComponent {
         this._accountService.verifyUser(this.user).subscribe({
           next: (response: any) => {
             if (response && response.detail == 'User verified successfully') {
-              this.message = "Verification successfull"
+              this.message = "Verification successful"
               this.verified = true
             } else {
               this.errorMessage = 'Failed to verify';

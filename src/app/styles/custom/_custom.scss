@@ -167,6 +167,10 @@ p {
         background-color: var(--info-bg-color);
         color: var(--success-color);
     }
+    &.created {
+        background-color: var(--info-bg-second-color);
+        color: var(--text-info-color);
+    }
 }
 @media(max-width:1024px) {
     .w-mobile-100 {

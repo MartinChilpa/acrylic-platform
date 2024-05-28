@@ -80,6 +80,10 @@ export class NavigationService {
     this._router.navigateByUrl(`/my-split-sheets`);
   }
 
+  navigateToCreateSplitSheet() {
+    this._router.navigateByUrl(`/create-split-sheet`);
+  }
+
   navigateToUploadTrack() {
     this._router.navigate(['upload']);
   }

@@ -7,6 +7,7 @@ export interface ISplitSheetResult {
     uuid: string;
     isrc: string;
     signed: any;
+    status: string;
     signature_request_id: string;
     created: string;
     updated: string;
