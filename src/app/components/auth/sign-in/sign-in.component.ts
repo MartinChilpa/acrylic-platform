@@ -35,7 +35,7 @@ export class SignInComponent implements OnInit {
       password: ['', Validators.required],
     });
 
-    // this.initGoogleSignIn();
+    this.initGoogleSignIn();
   }
 
 
@@ -71,7 +71,7 @@ export class SignInComponent implements OnInit {
       type: "standard", 
       text: "Sign In With Google", 
       theme: "outline",
-      size: "large",
+      size: "large"
     });
 
     google.accounts.id.prompt();
