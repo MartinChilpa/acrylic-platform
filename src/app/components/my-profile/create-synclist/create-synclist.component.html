@@ -1,0 +1,27 @@
+<ng-container>
+    <form [formGroup]="synclistForm" class="row gy-3 gx-2">
+        <div class="acr-box">
+            <div class="acr-input-label required">Synclist Name</div>
+            <input type="text" class="form-control acr-input" formControlName="name" placeholder="Synclist Name">
+        </div>
+
+        <div class="acr-box">
+            <div class="acr-input-label required">Synclist Description</div>
+            <textarea rows="5" class="form-control acr-input pt-2" rows="5" formControlName="description"
+                placeholder="Synclist Description">
+            </textarea>
+        </div>
+        @if (!isLoading) {
+        <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon" [fileDropzoneHeader]="fileDropzoneHeader"
+            [fileDropzoneSize]="fileDropzoneSize" [existingFiles]="[synclistForm.get('cover_image')?.value]"
+            [allowExtensions]="['jpg', 'jpeg']" (uploadedFileList)="setUploadFile('cover_image', $event)"
+            [accept]="'.jpg, .jpeg'"></acrylic-file-dropzone>
+        <acrylic-file-dropzone [fileDropzoneIcon]="fileDropzoneIcon"
+            [fileDropzoneHeader]="'Drop your Background Image File here or upload it manually'"
+            [fileDropzoneSize]="fileDropzoneSize" [allowExtensions]="['jpg', 'jpeg']"
+            [existingFiles]="[synclistForm.get('background_image')?.value]"
+            (uploadedFileList)="setUploadFile('background_image', $event)"
+            [accept]="'.jpg, .jpeg'"></acrylic-file-dropzone>
+        }
+    </form>
+</ng-container>
