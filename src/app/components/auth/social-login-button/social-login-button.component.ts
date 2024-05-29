@@ -10,7 +10,6 @@ declare var google: any;
   styleUrl: './social-login-button.component.scss'
 })
 export class SocialLoginButtonComponent implements OnInit {
-
   private _authService = inject(AuthService)
 
   ngOnInit(): void {
@@ -21,11 +20,7 @@ export class SocialLoginButtonComponent implements OnInit {
     this._authService.socialJwtPair({
       code: token,
       provider: 'google'
-    }).subscribe({
-      next: response => {
-
-      }
-    })
+    }).subscribe();
   }
 
   initGoogleSignIn(): void {
@@ -43,11 +38,8 @@ export class SocialLoginButtonComponent implements OnInit {
       theme: "outline",
       size: "large",
       align: 'center',
-      width: 200
+      // width: 200,
+      classes: 'w-100'
     });
-  }
-
-  signInWithGoogle(): void {
-    google.accounts.id.prompt();
   }
 }

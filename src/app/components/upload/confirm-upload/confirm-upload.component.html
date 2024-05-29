@@ -14,13 +14,15 @@
                     <div class="line bg-lightgray-border my-3"></div>
                     <div class="acr-box bg-light-gray text-center p-1">
                         <p class="mb-0 text-light-gray">Available:</p>
-                        @if(selectedPrice.max_artist_tracks === 0){
-                        <p>Unlimited</p>
+                        @if(selectedPrice.available_tracks != 0){
+                        <p>{{selectedPrice.available_tracks}}</p>
                         }
-                        @else {<p>{{selectedPrice.max_artist_tracks}}</p>}
+                        @else{
+                        <p>{{selectedPrice.available_tracks}}/{{selectedPrice.max_artist_tracks}}</p>
+                        }
                     </div>
                     <button class="btn btn-info mt-3 h-50px w-100">
-                        Price: $ {{selectedPrice.single_use_price}}
+                        Price: From ${{selectedPrice.min_price}} to ${{selectedPrice.max_price}}
                     </button>
                 </div>
                 }

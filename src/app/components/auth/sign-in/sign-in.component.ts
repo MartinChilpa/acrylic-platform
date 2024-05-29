@@ -32,14 +32,9 @@ export class SignInComponent implements OnInit {
     });
   }
 
-
   signIn(): void {
-    if (this.signInForm.invalid)
-      return;
-
-    // Disable the form
+    if (this.signInForm.invalid) return;
     this.signInForm.disable();
-
     this._authService.signIn(this.signInForm.value)
       .subscribe({
         next: () => {
@@ -47,7 +42,7 @@ export class SignInComponent implements OnInit {
           this._navigationService.navigateToHome();
         },
         error: () => {
-          this.signInForm.enable(); // Re-enable the form
+          this.signInForm.enable();
         }
       });
   }

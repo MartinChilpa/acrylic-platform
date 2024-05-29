@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { MyArtistService } from './../../../services/my-artist.service';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { ConfirmUploadComponent } from '../confirm-upload/confirm-upload.component';
 import { LiveUploadComponent } from '../live-upload/live-upload.component';
 import { FormGroup } from '@angular/forms';
 import { IPrice } from '../../../interfaces/response/price.response';
-import { PriceService } from '../../../services/price.service';
 
 @Component({
   selector: 'acrylic-upload-step-5',
@@ -18,7 +18,7 @@ export class UploadStep5Component {
   @Output() selectedPriceEvent = new EventEmitter();
 
   prices: IPrice[] = [];
-  private _priceService = inject(PriceService);
+  private _myArtistService = inject(MyArtistService);
   selectedPrice!: IPrice;
 
   nextUploadStepper(count: number) {
@@ -36,7 +36,7 @@ export class UploadStep5Component {
   }
 
   getPrices(): void {
-    this._priceService.getPrices().subscribe((response) => {
+    this._myArtistService.getPrices().subscribe((response) => {
       this.prices = response.results;
       this.selectedPrice = this.prices?.find(x => x.default) ?? {} as IPrice;
     })
