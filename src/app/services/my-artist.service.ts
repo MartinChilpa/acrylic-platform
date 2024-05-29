@@ -7,6 +7,7 @@ import { IMyArtistSynclistResult } from '../interfaces/response/my-artist-syncli
 import { ICreateTracks } from '../interfaces/response/create-tracks.response';
 import { ISplitSheetResult } from '../interfaces/response/split-sheet.response';
 import { ICommonSuccessResponse } from '../interfaces/response/common.response';
+import { IPrice } from '../interfaces/response/price.response';
 
 @Injectable({
   providedIn: 'root'
@@ -58,8 +59,8 @@ export class MyArtistService {
     return this._http.put<IMyArtistSynclistResult>(`${this.MY_ARTIST_API_URL}/synclists/${id}/`, request);
   }
 
-  getTracks(): Observable<ICreateTracks[]> {
-    return this._http.get<ICreateTracks[]>(`${this.MY_ARTIST_API_URL}/tracks/`);
+  getTracks(): Observable<ICommonSuccessResponse<ICreateTracks[]>> {
+    return this._http.get<ICommonSuccessResponse<ICreateTracks[]>>(`${this.MY_ARTIST_API_URL}/tracks/`);
   }
 
   getTrackById(id: string): Observable<ICreateTracks> {
@@ -118,5 +119,9 @@ export class MyArtistService {
   searchTracks(queryParams: any = {}): Observable<ICommonSuccessResponse<ICreateTracks[]>> {
     let params = this.buildQueryParams(queryParams)
     return this._http.get<ICommonSuccessResponse<ICreateTracks[]>>(`${this.MY_ARTIST_API_URL}/tracks/`, { params });
+  }
+
+  getPrices(): Observable<ICommonSuccessResponse<IPrice[]>> {
+    return this._http.get<ICommonSuccessResponse<IPrice[]>>(`${this.MY_ARTIST_API_URL}/prices/`);
   }
 }

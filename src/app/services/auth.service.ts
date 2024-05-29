@@ -99,4 +99,8 @@ export class AuthService {
 
     return of(false);
   }
+
+  socialJwtPair(request: any) {
+    return this._http.post(`${this.AUTH_API_URL}/social/jwt-pair/`, request)
+  }
 }

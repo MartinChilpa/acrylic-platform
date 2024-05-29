@@ -15,4 +15,8 @@
 
 .required {
     border: 1px solid var(--danger-color);
+
+    &::after {
+        display: none;
+    }
 }

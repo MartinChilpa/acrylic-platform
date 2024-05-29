@@ -6,19 +6,14 @@
                 <p class="mb-2">Preview Your Track</p>
                 <div class="d-flex-align-center gap-2">
                     <div>
-                        <img [src]="trackInfo ? trackInfo.image : 'assets/images/others/top-track.png'" height="70"
-                            width="70" alt="track-img" class="radius-5 me-2 cursor-pointer" (click)="playSnippet()" />
+                        <img [src]="trackInfo ? trackInfo.image : 'assets/images/others/default.jpg'" height="70"
+                            width="70" alt="track-img" class="radius-5 me-2" />
                     </div>
                     @if (trackInfo) {
                     <div class="d-flex flex-column">
                         <span>{{ trackInfo.name }}</span>
                         <small>{{ trackInfo.artist }}</small>
                         <small class="mt-1 text-beige">{{ trackInfo.duration | duration }}</small>
-                        @if (snippet) {
-                        <div class="text-center">
-                            <audio [src]="snippet" class="d-none hidden" #audioSnippet></audio>
-                        </div>
-                        }
                         @if (form.value['tags']?.length) {
                         <div class="mt-3 d-flex gap-2">
                             @for (item of form.value['tags']; track item) {

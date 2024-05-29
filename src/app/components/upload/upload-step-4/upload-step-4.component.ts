@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, effect, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, effect, inject } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MyArtistService } from '../../../services/my-artist.service';
 import { IMyArtist } from '../../../interfaces/response/my-artist.response';
@@ -15,11 +15,9 @@ import { DurationPipe } from '../../../pipes/duration.pipe';
   templateUrl: './upload-step-4.component.html',
   styleUrl: './upload-step-4.component.scss'
 })
-export class UploadStep4Component implements OnInit, OnDestroy {
+export class UploadStep4Component implements OnInit {
   @Input() form!: FormGroup;
   @Output() nextStepper = new EventEmitter();
-
-  @ViewChild("audioSnippet") audioSnippet!: ElementRef<HTMLAudioElement>
 
   snippet: string = '';
   coverImage: string = '';
@@ -81,22 +79,6 @@ export class UploadStep4Component implements OnInit, OnDestroy {
     })
   }
 
-  playSnippet() {
-    if (this.audioSnippet) {
-      if (this.audioSnippet.nativeElement.paused) {
-        this.audioSnippet.nativeElement.play()
-      } else {
-        this.audioSnippet.nativeElement.pause()
-      }
-    }
-  }
-
-  pauseSnippet() {
-    if (this.audioSnippet) {
-      this.audioSnippet.nativeElement.pause()
-    }
-  }
-
   nextUploadStepper(count: number) {
     this.nextStepper.emit(count);
   }
@@ -109,11 +91,5 @@ export class UploadStep4Component implements OnInit, OnDestroy {
       this.form.get('duration')?.setValue(parseInt(`${audio.duration}`));
     };
     audio.src = this.snippet;
-  }
-
-  ngOnDestroy(): void {
-    if (this.audioSnippet) {
-      this.audioSnippet.nativeElement.remove()
-    }
   }
 }

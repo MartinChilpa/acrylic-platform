@@ -57,7 +57,7 @@
             <div class="acr-box">
                 <div class="acr-input-label">Your Track ISRC Code</div>
                 <input type="text" id="isrc-code" formControlName="isrc" acrylicPreventTypingIfDisabled class="form-control acr-input"
-                    placeholder="ISRC Code" autocomplete="off" (keyup)="$event.preventDefault();">
+                    placeholder="ISRC Code" autocomplete="off">
                 @if (form.get('isrc')?.errors?.['pattern']) {
                 <div class="text-danger mt-1">
                     Please enter valid ISRC code.
