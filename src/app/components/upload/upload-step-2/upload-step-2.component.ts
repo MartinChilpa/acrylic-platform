@@ -25,9 +25,16 @@ export class UploadStep2Component implements OnInit {
 
   ngOnInit(): void {
     this.getDistributors()
+    if (!this.form.get('distributor')?.value && (this.form.get('other_distributor')?.value || this.form.get('other_distributor_email')?.value)) {
+      this.form.get('distributor')?.setValue('other');
+      this.isDistributorNameRequired = true;
+    }
   }
 
   nextUploadStepper(count: number) {
+    if (this.form.get('distributor')?.value == 'other') {
+      this.form.get('distributor')?.setValue('')
+    }
     this.nextStepper.emit(count);
   }
 
@@ -37,20 +44,21 @@ export class UploadStep2Component implements OnInit {
         this.distributors = response.results;
         this.distributors.push({
           name: "Other",
-          uuid: null
+          uuid: "other"
         });
       }
     })
   }
 
   dropdownSelected($event: any) {
-    if ($event.uuid) {
+    if ($event.uuid != "other") {
       this.form.get('other_distributor')?.setValue('');
       this.form.get('other_distributor_email')?.setValue('');
       this.form.get('distributor')?.setValue($event.uuid);
       this.isDistributorNameRequired = false;
     }
     else {
+      this.form.get('distributor')?.setValue($event.uuid);
       this.isDistributorNameRequired = true;
     }
   }

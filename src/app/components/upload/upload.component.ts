@@ -54,12 +54,29 @@ export class UploadComponent implements OnInit, AfterViewInit {
       other_distributor: [''],
       price: [],
       track_found: [0]
-    });
+    }, { validator: this.otherEmailValidator });
     this.uploadTrackForm.get('isrc')?.disable()
     if (this.uploadTrackId) {
       this.getTrackById()
       if (this.isAssignPrice) {
         this.activeStepper = 5
+      }
+    }
+  }
+
+  otherEmailValidator(formGroup: FormGroup) {
+    const distributor = formGroup.get('distributor');
+    const otherEmail = formGroup.get('other_distributor_email');
+
+    if (distributor?.value !== 'other') {
+      otherEmail?.setErrors(null);
+    } else {
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+      if (!emailPattern.test(otherEmail?.value)) {
+        otherEmail?.setErrors({ invalidEmail: true });
+      }
+      else {
+        otherEmail?.setErrors(null);
       }
     }
   }
