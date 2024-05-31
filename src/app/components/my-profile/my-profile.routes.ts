@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 export const myProfileRoutesNames = {
     EMPTY: '',
     ADD_SYNCLIST: 'add-synclist',
-    EDIT_SYNCLIST: 'edit-synclist/:synclistId',
+    EDIT_SYNCLIST: 'edit-synclist/:synclistId'
 };
 
 export const MY_PROFILE_ROUTES: Routes = [

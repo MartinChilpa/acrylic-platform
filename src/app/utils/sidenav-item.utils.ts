@@ -1,6 +1,6 @@
 export const sidenavItems = [
   { icon: 'home', label: 'Home', routerLink: '/home' },
-  { icon: 'files', label: 'My Split Sheets', routerLink: '/my-split-sheets'},
+  { icon: 'files', label: 'My Split Sheets', routerLink: '/my-split-sheets' },
   { icon: 'music', label: 'My Tracks', routerLink: '/my-tracks' },
   { icon: 'user', label: 'My Profile', routerLink: '/my-profile' },
   {
@@ -21,3 +21,14 @@ export const sidenavItems = [
     showSubMenu: false
   },
 ];
+
+export const publicSidenavItems = [
+  {
+    icon: 'question', label: 'My Support', routerLink: '/my-support',
+    submenu: [
+      { label: 'FAQ & Help', routerLink: '/my-support/faq' },
+      { label: 'Customer Success', routerLink: '/my-support/customer-success' }
+    ],
+    showSubMenu: false
+  },
+]
