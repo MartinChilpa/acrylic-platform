@@ -1,0 +1,54 @@
+<ng-container [formGroup]="publicProfileForm">
+    <div class="acr-box mt-4">
+        <p>Profile Details</p>
+        <div class="row mt-0 flex-column gy-3">
+            <div class="col-md-6">
+                <label for="profile-name" class="acr-input-label">Your Name</label>
+                <input type="text" id="profile-name" formControlName="name" class="form-control acr-input" placeholder="Your Name">
+            </div>
+            <div class="col-md-6">
+                <label for="profile-headline" class="acr-input-label">Profile Headline</label>
+                <input type="text" id="profile-headline" formControlName="slug" class="form-control acr-input" placeholder="Profile Headline">
+            </div>
+            <div class="col-md-6">
+                <label for="profile-bio" class="acr-input-label">Bio</label>
+                <textarea id="profile-bio" formControlName="bio" class="form-control acr-input mb-0 resize-none" placeholder="Company Billing Profile"></textarea>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border" (click)="saveProfile()">Save</button>
+            </div>
+        </div>
+    </div>
+    <div class="acr-box mt-4">
+        <p>Social Links</p>
+        <div class="row mt-0 flex-column gy-3">
+            <div class="col-md-6">
+                <div class="row gy-3">
+                    <div class="col-md-6">
+                        <label for="profile-soundCloud" class="acr-input-label">Soundcloud</label>
+                        <input type="text" id="profile-soundCloud" formControlName="soundcloud_url" class="form-control acr-input" placeholder="Sound cloud">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="profile-spotify" class="acr-input-label">Spotify</label>
+                        <input type="text" id="profile-spotify" formControlName="spotify_url" class="form-control acr-input" placeholder="Spotify">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="apple-podcasts" class="acr-input-label">Apple Podcasts</label>
+                        <input type="text" id="apple-podcasts" formControlName="itunes_url" class="form-control acr-input" placeholder="Apple Podcasts">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="tik-tok" class="acr-input-label">TikTok</label>
+                        <input type="text" id="tik-tok" formControlName="tiktok_url" class="form-control acr-input" placeholder="TikTok">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="instagram" class="acr-input-label">Instagram</label>
+                        <input type="text" id="instagram" formControlName="instagram_url" class="form-control acr-input" placeholder="Instagram">
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border" (click)="saveProfile()">Save</button>
+            </div>
+        </div>
+    </div>
+</ng-container>

@@ -43,6 +43,10 @@ export class MyArtistService {
     )
   }
 
+  updateMyArtist(request: IMyArtist): Observable<IMyArtist> {
+    return this._http.put<IMyArtist>(`${this.MY_ARTIST_API_URL}/profile/`, request)
+  }
+
   getMyArtistSynclist(): Observable<ICommonSuccessResponse<IMyArtistSynclistResult[]>> {
     return this._http.get<ICommonSuccessResponse<IMyArtistSynclistResult[]>>(`${this.MY_ARTIST_API_URL}/synclists/`);
   }
