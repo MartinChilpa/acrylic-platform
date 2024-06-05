@@ -14,7 +14,8 @@ export const routesNames = {
   SUPPORT: 'my-support',
   PAGE_NOT_FOUND: 'page-not-found',
   FINANCE: 'my-finances',
-  MY_SPLIT_SHEETS:'my-split-sheets',
+  MY_SPLIT_SHEETS: 'my-split-sheets',
+  ARTIST_PROFILE: 'artist-profile/:slug',
   EMPTY: ''
 };
 
@@ -59,7 +60,10 @@ export const routes: Routes = [
       },
       {
         path: routesNames.SUPPORT,
-        loadChildren: () => import('./components/my-support/my-support.routes').then((mod) => mod.MY_SUPPORT_ROUTES)
+        loadChildren: () => import('./components/my-support/my-support.routes').then((mod) => mod.MY_SUPPORT_ROUTES),
+        data: {
+          public: true
+        }
       },
       {
         path: routesNames.FINANCE,
@@ -68,7 +72,14 @@ export const routes: Routes = [
       {
         path: routesNames.MY_SPLIT_SHEETS,
         loadComponent: () => import('./components/my-split-sheets/my-split-sheets.component').then((c) => c.MySplitSheetsComponent)
-      }
+      },
+      {
+        path: routesNames.ARTIST_PROFILE,
+        loadComponent: () => import('./components/my-profile/artist-profile/artist-profile.component').then((mod) => mod.ArtistProfileComponent),
+        data: {
+          public: true
+        }
+      },
     ],
   },
   {
