@@ -15,7 +15,7 @@ export const routesNames = {
   PAGE_NOT_FOUND: 'page-not-found',
   FINANCE: 'my-finances',
   MY_SPLIT_SHEETS: 'my-split-sheets',
-  ARTIST_PROFILE: 'artist-profile/:slug',
+  ARTIST_PROFILE: 'artist/:slug',
   EMPTY: ''
 };
 
