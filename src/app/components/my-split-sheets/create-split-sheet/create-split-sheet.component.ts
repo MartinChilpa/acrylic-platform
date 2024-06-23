@@ -196,7 +196,6 @@ export class CreateSplitSheetComponent {
       new FormGroup({
         name: new FormControl('', [Validators.required]),
         email: new FormControl('', [Validators.required, Validators.email]),
-        legal_name: new FormControl(''),
         role: new FormControl(''),
         percent: new FormControl(0, [Validators.required])
       })
@@ -225,7 +224,6 @@ export class CreateSplitSheetComponent {
       new FormGroup({
         name: new FormControl('', [Validators.required]),
         email: new FormControl('', [Validators.required, Validators.email]),
-        legal_name: new FormControl(''),
         role: new FormControl(''),
         percent: new FormControl(0, [Validators.required])
       })
