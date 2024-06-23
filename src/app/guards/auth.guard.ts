@@ -6,6 +6,9 @@ import { NavigationService } from '../services/navigation.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const _navigationService = inject(NavigationService);
+  if (route.firstChild?.data?.['public']) {
+    return of(true);
+  }
   return inject(AuthService).check()
     .pipe(
       switchMap((authenticated) => {

@@ -38,6 +38,7 @@ export class SignUpComponent {
       password: ['', Validators.required],
       password_confirm: ['', Validators.required],
       profile: [''],
+      spotify_url: [''],
       type: ['artist']
     }, { validator: this.passwordMatchValidator });
   }

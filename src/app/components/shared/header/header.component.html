@@ -12,7 +12,7 @@
                 @if(_authService.IsLoggedIn()){
                     <div class="col-12 d-flex justify-content-end align-items-center p-0 mt-lg-0 mt-2">
                         @if(_myArtistService.myArtist()?.image){
-                            <a [routerLink]="['/my-profile']" title="Profile">
+                            <a [routerLink]="['/my-profile/edit-profile']" title="Profile">
                                 <img [ngSrc]="_myArtistService.myArtist()!.image" width="36" height="36">
                             </a>
                             <span class="mx-2">|</span>

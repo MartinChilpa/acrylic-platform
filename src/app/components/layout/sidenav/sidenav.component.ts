@@ -1,7 +1,8 @@
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { sidenavItems } from '../../../utils/sidenav-item.utils';
-import { Component, OnInit, inject } from '@angular/core';
+import { publicSidenavItems, sidenavItems } from '../../../utils/sidenav-item.utils';
+import { Component, OnInit, effect, inject } from '@angular/core';
 import { NgClass, NgOptimizedImage } from '@angular/common';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'acrylic-sidenav',
@@ -17,7 +18,22 @@ import { NgClass, NgOptimizedImage } from '@angular/common';
 })
 export class SidenavComponent implements OnInit {
   private router = inject(Router);
-  sidenavItems = sidenavItems;
+  sidenavItems: any[] = [];
+
+  userLoggedIn: boolean = false;
+
+  private _authService = inject(AuthService);
+
+  constructor() {
+    effect(() => {
+      this.userLoggedIn = this._authService.IsLoggedIn()
+      if (this.userLoggedIn) {
+        this.sidenavItems = sidenavItems;
+      } else {
+        this.sidenavItems = publicSidenavItems;
+      }
+    })
+  }
 
   ngOnInit(): void {
     const currentUrl = this.router.url;

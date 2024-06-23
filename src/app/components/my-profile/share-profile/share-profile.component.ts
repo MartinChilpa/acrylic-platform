@@ -29,7 +29,7 @@ export class ShareProfileComponent {
   ];
 
   getSlug() {
-    return `${environment.APP_URL}/${this.myArtist.slug}`;
+    return `${environment.APP_URL}/artist/${this.myArtist.slug}`;
   }
 
   copyToClipboard(item: string) {

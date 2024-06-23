@@ -56,8 +56,8 @@
         <div class="col-12">
             <div class="acr-box">
                 <div class="acr-input-label">Your Track ISRC Code</div>
-                <input type="text" id="isrc-code" formControlName="isrc" acrylicPreventTypingIfDisabled class="form-control acr-input"
-                    placeholder="ISRC Code" autocomplete="off">
+                <input type="text" id="isrc-code" formControlName="isrc" acrylicPreventTypingIfDisabled
+                    class="form-control acr-input" placeholder="ISRC Code" autocomplete="off">
                 @if (form.get('isrc')?.errors?.['pattern']) {
                 <div class="text-danger mt-1">
                     Please enter valid ISRC code.
@@ -75,14 +75,14 @@
         @if(isDistributorNameRequired) {
         <div class="col-12">
             <div class="acr-box">
-                <div class="acr-input-label">Name Of Distributor Or Label Contact</div>
+                <div class="acr-input-label required">Name Of Distributor Or Label Contact</div>
                 <input type="text" formControlName="other_distributor" class="form-control acr-input"
                     placeholder="Name Of Distributor Or Label Contact" autocomplete="off">
             </div>
         </div>
         <div class="col-12">
             <div class="acr-box">
-                <div class="acr-input-label">Email Of Distributor Or Label Contact</div>
+                <div class="acr-input-label required">Email Of Distributor Or Label Contact</div>
                 <input type="text" formControlName="other_distributor_email" class="form-control acr-input"
                     placeholder="Email Of Distributor Or Label Contact" autocomplete="off">
             </div>
@@ -95,11 +95,11 @@
                 <div class="row justify-content-center gy-2">
                     <div class="col-md-5 col-12 text-end">
                         <button class="btn btn-acrylic px-4 px-lg-5 py-2 light-gray-border"
-                        (click)="nextUploadStepper(1)">Back</button>
+                            (click)="nextUploadStepper(1)">Back</button>
                     </div>
                     <div class="col-md-5 col-12">
                         <button class="btn btn-info px-4 px-lg-5 py-2 light-gray-border" (click)="nextUploadStepper(3)"
-                            [disabled]="!form.get('isrc')?.value || form.get('isrc')?.errors?.['pattern']">Next</button>
+                            [disabled]="!form.get('isrc')?.value || form.get('isrc')?.errors?.['pattern'] || (form.get('distributor')?.value == 'other' ? (!form.get('other_distributor')?.value || !form.get('other_distributor_email')?.value || form.get('other_distributor_email')?.errors?.['invalidEmail']) : false)">Next</button>
                     </div>
                 </div>
             </div>

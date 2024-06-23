@@ -1,0 +1,20 @@
+<div class="acr-box p-1 d-inline-flex light-gray-border">
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="cursor-pointer fw-bold"
+                [ngClass]="{'btn btn-main h-100 d-flex-center' : activeProfileIndex == 1, 'text-primary nav-link' : activeProfileIndex != 1}"
+                (click)="editProfileTab(1)">Public Profile</a>
+        </li>
+        <li class="nav-item">
+            <a class="cursor-pointer fw-bold"
+                [ngClass]="{'btn btn-main h-100 d-flex-center' : activeProfileIndex == 2, 'text-primary nav-link' : activeProfileIndex != 2}"
+                (click)="editProfileTab(2)">Privacy & Security</a>
+        </li>
+        <li class="nav-item">
+            <a class="cursor-pointer fw-bold"
+                [ngClass]="{'btn btn-main h-100 d-flex-center' : activeProfileIndex == 3, 'text-primary nav-link' : activeProfileIndex != 3}"
+                (click)="editProfileTab(3)">Notifications</a>
+        </li>
+    </ul>
+</div>
+<ng-container #acrylicEditProfileRef></ng-container>

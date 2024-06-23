@@ -70,6 +70,10 @@ p {
     align-items: center;
 }
 
+.d-flex-none {
+    flex: none;
+}
+
 .d-flex-justify-between {
     display: flex;
     justify-content: space-between;
@@ -254,4 +258,38 @@ p {
 .required:after {
     content: " *";
     color: var(--danger-color);
+}
+
+/**Profile Page Css**/
+.h-bg-profile{
+    height: 230px;
+}
+
+.diego-img {
+    top: calc(-100% + 55%);
+    left: calc(-100% + 93%);
+}
+
+.bottom-10px{
+    bottom: 10px;
+}
+
+.pinned-sync-box {
+    height: 170px;
+    .pinned-sync-back {
+        background-repeat: no-repeat;
+        background-size: cover;
+        .pinned-sync-gradient-layer {
+            background: var(--default-gradient-gray-background-color);
+        }
+        .pinned-sync-content {
+            position: relative;
+            z-index: 1;
+        }
+        .pinned-sync-edit {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    }
 }
