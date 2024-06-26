@@ -6,6 +6,7 @@ import { NgClass } from '@angular/common';
 import { AlertService } from '../../../services/alert.service';
 import { AccountService } from '../../../services/account.service';
 import { SocialLoginButtonComponent } from '../social-login-button/social-login-button.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'acrylic-sign-up',
@@ -26,15 +27,17 @@ export class SignUpComponent {
   signUpForm!: FormGroup;
 
   private _fb = inject(FormBuilder);
+  private _accountService = inject(AccountService);
+  private _alertService = inject(AlertService);
+  private _activatedRoute = inject(ActivatedRoute);
   public _navigationService = inject(NavigationService);
-  public _accountService = inject(AccountService);
-  public _alertService = inject(AlertService);
 
   ngOnInit(): void {
+    const emailFromQueryParams = this._activatedRoute.snapshot.queryParamMap.get('email') || '';
     this.signUpForm = this._fb.group({
       first_name: ['', Validators.required],
       last_name: [''],
-      email: ['', [Validators.required, Validators.email]],
+      email: [emailFromQueryParams, [Validators.required, Validators.email]],
       password: ['', Validators.required],
       password_confirm: ['', Validators.required],
       profile: [''],
