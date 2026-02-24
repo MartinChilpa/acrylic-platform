@@ -4,6 +4,7 @@ export const authRoutesNames = {
     EMPTY: '',
     SIGNIN: 'sign-in',
     SIGNUP: 'sign-up',
+    SIGNUP_CLUB: 'sign-up-club',
     FORGOT_PASSWORD: 'forgot-password',
     RESET_PASSWORD: 'reset-password',
     VERIFY_USER: 'verify-user',
@@ -43,7 +44,18 @@ export const AUTH_ROUTES: Routes = [
             {
                 path: authRoutesNames.RESET_PASSWORD,
                 loadComponent: () => import('./reset-password/reset-password.component').then((mod) => mod.ResetPasswordComponent),
-            }
+            },
+      
         ],
+    },      
+    {
+        path: 'club', // Esto hará que la ruta sea /auth/club/sign-up
+        loadComponent: () => import('./auth-club-layout/auth-club-layout.component').then(c => c.AuthClubLayoutComponent),
+        children: [
+        {
+            path: 'sign-up', 
+            loadComponent: () => import('./sign-up-club/sign-up-club.component').then(m => m.SignUpClubComponent)
+        }
+        ]
     }
 ];
