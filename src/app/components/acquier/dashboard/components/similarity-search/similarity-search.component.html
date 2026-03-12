@@ -1,0 +1,252 @@
+<style>
+    :host {
+  --bg-dark: #0c0c0c;
+  --bg-card: #161616;
+  --accent-pink: #d63384;
+  --text-main: #ffffff;
+  --text-muted: #888;
+  display: block;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  padding: 20px;
+}
+
+/* Search Bar */
+.search-input-wrapper {
+  background: #1a1a1a;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border: 1px solid #333;
+}
+
+.search-input-wrapper input {
+  background: transparent;
+  border: none;
+  color: white;
+  flex: 1;
+  padding: 10px;
+  outline: none;
+}
+
+.btn-ai-search {
+  background: linear-gradient(90deg, #9c27b0, #e91e63);
+  border: none;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Chips */
+.chips-container {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.chip {
+  background: #222;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  border: 1px solid #333;
+}
+
+/* Result Rows */
+.result-row {
+  background: var(--bg-card);
+  margin-bottom: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: background 0.2s;
+}
+
+.result-row:hover {
+  background: #1f1f1f;
+}
+
+.song-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 250px;
+}
+
+.thumbnail {
+  width: 40px;
+  height: 40px;
+  background: #333;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 11px;
+  border: 1px solid currentColor;
+}
+
+.status-badge.bid { color: #a855f7; }
+.status-badge.pre { color: #3b82f6; }
+
+.metrics {
+  display: flex;
+  gap: 15px;
+  color: #4ade80;
+  font-size: 13px;
+}
+
+.waveform {
+  flex: 1;
+  height: 30px;
+  background: rgba(255,255,255,0.1); /* Dummy placeholder */
+  border-radius: 4px;
+}
+
+.play-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.btn-play {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .metrics, .waveform {
+    display: none;
+  }
+}
+</style>
+
+<div class="dashboard-container">
+  <div class="search-header">
+    <div class="search-input-wrapper" [class.invalid]="searchControl.invalid && searchControl.dirty">
+      <span class="icon-sparkles" [class.loading-spin]="loading">✨</span>
+      
+      <input
+        type="text"
+        [formControl]="searchControl"
+        placeholder="Paste a YouTube URL to find similar tracks..."
+      />
+
+      <div class="search-actions">
+        <button class="btn-ai-search" (click)="search()" [disabled]="loading || searchControl.invalid">
+          {{ loading ? 'Searching...' : 'Search' }}
+        </button>
+      </div>
+    </div>
+    
+    <small class="error-text" *ngIf="searchControl.invalid && searchControl.dirty">
+      Please enter a valid YouTube URL.
+    </small>
+    <small class="error-text" *ngIf="errorMsg">
+      {{ errorMsg }}
+    </small>
+  </div>
+
+  <div class="empty-results" *ngIf="results.length === 0 && !loading">
+    <p>No results yet. Try pasting a link!</p>
+  </div>
+
+  <div class="results-list" *ngIf="!loading">
+     <div class="result-card" *ngFor="let result of results">
+        </div>
+  </div>
+</div>
+
+
+<!-- <div class="dashboard-container">
+
+  <div class="search-header">
+    <div class="search-input-wrapper">
+      <span class="icon-sparkles">✨</span>
+      <input type="text" [formControl]="searchControl" placeholder="Intense action music for highlight reel">
+      <div class="search-actions">
+        <button class="btn-icon">⚙️</button>
+        <button class="btn-icon">🕒</button>
+        <button class="btn-ai-search" (click)="search()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-info">
+    <p><strong>{{results.length}} Results for</strong> "Intense action music..."</p>
+    <div class="chips-container">
+      <span class="chip">Intense Simi</span>
+      <span class="chip">Action</span>
+      <span class="chip">Trailer</span>
+      <span class="chip">Epic</span>
+    </div>
+  </div>
+
+    <div class="results">
+
+      <div *ngFor="let r of results">
+
+        <b>{{ r.track_name }}</b>
+        <span>{{ r.artist }}</span>
+        <span>{{ r.similarity_score }}</span>
+
+      </div>
+
+    </div>
+
+  <div class="results-list">
+    <h3>Top matches ({{results.length}})</h3>
+    
+    <div class="result-row" *NgFor="let item of results">
+      <div class="song-info">
+        <div class="thumbnail">🇨🇦</div>
+        <div>
+          <p class="title">{{item.title}}</p>
+          <p class="subtitle">{{item.artist}} • {{item.genre}}</p>
+        </div>
+      </div>
+
+      <div class="status-badge" [ngClass]="item.status">{{item.tag}}</div>
+
+      <div class="metrics">
+        <span>👤 {{item.size}}</span>
+        <span>🔥 {{item.intensity}}</span>
+        <span>🏆 {{item.strength}}</span>
+      </div>
+
+      <div class="waveform">
+        <div class="wave-dummy"></div>
+      </div>
+
+      <div class="play-actions">
+        <span class="duration">{{item.duration}}</span>
+        <button class="btn-play">▶</button>
+        <button class="btn-icon">🤍</button>
+        <button class="btn-icon">📂</button>
+      </div>
+    </div>
+  </div>
+</div> -->
