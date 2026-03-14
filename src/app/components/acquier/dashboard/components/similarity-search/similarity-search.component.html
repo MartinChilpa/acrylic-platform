@@ -66,6 +66,8 @@
   align-items: center;
   gap: 20px;
   transition: background 0.2s;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .result-row:hover {
@@ -104,6 +106,64 @@
   gap: 15px;
   color: #4ade80;
   font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.track-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+}
+
+.thumb-image {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #333;
+}
+
+.thumb-fallback {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  background: #2a2a2a;
+  color: #bbb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  border: 1px solid #333;
+}
+
+.title-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.meta-line {
+  color: #bdbdbd;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.tag-line {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  background: #202020;
+  border: 1px solid #333;
+  color: #d7d7d7;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
 }
 
 .waveform {
@@ -175,8 +235,47 @@
   </div>
 
   <div class="results-list" *ngIf="!loading">
-     <div class="result-card" *ngFor="let result of results">
+    <div class="result-card result-row" *ngFor="let result of results">
+      <div class="track-grid">
+        <ng-container *ngIf="getThumbnailPath(result) as thumb; else noThumb">
+          <img class="thumb-image" [src]="thumb" [alt]="result.track_name || 'Track thumbnail'" />
+        </ng-container>
+        <ng-template #noThumb>
+          <div class="thumb-fallback">NO IMG</div>
+        </ng-template>
+
+        <div>
+          <div class="title-line">
+            <strong>{{ result.track_name || 'Sin titulo' }}</strong>
+            <span class="pill">ID {{ result.id }}</span>
+          </div>
+
+          <div class="meta-line">
+            {{ result.artist_canonical || 'Artista desconocido' }}
+            • {{ formatDuration(result.duration) }}
+            <span *ngIf="result.release_year"> • {{ result.release_year }}</span>
+          </div>
+
+          <div class="metrics">
+            <span *ngIf="result.auto_tagging_output?.bpm">BPM: {{ result.auto_tagging_output?.bpm }}</span>
+            <span *ngIf="result.auto_tagging_output?.key?.length">Key: {{ result.auto_tagging_output?.key[0] }}</span>
+            <span *ngIf="result.auto_tagging_output?.tempo?.length">Tempo: {{ result.auto_tagging_output?.tempo[0] }}</span>
+          </div>
+
+          <div class="tag-line">
+            <span class="pill" *ngIf="result.auto_tagging_output?.genres?.length">
+              {{ result.auto_tagging_output?.genres?.join(', ') }}
+            </span>
+            <span class="pill" *ngIf="result.auto_tagging_output?.moods?.length">
+              {{ result.auto_tagging_output?.moods?.slice(0, 3)?.join(' • ') }}
+            </span>
+            <span class="pill" *ngIf="result.auto_tagging_output?.language?.length">
+              Idioma: {{ result.auto_tagging_output?.language?.join(', ') }}
+            </span>
+          </div>
         </div>
+      </div>
+    </div>
   </div>
 </div>
 
