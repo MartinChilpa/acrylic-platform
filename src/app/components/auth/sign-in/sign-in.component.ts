@@ -39,7 +39,11 @@ export class SignInComponent implements OnInit {
       .subscribe({
         next: () => {
           this._alertService.success("Logged in successfully");
-          this._navigationService.navigateToHome();
+          if (this._authService.isArtistUserType()) {
+            this._navigationService.navigateToHome();
+          } else {
+            this._navigationService.navigateToAcquierDashboard();
+          }
         },
         error: () => {
           this.signInForm.enable();

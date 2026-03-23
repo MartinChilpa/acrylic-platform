@@ -173,6 +173,25 @@
   border-radius: 4px;
 }
 
+.waveform-empty {
+  width: 100%;
+  height: 72px;
+  margin: 10px 0 8px;
+  border: 1px dashed #3a3a3a;
+  border-radius: 4px;
+  color: #8f8f8f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.waveform-error {
+  margin-top: 6px;
+  color: #fca5a5;
+  font-size: 12px;
+}
+
 .play-actions {
   display: flex;
   align-items: center;
@@ -212,7 +231,7 @@
       <input
         type="text"
         [formControl]="searchControl"
-        placeholder="Paste a YouTube URL to find similar tracks..."
+        placeholder="Paste a URL (YouTube, Vimeo, SoundCloud, Spotify, Apple Music, TikTok)..."
       />
 
       <div class="search-actions">
@@ -223,7 +242,7 @@
     </div>
     
     <small class="error-text" *ngIf="searchControl.invalid && searchControl.dirty">
-      Please enter a valid YouTube URL.
+      Please enter a valid supported URL.
     </small>
     <small class="error-text" *ngIf="errorMsg">
       {{ errorMsg }}
@@ -235,22 +254,38 @@
   </div>
 
   <div class="results-list" *ngIf="!loading">
-    <div class="result-card result-row" *ngFor="let result of results">
+    <div class="result-card result-row" *ngFor="let result of results; let i = index">
       <div class="track-grid">
-        <ng-container *ngIf="getThumbnailPath(result) as thumb; else noThumb">
-          <img class="thumb-image" [src]="thumb" [alt]="result.track_name || 'Track thumbnail'" />
-        </ng-container>
-        <ng-template #noThumb>
-          <div class="thumb-fallback">NO IMG</div>
-        </ng-template>
+        <img class="thumb-image" [src]="getTrackImage(result)" [alt]="result.track_name || 'Track thumbnail'" />
 
         <div>
           <div class="title-line">
-            <strong>{{ result.track_name || 'Sin titulo' }}</strong>
-            <span class="pill">ID {{ result.id }}</span>
+            <strong>{{ result.track_name || result.name || 'Sin titulo' }}</strong>
+       
           </div>
 
           <div class="meta-line">
+            <audio
+              *ngIf="getTrackAudioUrl(result) as audioUrl"
+              #audioRef
+              [attr.data-track-key]="getTrackKey(result, i)"
+              [src]="audioUrl"
+              controls>
+            </audio>
+
+            <div
+              class="waveform"
+              *ngIf="getTrackWaveformUrl(result); else noWaveform"
+              #waveOverviewRef
+              [attr.data-track-key]="getTrackKey(result, i)">
+            </div>
+            <div class="waveform-error" *ngIf="getWaveformError(result, i) as waveError">
+              {{ waveError }}
+            </div>
+            <ng-template #noWaveform>
+              <div class="waveform-empty">No waveform available</div>
+            </ng-template>
+          
             {{ result.artist_canonical || 'Artista desconocido' }}
             • {{ formatDuration(result.duration) }}
             <span *ngIf="result.release_year"> • {{ result.release_year }}</span>
@@ -263,15 +298,11 @@
           </div>
 
           <div class="tag-line">
-            <span class="pill" *ngIf="result.auto_tagging_output?.genres?.length">
-              {{ result.auto_tagging_output?.genres?.join(', ') }}
+ 
+            <span class="pill" *ngIf="result.moods?.length">
+              {{ result.moods?.slice(0, 3)?.join(' • ') }}
             </span>
-            <span class="pill" *ngIf="result.auto_tagging_output?.moods?.length">
-              {{ result.auto_tagging_output?.moods?.slice(0, 3)?.join(' • ') }}
-            </span>
-            <span class="pill" *ngIf="result.auto_tagging_output?.language?.length">
-              Idioma: {{ result.auto_tagging_output?.language?.join(', ') }}
-            </span>
+
           </div>
         </div>
       </div>
