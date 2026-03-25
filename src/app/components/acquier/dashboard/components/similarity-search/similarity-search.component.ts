@@ -165,6 +165,10 @@ ngOnInit() {
   }
 
   getTrackImage(track: any): string {
+    const coverImage = track?.cover_image;
+    if (typeof coverImage === 'string' && coverImage.trim().length > 0) {
+      return coverImage;
+    }
     return this.getThumbnailPath(track) ?? 'assets/images/others/default.jpg';
   }
 
@@ -175,6 +179,141 @@ ngOnInit() {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
+  }
+
+  formatFollowers(value: unknown): string | null {
+    const num = Number(value);
+    if (!Number.isFinite(num) || num < 0) {
+      return null;
+    }
+    return new Intl.NumberFormat('en-US').format(num);
+  }
+
+  getAudienceSize(track: any): string | null {
+    const values = [
+      Number(track?.spotify_followers ?? 0),
+      Number(track?.tiktok_followers ?? 0),
+      Number(track?.youtube_followers ?? 0),
+      Number(track?.instagram_followers ?? 0)
+    ];
+
+    const validValues = values.filter((v) => Number.isFinite(v) && v > 0);
+    if (!validValues.length) {
+      return null;
+    }
+
+    const total = validValues.reduce((sum, v) => sum + v, 0);
+    return new Intl.NumberFormat('en-US').format(total);
+  }
+
+  getFollowerBreakdown(track: any): Array<{ label: string; value: number; percent: number; color: string }> {
+    const raw = [
+      { label: 'Spotify', value: Number(track?.spotify_followers ?? 0), color: '#22c55e' },
+      { label: 'TikTok', value: Number(track?.tiktok_followers ?? 0), color: '#f43f5e' },
+      { label: 'YouTube', value: Number(track?.youtube_followers ?? 0), color: '#ef4444' },
+      { label: 'Instagram', value: Number(track?.instagram_followers ?? 0), color: '#a855f7' }
+    ].filter((item) => Number.isFinite(item.value) && item.value > 0);
+
+    const total = raw.reduce((sum, item) => sum + item.value, 0);
+    if (total <= 0) {
+      return [];
+    }
+
+    return raw.map((item) => ({
+      ...item,
+      percent: Number(((item.value / total) * 100).toFixed(1))
+    }));
+  }
+
+  getFollowersPieBackground(track: any): string | null {
+    const breakdown = this.getFollowerBreakdown(track);
+    if (!breakdown.length) {
+      return null;
+    }
+
+    let start = 0;
+    const stops = breakdown.map((item) => {
+      const end = start + item.percent;
+      const stop = `${item.color} ${start}% ${end}%`;
+      start = end;
+      return stop;
+    });
+
+    return `conic-gradient(${stops.join(', ')})`;
+  }
+
+  getInstagramDemographic(track: any, key: 'female' | 'male'): number | null {
+    const source = track?.chartmetric_instagram_demographics;
+    if (!source) {
+      return null;
+    }
+
+    const parseValue = (value: unknown): number | null => {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    if (Array.isArray(source)) {
+      for (const item of source) {
+        if (item && typeof item === 'object') {
+          const direct = (item as Record<string, unknown>)[key];
+          const parsed = parseValue(direct);
+          if (parsed !== null) {
+            return parsed;
+          }
+        }
+      }
+      return null;
+    }
+
+    if (source && typeof source === 'object') {
+      const direct = (source as Record<string, unknown>)[key];
+      return parseValue(direct);
+    }
+
+    return null;
+  }
+
+  getGenderSplit(track: any): { female: number; male: number } | null {
+    const female = this.getInstagramDemographic(track, 'female');
+    const male = this.getInstagramDemographic(track, 'male');
+
+    if (female === null && male === null) {
+      return null;
+    }
+
+    const safeFemale = Math.max(0, female ?? 0);
+    const safeMale = Math.max(0, male ?? 0);
+    const total = safeFemale + safeMale;
+
+    if (total <= 0) {
+      return { female: 0, male: 0 };
+    }
+
+    return {
+      female: Number(((safeFemale / total) * 100).toFixed(1)),
+      male: Number(((safeMale / total) * 100).toFixed(1))
+    };
+  }
+
+  getTopCityNames(track: any): string[] | null {
+    const source = track?.chartmetric_instagram_top_cities;
+    if (!Array.isArray(source) || source.length === 0) {
+      return null;
+    }
+
+    const topCities = source
+      .slice(0, 3)
+      .map((item: unknown) => {
+        if (!item || typeof item !== 'object') {
+          return null;
+        }
+        const city = (item as Record<string, unknown>)['city_name'];
+        return typeof city === 'string' ? city.trim() : null;
+      })
+      .filter((city): city is string => !!city);
+
+    return topCities.length ? topCities : null;
   }
 
   getTrackKey(track: any, index: number): string {

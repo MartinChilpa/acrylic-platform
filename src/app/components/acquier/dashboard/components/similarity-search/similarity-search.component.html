@@ -166,6 +166,83 @@
   font-size: 11px;
 }
 
+.gender-split {
+  margin-top: 8px;
+}
+
+.gender-track {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #2b2b2b;
+  display: flex;
+  border: 1px solid #3a3a3a;
+}
+
+.gender-female {
+  background: #ec4899;
+  height: 100%;
+}
+
+.gender-male {
+  background: #3b82f6;
+  height: 100%;
+}
+
+.gender-legend {
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #d7d7d7;
+}
+
+.followers-pie-wrap {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.followers-pie {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 1px solid #3a3a3a;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.followers-pie::after {
+  content: '';
+  position: absolute;
+  inset: 13px;
+  border-radius: 50%;
+  background: #161616;
+  border: 1px solid #2f2f2f;
+}
+
+.followers-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 11px;
+  color: #d7d7d7;
+}
+
+.followers-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.followers-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
 .waveform {
   flex: 1;
   height: 30px;
@@ -295,6 +372,11 @@
             <span *ngIf="result.auto_tagging_output?.bpm">BPM: {{ result.auto_tagging_output?.bpm }}</span>
             <span *ngIf="result.auto_tagging_output?.key?.length">Key: {{ result.auto_tagging_output?.key[0] }}</span>
             <span *ngIf="result.auto_tagging_output?.tempo?.length">Tempo: {{ result.auto_tagging_output?.tempo[0] }}</span>
+            <span *ngIf="getAudienceSize(result) as audience">Audience Size: {{ audience }}</span>
+            <span *ngIf="formatFollowers(result.spotify_followers) as followers">Spotify: {{ followers }}</span>
+            <span *ngIf="formatFollowers(result.tiktok_followers) as followers">TikTok: {{ followers }}</span>
+            <span *ngIf="formatFollowers(result.youtube_followers) as followers">YouTube: {{ followers }}</span>
+            <span *ngIf="formatFollowers(result.instagram_followers) as followers">Instagram: {{ followers }}</span>
           </div>
 
           <div class="tag-line">
@@ -302,7 +384,28 @@
             <span class="pill" *ngIf="result.moods?.length">
               {{ result.moods?.slice(0, 3)?.join(' • ') }}
             </span>
-
+            <span class="pill" *ngIf="getTopCityNames(result) as topCities">
+              Top Cities: {{ topCities.join(' • ') }}
+            </span>
+          </div>
+          <div class="followers-pie-wrap" *ngIf="getFollowersPieBackground(result) as pieBackground">
+            <div class="followers-pie" [style.background]="pieBackground"></div>
+            <div class="followers-legend">
+              <span class="followers-legend-item" *ngFor="let item of getFollowerBreakdown(result)">
+                <span class="followers-dot" [style.background]="item.color"></span>
+                {{ item.label }} {{ item.percent }}%
+              </span>
+            </div>
+          </div>
+          <div class="gender-split" *ngIf="getGenderSplit(result) as split">
+            <div class="gender-track">
+              <div class="gender-female" [style.width.%]="split.female"></div>
+              <div class="gender-male" [style.width.%]="split.male"></div>
+            </div>
+            <div class="gender-legend">
+              <span>Female {{ split.female }}%</span>
+              <span>Male {{ split.male }}%</span>
+            </div>
           </div>
         </div>
       </div>
