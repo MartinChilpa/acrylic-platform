@@ -1,329 +1,47 @@
-<style>
-    :host {
-  --bg-dark: #0c0c0c;
-  --bg-card: #161616;
-  --accent-pink: #d63384;
-  --text-main: #ffffff;
-  --text-muted: #888;
-  display: block;
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  font-family: 'Inter', sans-serif;
-  padding: 20px;
-}
-
-/* Search Bar */
-.search-input-wrapper {
-  background: #1a1a1a;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  padding: 8px 16px;
-  border: 1px solid #333;
-}
-
-.search-input-wrapper input {
-  background: transparent;
-  border: none;
-  color: white;
-  flex: 1;
-  padding: 10px;
-  outline: none;
-}
-
-.btn-ai-search {
-  background: linear-gradient(90deg, #9c27b0, #e91e63);
-  border: none;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-/* Chips */
-.chips-container {
-  display: flex;
-  gap: 10px;
-  margin: 15px 0;
-}
-
-.chip {
-  background: #222;
-  padding: 5px 15px;
-  border-radius: 20px;
-  font-size: 12px;
-  border: 1px solid #333;
-}
-
-/* Result Rows */
-.result-row {
-  background: var(--bg-card);
-  margin-bottom: 8px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  transition: background 0.2s;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.result-row:hover {
-  background: #1f1f1f;
-}
-
-.song-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  width: 250px;
-}
-
-.thumbnail {
-  width: 40px;
-  height: 40px;
-  background: #333;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 15px;
-  font-size: 11px;
-  border: 1px solid currentColor;
-}
-
-.status-badge.bid { color: #a855f7; }
-.status-badge.pre { color: #3b82f6; }
-
-.metrics {
-  display: flex;
-  gap: 15px;
-  color: #4ade80;
-  font-size: 13px;
-  flex-wrap: wrap;
-}
-
-.track-grid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 14px;
-}
-
-.thumb-image {
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
-  object-fit: cover;
-  border: 1px solid #333;
-}
-
-.thumb-fallback {
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
-  background: #2a2a2a;
-  color: #bbb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  border: 1px solid #333;
-}
-
-.title-line {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.meta-line {
-  color: #bdbdbd;
-  font-size: 13px;
-  margin-top: 4px;
-}
-
-.tag-line {
-  margin-top: 8px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.pill {
-  background: #202020;
-  border: 1px solid #333;
-  color: #d7d7d7;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 11px;
-}
-
-.gender-split {
-  margin-top: 8px;
-}
-
-.gender-track {
-  width: 100%;
-  height: 10px;
-  border-radius: 999px;
-  overflow: hidden;
-  background: #2b2b2b;
-  display: flex;
-  border: 1px solid #3a3a3a;
-}
-
-.gender-female {
-  background: #ec4899;
-  height: 100%;
-}
-
-.gender-male {
-  background: #3b82f6;
-  height: 100%;
-}
-
-.gender-legend {
-  margin-top: 6px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #d7d7d7;
-}
-
-.followers-pie-wrap {
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.followers-pie {
-  width: 62px;
-  height: 62px;
-  border-radius: 50%;
-  border: 1px solid #3a3a3a;
-  position: relative;
-  flex: 0 0 auto;
-}
-
-.followers-pie::after {
-  content: '';
-  position: absolute;
-  inset: 13px;
-  border-radius: 50%;
-  background: #161616;
-  border: 1px solid #2f2f2f;
-}
-
-.followers-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 10px;
-  font-size: 11px;
-  color: #d7d7d7;
-}
-
-.followers-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.followers-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.waveform {
-  flex: 1;
-  height: 30px;
-  background: rgba(255,255,255,0.1); /* Dummy placeholder */
-  border-radius: 4px;
-}
-
-.waveform-empty {
-  width: 100%;
-  height: 72px;
-  margin: 10px 0 8px;
-  border: 1px dashed #3a3a3a;
-  border-radius: 4px;
-  color: #8f8f8f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-}
-
-.waveform-error {
-  margin-top: 6px;
-  color: #fca5a5;
-  font-size: 12px;
-}
-
-.play-actions {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.btn-play {
-  background: white;
-  border: none;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  cursor: pointer;
-}
-
-.btn-icon {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 18px;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-  .metrics, .waveform {
-    display: none;
-  }
-}
-</style>
-
 <div class="dashboard-container">
   <div class="search-header">
-    <div class="search-input-wrapper" [class.invalid]="searchControl.invalid && searchControl.dirty">
+    <div class="search-input-wrapper">
       <span class="icon-sparkles" [class.loading-spin]="loading">✨</span>
       
       <input
         type="text"
         [formControl]="searchControl"
+        (focus)="onSearchInputFocus()"
+        (input)="onSearchInputChange()"
+        (blur)="onSearchInputBlur()"
         placeholder="Paste a URL (YouTube, Vimeo, SoundCloud, Spotify, Apple Music, TikTok)..."
       />
 
       <div class="search-actions">
-        <button class="btn-ai-search" (click)="search()" [disabled]="loading || searchControl.invalid">
+        <input
+          #videoFileInput
+          type="file"
+          accept="video/mp4,.mp4"
+          class="d-none"
+          (change)="onVideoSelected($event)"
+        />
+        <button class="btn-ai-search" type="button" (click)="videoFileInput.click()">
+          Upload MP4
+        </button>
+        <button class="btn-ai-search" (click)="search()" [disabled]="!canSearch">
           {{ loading ? 'Searching...' : 'Search' }}
         </button>
       </div>
     </div>
     
-    <small class="error-text" *ngIf="searchControl.invalid && searchControl.dirty">
-      Please enter a valid supported URL.
-    </small>
     <small class="error-text" *ngIf="errorMsg">
       {{ errorMsg }}
     </small>
+    <div class="search-info-box" *ngIf="showSearchInfo">
+      Deteccion automatica: URL de plataforma compatible, texto para prompt o archivo MP4.
+    </div>
+
+    <div class="video-preview-wrap" *ngIf="selectedVideoUrl">
+      <div class="video-preview-name" *ngIf="selectedVideoName">
+        {{ selectedVideoName }}
+      </div>
+      <video class="video-preview-player" [src]="selectedVideoUrl" controls></video>
+    </div>
   </div>
 
   <div class="empty-results" *ngIf="results.length === 0 && !loading">
@@ -336,34 +54,69 @@
         <img class="thumb-image" [src]="getTrackImage(result)" [alt]="result.track_name || 'Track thumbnail'" />
 
         <div>
-          <div class="title-line">
-            <strong>{{ result.track_name || result.name || 'Sin titulo' }}</strong>
-       
+          <div class="header-artist">
+            <div class="pte1">
+              <div class="title-line">
+                <span>{{ result.track_name || result.name || 'Sin titulo' }}</span>
+              </div>
+
+              <div class="div-subtitle">
+                <p class="subtitle-artist">{{ result.artist_canonical || 'Artista desconocido' }}</p>
+                <span class="pill" *ngIf="result.moods?.length">
+                  {{ result.moods?.slice(0, 3)?.join(' • ') }}
+                </span>
+              </div>
+            </div>
+
+            <div class="pt2">
+              <h2>parte2</h2>
+            </div>
+
+            <div class="pt3">
+              <div
+                class="waveform"
+                *ngIf="getTrackWaveformUrl(result); else noWaveform"
+                #waveOverviewRef
+                [attr.data-track-key]="getTrackKey(result, i)">
+              </div>
+              <div class="waveform-error" *ngIf="getWaveformError(result, i) as waveError">
+                {{ waveError }}
+              </div>
+              <ng-template #noWaveform>
+                <div class="waveform-empty">No waveform available</div>
+              </ng-template>
+
+              <button
+                class="btn-play-wave"
+                type="button"
+                *ngIf="getTrackAudioUrl(result)"
+                (click)="toggleTrackPlayback(result, i)">
+                {{ isTrackPlaying(result, i) ? 'Pause' : 'Play' }}
+              </button>
+              <span class="audio-timer" *ngIf="getTrackAudioUrl(result)">
+                {{ getTrackTimerLabel(result, i) }}
+              </span>
+              <audio
+                *ngIf="getTrackAudioUrl(result) as audioUrl"
+                class="audio-hidden"
+                #audioRef
+                [attr.data-track-key]="getTrackKey(result, i)"
+                [src]="audioUrl"
+                (play)="onTrackAudioPlay(result, i)"
+                (pause)="onTrackAudioPause(result, i)"
+                (timeupdate)="onTrackAudioTimeUpdate(result, i, $event)"
+                (ended)="onTrackAudioPause(result, i)">
+              </audio>
+              </div>
           </div>
 
-          <div class="meta-line">
-            <audio
-              *ngIf="getTrackAudioUrl(result) as audioUrl"
-              #audioRef
-              [attr.data-track-key]="getTrackKey(result, i)"
-              [src]="audioUrl"
-              controls>
-            </audio>
 
-            <div
-              class="waveform"
-              *ngIf="getTrackWaveformUrl(result); else noWaveform"
-              #waveOverviewRef
-              [attr.data-track-key]="getTrackKey(result, i)">
-            </div>
-            <div class="waveform-error" *ngIf="getWaveformError(result, i) as waveError">
-              {{ waveError }}
-            </div>
-            <ng-template #noWaveform>
-              <div class="waveform-empty">No waveform available</div>
-            </ng-template>
+          <div class="meta-line">
+
+
+
           
-            {{ result.artist_canonical || 'Artista desconocido' }}
+            
             • {{ formatDuration(result.duration) }}
             <span *ngIf="result.release_year"> • {{ result.release_year }}</span>
           </div>
@@ -381,9 +134,7 @@
 
           <div class="tag-line">
  
-            <span class="pill" *ngIf="result.moods?.length">
-              {{ result.moods?.slice(0, 3)?.join(' • ') }}
-            </span>
+
             <span class="pill" *ngIf="getTopCityNames(result) as topCities">
               Top Cities: {{ topCities.join(' • ') }}
             </span>
@@ -412,74 +163,3 @@
     </div>
   </div>
 </div>
-
-
-<!-- <div class="dashboard-container">
-
-  <div class="search-header">
-    <div class="search-input-wrapper">
-      <span class="icon-sparkles">✨</span>
-      <input type="text" [formControl]="searchControl" placeholder="Intense action music for highlight reel">
-      <div class="search-actions">
-        <button class="btn-icon">⚙️</button>
-        <button class="btn-icon">🕒</button>
-        <button class="btn-ai-search" (click)="search()">Search</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="results-info">
-    <p><strong>{{results.length}} Results for</strong> "Intense action music..."</p>
-    <div class="chips-container">
-      <span class="chip">Intense Simi</span>
-      <span class="chip">Action</span>
-      <span class="chip">Trailer</span>
-      <span class="chip">Epic</span>
-    </div>
-  </div>
-
-    <div class="results">
-
-      <div *ngFor="let r of results">
-
-        <b>{{ r.track_name }}</b>
-        <span>{{ r.artist }}</span>
-        <span>{{ r.similarity_score }}</span>
-
-      </div>
-
-    </div>
-
-  <div class="results-list">
-    <h3>Top matches ({{results.length}})</h3>
-    
-    <div class="result-row" *NgFor="let item of results">
-      <div class="song-info">
-        <div class="thumbnail">🇨🇦</div>
-        <div>
-          <p class="title">{{item.title}}</p>
-          <p class="subtitle">{{item.artist}} • {{item.genre}}</p>
-        </div>
-      </div>
-
-      <div class="status-badge" [ngClass]="item.status">{{item.tag}}</div>
-
-      <div class="metrics">
-        <span>👤 {{item.size}}</span>
-        <span>🔥 {{item.intensity}}</span>
-        <span>🏆 {{item.strength}}</span>
-      </div>
-
-      <div class="waveform">
-        <div class="wave-dummy"></div>
-      </div>
-
-      <div class="play-actions">
-        <span class="duration">{{item.duration}}</span>
-        <button class="btn-play">▶</button>
-        <button class="btn-icon">🤍</button>
-        <button class="btn-icon">📂</button>
-      </div>
-    </div>
-  </div>
-</div> -->

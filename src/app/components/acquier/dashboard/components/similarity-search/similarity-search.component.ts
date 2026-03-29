@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { ReactiveFormsModule, FormControl, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Subject, of } from 'rxjs';
 import { switchMap, tap, catchError } from 'rxjs/operators';
 
@@ -18,47 +18,59 @@ export class SimilaritySearchComponent implements OnInit {
   private sameQueryCooldownMs = 3000;
   private lastQuery = '';
   private lastQueryAt = 0;
-  private supportedUrlValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-    const value = (control.value ?? '').trim();
-    if (!value) {
-      return null;
-    }
-    return this.isSupportedMediaUrl(value) ? null : { unsupportedUrl: true };
-  };
-  
-  // 1. Un solo Control con validación de URL
-  searchControl = new FormControl('', [
-    this.supportedUrlValidator
-  ]);
-
-  // 2. Un "disparador" manual para el botón
-  private manualSearch$ = new Subject<string>();
+  searchControl = new FormControl('');
+  private manualSearch$ = new Subject<{ type: 'url' | 'prompt' | 'video'; query?: string; file?: File }>();
   private peaksLib: any | null = null;
   private peaksInstances = new Map<string, any>();
   private waveformErrors = new Map<string, string>();
+  private playingTrackKeys = new Set<string>();
+  private trackTimes = new Map<string, { current: number; duration: number }>();
   
   results: any[] = [];
   globalFileWav: string | null = null;
+  selectedVideoFile: File | null = null;
+  selectedVideoUrl: string | null = null;
+  selectedVideoName: string | null = null;
+  showSearchInfo = false;
   loading = false;
   errorMsg: string | null = null;
   @ViewChildren('audioRef') private audioRefs!: QueryList<ElementRef<HTMLAudioElement>>;
   @ViewChildren('waveOverviewRef') private waveOverviewRefs!: QueryList<ElementRef<HTMLDivElement>>;
 
 ngOnInit() {
-  // Ahora solo escuchamos el disparador manual del botón
   this.manualSearch$.pipe(
     tap(() => {
       this.loading = true;
       this.errorMsg = null;
     }),
-    switchMap(query =>
-      this.similarityService.searchSimilarity(query).pipe(
-        catchError(err => {
-          this.errorMsg = 'Error en el servidor. Revisa la consola.';
-          return of([]);
-        })
-      )
-    )
+    switchMap((request) => {
+      if (request.type === 'video' && request.file) {
+        return this.similarityService.searchSimilarityByVideo(request.file).pipe(
+          catchError(() => {
+            this.errorMsg = 'Error en busqueda por video. Revisa la consola.';
+            return of([]);
+          })
+        );
+      }
+      if (request.type === 'url' && request.query) {
+        return this.similarityService.searchSimilarityByUrl(request.query).pipe(
+          catchError(() => {
+            this.errorMsg = 'Error en busqueda por URL. Revisa la consola.';
+            return of([]);
+          })
+        );
+      }
+      if (request.type === 'prompt' && request.query) {
+        return this.similarityService.searchSimilarityByPrompt(request.query).pipe(
+          catchError(() => {
+            this.errorMsg = 'Error en busqueda por prompt. Revisa la consola.';
+            return of([]);
+          })
+        );
+      }
+      this.errorMsg = 'No se pudo determinar el tipo de busqueda.';
+      return of([]);
+    })
   ).subscribe((data: unknown) => {
     console.log('[similarity raw response]', data);
     this.destroyAllPeaks();
@@ -83,22 +95,30 @@ ngOnInit() {
 
   ngOnDestroy(): void {
     this.destroyAllPeaks();
+    this.clearSelectedVideo();
   }
-  // 4. El botón ahora solo "empuja" el valor al flujo existente
+
+  get canSearch(): boolean {
+    if (this.loading) {
+      return false;
+    }
+    const query = (this.searchControl.value ?? '').trim();
+    return !!query || !!this.selectedVideoFile;
+  }
+
   search() {
     const query = (this.searchControl.value ?? '').trim();
+    const now = Date.now();
+
+    if (this.selectedVideoFile) {
+      this.manualSearch$.next({ type: 'video', file: this.selectedVideoFile });
+      return;
+    }
 
     if (!query) {
-      this.errorMsg = 'Pega una URL de YouTube.';
+      this.errorMsg = 'Pega una URL, escribe un prompt o sube un MP4.';
       return;
     }
-
-    if (!this.isSupportedMediaUrl(query)) {
-      this.errorMsg = 'La URL no es compatible. Usa YouTube, Vimeo, SoundCloud, Spotify, Apple Music o TikTok.';
-      return;
-    }
-
-    const now = Date.now();
     const isSameQuery = query === this.lastQuery;
     const withinCooldown = now - this.lastQueryAt < this.sameQueryCooldownMs;
     if (isSameQuery && withinCooldown) {
@@ -108,8 +128,62 @@ ngOnInit() {
 
     this.lastQuery = query;
     this.lastQueryAt = now;
+    if (this.isSupportedMediaUrl(query)) {
+      this.manualSearch$.next({ type: 'url', query });
+      return;
+    }
+    this.manualSearch$.next({ type: 'prompt', query });
+  }
 
-    this.manualSearch$.next(query);
+  onVideoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) {
+      return;
+    }
+    const file = input.files?.[0] ?? null;
+    if (!file) {
+      return;
+    }
+
+    if (file.type !== 'video/mp4' && !file.name.toLowerCase().endsWith('.mp4')) {
+      this.errorMsg = 'Solo se permite formato MP4.';
+      input.value = '';
+      return;
+    }
+
+    this.clearSelectedVideo();
+
+    this.errorMsg = null;
+    this.selectedVideoFile = file;
+    this.selectedVideoName = file.name;
+    this.selectedVideoUrl = URL.createObjectURL(file);
+    this.showSearchInfo = false;
+  }
+
+  clearSelectedVideo(): void {
+    if (this.selectedVideoUrl) {
+      URL.revokeObjectURL(this.selectedVideoUrl);
+    }
+    this.selectedVideoFile = null;
+    this.selectedVideoName = null;
+    this.selectedVideoUrl = null;
+  }
+
+  onSearchInputFocus(): void {
+    const query = (this.searchControl.value ?? '').trim();
+    this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
+  }
+
+  onSearchInputChange(): void {
+    const query = (this.searchControl.value ?? '').trim();
+    if (query.length > 0 && this.selectedVideoFile) {
+      this.clearSelectedVideo();
+    }
+    this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
+  }
+
+  onSearchInputBlur(): void {
+    this.showSearchInfo = false;
   }
 
   private normalizeResponse(data: unknown): any[] {
@@ -334,6 +408,60 @@ ngOnInit() {
     return this.waveformErrors.get(this.getTrackKey(track, index)) ?? null;
   }
 
+  isTrackPlaying(track: any, index: number): boolean {
+    return this.playingTrackKeys.has(this.getTrackKey(track, index));
+  }
+
+  toggleTrackPlayback(track: any, index: number): void {
+    const key = this.getTrackKey(track, index);
+    const audioElement = this.audioRefs?.find(ref => ref.nativeElement.dataset['trackKey'] === key)?.nativeElement;
+    if (!audioElement) {
+      return;
+    }
+
+    if (audioElement.paused) {
+      void audioElement.play();
+      return;
+    }
+    audioElement.pause();
+  }
+
+  onTrackAudioPlay(track: any, index: number): void {
+    this.playingTrackKeys.add(this.getTrackKey(track, index));
+  }
+
+  onTrackAudioPause(track: any, index: number): void {
+    this.playingTrackKeys.delete(this.getTrackKey(track, index));
+  }
+
+  onTrackAudioTimeUpdate(track: any, index: number, event: Event): void {
+    const audio = event.target as HTMLAudioElement | null;
+    if (!audio) {
+      return;
+    }
+    this.trackTimes.set(this.getTrackKey(track, index), {
+      current: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+      duration: Number.isFinite(audio.duration) ? audio.duration : 0
+    });
+  }
+
+  getTrackTimerLabel(track: any, index: number): string {
+    const key = this.getTrackKey(track, index);
+    const time = this.trackTimes.get(key);
+    const current = time?.current ?? 0;
+    const duration = time?.duration ?? 0;
+    return `${this.formatMmSs(current)} / ${this.formatMmSs(duration)}`;
+  }
+
+  private formatMmSs(totalSeconds: number): string {
+    if (!Number.isFinite(totalSeconds) || totalSeconds < 0) {
+      return '00:00';
+    }
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
   private async initializePeaksForVisibleRows(): Promise<void> {
     if (!this.results.length) {
       return;
@@ -362,10 +490,10 @@ ngOnInit() {
       Peaks.init({
         overview: {
           container: overviewElement,
-          waveformColor: '#9ee9ff'
+          waveformColor: '#ffffff'
         },
-        waveformColor: '#9ee9ff',
-        playheadColor: '#ff4d6d',
+        waveformColor: '#ffffff',
+        playheadColor: '#023185',
         mediaElement: audioElement,
         dataUri: {
           json: waveformUrl
@@ -404,6 +532,8 @@ ngOnInit() {
       }
     });
     this.peaksInstances.clear();
+    this.playingTrackKeys.clear();
+    this.trackTimes.clear();
   }
 
   private isSupportedMediaUrl(inputUrl: string): boolean {
