@@ -4,7 +4,10 @@ import { noAuthGuard } from './guards/no-auth.guard';
 
 export const routesNames = {
   HOME: 'home',
+  ARTIST: 'artist',
+  DASHBOARD: 'dashboard',
   AUTH: 'auth',
+  ACQUIER: 'acquier',
   MY_PROFILE: 'my-profile',
   UPLOAD: 'upload',
   CREATE_SPLITSHEET: 'create-split-sheet',
@@ -15,19 +18,35 @@ export const routesNames = {
   PAGE_NOT_FOUND: 'page-not-found',
   FINANCE: 'my-finances',
   MY_SPLIT_SHEETS: 'my-split-sheets',
-  ARTIST_PROFILE: 'artist/:slug',
+  ARTIST_PROFILE: 'profile/:slug',
   EMPTY: ''
 };
 
 export const routes: Routes = [
+
   {
-    path: routesNames.EMPTY,
+    path: '',
+    redirectTo: 'artist',
+    pathMatch: 'full'
+  },{
+
+    path: routesNames.ACQUIER,
+    loadComponent: () => import('./components/layout/acquier/layout-page/layout-page.component').then((c) => c.LayoutPageComponent),
+    children:[
+      {
+        path: routesNames.DASHBOARD,
+        loadComponent: () => import('./components/acquier/dashboard/dashboard.component').then((c)=>c.DashboardComponent),
+      }
+    ]
+  },
+  {
+    path: routesNames.ARTIST,
     loadComponent: () => import('./components/layout/layout-page/layout-page.component').then((c) => c.LayoutPageComponent),
     canActivate: [authGuard],
     children: [
       {
         path: routesNames.EMPTY,
-        redirectTo: routesNames.HOME,
+        redirectTo: "artist",
         pathMatch: 'full',
       },
       {

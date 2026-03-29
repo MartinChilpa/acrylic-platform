@@ -1,0 +1,25 @@
+<acrylic-header></acrylic-header>
+
+<div class="row mt-2 gy-3">
+    <div class="d-block d-md-none">
+        <a class="cursor-pointer" data-bs-toggle="offcanvas" data-bs-target="#acrylicOffcanvas">
+            <img ngSrc="assets/images/icons/down-arrow-white.svg" width="18" height="18" />
+        </a>
+        <div class="offcanvas offcanvas-top mt-0 bg-primary" tabindex="-1" id="acrylicOffcanvas">
+            <div class="offcanvas-header pb-0 pt-4">
+                <button type="button" class="bg-transparent border-0" data-bs-dismiss="offcanvas">
+                    <img ngSrc="assets/images/icons/close.svg" alt="close" width="20" height="20" />
+                </button>
+            </div>
+            <div class="offcanvas-body">
+                <acrylic-sidenav></acrylic-sidenav>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-lg-3 col-md-3 col-12 d-none d-md-block">
+        <acrylic-sidenav></acrylic-sidenav>
+    </div>
+    <div class="col-xl-10 col-lg-9 col-md-9 col-12">
+        <router-outlet />
+    </div>
+</div>

@@ -1,0 +1,591 @@
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
+import { NgClass, NgFor, NgIf } from '@angular/common';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { Subject, of } from 'rxjs';
+import { switchMap, tap, catchError } from 'rxjs/operators';
+
+import { SimilarityUrlService } from '../../services/similarity-url.service';
+
+@Component({
+  selector: 'acrylic-similarity-search',
+  standalone: true,
+  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule],
+  templateUrl: './similarity-search.component.html',
+  styleUrls: ['./similarity-search.component.scss']
+})
+export class SimilaritySearchComponent implements OnInit {
+  private similarityService = inject(SimilarityUrlService);
+  private sameQueryCooldownMs = 3000;
+  private lastQuery = '';
+  private lastQueryAt = 0;
+  searchControl = new FormControl('');
+  private manualSearch$ = new Subject<{ type: 'url' | 'prompt' | 'video'; query?: string; file?: File }>();
+  private peaksLib: any | null = null;
+  private peaksInstances = new Map<string, any>();
+  private waveformErrors = new Map<string, string>();
+  private playingTrackKeys = new Set<string>();
+  private trackTimes = new Map<string, { current: number; duration: number }>();
+  
+  results: any[] = [];
+  globalFileWav: string | null = null;
+  selectedVideoFile: File | null = null;
+  selectedVideoUrl: string | null = null;
+  selectedVideoName: string | null = null;
+  showSearchInfo = false;
+  loading = false;
+  errorMsg: string | null = null;
+  @ViewChildren('audioRef') private audioRefs!: QueryList<ElementRef<HTMLAudioElement>>;
+  @ViewChildren('waveOverviewRef') private waveOverviewRefs!: QueryList<ElementRef<HTMLDivElement>>;
+
+ngOnInit() {
+  this.manualSearch$.pipe(
+    tap(() => {
+      this.loading = true;
+      this.errorMsg = null;
+    }),
+    switchMap((request) => {
+      if (request.type === 'video' && request.file) {
+        return this.similarityService.searchSimilarityByVideo(request.file).pipe(
+          catchError(() => {
+            this.errorMsg = 'Error en busqueda por video. Revisa la consola.';
+            return of([]);
+          })
+        );
+      }
+      if (request.type === 'url' && request.query) {
+        return this.similarityService.searchSimilarityByUrl(request.query).pipe(
+          catchError(() => {
+            this.errorMsg = 'Error en busqueda por URL. Revisa la consola.';
+            return of([]);
+          })
+        );
+      }
+      if (request.type === 'prompt' && request.query) {
+        return this.similarityService.searchSimilarityByPrompt(request.query).pipe(
+          catchError(() => {
+            this.errorMsg = 'Error en busqueda por prompt. Revisa la consola.';
+            return of([]);
+          })
+        );
+      }
+      this.errorMsg = 'No se pudo determinar el tipo de busqueda.';
+      return of([]);
+    })
+  ).subscribe((data: unknown) => {
+    console.log('[similarity raw response]', data);
+    this.destroyAllPeaks();
+    this.waveformErrors.clear();
+    this.globalFileWav = this.extractGlobalFileWav(data);
+    this.results = this.normalizeResponse(data);
+    this.loading = false;
+    queueMicrotask(() => {
+      this.initializePeaksForVisibleRows();
+    });
+  });
+}
+
+  ngAfterViewInit(): void {
+    this.audioRefs.changes.subscribe(() => {
+      this.initializePeaksForVisibleRows();
+    });
+    this.waveOverviewRefs.changes.subscribe(() => {
+      this.initializePeaksForVisibleRows();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroyAllPeaks();
+    this.clearSelectedVideo();
+  }
+
+  get canSearch(): boolean {
+    if (this.loading) {
+      return false;
+    }
+    const query = (this.searchControl.value ?? '').trim();
+    return !!query || !!this.selectedVideoFile;
+  }
+
+  search() {
+    const query = (this.searchControl.value ?? '').trim();
+    const now = Date.now();
+
+    if (this.selectedVideoFile) {
+      this.manualSearch$.next({ type: 'video', file: this.selectedVideoFile });
+      return;
+    }
+
+    if (!query) {
+      this.errorMsg = 'Pega una URL, escribe un prompt o sube un MP4.';
+      return;
+    }
+    const isSameQuery = query === this.lastQuery;
+    const withinCooldown = now - this.lastQueryAt < this.sameQueryCooldownMs;
+    if (isSameQuery && withinCooldown) {
+      this.errorMsg = `Espera ${Math.ceil((this.sameQueryCooldownMs - (now - this.lastQueryAt)) / 1000)}s para repetir la misma busqueda.`;
+      return;
+    }
+
+    this.lastQuery = query;
+    this.lastQueryAt = now;
+    if (this.isSupportedMediaUrl(query)) {
+      this.manualSearch$.next({ type: 'url', query });
+      return;
+    }
+    this.manualSearch$.next({ type: 'prompt', query });
+  }
+
+  onVideoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) {
+      return;
+    }
+    const file = input.files?.[0] ?? null;
+    if (!file) {
+      return;
+    }
+
+    if (file.type !== 'video/mp4' && !file.name.toLowerCase().endsWith('.mp4')) {
+      this.errorMsg = 'Solo se permite formato MP4.';
+      input.value = '';
+      return;
+    }
+
+    this.clearSelectedVideo();
+
+    this.errorMsg = null;
+    this.selectedVideoFile = file;
+    this.selectedVideoName = file.name;
+    this.selectedVideoUrl = URL.createObjectURL(file);
+    this.showSearchInfo = false;
+  }
+
+  clearSelectedVideo(): void {
+    if (this.selectedVideoUrl) {
+      URL.revokeObjectURL(this.selectedVideoUrl);
+    }
+    this.selectedVideoFile = null;
+    this.selectedVideoName = null;
+    this.selectedVideoUrl = null;
+  }
+
+  onSearchInputFocus(): void {
+    const query = (this.searchControl.value ?? '').trim();
+    this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
+  }
+
+  onSearchInputChange(): void {
+    const query = (this.searchControl.value ?? '').trim();
+    if (query.length > 0 && this.selectedVideoFile) {
+      this.clearSelectedVideo();
+    }
+    this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
+  }
+
+  onSearchInputBlur(): void {
+    this.showSearchInfo = false;
+  }
+
+  private normalizeResponse(data: unknown): any[] {
+    return this.findArrayInPayload(data) ?? [];
+  }
+
+  private extractGlobalFileWav(data: unknown): string | null {
+    if (!data || typeof data !== 'object') {
+      return null;
+    }
+    const record = data as Record<string, unknown>;
+    return typeof record['file_wav'] === 'string' ? record['file_wav'] : null;
+  }
+
+  private findArrayInPayload(value: unknown): any[] | null {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    if (!value || typeof value !== 'object') {
+      return null;
+    }
+
+    const record = value as Record<string, unknown>;
+
+    for (const key of ['tracks', 'results', 'data', 'items', 'matches', 'payload']) {
+      const candidate = record[key];
+      if (Array.isArray(candidate)) {
+        return candidate;
+      }
+    }
+
+    for (const nested of Object.values(record)) {
+      const found = this.findArrayInPayload(nested);
+      if (found) {
+        return found;
+      }
+    }
+
+    return null;
+  }
+
+  getThumbnailPath(track: any): string | null {
+    const thumbs = track?.thumbnails as Array<{ size?: string; path?: string }> | undefined;
+    if (!Array.isArray(thumbs) || thumbs.length === 0) {
+      return null;
+    }
+
+    const preferred = thumbs.find((t) => t?.size === '600x600')
+      ?? thumbs.find((t) => t?.size === '80x80')
+      ?? thumbs[0];
+
+    return typeof preferred?.path === 'string' ? preferred.path : null;
+  }
+
+  getTrackImage(track: any): string {
+    const coverImage = track?.cover_image;
+    if (typeof coverImage === 'string' && coverImage.trim().length > 0) {
+      return coverImage;
+    }
+    return this.getThumbnailPath(track) ?? 'assets/images/others/default.jpg';
+  }
+
+  formatDuration(totalSeconds: number | null | undefined): string {
+    if (typeof totalSeconds !== 'number' || Number.isNaN(totalSeconds) || totalSeconds < 0) {
+      return '--:--';
+    }
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  formatFollowers(value: unknown): string | null {
+    const num = Number(value);
+    if (!Number.isFinite(num) || num < 0) {
+      return null;
+    }
+    return new Intl.NumberFormat('en-US').format(num);
+  }
+
+  getAudienceSize(track: any): string | null {
+    const values = [
+      Number(track?.spotify_followers ?? 0),
+      Number(track?.tiktok_followers ?? 0),
+      Number(track?.youtube_followers ?? 0),
+      Number(track?.instagram_followers ?? 0)
+    ];
+
+    const validValues = values.filter((v) => Number.isFinite(v) && v > 0);
+    if (!validValues.length) {
+      return null;
+    }
+
+    const total = validValues.reduce((sum, v) => sum + v, 0);
+    return new Intl.NumberFormat('en-US').format(total);
+  }
+
+  getFollowerBreakdown(track: any): Array<{ label: string; value: number; percent: number; color: string }> {
+    const raw = [
+      { label: 'Spotify', value: Number(track?.spotify_followers ?? 0), color: '#22c55e' },
+      { label: 'TikTok', value: Number(track?.tiktok_followers ?? 0), color: '#f43f5e' },
+      { label: 'YouTube', value: Number(track?.youtube_followers ?? 0), color: '#ef4444' },
+      { label: 'Instagram', value: Number(track?.instagram_followers ?? 0), color: '#a855f7' }
+    ].filter((item) => Number.isFinite(item.value) && item.value > 0);
+
+    const total = raw.reduce((sum, item) => sum + item.value, 0);
+    if (total <= 0) {
+      return [];
+    }
+
+    return raw.map((item) => ({
+      ...item,
+      percent: Number(((item.value / total) * 100).toFixed(1))
+    }));
+  }
+
+  getFollowersPieBackground(track: any): string | null {
+    const breakdown = this.getFollowerBreakdown(track);
+    if (!breakdown.length) {
+      return null;
+    }
+
+    let start = 0;
+    const stops = breakdown.map((item) => {
+      const end = start + item.percent;
+      const stop = `${item.color} ${start}% ${end}%`;
+      start = end;
+      return stop;
+    });
+
+    return `conic-gradient(${stops.join(', ')})`;
+  }
+
+  getInstagramDemographic(track: any, key: 'female' | 'male'): number | null {
+    const source = track?.chartmetric_instagram_demographics;
+    if (!source) {
+      return null;
+    }
+
+    const parseValue = (value: unknown): number | null => {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    if (Array.isArray(source)) {
+      for (const item of source) {
+        if (item && typeof item === 'object') {
+          const direct = (item as Record<string, unknown>)[key];
+          const parsed = parseValue(direct);
+          if (parsed !== null) {
+            return parsed;
+          }
+        }
+      }
+      return null;
+    }
+
+    if (source && typeof source === 'object') {
+      const direct = (source as Record<string, unknown>)[key];
+      return parseValue(direct);
+    }
+
+    return null;
+  }
+
+  getGenderSplit(track: any): { female: number; male: number } | null {
+    const female = this.getInstagramDemographic(track, 'female');
+    const male = this.getInstagramDemographic(track, 'male');
+
+    if (female === null && male === null) {
+      return null;
+    }
+
+    const safeFemale = Math.max(0, female ?? 0);
+    const safeMale = Math.max(0, male ?? 0);
+    const total = safeFemale + safeMale;
+
+    if (total <= 0) {
+      return { female: 0, male: 0 };
+    }
+
+    return {
+      female: Number(((safeFemale / total) * 100).toFixed(1)),
+      male: Number(((safeMale / total) * 100).toFixed(1))
+    };
+  }
+
+  getTopCityNames(track: any): string[] | null {
+    const source = track?.chartmetric_instagram_top_cities;
+    if (!Array.isArray(source) || source.length === 0) {
+      return null;
+    }
+
+    const topCities = source
+      .slice(0, 3)
+      .map((item: unknown) => {
+        if (!item || typeof item !== 'object') {
+          return null;
+        }
+        const city = (item as Record<string, unknown>)['city_name'];
+        return typeof city === 'string' ? city.trim() : null;
+      })
+      .filter((city): city is string => !!city);
+
+    return topCities.length ? topCities : null;
+  }
+
+  getTrackKey(track: any, index: number): string {
+    return (track?.id ?? track?.uuid ?? index).toString();
+  }
+
+  getTrackAudioUrl(track: any): string | null {
+    const source = track?.file_wav ?? this.globalFileWav;
+    return typeof source === 'string' && source.length > 0 ? source : null;
+  }
+
+  getTrackWaveformUrl(track: any): string | null {
+    const source = track?.waveform ?? track?.waveform_url;
+    return typeof source === 'string' && source.length > 0 ? source : null;
+  }
+
+  getWaveformError(track: any, index: number): string | null {
+    return this.waveformErrors.get(this.getTrackKey(track, index)) ?? null;
+  }
+
+  isTrackPlaying(track: any, index: number): boolean {
+    return this.playingTrackKeys.has(this.getTrackKey(track, index));
+  }
+
+  toggleTrackPlayback(track: any, index: number): void {
+    const key = this.getTrackKey(track, index);
+    const audioElement = this.audioRefs?.find(ref => ref.nativeElement.dataset['trackKey'] === key)?.nativeElement;
+    if (!audioElement) {
+      return;
+    }
+
+    if (audioElement.paused) {
+      void audioElement.play();
+      return;
+    }
+    audioElement.pause();
+  }
+
+  onTrackAudioPlay(track: any, index: number): void {
+    this.playingTrackKeys.add(this.getTrackKey(track, index));
+  }
+
+  onTrackAudioPause(track: any, index: number): void {
+    this.playingTrackKeys.delete(this.getTrackKey(track, index));
+  }
+
+  onTrackAudioTimeUpdate(track: any, index: number, event: Event): void {
+    const audio = event.target as HTMLAudioElement | null;
+    if (!audio) {
+      return;
+    }
+    this.trackTimes.set(this.getTrackKey(track, index), {
+      current: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+      duration: Number.isFinite(audio.duration) ? audio.duration : 0
+    });
+  }
+
+  getTrackTimerLabel(track: any, index: number): string {
+    const key = this.getTrackKey(track, index);
+    const time = this.trackTimes.get(key);
+    const current = time?.current ?? 0;
+    const duration = time?.duration ?? 0;
+    return `${this.formatMmSs(current)} / ${this.formatMmSs(duration)}`;
+  }
+
+  private formatMmSs(totalSeconds: number): string {
+    if (!Number.isFinite(totalSeconds) || totalSeconds < 0) {
+      return '00:00';
+    }
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  private async initializePeaksForVisibleRows(): Promise<void> {
+    if (!this.results.length) {
+      return;
+    }
+
+    const Peaks = await this.getPeaksLib();
+
+    this.results.forEach((track, index) => {
+      const key = this.getTrackKey(track, index);
+      if (this.peaksInstances.has(key)) {
+        return;
+      }
+
+      const audioUrl = this.getTrackAudioUrl(track);
+      const waveformUrl = this.getTrackWaveformUrl(track);
+      if (!audioUrl || !waveformUrl) {
+        return;
+      }
+
+      const audioElement = this.audioRefs?.find(ref => ref.nativeElement.dataset['trackKey'] === key)?.nativeElement;
+      const overviewElement = this.waveOverviewRefs?.find(ref => ref.nativeElement.dataset['trackKey'] === key)?.nativeElement;
+      if (!audioElement || !overviewElement) {
+        return;
+      }
+
+      Peaks.init({
+        overview: {
+          container: overviewElement,
+          waveformColor: '#ffffff'
+        },
+        waveformColor: '#ffffff',
+        playheadColor: '#023185',
+        mediaElement: audioElement,
+        dataUri: {
+          json: waveformUrl
+        },
+        showPlayheadTime: false,
+        keyboard: false
+      }, (err: unknown, peaksInstance: any) => {
+        if (err || !peaksInstance) {
+          const message = err && typeof err === 'object' && 'message' in err
+            ? String((err as { message?: unknown }).message ?? 'Failed to load waveform')
+            : 'Failed to load waveform';
+          this.waveformErrors.set(key, message);
+          return;
+        }
+        this.waveformErrors.delete(key);
+        this.peaksInstances.set(key, peaksInstance);
+      });
+    });
+  }
+
+  private async getPeaksLib(): Promise<any> {
+    if (this.peaksLib) {
+      return this.peaksLib;
+    }
+    const module = await import('peaks.js');
+    this.peaksLib = module.default ?? module;
+    return this.peaksLib;
+  }
+
+  private destroyAllPeaks(): void {
+    this.peaksInstances.forEach((instance) => {
+      try {
+        instance?.destroy?.();
+      } catch {
+        // no-op
+      }
+    });
+    this.peaksInstances.clear();
+    this.playingTrackKeys.clear();
+    this.trackTimes.clear();
+  }
+
+  private isSupportedMediaUrl(inputUrl: string): boolean {
+    let url = inputUrl.trim();
+    if (!/^https?:\/\//i.test(url)) {
+      url = `https://${url}`;
+    }
+
+    try {
+      const parsed = new URL(url);
+      const host = parsed.hostname.toLowerCase();
+      const path = parsed.pathname;
+
+      if (host === 'youtube.com' || host === 'www.youtube.com' || host === 'youtu.be' || host.endsWith('.youtube.com')) {
+        return true;
+      }
+
+      if (host === 'vimeo.com' || host === 'www.vimeo.com' || host === 'vimeopro.com' || host === 'www.vimeopro.com') {
+        return true;
+      }
+
+      if (host === 'i.vimeocdn.com' && path.startsWith('/video/')) {
+        return true;
+      }
+
+      if (host === 'soundcloud.com' || host === 'www.soundcloud.com') {
+        return true;
+      }
+
+      if (host === 'w.soundcloud.com' && path.startsWith('/player/')) {
+        return true;
+      }
+
+      if (host === 'api.soundcloud.com' && path.startsWith('/tracks/')) {
+        return true;
+      }
+
+      if (host === 'open.spotify.com' && (path.startsWith('/track/') || path.startsWith('/embed/track/'))) {
+        return true;
+      }
+
+      if (host === 'music.apple.com') {
+        return true;
+      }
+
+      if ((host === 'tiktok.com' || host === 'www.tiktok.com') && /\/@[^/]+\/video\/\d+/.test(path)) {
+        return true;
+      }
+
+      return false;
+    } catch {
+      return false;
+    }
+  }
+}

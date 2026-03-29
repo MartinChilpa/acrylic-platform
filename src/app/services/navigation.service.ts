@@ -9,7 +9,11 @@ export class NavigationService {
   private _router = inject(Router);
 
   navigateToHome() {
-    this._router.navigate(['home']);
+    this._router.navigate(['artist/home']);
+  }
+
+  navigateToAcquierDashboard() {
+    this._router.navigate(['acquier/dashboard']);
   }
 
   navigateToSignIn() {
