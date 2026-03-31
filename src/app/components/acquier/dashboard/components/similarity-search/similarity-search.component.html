@@ -51,10 +51,11 @@
   <div class="results-list" *ngIf="!loading">
     <div class="result-card result-row" *ngFor="let result of results; let i = index">
       <div class="track-grid">
-        <img class="thumb-image" [src]="getTrackImage(result)" [alt]="result.track_name || 'Track thumbnail'" />
+        
 
         <div>
           <div class="header-artist">
+            <img class="thumb-image" [src]="getTrackImage(result)" [alt]="result.track_name || 'Track thumbnail'" />
             <div class="pte1">
               <div class="title-line">
                 <span>{{ result.track_name || result.name || 'Sin titulo' }}</span>
@@ -69,95 +70,206 @@
             </div>
 
             <div class="pt2">
-              <h2>parte2</h2>
+              <div class="pt2-icon-tier ">
+              </div>
+
+              <div class="pt2-item">
+                <img class="pt2-icon" src="assets/images/icons/large.svg" alt="Platform 2" />
+                <span class="pt2-label" *ngIf="getAudienceSize(result) as audience">{{ audience }}</span>
+              </div>
+
+              <div class="pt2-item">
+                <img class="pt2-icon" src="assets/images/icons/volleyball.svg" alt="Platform 3" />
+                <span class="pt2-label">Pending</span>
+              </div>
+              <div class="pt2-item">
+                <img class="pt2-icon" src="assets/images/icons/gauge.svg" alt="Platform 4" />
+                <span class="pt2-label">Pending</span>
+              </div>
             </div>
 
-            <div class="pt3">
-              <div
-                class="waveform"
-                *ngIf="getTrackWaveformUrl(result); else noWaveform"
-                #waveOverviewRef
-                [attr.data-track-key]="getTrackKey(result, i)">
+            <div class="pt3" style="flex-direction: row">
+              <div class="wave-shell">
+                <div class="waveform-box">
+                  <div
+                    class="waveform"
+                    *ngIf="getTrackWaveformUrl(result); else noWaveform"
+                    #waveOverviewRef
+                    [attr.data-track-key]="getTrackKey(result, i)">
+                  </div>
+                  <ng-template #noWaveform>
+                    <div class="waveform-empty">No waveform available</div>
+                  </ng-template>
+                </div>
+
+                <div class="wave-controls" *ngIf="getTrackAudioUrl(result)">
+                  <span class="audio-timer">
+                    {{ getTrackTimerLabel(result, i) }}
+                  </span>
+                  <button
+                    class="btn-play-wave"
+                    type="button"
+                    (click)="toggleTrackPlayback(result, i)">
+                    {{ isTrackPlaying(result, i) ? '⏸' : '▶' }}
+                  </button>
+
+                </div>
               </div>
               <div class="waveform-error" *ngIf="getWaveformError(result, i) as waveError">
                 {{ waveError }}
               </div>
-              <ng-template #noWaveform>
-                <div class="waveform-empty">No waveform available</div>
-              </ng-template>
-
-              <button
-                class="btn-play-wave"
-                type="button"
-                *ngIf="getTrackAudioUrl(result)"
-                (click)="toggleTrackPlayback(result, i)">
-                {{ isTrackPlaying(result, i) ? 'Pause' : 'Play' }}
-              </button>
-              <span class="audio-timer" *ngIf="getTrackAudioUrl(result)">
-                {{ getTrackTimerLabel(result, i) }}
-              </span>
               <audio
                 *ngIf="getTrackAudioUrl(result) as audioUrl"
                 class="audio-hidden"
                 #audioRef
                 [attr.data-track-key]="getTrackKey(result, i)"
                 [src]="audioUrl"
-                (play)="onTrackAudioPlay(result, i)"
+                preload="auto"
+                (playing)="onTrackAudioPlay(result, i, $event)"
                 (pause)="onTrackAudioPause(result, i)"
+                (loadedmetadata)="onTrackAudioMeta(result, i, $event)"
+                (durationchange)="onTrackAudioMeta(result, i, $event)"
                 (timeupdate)="onTrackAudioTimeUpdate(result, i, $event)"
                 (ended)="onTrackAudioPause(result, i)">
               </audio>
+
+                <div class="button-section">
+                  <button type="button" class="btn-section-action" aria-label="Open panel">
+                    <img src="assets/images/icons/panel-top-open.svg" alt="Open panel" />
+                  </button>
+                  <button type="button" class="btn-section-action" aria-label="Add favorite">
+                    <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
+                  </button>
+                </div>
               </div>
+
+     
           </div>
 
 
-          <div class="meta-line">
+          <p class="title-audience">Audience Snapshot</p>
+          <div style="display: flex;">
+            <div class="insights-section">
+              <div class="insights-row">
+                <div class="cities-double">
+                  <div class="cities-col">
+                    <div class="cities-title">Top Countries</div>
+                    <ng-container *ngIf="getTopCountries(result) as topCountries; else noCountries">
+                      <div class="city-item" *ngFor="let country of topCountries; let idx = index">
+                        {{ country.flag ? (country.flag + ' ') : '' }}{{ country.name }}
+                      </div>
+                    </ng-container>
+                    <ng-template #noCountries>
+                      <div class="city-item">1.-No data</div>
+                      <div class="city-item">2.-No data</div>
+                      <div class="city-item">3.-No data</div>
+                    </ng-template>
+                  </div>
+                  <div class="cities-col">
+                    <div class="cities-title">Top Cities</div>
+                    <ng-container *ngIf="getTopCityNames(result) as topCities; else noCities">
+                      <div class="city-item" *ngFor="let city of topCities; let idx = index">
+                        {{ idx + 1 }}. {{ city }}
+                      </div>
+                    </ng-container>
+                    <ng-template #noCities>
+                      <div class="city-item">1. -</div>
+                      <div class="city-item">2. -</div>
+                      <div class="city-item">3. -</div>
+                    </ng-template>
+                  </div>
+                </div>
 
+                <div class="gender-split" *ngIf="getGenderSplit(result) as split">
+                  <div class="gender-track">
+                    <div class="gender-female" [style.width.%]="split.female"></div>
+                    <div class="gender-male" [style.width.%]="split.male"></div>
+                  </div>
+                  <div class="gender-legend">
+                    <span>Female {{ split.female }}%</span>
+                    <span>Male {{ split.male }}%</span>
+                  </div>
+                </div>
+              </div>
 
+              <div class="insights-bottom">
+                <div class="insight-item">
+                  <p class="insight-label">Followers Mix</p>
+                  <div class="insight-card">
+                    <div class="followers-pie-wrap" *ngIf="getFollowersPieBackground(result) as pieBackground; else noFollowersMix">
+                      <div class="followers-top-row">
+                        <div class="followers-top-item">
+                          <img class="pt2-icon-audience" src="assets/images/icons/large.svg" alt="Audience size" />
+                          <div class="div-audience-data"> 
+                            <p style="font-size: 11px;">Large</p>
+                            <span class="pt2-label-audience" *ngIf="getAudienceSize(result) as audience">{{ audience }}</span>
 
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="followers-main-row">
+                        <div class="followers-pie" [style.background]="pieBackground"></div>
+                        <div class="followers-legend">
+                          <span class="followers-legend-item" *ngFor="let item of getFollowerBreakdown(result)">
+                            <span class="followers-dot" [style.background]="item.color"></span>
+                            {{ item.label }} {{ item.percent }}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <ng-template #noFollowersMix>
+                      <div class="insight-placeholder">Audience Composition</div>
+                    </ng-template>
+                  </div>
+                </div>
+                <div class="insight-item">
+                  <p class="insight-label">Audience Sports Fit</p>
+                  <div class="insight-card">
+                      
+                    <div class="insight-placeholder">No data</div>
+                  </div>
+                </div>
+                <div class="insight-item">
+                  <p class="insight-label">Track Virality</p>
+                  <div class="insight-card">
+                    <div class="insight-placeholder">No data</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tier-section">
+              <div class="tier-offer-card">
+                <div class="tier-offer-stripe"></div>
+                <div class="tier-offer-body">
+                  <div class="tier-offer-copy">
+                    <div class="tier-offer-price">$1,500</div>
+                    <div class="tier-offer-caption">PreClear Price</div>
+                  </div>
+                  <button type="button" class="tier-license-btn">
+                    License for $1,500
+                  </button>
+                </div>
+              </div>
+
+              <div class="tier-rule-row">
+                <div class="tier-rule-pill">
+                  <span class="tier-rule-dot"></span>
+                  <span class="tier-rule-text">Archival Restriction: None</span>
+                </div>
+                <button type="button" class="tier-rule-icon" aria-label="Edit archival restriction"></button>
+              </div>
+
+              <div class="tier-rule-row">
+                <div class="tier-rule-pill">
+                  <span class="tier-rule-dot"></span>
+                  <span class="tier-rule-text">YouTube Restriction: None</span>
+                </div>
+                <button type="button" class="tier-rule-icon" aria-label="Edit youtube restriction"></button>
+              </div>
+            </div>
+          </div>
           
-            
-            • {{ formatDuration(result.duration) }}
-            <span *ngIf="result.release_year"> • {{ result.release_year }}</span>
-          </div>
-
-          <div class="metrics">
-            <span *ngIf="result.auto_tagging_output?.bpm">BPM: {{ result.auto_tagging_output?.bpm }}</span>
-            <span *ngIf="result.auto_tagging_output?.key?.length">Key: {{ result.auto_tagging_output?.key[0] }}</span>
-            <span *ngIf="result.auto_tagging_output?.tempo?.length">Tempo: {{ result.auto_tagging_output?.tempo[0] }}</span>
-            <span *ngIf="getAudienceSize(result) as audience">Audience Size: {{ audience }}</span>
-            <span *ngIf="formatFollowers(result.spotify_followers) as followers">Spotify: {{ followers }}</span>
-            <span *ngIf="formatFollowers(result.tiktok_followers) as followers">TikTok: {{ followers }}</span>
-            <span *ngIf="formatFollowers(result.youtube_followers) as followers">YouTube: {{ followers }}</span>
-            <span *ngIf="formatFollowers(result.instagram_followers) as followers">Instagram: {{ followers }}</span>
-          </div>
-
-          <div class="tag-line">
- 
-
-            <span class="pill" *ngIf="getTopCityNames(result) as topCities">
-              Top Cities: {{ topCities.join(' • ') }}
-            </span>
-          </div>
-          <div class="followers-pie-wrap" *ngIf="getFollowersPieBackground(result) as pieBackground">
-            <div class="followers-pie" [style.background]="pieBackground"></div>
-            <div class="followers-legend">
-              <span class="followers-legend-item" *ngFor="let item of getFollowerBreakdown(result)">
-                <span class="followers-dot" [style.background]="item.color"></span>
-                {{ item.label }} {{ item.percent }}%
-              </span>
-            </div>
-          </div>
-          <div class="gender-split" *ngIf="getGenderSplit(result) as split">
-            <div class="gender-track">
-              <div class="gender-female" [style.width.%]="split.female"></div>
-              <div class="gender-male" [style.width.%]="split.male"></div>
-            </div>
-            <div class="gender-legend">
-              <span>Female {{ split.female }}%</span>
-              <span>Male {{ split.male }}%</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>

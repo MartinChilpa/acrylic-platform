@@ -15,6 +15,11 @@ import { SimilarityUrlService } from '../../services/similarity-url.service';
 })
 export class SimilaritySearchComponent implements OnInit {
   private similarityService = inject(SimilarityUrlService);
+  private readonly dummyHighlights = [
+    { offset: 25.088, duration: 45.72 },
+    { offset: 94.208, duration: 44.184 },
+    { offset: 169.472, duration: 18.072 }
+  ];
   private sameQueryCooldownMs = 3000;
   private lastQuery = '';
   private lastQueryAt = 0;
@@ -25,6 +30,7 @@ export class SimilaritySearchComponent implements OnInit {
   private waveformErrors = new Map<string, string>();
   private playingTrackKeys = new Set<string>();
   private trackTimes = new Map<string, { current: number; duration: number }>();
+  private timerRafIds = new Map<string, number>();
   
   results: any[] = [];
   globalFileWav: string | null = null;
@@ -390,8 +396,53 @@ ngOnInit() {
     return topCities.length ? topCities : null;
   }
 
+  getTopCountries(track: any): Array<{ name: string; code2: string; flag: string }> | null {
+    const source = track?.chartmetric_instagram_top_countries;
+    if (!Array.isArray(source) || source.length === 0) {
+      return null;
+    }
+
+    const topCountries = source
+      .slice(0, 3)
+      .map((item: unknown) => {
+        if (!item || typeof item !== 'object') {
+          return null;
+        }
+        const record = item as Record<string, unknown>;
+        const name = typeof record['name'] === 'string' ? record['name'].trim() : '';
+        const code2 = typeof record['code2'] === 'string' ? record['code2'].trim().toUpperCase() : '';
+        if (!name) {
+          return null;
+        }
+        return {
+          name,
+          code2,
+          flag: this.toFlagEmoji(code2)
+        };
+      })
+      .filter((country): country is { name: string; code2: string; flag: string } => !!country);
+
+    return topCountries.length ? topCountries : null;
+  }
+
+  toFlagEmoji(code2: string | null | undefined): string {
+    if (!code2 || code2.length !== 2) {
+      return '';
+    }
+    const code = code2.toUpperCase();
+    const first = code.charCodeAt(0);
+    const second = code.charCodeAt(1);
+    const isAtoZ = (value: number) => value >= 65 && value <= 90;
+    if (!isAtoZ(first) || !isAtoZ(second)) {
+      return '';
+    }
+    const OFFSET = 0x1f1e6 - 65;
+    return String.fromCodePoint(first + OFFSET, second + OFFSET);
+  }
+
   getTrackKey(track: any, index: number): string {
-    return (track?.id ?? track?.uuid ?? index).toString();
+    const base = (track?.id ?? track?.uuid ?? 'track').toString();
+    return `${base}-${index}`;
   }
 
   getTrackAudioUrl(track: any): string | null {
@@ -420,18 +471,29 @@ ngOnInit() {
     }
 
     if (audioElement.paused) {
-      void audioElement.play();
+      this.playingTrackKeys.add(key);
+      void audioElement.play().catch(() => {
+        this.playingTrackKeys.delete(key);
+      });
       return;
     }
+    this.playingTrackKeys.delete(key);
     audioElement.pause();
   }
 
-  onTrackAudioPlay(track: any, index: number): void {
-    this.playingTrackKeys.add(this.getTrackKey(track, index));
+  onTrackAudioPlay(track: any, index: number, event: Event): void {
+    const key = this.getTrackKey(track, index);
+    this.playingTrackKeys.add(key);
+    const audio = event.target as HTMLAudioElement | null;
+    if (audio) {
+      this.startTimerLoop(key, audio);
+    }
   }
 
   onTrackAudioPause(track: any, index: number): void {
-    this.playingTrackKeys.delete(this.getTrackKey(track, index));
+    const key = this.getTrackKey(track, index);
+    this.playingTrackKeys.delete(key);
+    this.stopTimerLoop(key);
   }
 
   onTrackAudioTimeUpdate(track: any, index: number, event: Event): void {
@@ -450,7 +512,7 @@ ngOnInit() {
     const time = this.trackTimes.get(key);
     const current = time?.current ?? 0;
     const duration = time?.duration ?? 0;
-    return `${this.formatMmSs(current)} / ${this.formatMmSs(duration)}`;
+    return `${this.formatMmSs(current)} `;
   }
 
   private formatMmSs(totalSeconds: number): string {
@@ -460,6 +522,42 @@ ngOnInit() {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = Math.floor(totalSeconds % 60);
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  onTrackAudioMeta(track: any, index: number, event: Event): void {
+    const audio = event.target as HTMLAudioElement | null;
+    if (!audio) {
+      return;
+    }
+    const key = this.getTrackKey(track, index);
+    this.trackTimes.set(key, {
+      current: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+      duration: Number.isFinite(audio.duration) ? audio.duration : 0
+    });
+  }
+
+  private startTimerLoop(key: string, audio: HTMLAudioElement): void {
+    this.stopTimerLoop(key);
+    const tick = () => {
+      this.trackTimes.set(key, {
+        current: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+        duration: Number.isFinite(audio.duration) ? audio.duration : 0
+      });
+      if (!audio.paused && !audio.ended) {
+        const rafId = requestAnimationFrame(tick);
+        this.timerRafIds.set(key, rafId);
+      }
+    };
+    const rafId = requestAnimationFrame(tick);
+    this.timerRafIds.set(key, rafId);
+  }
+
+  private stopTimerLoop(key: string): void {
+    const rafId = this.timerRafIds.get(key);
+    if (rafId !== undefined) {
+      cancelAnimationFrame(rafId);
+      this.timerRafIds.delete(key);
+    }
   }
 
   private async initializePeaksForVisibleRows(): Promise<void> {
@@ -490,7 +588,8 @@ ngOnInit() {
       Peaks.init({
         overview: {
           container: overviewElement,
-          waveformColor: '#ffffff'
+          waveformColor: '#ffffff',
+          showAxisLabels: false
         },
         waveformColor: '#ffffff',
         playheadColor: '#023185',
@@ -510,8 +609,53 @@ ngOnInit() {
         }
         this.waveformErrors.delete(key);
         this.peaksInstances.set(key, peaksInstance);
+        this.applyHighlightsToPeaks(peaksInstance, track);
       });
     });
+  }
+
+  private applyHighlightsToPeaks(peaksInstance: any, track: any): void {
+    const highlights = this.getTrackHighlights(track);
+    if (!highlights.length || !peaksInstance?.segments?.add) {
+      return;
+    }
+
+    try {
+      peaksInstance.segments.removeAll?.();
+      peaksInstance.segments.add(
+        highlights.map((item, index) => ({
+          id: `highlight-${index}`,
+          startTime: item.offset,
+          endTime: item.offset + item.duration,
+          labelText: `H${index + 1}`,
+          color: 'rgba(2, 49, 133, 0.35)',
+          editable: false
+        }))
+      );
+    } catch {
+      // no-op
+    }
+  }
+
+  private getTrackHighlights(track: any): Array<{ offset: number; duration: number }> {
+    const source = Array.isArray(track?.highlights) && track.highlights.length
+      ? track.highlights
+      : this.dummyHighlights;
+
+    return source
+      .map((item: unknown) => {
+        if (!item || typeof item !== 'object') {
+          return null;
+        }
+        const record = item as Record<string, unknown>;
+        const offset = Number(record['offset']);
+        const duration = Number(record['duration']);
+        if (!Number.isFinite(offset) || !Number.isFinite(duration) || offset < 0 || duration <= 0) {
+          return null;
+        }
+        return { offset, duration };
+      })
+      .filter((item: { offset: number; duration: number } | null): item is { offset: number; duration: number } => !!item);
   }
 
   private async getPeaksLib(): Promise<any> {
@@ -534,6 +678,8 @@ ngOnInit() {
     this.peaksInstances.clear();
     this.playingTrackKeys.clear();
     this.trackTimes.clear();
+    this.timerRafIds.forEach((rafId) => cancelAnimationFrame(rafId));
+    this.timerRafIds.clear();
   }
 
   private isSupportedMediaUrl(inputUrl: string): boolean {
