@@ -1,18 +1,20 @@
 <div class="dashboard-container">
   <div class="search-header">
-    <div class="search-input-wrapper">
-      <span class="icon-sparkles" [class.loading-spin]="loading">✨</span>
-      
+    <div class="search-box-wrap">
+    <div class="search-box" [class.search-box--active]="searchQuery">
+    <svg class="search-ai-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>
       <input
+        class="search-input"
         type="text"
         [formControl]="searchControl"
         (focus)="onSearchInputFocus()"
         (input)="onSearchInputChange()"
         (blur)="onSearchInputBlur()"
-        placeholder="Paste a URL (YouTube, Vimeo, SoundCloud, Spotify, Apple Music, TikTok)..."
+        placeholder="Type anything or paste a link / upload a file"
       />
-
-      <div class="search-actions">
+  
         <input
           #videoFileInput
           type="file"
@@ -20,41 +22,107 @@
           class="d-none"
           (change)="onVideoSelected($event)"
         />
-        <button class="btn-ai-search" type="button" (click)="videoFileInput.click()">
-          Upload MP4
+         <button
+      class="btn-ai-search btn-ai-search--active"
+      (click)="videoFileInput.click()">
+          <span>Upload MP4</span>
         </button>
-        <button class="btn-ai-search" (click)="search()" [disabled]="!canSearch">
-          {{ loading ? 'Searching...' : 'Search' }}
+        <button
+          class="btn-ai-search btn-ai-search--submit"
+          [class.btn-ai-search--active]="canSearch"
+          (click)="search()"
+          [disabled]="!canSearch">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 14L11.1334 11.1333" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+          <span>{{ loading ? 'Searching...' : 'Search' }}</span>
         </button>
+   
+    </div>
+
+
+  <div class="search-dropdown" *ngIf="showDropdown">
+
+    <div class="dropdown-suggestions">
+      <div class="dropdown-item" *ngFor="let suggestion of suggestions">
+        <div class="dropdown-item__icon">
+          <svg *ngIf="suggestion.type === 'prompt'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="14,2 14,8 20,8" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg *ngIf="suggestion.type === 'video'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <polygon points="23,7 16,12 23,17" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg *ngIf="suggestion.type === 'keyword'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="#AD46FF" stroke-width="1.5"/>
+            <path d="M21 21L16.65 16.65" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <svg *ngIf="suggestion.type === 'link'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg *ngIf="suggestion.type === 'track'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M9 18V5l12-2v13" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="6" cy="18" r="3" stroke="#AD46FF" stroke-width="1.5"/>
+            <circle cx="18" cy="16" r="3" stroke="#AD46FF" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="dropdown-item__text">
+          <span class="dropdown-item__title">{{ suggestion.title }}</span>
+          <span class="dropdown-item__subtitle">{{ suggestion.subtitle }}</span>
+        </div>
       </div>
     </div>
-    
-    <small class="error-text" *ngIf="errorMsg">
-      {{ errorMsg }}
-    </small>
-    <div class="search-info-box" *ngIf="showSearchInfo">
+
+
+  </div>
+  </div>
+
+    <!-- <div class="search-info-box" *ngIf="showSearchInfo">
       Deteccion automatica: URL de plataforma compatible, texto para prompt o archivo MP4.
-    </div>
+    </div> -->
 
     <div class="video-preview-wrap" *ngIf="selectedVideoUrl">
       <div class="video-preview-name" *ngIf="selectedVideoName">
-        {{ selectedVideoName }}
+      Uploaded video:
       </div>
       <video class="video-preview-player" [src]="selectedVideoUrl" controls></video>
+
+      <div style="display: flex;">
+        <img src="assets/images/icons/Video.svg" alt="Video" class="video-preview-icon" />
+        <p>{{ selectedVideoName }}</p>
+      </div>
+
     </div>
   </div>
 
-  <div class="empty-results" *ngIf="results.length === 0 && !loading">
-    <p>No results yet. Try pasting a link!</p>
-  </div>
+
 
   <div class="results-list" *ngIf="!loading">
+
+    <div *ngIf="(results?.length ?? 0) > 0">
+      <div style="margin: 39px 0px 19px 2px;">
+        <span class="results-count">266 Results for </span>
+      </div>
+      <h3 class="results-section__title"> Top matches <span class="results-section__count">(5)</span></h3>
+
+    <div class="results-cols-header">
+      <div class="rcols-spacer"></div>
+      <span class="rcols-label">Tier</span>
+      <span class="rcols-label">Audience Size</span>
+      <span class="rcols-label">Audience Sports Fit</span>
+      <span class="rcols-label">Track Virality</span>
+      <div class="rcols-right"></div>
+    </div>
+    </div>
+
     <div class="result-card result-row" *ngFor="let result of results; let i = index">
       <div class="track-grid">
-        <img class="thumb-image" [src]="getTrackImage(result)" [alt]="result.track_name || 'Track thumbnail'" />
-
         <div>
           <div class="header-artist">
+            <img class="thumb-image" [src]="getTrackImage(result)" [alt]="result.track_name || 'Track thumbnail'" />
             <div class="pte1">
               <div class="title-line">
                 <span>{{ result.track_name || result.name || 'Sin titulo' }}</span>
@@ -62,102 +130,238 @@
 
               <div class="div-subtitle">
                 <p class="subtitle-artist">{{ result.artist_canonical || 'Artista desconocido' }}</p>
-                <span class="pill" *ngIf="result.moods?.length">
+                <span class="subtitle-artist subtitle-moods" *ngIf="result.moods?.length">
                   {{ result.moods?.slice(0, 3)?.join(' • ') }}
                 </span>
               </div>
             </div>
 
             <div class="pt2">
-              <h2>parte2</h2>
+              <div class="pt2-icon-tier ">
+              </div>
+
+              <div class="pt2-item">
+                <img class="pt2-icon" [src]="getAudienceSizeIconPath(result)" alt="Audience size" />
+                <span class="pt2-label" *ngIf="getAudienceSize(result) as audience">{{ audience }}</span>
+              </div>
+
+              <div class="pt2-item">
+                <img class="pt2-icon" [src]="getSportFitIconPath(result)" alt="Sport Fit" />
+                <span class="pt2-label"> {{ getAudienceSportFitPercentage(result) ?? '--' }}%</span>
+              </div>
+              <div class="pt2-item">
+                <img class="pt2-icon" src="assets/images/icons/gauge.svg" alt="Platform 4" />
+                <span class="pt2-label">1%</span>
+              </div>
             </div>
 
-            <div class="pt3">
-              <div
-                class="waveform"
-                *ngIf="getTrackWaveformUrl(result); else noWaveform"
-                #waveOverviewRef
-                [attr.data-track-key]="getTrackKey(result, i)">
+            <div class="pt3" style="flex-direction: row">
+              <div class="wave-shell">
+                <div class="waveform-box">
+                  <div
+                    class="waveform"
+                    *ngIf="getTrackWaveformUrl(result); else noWaveform"
+                    #waveOverviewRef
+                    [attr.data-track-key]="getTrackKey(result, i)">
+                  </div>
+                  <ng-template #noWaveform>
+                    <div class="waveform-empty">No waveform available</div>
+                  </ng-template>
+                </div>
+
+                <div class="wave-controls" *ngIf="getTrackAudioUrl(result)">
+                  <span class="audio-timer">
+                    {{ getTrackTimerLabel(result, i) }}
+                  </span>
+                  <button
+                    class="btn-play-wave"
+                    type="button"
+                    (click)="toggleTrackPlayback(result, i)">
+                    {{ isTrackPlaying(result, i) ? '⏸' : '▶' }}
+                  </button>
+
+                </div>
               </div>
               <div class="waveform-error" *ngIf="getWaveformError(result, i) as waveError">
                 {{ waveError }}
               </div>
-              <ng-template #noWaveform>
-                <div class="waveform-empty">No waveform available</div>
-              </ng-template>
-
-              <button
-                class="btn-play-wave"
-                type="button"
-                *ngIf="getTrackAudioUrl(result)"
-                (click)="toggleTrackPlayback(result, i)">
-                {{ isTrackPlaying(result, i) ? 'Pause' : 'Play' }}
-              </button>
-              <span class="audio-timer" *ngIf="getTrackAudioUrl(result)">
-                {{ getTrackTimerLabel(result, i) }}
-              </span>
               <audio
                 *ngIf="getTrackAudioUrl(result) as audioUrl"
                 class="audio-hidden"
                 #audioRef
                 [attr.data-track-key]="getTrackKey(result, i)"
                 [src]="audioUrl"
-                (play)="onTrackAudioPlay(result, i)"
+                preload="auto"
+                (playing)="onTrackAudioPlay(result, i, $event)"
                 (pause)="onTrackAudioPause(result, i)"
+                (loadedmetadata)="onTrackAudioMeta(result, i, $event)"
+                (durationchange)="onTrackAudioMeta(result, i, $event)"
                 (timeupdate)="onTrackAudioTimeUpdate(result, i, $event)"
                 (ended)="onTrackAudioPause(result, i)">
               </audio>
+
+                <div class="button-section">
+                  <button type="button" class="btn-section-action" aria-label="Add favorite">
+                    <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-section-action"
+                    aria-label="Toggle panel"
+                    (click)="togglePanel(result, i)">
+                    <img
+                      [src]="isPanelOpen(result, i) ? 'assets/images/icons/panel-top-open.svg' : 'assets/images/icons/panel-top-close.svg'"
+                      [alt]="isPanelOpen(result, i) ? 'Open panel' : 'Close panel'" />
+                  </button>
+
+                </div>
               </div>
+
+     
           </div>
 
 
-          <div class="meta-line">
+          <p class="title-audience" *ngIf="isPanelOpen(result, i)">Audience Snapshot</p>
+          <div style="display: flex;" *ngIf="isPanelOpen(result, i)">
+            <div class="insights-section">
+              <div class="insights-row">
+                <div class="cities-double">
+                  <div class="cities-col">
+                    <div class="cities-title">Top Countries</div>
+                    <ng-container *ngIf="getTopCountries(result) as topCountries; else noCountries">
+                      <div class="city-item" *ngFor="let country of topCountries; let idx = index">
+                        {{ country.flag ? (country.flag + ' ') : '' }}{{ country.name }}
+                      </div>
+                    </ng-container>
+                    <ng-template #noCountries>
+                      <div class="city-item">1.-No data</div>
+                      <div class="city-item">2.-No data</div>
+                      <div class="city-item">3.-No data</div>
+                    </ng-template>
+                  </div>
+                  <div class="cities-col">
+                    <div class="cities-title">Top Cities</div>
+                    <ng-container *ngIf="getTopCityNames(result) as topCities; else noCities">
+                      <div class="city-item" *ngFor="let city of topCities; let idx = index">
+                        {{ idx + 1 }}. {{ city }}
+                      </div>
+                    </ng-container>
+                    <ng-template #noCities>
+                      <div class="city-item">1. -</div>
+                      <div class="city-item">2. -</div>
+                      <div class="city-item">3. -</div>
+                    </ng-template>
+                  </div>
+                </div>
 
+                <div class="gender-split" *ngIf="getGenderSplit(result) as split">
+                  <div class="cities-title">AUDIENCE SPLIT</div>
+                  <div class="gender-legend">
+                    <span>Female {{ split.female }}%</span>
+                    <span>Male {{ split.male }}%</span>
+                  </div>
+                  <div class="gender-track">
+                    <div class="gender-female" [style.width.%]="split.female"></div>
+                    <div class="gender-male" [style.width.%]="split.male"></div>
+                  </div>
+  
+                </div>
+              </div>
 
+              <div class="insights-bottom">
+                <div class="insight-item">
+                  
+                  <div class="insight-card">
+                    <div class="data-card__header">Audience Composition</div>
+                    <div class="followers-pie-wrap" *ngIf="getFollowersPieBackground(result) as pieBackground; else noFollowersMix">
+                      <div class="followers-top-row">
+                        <div class="followers-top-item">
+                          <img class="pt2-icon-audience" [src]="getAudienceSizeIconPath(result)" alt="Audience size" />
+                          <div class="div-audience-data"> 
+                            <p class="number-follow">Large</p>
+                            <span class="pt2-label-audience" *ngIf="getAudienceSize(result) as audience">{{ audience }}</span>
 
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="followers-main-row">
+                        <div class="followers-pie" [style.background]="pieBackground"></div>
+                        <div class="followers-legend">
+                          <span class="followers-legend-item" *ngFor="let item of getFollowerBreakdown(result)">
+                            <span class="followers-dot" [style.background]="item.color"></span>
+                            {{ item.label }} {{ item.percent }}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <ng-template #noFollowersMix>
+                      <div class="insight-placeholder">Audience Composition</div>
+                    </ng-template>
+                  </div>
+                </div>
+                <div class="insight-item">
+                  
+                  <div class="insight-card">
+                    <div class="data-card__header">Audience Sport Fit</div>
+                    <div class="sport-fit-content">
+                      <img class="sport-fit-icon" [src]="getSportFitIconPath(result)" alt="Audience Sport Fit" />
+                      <span class="sport-fit-label">Sport Fit</span>
+                      <span class="sport-fit-value">
+                        {{ getAudienceSportFitPercentage(result) ?? '--' }}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="insight-item">
+           
+                  <div class="insight-card">
+                    <div class="data-card__header">Audience Sport Fit</div>
+                    <div class="sport-fit-content">
+                      <img class="sport-fit-icon" src="assets/images/icons/volleyball.svg" alt="Audience Sport Fit" />
+                      <span class="sport-fit-label">Sport Fit</span>
+                      <span class="sport-fit-value">
+                        {{ getAudienceSportFitPercentage(result) ?? '--' }}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+      <div class="expanded-right">
+        <h4 class="panel-section-title">Licensing</h4>
+
+        <div class="licensing-box" [class]="'licensing-box--'">
+    
+            <div class="licensing-included-label">Included</div>
+            <div class="licensing-included-sublabel">ABC</div>
+    
+          <button class="btn-license" [class]="'btn-license--' + '--bid2clear'">
+            ABC
+          </button>
+        </div>
+
+        <div class="restriction-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Archival Restriction: ABC</span>
+          <button class="btn-help">?</button>
+        </div>
+
+        <div class="restriction-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" stroke="currentColor" stroke-width="1.5"/>
+            <polygon points="9.75,15.02 15.5,12 9.75,8.98 9.75,15.02" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+          <span>YouTube Restriction: ABC</span>
+          <button class="btn-help">?</button>
+        </div>
+      </div>
+
+          </div>
           
-            
-            • {{ formatDuration(result.duration) }}
-            <span *ngIf="result.release_year"> • {{ result.release_year }}</span>
-          </div>
-
-          <div class="metrics">
-            <span *ngIf="result.auto_tagging_output?.bpm">BPM: {{ result.auto_tagging_output?.bpm }}</span>
-            <span *ngIf="result.auto_tagging_output?.key?.length">Key: {{ result.auto_tagging_output?.key[0] }}</span>
-            <span *ngIf="result.auto_tagging_output?.tempo?.length">Tempo: {{ result.auto_tagging_output?.tempo[0] }}</span>
-            <span *ngIf="getAudienceSize(result) as audience">Audience Size: {{ audience }}</span>
-            <span *ngIf="formatFollowers(result.spotify_followers) as followers">Spotify: {{ followers }}</span>
-            <span *ngIf="formatFollowers(result.tiktok_followers) as followers">TikTok: {{ followers }}</span>
-            <span *ngIf="formatFollowers(result.youtube_followers) as followers">YouTube: {{ followers }}</span>
-            <span *ngIf="formatFollowers(result.instagram_followers) as followers">Instagram: {{ followers }}</span>
-          </div>
-
-          <div class="tag-line">
- 
-
-            <span class="pill" *ngIf="getTopCityNames(result) as topCities">
-              Top Cities: {{ topCities.join(' • ') }}
-            </span>
-          </div>
-          <div class="followers-pie-wrap" *ngIf="getFollowersPieBackground(result) as pieBackground">
-            <div class="followers-pie" [style.background]="pieBackground"></div>
-            <div class="followers-legend">
-              <span class="followers-legend-item" *ngFor="let item of getFollowerBreakdown(result)">
-                <span class="followers-dot" [style.background]="item.color"></span>
-                {{ item.label }} {{ item.percent }}%
-              </span>
-            </div>
-          </div>
-          <div class="gender-split" *ngIf="getGenderSplit(result) as split">
-            <div class="gender-track">
-              <div class="gender-female" [style.width.%]="split.female"></div>
-              <div class="gender-male" [style.width.%]="split.male"></div>
-            </div>
-            <div class="gender-legend">
-              <span>Female {{ split.female }}%</span>
-              <span>Male {{ split.male }}%</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>

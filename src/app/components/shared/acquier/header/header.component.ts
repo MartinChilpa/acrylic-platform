@@ -1,37 +1,25 @@
-
-import { NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
-import { AuthService } from '../../../../services/auth.service';
-
-import { NavigationService } from '../../../../services/navigation.service';
-import { RouterLink } from '@angular/router';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'acrylic-header',
   standalone: true,
-  imports: [
-    NgOptimizedImage,
-    NgClass,
-    RouterLink
-  ],
+  imports: [CommonModule],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrls: ['./header.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class HeaderComponent {
+  @Input() teamName: string = '';
+  @Input() teamLogo: string = '';
+  @Input() tagline: string = '';
+  @Input() primaryColor: string = '#003DA6';
+  @Input() secondaryColor: string = '#FFFFFF';
 
-
-    public _authService = inject(AuthService);
-
-    public _navigationService = inject(NavigationService);
-  
-    ngOnInit(): void {
-      if (this._authService.IsLoggedIn()) {
-       console.log('Componente inicializado. Datos:');
-      }
-    }
-  
-    signOut(): void {
-      this._authService.signOut();
-    }
-
+  get dynamicStyles() {
+    return {
+      '--primary-color': this.primaryColor,
+      '--secondary-color': this.secondaryColor,
+    };
+  }
 }

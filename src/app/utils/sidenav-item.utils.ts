@@ -32,3 +32,10 @@ export const publicSidenavItems = [
     showSubMenu: false
   },
 ]
+
+export const acquierSidenavItems = [
+  { icon: 'home', label: 'Home', routerLink: '/acquier/dashboard' },
+  { icon: 'projects', label: 'Projects', routerLink: '/acquier/projects' },
+  { icon: 'licenses', label: 'Licenses', routerLink: '/acquier/licenses' },
+  { icon: 'performance', label: 'Performance', routerLink: '/acquier/performance', disabled: true, badge: 'Coming Soon' },
+];

@@ -1,64 +1,32 @@
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { publicSidenavItems, sidenavItems } from '../../../../utils/sidenav-item.utils';
-import { Component, OnInit, effect, inject } from '@angular/core';
-import { NgClass, NgOptimizedImage } from '@angular/common';
+import { Component, HostListener, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { acquierSidenavItems } from '../../../../utils/sidenav-item.utils';
 import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'acrylic-sidenav',
   standalone: true,
-  imports: [
-    NgOptimizedImage,
-    RouterLinkActive,
-    RouterLink,
-    NgClass,
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sidenav.component.html',
   styleUrl: './sidenav.component.scss'
 })
-export class SidenavComponent implements OnInit {
-  private router = inject(Router);
-  sidenavItems: any[] = [];
+export class SidenavComponent {
+  private authService = inject(AuthService);
+  isExpanded = signal(false);
+  navItems = acquierSidenavItems;
 
-  userLoggedIn: boolean = false;
-
-  private _authService = inject(AuthService);
-
-  constructor() {
-    effect(() => {
-      this.userLoggedIn = this._authService.IsLoggedIn()
-      if (this.userLoggedIn) {
-        this.sidenavItems = sidenavItems;
-      } else {
-        this.sidenavItems = publicSidenavItems;
-      }
-    })
+  @HostListener('mouseenter')
+  onMouseEnter() {
+    this.isExpanded.set(true);
   }
 
-  ngOnInit(): void {
-    const currentUrl = this.router.url;
-
-    this.sidenavItems.forEach(item => {
-      if (item.routerLink && currentUrl.includes(item.routerLink)) {
-        item.showSubMenu = true;
-      } else {
-        item.showSubMenu = false;
-      }
-    });
+  @HostListener('mouseleave')
+  onMouseLeave() {
+    this.isExpanded.set(false);
   }
 
-  toggleSubMenu(item: any) {
-    this.sidenavItems.filter(x => x.label != item.label && x.submenu).forEach(item => {
-      item.showSubMenu = false;
-    })
-    if (item.submenu) {
-      item.showSubMenu = !item.showSubMenu;
-    }
-  }
-
-  collapseMenu() {
-    this.sidenavItems.forEach(item => {
-      item.showSubMenu = false;
-    })
+  signOut(): void {
+    this.authService.signOut();
   }
 }

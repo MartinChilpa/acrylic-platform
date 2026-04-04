@@ -1,0 +1,38 @@
+.content-area {
+  display: flex;
+  padding: 64px 40px 40px 40px;
+  flex-direction: column;
+  align-items: center;
+  gap: 64px;
+  flex: 1 0 0;
+  align-self: stretch;
+  box-sizing: border-box;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 1072px;
+  box-sizing: border-box;
+}
+
+.search-title {
+  margin: 0;
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  color: #FFFFFF;
+  display: block;
+
+  &__highlight {
+    display: inline;
+    background: linear-gradient(135deg, #AD46FF, #F6339A);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+}

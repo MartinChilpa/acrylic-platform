@@ -1,10 +1,16 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component,Output,EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Subject, of } from 'rxjs';
 import { switchMap, tap, catchError } from 'rxjs/operators';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
+interface Suggestion {
+  icon: string;
+  type: string;
+  title: string;
+  subtitle: string;
+}
 
 @Component({
   selector: 'acrylic-similarity-search',
@@ -13,8 +19,22 @@ import { SimilarityUrlService } from '../../services/similarity-url.service';
   templateUrl: './similarity-search.component.html',
   styleUrls: ['./similarity-search.component.scss']
 })
+
+
 export class SimilaritySearchComponent implements OnInit {
+
+    @Output() searchInput = new EventEmitter<string>();
+  
   private similarityService = inject(SimilarityUrlService);
+  private readonly dummyHighlights = [
+    { offset: 25.088, duration: 45.72 },
+    { offset: 94.208, duration: 44.184 },
+    { offset: 169.472, duration: 18.072 }
+  ];
+
+  
+  searchQuery: string = '';
+  showDropdown: boolean = false;
   private sameQueryCooldownMs = 3000;
   private lastQuery = '';
   private lastQueryAt = 0;
@@ -24,7 +44,18 @@ export class SimilaritySearchComponent implements OnInit {
   private peaksInstances = new Map<string, any>();
   private waveformErrors = new Map<string, string>();
   private playingTrackKeys = new Set<string>();
+  private openedPanels = new Set<string>();
   private trackTimes = new Map<string, { current: number; duration: number }>();
+  private timerRafIds = new Map<string, number>();
+
+  suggestions: Suggestion[] = [
+    { icon: '', type: 'prompt', title: 'Write a prompt', subtitle: 'Rosalia-style dance for chase scene' },
+    { icon: '', type: 'video', title: 'Upload a video', subtitle: 'up to 60 sec / 60 MB' },
+    { icon: '', type: 'keyword', title: 'Search keywords', subtitle: 'e.g., guitar, upbeat' },
+    { icon: '', type: 'link', title: 'Paste a link', subtitle: 'Paste a link. Get matches to similar tracks.' },
+    { icon: '', type: 'track', title: 'Find a specific track', subtitle: 'Search title and artist.' },
+  ];
+
   
   results: any[] = [];
   globalFileWav: string | null = null;
@@ -96,6 +127,13 @@ ngOnInit() {
   ngOnDestroy(): void {
     this.destroyAllPeaks();
     this.clearSelectedVideo();
+  }
+
+
+  selectSuggestion(suggestion: Suggestion) {
+    this.searchQuery = suggestion.title;
+    this.searchControl.setValue(suggestion.title);
+    this.showDropdown = false;
   }
 
   get canSearch(): boolean {
@@ -171,19 +209,27 @@ ngOnInit() {
 
   onSearchInputFocus(): void {
     const query = (this.searchControl.value ?? '').trim();
+    this.searchQuery = query;
+    this.showDropdown = true;
     this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
   }
 
   onSearchInputChange(): void {
     const query = (this.searchControl.value ?? '').trim();
+    this.searchQuery = query;
     if (query.length > 0 && this.selectedVideoFile) {
       this.clearSelectedVideo();
     }
+    this.showDropdown = true;
     this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
   }
 
   onSearchInputBlur(): void {
-    this.showSearchInfo = false;
+    // Let suggestion clicks register before hiding dropdown.
+    setTimeout(() => {
+      this.showDropdown = false;
+      this.showSearchInfo = false;
+    }, 120);
   }
 
   private normalizeResponse(data: unknown): any[] {
@@ -264,6 +310,14 @@ ngOnInit() {
   }
 
   getAudienceSize(track: any): string | null {
+    const total = this.getAudienceSizeValue(track);
+    if (total === null) {
+      return null;
+    }
+    return new Intl.NumberFormat('en-US').format(total);
+  }
+
+  getAudienceSizeValue(track: any): number | null {
     const values = [
       Number(track?.spotify_followers ?? 0),
       Number(track?.tiktok_followers ?? 0),
@@ -276,8 +330,21 @@ ngOnInit() {
       return null;
     }
 
-    const total = validValues.reduce((sum, v) => sum + v, 0);
-    return new Intl.NumberFormat('en-US').format(total);
+    return validValues.reduce((sum, v) => sum + v, 0);
+  }
+
+  getAudienceSizeIconPath(track: any): string {
+    const total = this.getAudienceSizeValue(track);
+    if (total === null) {
+      return 'assets/images/icons/large.svg';
+    }
+    if (total < 10_000) {
+      return 'assets/images/icons/range/users-l.svg';
+    }
+    if (total <= 100_000) {
+      return 'assets/images/icons/range/users-m.svg';
+    }
+    return 'assets/images/icons/range/users.h.svg';
   }
 
   getFollowerBreakdown(track: any): Array<{ label: string; value: number; percent: number; color: string }> {
@@ -390,8 +457,104 @@ ngOnInit() {
     return topCities.length ? topCities : null;
   }
 
+  getTopCountries(track: any): Array<{ name: string; code2: string; flag: string }> | null {
+    const source = track?.chartmetric_instagram_top_countries;
+    if (!Array.isArray(source) || source.length === 0) {
+      return null;
+    }
+
+    const topCountries = source
+      .slice(0, 3)
+      .map((item: unknown) => {
+        if (!item || typeof item !== 'object') {
+          return null;
+        }
+        const record = item as Record<string, unknown>;
+        const name = typeof record['name'] === 'string' ? record['name'].trim() : '';
+        const code2 = typeof record['code2'] === 'string' ? record['code2'].trim().toUpperCase() : '';
+        if (!name) {
+          return null;
+        }
+        return {
+          name,
+          code2,
+          flag: this.toFlagEmoji(code2)
+        };
+      })
+      .filter((country): country is { name: string; code2: string; flag: string } => !!country);
+
+    return topCountries.length ? topCountries : null;
+  }
+
+  getAudienceSportFitPercentage(track: any): number | null {
+    const candidates: unknown[] = [
+      track?.chartmetric_instagram_sports_fit_percent,
+      track?.audience_sport_fit_percentage,
+      track?.audience_sport_fit_percent,
+      track?.audience_sport_fit,
+      track?.sport_fit_percentage,
+      track?.sport_fit_percent,
+      track?.sport_fit,
+      track?.sports_fit_percentage,
+      track?.sports_fit_percent,
+      track?.sports_fit
+    ];
+
+    for (const value of candidates) {
+      const normalized = typeof value === 'string' ? value.replace('%', '').trim() : value;
+      const n = Number(normalized);
+      if (Number.isFinite(n)) {
+        return Math.max(0, Math.min(100, Number(n.toFixed(1))));
+      }
+    }
+    return null;
+  }
+
+  getSportFitIconPath(track: any): string {
+    const percentage = this.getAudienceSportFitPercentage(track);
+    if (percentage === null) {
+      return 'assets/images/icons/volleyball.svg';
+    }
+    if (percentage <= 33) {
+      return 'assets/images/icons/range/volleyball-l.svg';
+    }
+    if (percentage <= 66) {
+      return 'assets/images/icons/range/volleyball-m.svg';
+    }
+    return 'assets/images/icons/range/volleyball-h.svg';
+  }
+
+  toFlagEmoji(code2: string | null | undefined): string {
+    if (!code2 || code2.length !== 2) {
+      return '';
+    }
+    const code = code2.toUpperCase();
+    const first = code.charCodeAt(0);
+    const second = code.charCodeAt(1);
+    const isAtoZ = (value: number) => value >= 65 && value <= 90;
+    if (!isAtoZ(first) || !isAtoZ(second)) {
+      return '';
+    }
+    const OFFSET = 0x1f1e6 - 65;
+    return String.fromCodePoint(first + OFFSET, second + OFFSET);
+  }
+
   getTrackKey(track: any, index: number): string {
-    return (track?.id ?? track?.uuid ?? index).toString();
+    const base = (track?.id ?? track?.uuid ?? 'track').toString();
+    return `${base}-${index}`;
+  }
+
+  togglePanel(track: any, index: number): void {
+    const key = this.getTrackKey(track, index);
+    if (this.openedPanels.has(key)) {
+      this.openedPanels.delete(key);
+      return;
+    }
+    this.openedPanels.add(key);
+  }
+
+  isPanelOpen(track: any, index: number): boolean {
+    return this.openedPanels.has(this.getTrackKey(track, index));
   }
 
   getTrackAudioUrl(track: any): string | null {
@@ -420,18 +583,29 @@ ngOnInit() {
     }
 
     if (audioElement.paused) {
-      void audioElement.play();
+      this.playingTrackKeys.add(key);
+      void audioElement.play().catch(() => {
+        this.playingTrackKeys.delete(key);
+      });
       return;
     }
+    this.playingTrackKeys.delete(key);
     audioElement.pause();
   }
 
-  onTrackAudioPlay(track: any, index: number): void {
-    this.playingTrackKeys.add(this.getTrackKey(track, index));
+  onTrackAudioPlay(track: any, index: number, event: Event): void {
+    const key = this.getTrackKey(track, index);
+    this.playingTrackKeys.add(key);
+    const audio = event.target as HTMLAudioElement | null;
+    if (audio) {
+      this.startTimerLoop(key, audio);
+    }
   }
 
   onTrackAudioPause(track: any, index: number): void {
-    this.playingTrackKeys.delete(this.getTrackKey(track, index));
+    const key = this.getTrackKey(track, index);
+    this.playingTrackKeys.delete(key);
+    this.stopTimerLoop(key);
   }
 
   onTrackAudioTimeUpdate(track: any, index: number, event: Event): void {
@@ -450,7 +624,13 @@ ngOnInit() {
     const time = this.trackTimes.get(key);
     const current = time?.current ?? 0;
     const duration = time?.duration ?? 0;
-    return `${this.formatMmSs(current)} / ${this.formatMmSs(duration)}`;
+    return `${this.formatMmSs(current)} `;
+  }
+  onSearch() {
+    if (this.searchQuery) {
+      this.searchInput.emit(this.searchQuery);
+      this.showDropdown = false;
+    }
   }
 
   private formatMmSs(totalSeconds: number): string {
@@ -460,6 +640,42 @@ ngOnInit() {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = Math.floor(totalSeconds % 60);
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  onTrackAudioMeta(track: any, index: number, event: Event): void {
+    const audio = event.target as HTMLAudioElement | null;
+    if (!audio) {
+      return;
+    }
+    const key = this.getTrackKey(track, index);
+    this.trackTimes.set(key, {
+      current: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+      duration: Number.isFinite(audio.duration) ? audio.duration : 0
+    });
+  }
+
+  private startTimerLoop(key: string, audio: HTMLAudioElement): void {
+    this.stopTimerLoop(key);
+    const tick = () => {
+      this.trackTimes.set(key, {
+        current: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+        duration: Number.isFinite(audio.duration) ? audio.duration : 0
+      });
+      if (!audio.paused && !audio.ended) {
+        const rafId = requestAnimationFrame(tick);
+        this.timerRafIds.set(key, rafId);
+      }
+    };
+    const rafId = requestAnimationFrame(tick);
+    this.timerRafIds.set(key, rafId);
+  }
+
+  private stopTimerLoop(key: string): void {
+    const rafId = this.timerRafIds.get(key);
+    if (rafId !== undefined) {
+      cancelAnimationFrame(rafId);
+      this.timerRafIds.delete(key);
+    }
   }
 
   private async initializePeaksForVisibleRows(): Promise<void> {
@@ -490,7 +706,8 @@ ngOnInit() {
       Peaks.init({
         overview: {
           container: overviewElement,
-          waveformColor: '#ffffff'
+          waveformColor: '#ffffff',
+          showAxisLabels: false
         },
         waveformColor: '#ffffff',
         playheadColor: '#023185',
@@ -510,8 +727,53 @@ ngOnInit() {
         }
         this.waveformErrors.delete(key);
         this.peaksInstances.set(key, peaksInstance);
+        this.applyHighlightsToPeaks(peaksInstance, track);
       });
     });
+  }
+
+  private applyHighlightsToPeaks(peaksInstance: any, track: any): void {
+    const highlights = this.getTrackHighlights(track);
+    if (!highlights.length || !peaksInstance?.segments?.add) {
+      return;
+    }
+
+    try {
+      peaksInstance.segments.removeAll?.();
+      peaksInstance.segments.add(
+        highlights.map((item, index) => ({
+          id: `highlight-${index}`,
+          startTime: item.offset,
+          endTime: item.offset + item.duration,
+          labelText: `H${index + 1}`,
+          color: 'rgba(2, 49, 133, 0.35)',
+          editable: false
+        }))
+      );
+    } catch {
+      // no-op
+    }
+  }
+
+  private getTrackHighlights(track: any): Array<{ offset: number; duration: number }> {
+    const source = Array.isArray(track?.highlights) && track.highlights.length
+      ? track.highlights
+      : this.dummyHighlights;
+
+    return source
+      .map((item: unknown) => {
+        if (!item || typeof item !== 'object') {
+          return null;
+        }
+        const record = item as Record<string, unknown>;
+        const offset = Number(record['offset']);
+        const duration = Number(record['duration']);
+        if (!Number.isFinite(offset) || !Number.isFinite(duration) || offset < 0 || duration <= 0) {
+          return null;
+        }
+        return { offset, duration };
+      })
+      .filter((item: { offset: number; duration: number } | null): item is { offset: number; duration: number } => !!item);
   }
 
   private async getPeaksLib(): Promise<any> {
@@ -521,6 +783,12 @@ ngOnInit() {
     const module = await import('peaks.js');
     this.peaksLib = module.default ?? module;
     return this.peaksLib;
+  }
+
+  setQuery(query: string) {
+    this.searchQuery = query;
+    this.searchControl.setValue(query);
+    this.showDropdown = false;
   }
 
   private destroyAllPeaks(): void {
@@ -533,7 +801,10 @@ ngOnInit() {
     });
     this.peaksInstances.clear();
     this.playingTrackKeys.clear();
+    this.openedPanels.clear();
     this.trackTimes.clear();
+    this.timerRafIds.forEach((rafId) => cancelAnimationFrame(rafId));
+    this.timerRafIds.clear();
   }
 
   private isSupportedMediaUrl(inputUrl: string): boolean {

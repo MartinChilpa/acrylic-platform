@@ -1,0 +1,91 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.team-header {
+  width: 100%;
+}
+
+.team-header__bar {
+  display: flex;
+  height: 200px;
+  justify-content: flex-start;
+  align-items: center;
+  align-self: stretch;
+  border-top: 8px solid #C1C5C8;
+  background: linear-gradient(92deg, rgba(0,0,0,0.20) 0%, rgba(255,255,255,0.10) 49.52%, rgba(0,0,0,0.20) 100%), var(--primary-color, #003DA6);
+  padding-left: 48px;
+}
+
+.team-header__inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: auto; 
+  margin-right: auto;
+  gap: 24px;
+  width: auto;
+}
+
+.team-header__logo-wrapper {
+  display: flex;
+  width: 148px;
+  height: 148px;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto; 
+  margin-right: auto;
+  flex-shrink: 0;
+  aspect-ratio: 1/1;
+}
+
+.team-header__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.team-header__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto; 
+  margin-right: auto;
+  gap: 8px;
+  flex: 1;
+}
+
+.team-header__title {
+  margin: 0;
+  color: #FFF;
+  font-family: 'Glacial IndifferenceNormal';
+  font-size: 80px;
+  font-weight: 700;
+  line-height: normal;
+  text-transform: uppercase;
+  align-items: center;
+  margin-left: auto; 
+  margin-right: auto;
+}
+
+.team-header__tagline-wrapper {
+  display: flex;
+  padding: 4px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 16px;
+  background: #C1C5C8;
+  margin-left: auto; 
+  margin-right: auto;
+}
+
+.team-header__tagline {
+  color: #003DA6;
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+}
