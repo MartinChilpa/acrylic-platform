@@ -58,6 +58,7 @@ export class SimilaritySearchComponent implements OnInit {
 
   
   results: any[] = [];
+  lastSearchLabel = '';
   globalFileWav: string | null = null;
   selectedVideoFile: File | null = null;
   selectedVideoUrl: string | null = null;
@@ -149,6 +150,7 @@ ngOnInit() {
     const now = Date.now();
 
     if (this.selectedVideoFile) {
+      this.lastSearchLabel = this.selectedVideoName?.trim() || 'Uploaded video';
       this.manualSearch$.next({ type: 'video', file: this.selectedVideoFile });
       return;
     }
@@ -166,6 +168,7 @@ ngOnInit() {
 
     this.lastQuery = query;
     this.lastQueryAt = now;
+    this.lastSearchLabel = query;
     if (this.isSupportedMediaUrl(query)) {
       this.manualSearch$.next({ type: 'url', query });
       return;
