@@ -69,10 +69,17 @@ $row-pad: 16px;
 }
 
 .btn-ai-search svg,
+.btn-ai-search img,
 .btn-ai-search span {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
+}
+
+.btn-ai-search__icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
 }
 
 .btn-ai-search--active {

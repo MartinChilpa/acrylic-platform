@@ -22,10 +22,17 @@
           class="d-none"
           (change)="onVideoSelected($event)"
         />
-         <button
-      class="btn-ai-search btn-ai-search--active"
+         <button style="    color: #000000;
+                            background: #ffffff;
+                            border: 1.5px solid;"
+      class="btn-ai-search"
       (click)="videoFileInput.click()">
-          <span>Upload MP4</span>
+          <img
+            class="btn-ai-search__icon"
+            src="assets/images/icons/upload-video.svg"
+            alt=""
+            aria-hidden="true" />
+          <span>Upload</span>
         </button>
         <button
           class="btn-ai-search btn-ai-search--submit"
@@ -104,7 +111,7 @@
 
     <div *ngIf="(results?.length ?? 0) > 0">
       <div style="margin: 39px 0px 19px 2px;">
-        <span class="results-count">266 Results for </span>
+        <span class="results-count">{{ results.length }} Results for {{ lastSearchLabel }}</span>
       </div>
       <h3 class="results-section__title"> Top matches <span class="results-section__count">(5)</span></h3>
 
