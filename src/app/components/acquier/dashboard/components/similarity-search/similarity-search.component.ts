@@ -1,10 +1,16 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component,Output,EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Subject, of } from 'rxjs';
 import { switchMap, tap, catchError } from 'rxjs/operators';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
+interface Suggestion {
+  icon: string;
+  type: string;
+  title: string;
+  subtitle: string;
+}
 
 @Component({
   selector: 'acrylic-similarity-search',
@@ -13,13 +19,22 @@ import { SimilarityUrlService } from '../../services/similarity-url.service';
   templateUrl: './similarity-search.component.html',
   styleUrls: ['./similarity-search.component.scss']
 })
+
+
 export class SimilaritySearchComponent implements OnInit {
+
+    @Output() searchInput = new EventEmitter<string>();
+  
   private similarityService = inject(SimilarityUrlService);
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
     { offset: 94.208, duration: 44.184 },
     { offset: 169.472, duration: 18.072 }
   ];
+
+  
+  searchQuery: string = '';
+  showDropdown: boolean = false;
   private sameQueryCooldownMs = 3000;
   private lastQuery = '';
   private lastQueryAt = 0;
@@ -29,8 +44,18 @@ export class SimilaritySearchComponent implements OnInit {
   private peaksInstances = new Map<string, any>();
   private waveformErrors = new Map<string, string>();
   private playingTrackKeys = new Set<string>();
+  private openedPanels = new Set<string>();
   private trackTimes = new Map<string, { current: number; duration: number }>();
   private timerRafIds = new Map<string, number>();
+
+  suggestions: Suggestion[] = [
+    { icon: '', type: 'prompt', title: 'Write a prompt', subtitle: 'Rosalia-style dance for chase scene' },
+    { icon: '', type: 'video', title: 'Upload a video', subtitle: 'up to 60 sec / 60 MB' },
+    { icon: '', type: 'keyword', title: 'Search keywords', subtitle: 'e.g., guitar, upbeat' },
+    { icon: '', type: 'link', title: 'Paste a link', subtitle: 'Paste a link. Get matches to similar tracks.' },
+    { icon: '', type: 'track', title: 'Find a specific track', subtitle: 'Search title and artist.' },
+  ];
+
   
   results: any[] = [];
   globalFileWav: string | null = null;
@@ -102,6 +127,13 @@ ngOnInit() {
   ngOnDestroy(): void {
     this.destroyAllPeaks();
     this.clearSelectedVideo();
+  }
+
+
+  selectSuggestion(suggestion: Suggestion) {
+    this.searchQuery = suggestion.title;
+    this.searchControl.setValue(suggestion.title);
+    this.showDropdown = false;
   }
 
   get canSearch(): boolean {
@@ -177,19 +209,27 @@ ngOnInit() {
 
   onSearchInputFocus(): void {
     const query = (this.searchControl.value ?? '').trim();
+    this.searchQuery = query;
+    this.showDropdown = true;
     this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
   }
 
   onSearchInputChange(): void {
     const query = (this.searchControl.value ?? '').trim();
+    this.searchQuery = query;
     if (query.length > 0 && this.selectedVideoFile) {
       this.clearSelectedVideo();
     }
+    this.showDropdown = true;
     this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
   }
 
   onSearchInputBlur(): void {
-    this.showSearchInfo = false;
+    // Let suggestion clicks register before hiding dropdown.
+    setTimeout(() => {
+      this.showDropdown = false;
+      this.showSearchInfo = false;
+    }, 120);
   }
 
   private normalizeResponse(data: unknown): any[] {
@@ -270,6 +310,14 @@ ngOnInit() {
   }
 
   getAudienceSize(track: any): string | null {
+    const total = this.getAudienceSizeValue(track);
+    if (total === null) {
+      return null;
+    }
+    return new Intl.NumberFormat('en-US').format(total);
+  }
+
+  getAudienceSizeValue(track: any): number | null {
     const values = [
       Number(track?.spotify_followers ?? 0),
       Number(track?.tiktok_followers ?? 0),
@@ -282,8 +330,21 @@ ngOnInit() {
       return null;
     }
 
-    const total = validValues.reduce((sum, v) => sum + v, 0);
-    return new Intl.NumberFormat('en-US').format(total);
+    return validValues.reduce((sum, v) => sum + v, 0);
+  }
+
+  getAudienceSizeIconPath(track: any): string {
+    const total = this.getAudienceSizeValue(track);
+    if (total === null) {
+      return 'assets/images/icons/large.svg';
+    }
+    if (total < 10_000) {
+      return 'assets/images/icons/range/users-l.svg';
+    }
+    if (total <= 100_000) {
+      return 'assets/images/icons/range/users-m.svg';
+    }
+    return 'assets/images/icons/range/users.h.svg';
   }
 
   getFollowerBreakdown(track: any): Array<{ label: string; value: number; percent: number; color: string }> {
@@ -425,6 +486,44 @@ ngOnInit() {
     return topCountries.length ? topCountries : null;
   }
 
+  getAudienceSportFitPercentage(track: any): number | null {
+    const candidates: unknown[] = [
+      track?.chartmetric_instagram_sports_fit_percent,
+      track?.audience_sport_fit_percentage,
+      track?.audience_sport_fit_percent,
+      track?.audience_sport_fit,
+      track?.sport_fit_percentage,
+      track?.sport_fit_percent,
+      track?.sport_fit,
+      track?.sports_fit_percentage,
+      track?.sports_fit_percent,
+      track?.sports_fit
+    ];
+
+    for (const value of candidates) {
+      const normalized = typeof value === 'string' ? value.replace('%', '').trim() : value;
+      const n = Number(normalized);
+      if (Number.isFinite(n)) {
+        return Math.max(0, Math.min(100, Number(n.toFixed(1))));
+      }
+    }
+    return null;
+  }
+
+  getSportFitIconPath(track: any): string {
+    const percentage = this.getAudienceSportFitPercentage(track);
+    if (percentage === null) {
+      return 'assets/images/icons/volleyball.svg';
+    }
+    if (percentage <= 33) {
+      return 'assets/images/icons/range/volleyball-l.svg';
+    }
+    if (percentage <= 66) {
+      return 'assets/images/icons/range/volleyball-m.svg';
+    }
+    return 'assets/images/icons/range/volleyball-h.svg';
+  }
+
   toFlagEmoji(code2: string | null | undefined): string {
     if (!code2 || code2.length !== 2) {
       return '';
@@ -443,6 +542,19 @@ ngOnInit() {
   getTrackKey(track: any, index: number): string {
     const base = (track?.id ?? track?.uuid ?? 'track').toString();
     return `${base}-${index}`;
+  }
+
+  togglePanel(track: any, index: number): void {
+    const key = this.getTrackKey(track, index);
+    if (this.openedPanels.has(key)) {
+      this.openedPanels.delete(key);
+      return;
+    }
+    this.openedPanels.add(key);
+  }
+
+  isPanelOpen(track: any, index: number): boolean {
+    return this.openedPanels.has(this.getTrackKey(track, index));
   }
 
   getTrackAudioUrl(track: any): string | null {
@@ -513,6 +625,12 @@ ngOnInit() {
     const current = time?.current ?? 0;
     const duration = time?.duration ?? 0;
     return `${this.formatMmSs(current)} `;
+  }
+  onSearch() {
+    if (this.searchQuery) {
+      this.searchInput.emit(this.searchQuery);
+      this.showDropdown = false;
+    }
   }
 
   private formatMmSs(totalSeconds: number): string {
@@ -667,6 +785,12 @@ ngOnInit() {
     return this.peaksLib;
   }
 
+  setQuery(query: string) {
+    this.searchQuery = query;
+    this.searchControl.setValue(query);
+    this.showDropdown = false;
+  }
+
   private destroyAllPeaks(): void {
     this.peaksInstances.forEach((instance) => {
       try {
@@ -677,6 +801,7 @@ ngOnInit() {
     });
     this.peaksInstances.clear();
     this.playingTrackKeys.clear();
+    this.openedPanels.clear();
     this.trackTimes.clear();
     this.timerRafIds.forEach((rafId) => cancelAnimationFrame(rafId));
     this.timerRafIds.clear();

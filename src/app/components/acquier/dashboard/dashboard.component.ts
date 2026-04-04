@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NgClass, NgOptimizedImage } from '@angular/common';
+import { HeaderComponent } from '../../shared/acquier/header/header.component';
 import { SimilaritySearchComponent } from '../dashboard/components/similarity-search/similarity-search.component';
 
 @Component({
@@ -7,6 +8,7 @@ import { SimilaritySearchComponent } from '../dashboard/components/similarity-se
   standalone: true,
   imports: [
     NgClass,
+    HeaderComponent,
     SimilaritySearchComponent
   ],
   templateUrl: './dashboard.component.html',
