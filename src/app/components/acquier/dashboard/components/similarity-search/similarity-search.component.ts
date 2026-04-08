@@ -5,6 +5,7 @@ import { Subject, of } from 'rxjs';
 import { switchMap, tap, catchError } from 'rxjs/operators';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
+import { LicenseComponent } from '../license/license.component';
 interface Suggestion {
   icon: string;
   type: string;
@@ -15,7 +16,7 @@ interface Suggestion {
 @Component({
   selector: 'acrylic-similarity-search',
   standalone: true,
-  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule],
+  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent],
   templateUrl: './similarity-search.component.html',
   styleUrls: ['./similarity-search.component.scss']
 })

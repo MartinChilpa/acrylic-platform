@@ -11,10 +11,12 @@ export const noAuthGuard: CanActivateFn = (route, state) => {
     .pipe(
       switchMap((authenticated) => {
         // If the user is not authenticated...
-        if (authenticated) {
+          if (authenticated) {
 
           // Redirect to the home page
-          if (_authService.isArtistUserType()) {
+          if (_authService.isLabelUserType()) {
+            _navigationService.navigateToLabelHome();
+          } else if (_authService.isArtistUserType()) {
             _navigationService.navigateToHome();
           } else {
             _navigationService.navigateToAcquierDashboard();

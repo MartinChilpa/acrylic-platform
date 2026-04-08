@@ -12,6 +12,10 @@ export class NavigationService {
     this._router.navigate(['artist/home']);
   }
 
+  navigateToLabelHome() {
+    this._router.navigate(['label/home']);
+  }
+
   navigateToAcquierDashboard() {
     this._router.navigate(['acquier/dashboard']);
   }

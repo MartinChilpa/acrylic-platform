@@ -1093,57 +1093,6 @@ $row-pad: 16px;
   }
 }
 
-.licensing-box {
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 10px;
-
-  &--bid2clear {
-    background: rgba(107, 33, 168, 0.18);
-    border: 1px solid rgba(192, 132, 252, 0.18);
-  }
-
-  &--preclear {
-    background: rgba(30, 64, 175, 0.18);
-    border: 1px solid rgba(96, 165, 250, 0.18);
-  }
-
-  &--artistpromo {
-    background: rgba(20, 83, 45, 0.18);
-    border: 1px solid rgba(74, 222, 128, 0.18);
-  }
-}
-
-.licensing-price {
-  font-family: 'Proxima Nova', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: #FFFFFF;
-  margin-bottom: 2px;
-}
-
-.licensing-price-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.45);
-  margin-bottom: 12px;
-}
-
-.licensing-included-label {
-  font-family: 'Proxima Nova', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: #FFFFFF;
-  margin-bottom: 2px;
-}
-
-.licensing-included-sublabel {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.45);
-  margin-bottom: 12px;
-}
-
 .results-count{
   font-family: "Inter", sans-serif;
   font-size: 14px;
@@ -1191,33 +1140,4 @@ $row-pad: 16px;
 .results-section__count {
     color: rgba(255, 255, 255, 0.4);
     font-weight: 400;
-}
-
-.btn-license {
-  width: 100%;
-  padding: 9px 14px;
-  border-radius: 6px;
-  border: none;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-
-  &:hover { opacity: 0.88; }
-
-  &--bid2clear {
-    background: linear-gradient(135deg, #7B2FBE, #AD46FF);
-    color: #FFFFFF;
-  }
-
-  &--preclear {
-    background: #1B4FD8;
-    color: #FFFFFF;
-  }
-
-  &--artistpromo {
-    background: #166534;
-    color: #FFFFFF;
-  }
 }
