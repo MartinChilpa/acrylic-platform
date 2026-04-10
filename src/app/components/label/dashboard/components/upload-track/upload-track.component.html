@@ -32,6 +32,22 @@
     </button>
   </div>
 
+  <div class="upload-track__bulk" *ngIf="rows.length && !errorMessage">
+    <div class="upload-track__bulk-title">Subir tracks en bulk</div>
+    <div class="upload-track__hint" *ngIf="missingBulkColumns.length">
+      Faltan columnas requeridas: {{ missingBulkColumns.join(', ') }}.
+    </div>
+    <div class="upload-track__bulk-meta" *ngIf="!missingBulkColumns.length">
+      Tracks detectados: <span class="upload-track__pill">{{ bulkTracks.length }}</span>
+      Omitidos por datos incompletos: <span class="upload-track__pill">{{ bulkSkippedRows }}</span>
+    </div>
+    <div class="upload-track__bulk-actions">
+      <button type="button" class="upload-track__upload" (click)="saveTracksBulkToBackend()" [disabled]="!canSaveTracksBulk()">
+        {{ isSavingTracksBulk ? 'Sending…' : 'Enviar mp3 + isrc + spotify link' }}
+      </button>
+    </div>
+  </div>
+
   <div class="upload-track__preview" *ngIf="rows.length">
     <div class="upload-track__preview-title">Preview (first 10 rows)</div>
     <div class="upload-track__table-wrap">

@@ -21,5 +21,11 @@ export class TrackCsvService {
     });
   }
 
+  saveTracksToS3Bulk(tracks: Array<{ mp3: string; isrc: string; spotify_url: string }>) {
+    return this.http.post<any>(`${this.API_URL}/save_tracks/`, {
+      tracks
+    });
+  }
+
   
 }

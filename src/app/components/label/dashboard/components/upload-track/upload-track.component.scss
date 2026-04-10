@@ -112,6 +112,33 @@
   margin-bottom: 8px;
 }
 
+.upload-track__bulk {
+  margin: 14px 0 10px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.upload-track__bulk-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.upload-track__bulk-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.upload-track__bulk-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .upload-track__table-wrap {
   overflow: auto;
   border-radius: 12px;

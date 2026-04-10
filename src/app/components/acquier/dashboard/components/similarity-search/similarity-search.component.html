@@ -48,6 +48,32 @@
    
     </div>
 
+    <div class="spotify-track-card" *ngIf="spotifyTrack as track">
+      <img class="spotify-track-card__img" [src]="track.image || 'assets/images/others/default.jpg'" alt="Spotify track image" />
+      <div class="spotify-track-card__body">
+        <div class="spotify-track-card__title">
+          {{ track.name }}
+        </div>
+        <div class="spotify-track-card__subtitle">
+          {{ track.artist || (track.artists.length ? track.artists.join(', ') : '') }}
+        </div>
+        <div class="spotify-track-card__meta">
+          <span *ngIf="track.isrc">ISRC: {{ track.isrc }}</span>
+          <span *ngIf="aimsStatusCode">AIMS: {{ aimsStatusCode }}</span>
+        </div>
+        <div class="spotify-track-card__actions">
+          <span *ngIf="existsInDb !== null"
+                class="spotify-track-card__badge"
+                [class.spotify-track-card__badge--ok]="existsInDb"
+                [class.spotify-track-card__badge--warn]="!existsInDb">
+            {{ existsInDb ? 'Existe en DB' : 'No existe en DB' }}
+          </span>
+          <a *ngIf="spotifyTrackUrl as url" class="spotify-track-card__link" [href]="url" target="_blank" rel="noopener noreferrer">
+            Abrir en Spotify
+          </a>
+        </div>
+      </div>
+    </div>
 
   <div class="search-dropdown" *ngIf="showDropdown">
 

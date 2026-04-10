@@ -13,6 +13,15 @@ interface Suggestion {
   subtitle: string;
 }
 
+interface SpotifyTrackInfo {
+  name: string | null;
+  artist: string | null;
+  artists: string[];
+  image: string | null;
+  isrc: string | null;
+  spotify_id: string | null;
+}
+
 @Component({
   selector: 'acrylic-similarity-search',
   standalone: true,
@@ -25,6 +34,7 @@ interface Suggestion {
 export class SimilaritySearchComponent implements OnInit {
 
     @Output() searchInput = new EventEmitter<string>();
+    @Output() searched = new EventEmitter<void>();
   
   private similarityService = inject(SimilarityUrlService);
   private readonly dummyHighlights = [
@@ -67,6 +77,9 @@ export class SimilaritySearchComponent implements OnInit {
   showSearchInfo = false;
   loading = false;
   errorMsg: string | null = null;
+  spotifyTrack: SpotifyTrackInfo | null = null;
+  existsInDb: boolean | null = null;
+  aimsStatusCode: number | null = null;
   @ViewChildren('audioRef') private audioRefs!: QueryList<ElementRef<HTMLAudioElement>>;
   @ViewChildren('waveOverviewRef') private waveOverviewRefs!: QueryList<ElementRef<HTMLDivElement>>;
 
@@ -75,6 +88,9 @@ ngOnInit() {
     tap(() => {
       this.loading = true;
       this.errorMsg = null;
+      this.spotifyTrack = null;
+      this.existsInDb = null;
+      this.aimsStatusCode = null;
     }),
     switchMap((request) => {
       if (request.type === 'video' && request.file) {
@@ -110,6 +126,9 @@ ngOnInit() {
     this.waveformErrors.clear();
     this.globalFileWav = this.extractGlobalFileWav(data);
     this.results = this.normalizeResponse(data);
+    this.spotifyTrack = this.extractSpotifyTrack(data);
+    this.existsInDb = this.extractExistsInDb(data);
+    this.aimsStatusCode = this.extractAimsStatusCode(data);
     this.loading = false;
     queueMicrotask(() => {
       this.initializePeaksForVisibleRows();
@@ -152,6 +171,7 @@ ngOnInit() {
 
     if (this.selectedVideoFile) {
       this.lastSearchLabel = this.selectedVideoName?.trim() || 'Uploaded video';
+      this.searched.emit();
       this.manualSearch$.next({ type: 'video', file: this.selectedVideoFile });
       return;
     }
@@ -171,9 +191,11 @@ ngOnInit() {
     this.lastQueryAt = now;
     this.lastSearchLabel = query;
     if (this.isSupportedMediaUrl(query)) {
+      this.searched.emit();
       this.manualSearch$.next({ type: 'url', query });
       return;
     }
+    this.searched.emit();
     this.manualSearch$.next({ type: 'prompt', query });
   }
 
@@ -246,6 +268,58 @@ ngOnInit() {
     }
     const record = data as Record<string, unknown>;
     return typeof record['file_wav'] === 'string' ? record['file_wav'] : null;
+  }
+
+  get spotifyTrackUrl(): string | null {
+    const id = this.spotifyTrack?.spotify_id;
+    if (!id) return null;
+    return `https://open.spotify.com/track/${id}`;
+  }
+
+  private extractSpotifyTrack(data: unknown): SpotifyTrackInfo | null {
+    if (!data || typeof data !== 'object') {
+      return null;
+    }
+    const record = data as Record<string, unknown>;
+    const spotify = record['spotify'];
+    if (!spotify || typeof spotify !== 'object') {
+      return null;
+    }
+
+    const s = spotify as Record<string, unknown>;
+    const name = typeof s['name'] === 'string' ? s['name'] : null;
+    if (!name) {
+      return null;
+    }
+
+    const artists = Array.isArray(s['artists'])
+      ? (s['artists'] as unknown[]).filter((x): x is string => typeof x === 'string')
+      : [];
+
+    return {
+      name,
+      artist: typeof s['artist'] === 'string' ? s['artist'] : null,
+      artists,
+      image: typeof s['image'] === 'string' ? s['image'] : null,
+      isrc: typeof s['isrc'] === 'string' ? s['isrc'] : null,
+      spotify_id: typeof s['spotify_id'] === 'string' ? s['spotify_id'] : null,
+    };
+  }
+
+  private extractExistsInDb(data: unknown): boolean | null {
+    if (!data || typeof data !== 'object') {
+      return null;
+    }
+    const record = data as Record<string, unknown>;
+    return typeof record['exists_in_db'] === 'boolean' ? record['exists_in_db'] : null;
+  }
+
+  private extractAimsStatusCode(data: unknown): number | null {
+    if (!data || typeof data !== 'object') {
+      return null;
+    }
+    const record = data as Record<string, unknown>;
+    return typeof record['aims_status_code'] === 'number' ? record['aims_status_code'] : null;
   }
 
   private findArrayInPayload(value: unknown): any[] | null {

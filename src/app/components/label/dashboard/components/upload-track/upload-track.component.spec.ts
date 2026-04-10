@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { UploadTrackComponent } from './upload-track.component';
 
@@ -8,7 +10,11 @@ describe('UploadTrackComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UploadTrackComponent]
+      imports: [UploadTrackComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ]
     })
     .compileComponents();
     

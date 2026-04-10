@@ -22,12 +22,16 @@ export class UploadTrackComponent {
   successMessage: string | null = null;
   isUploading = false;
   isSendingArtists = false;
+  isSavingTracksBulk = false;
 
   delimiter: ',' | ';' | '\t' | '|' = ',';
   hasHeaderRow = true;
 
   header: string[] = [];
   rows: string[][] = [];
+  bulkTracks: Array<{ mp3: string; isrc: string; spotify_url: string }> = [];
+  bulkSkippedRows = 0;
+  missingBulkColumns: string[] = [];
 
   get previewRows(): string[][] {
     return this.rows.slice(0, 10);
@@ -46,6 +50,10 @@ export class UploadTrackComponent {
     this.rows = [];
     this.artistsWithSpotify = [];
     this.isSendingArtists = false;
+    this.isSavingTracksBulk = false;
+    this.bulkTracks = [];
+    this.bulkSkippedRows = 0;
+    this.missingBulkColumns = [];
   }
 
   async onFileInputChange(event: Event): Promise<void> {
@@ -93,6 +101,8 @@ export class UploadTrackComponent {
 
       if (!this.rows.length) {
         this.errorMessage = 'No hay filas de datos en el CSV.';
+      } else {
+        this.rebuildBulkTracksFromCsv();
       }
     } catch (error) {
       this.errorMessage = (error as { message?: string })?.message ?? 'No se pudo leer el CSV.';
@@ -123,6 +133,38 @@ export class UploadTrackComponent {
         error: () => {
           this.errorMessage = 'No se pudo subir el CSV.';
           this.alertService.error('No se pudo subir el CSV.');
+        }
+      });
+  }
+
+  canSaveTracksBulk(): boolean {
+    return !this.isSavingTracksBulk && this.bulkTracks.length > 0 && !this.missingBulkColumns.length;
+  }
+
+  saveTracksBulkToBackend(): void {
+    if (this.isSavingTracksBulk) return;
+
+    if (this.missingBulkColumns.length) {
+      this.alertService.error(`Faltan columnas en el CSV: ${this.missingBulkColumns.join(', ')}`);
+      return;
+    }
+
+    if (!this.bulkTracks.length) {
+      this.alertService.error('No hay tracks válidos (mp3, isrc y spotify link).');
+      return;
+    }
+
+    this.isSavingTracksBulk = true;
+    this.trackCsvService.saveTracksToS3Bulk(this.bulkTracks)
+      .pipe(finalize(() => {
+        this.isSavingTracksBulk = false;
+      }))
+      .subscribe({
+        next: (res: any) => {
+          this.alertService.success(res?.detail ?? `Enviados ${this.bulkTracks.length} tracks al backend.`);
+        },
+        error: (err: any) => {
+          this.alertService.error(err?.error?.detail ?? 'No se pudieron enviar los tracks.');
         }
       });
   }
@@ -210,5 +252,68 @@ export class UploadTrackComponent {
 
     result.push(current);
     return result;
+  }
+
+  private rebuildBulkTracksFromCsv(): void {
+    this.bulkTracks = [];
+    this.bulkSkippedRows = 0;
+    this.missingBulkColumns = [];
+
+    if (!this.hasHeaderRow || !this.header.length) {
+      this.missingBulkColumns = ['mp3', 'isrc', 'spotify_url'];
+      return;
+    }
+
+    const isrcIndex = this.findHeaderIndex(['isrc', 'isrc_code', 'isrc code']);
+    const mp3Index = this.findHeaderIndex(['mp3', 'file_mp3', 'mp3_url', 'mp3 url', 'mp3_link', 'mp3 link', 'mp3_path', 'mp3 path', 'mp3_file', 'mp3 file']);
+    const spotifyIndex = this.findHeaderIndex(['spotify_url', 'spotify url', 'spotify_link', 'spotify link']);
+
+    if (isrcIndex < 0) this.missingBulkColumns.push('isrc');
+    if (mp3Index < 0) this.missingBulkColumns.push('mp3');
+    if (spotifyIndex < 0) this.missingBulkColumns.push('spotify_url');
+    if (this.missingBulkColumns.length) return;
+
+    for (const row of this.rows) {
+      const isrc = (row?.[isrcIndex] ?? '').trim();
+      const mp3 = (row?.[mp3Index] ?? '').trim();
+      const spotifyUrl = (row?.[spotifyIndex] ?? '').trim();
+
+      if (!isrc || !mp3 || !spotifyUrl) {
+        this.bulkSkippedRows++;
+        continue;
+      }
+
+      this.bulkTracks.push({
+        mp3,
+        isrc,
+        spotify_url: spotifyUrl
+      });
+    }
+  }
+
+  private findHeaderIndex(candidates: string[]): number {
+    const normalizedHeader = this.header.map((h) => this.normalizeHeader(h));
+    const normalizedCandidates = candidates.map((c) => this.normalizeHeader(c));
+
+    for (let index = 0; index < normalizedCandidates.length; index++) {
+      const candidate = normalizedCandidates[index];
+      const foundIndex = normalizedHeader.findIndex((h) => h === candidate);
+      if (foundIndex >= 0) return foundIndex;
+    }
+
+    for (let index = 0; index < normalizedCandidates.length; index++) {
+      const candidate = normalizedCandidates[index];
+      const foundIndex = normalizedHeader.findIndex((h) => h.includes(candidate) || candidate.includes(h));
+      if (foundIndex >= 0) return foundIndex;
+    }
+
+    return -1;
+  }
+
+  private normalizeHeader(value: string): string {
+    return (value ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/[\s_-]+/g, '');
   }
 }

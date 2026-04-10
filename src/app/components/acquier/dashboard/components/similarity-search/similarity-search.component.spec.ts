@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { SimilaritySearchComponent } from './similarity-search.component';
 
@@ -8,7 +10,11 @@ describe('SimilaritySearchComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SimilaritySearchComponent]
+      imports: [SimilaritySearchComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ]
     })
     .compileComponents();
     
