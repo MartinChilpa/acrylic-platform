@@ -10,25 +10,28 @@ export class SimilarityUrlService {
   private http = inject(HttpClient);
   API_URL = `${environment.API_URL}/${environment.VERSION}/aims`;
 
-  searchSimilarityByUrl(sourceUrl: string) {
+  searchSimilarityByUrl(sourceUrl: string, page: number = 1, pageSize: number = 10) {
     return this.http.post<any[]>(`${this.API_URL}/similarity/`, {
       youtube_url: sourceUrl,
-      page: 1
+      link: sourceUrl,
+      page,
+      page_size: pageSize
     });
   }
 
-  searchSimilarityByPrompt(text: string) {
+  searchSimilarityByPrompt(text: string, page: number = 1, pageSize: number = 10) {
     return this.http.post<any[]>(`${this.API_URL}/similarity-prompt/`, {
       text,
-      page: 1,
-      page_size: 50
+      page,
+      page_size: pageSize
     });
   }
 
-  searchSimilarityByVideo(videoFile: File) {
+  searchSimilarityByVideo(videoFile: File, page: number = 1, pageSize: number = 10) {
     const formData = new FormData();
     formData.append('video_file', videoFile);
-    formData.append('page', '1');
+    formData.append('page', String(page));
+    formData.append('page_size', String(pageSize));
     return this.http.post<any[]>(`${this.API_URL}/similarity-video/`, formData);
   }
 }

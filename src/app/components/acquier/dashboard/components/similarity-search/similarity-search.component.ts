@@ -1,8 +1,9 @@
-import { AfterViewInit, Component,Output,EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component, Output, EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { Subject, of } from 'rxjs';
-import { switchMap, tap, catchError } from 'rxjs/operators';
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { EMPTY, Subject, defer, of } from 'rxjs';
+import { catchError, expand, last, map, switchMap, tap } from 'rxjs/operators';
+import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
 import { LicenseComponent } from '../license/license.component';
@@ -25,18 +26,19 @@ interface SpotifyTrackInfo {
 @Component({
   selector: 'acrylic-similarity-search',
   standalone: true,
-  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent],
+  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule],
   templateUrl: './similarity-search.component.html',
-  styleUrls: ['./similarity-search.component.scss']
+  styleUrls: ['./similarity-search.component.base.scss', './similarity-search.component.scss']
 })
 
 
 export class SimilaritySearchComponent implements OnInit {
 
-    @Output() searchInput = new EventEmitter<string>();
-    @Output() searched = new EventEmitter<void>();
+  @Output() searchInput = new EventEmitter<string>();
+  @Output() searched = new EventEmitter<void>();
   
   private similarityService = inject(SimilarityUrlService);
+  private modalService = inject(ModalService);
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
     { offset: 94.208, duration: 44.184 },
@@ -54,6 +56,7 @@ export class SimilaritySearchComponent implements OnInit {
   private peaksLib: any | null = null;
   private peaksInstances = new Map<string, any>();
   private waveformErrors = new Map<string, string>();
+  private waveformLoading = new Set<string>();
   private playingTrackKeys = new Set<string>();
   private openedPanels = new Set<string>();
   private trackTimes = new Map<string, { current: number; duration: number }>();
@@ -69,6 +72,12 @@ export class SimilaritySearchComponent implements OnInit {
 
   
   results: any[] = [];
+  pageSize = 10;
+  pageNumber = 1;
+  totalCount: number | null = null;
+  maxPrefetchResults = 30;
+  allResults: any[] = [];
+  private lastSearchRequest: { type: 'url' | 'prompt' | 'video'; query?: string; file?: File } | null = null;
   lastSearchLabel = '';
   globalFileWav: string | null = null;
   selectedVideoFile: File | null = null;
@@ -77,64 +86,101 @@ export class SimilaritySearchComponent implements OnInit {
   showSearchInfo = false;
   loading = false;
   errorMsg: string | null = null;
+
+  licenseModalTrack: any | null = null;
+  licensedTrack: any | null = null;
+  paidMediaAddOn = false;
+  generalTermsOpen = false;
+
   spotifyTrack: SpotifyTrackInfo | null = null;
   existsInDb: boolean | null = null;
   aimsStatusCode: number | null = null;
+  seedTrack: any | null = null;
+  seedInCatalog: boolean | null = null;
   @ViewChildren('audioRef') private audioRefs!: QueryList<ElementRef<HTMLAudioElement>>;
   @ViewChildren('waveOverviewRef') private waveOverviewRefs!: QueryList<ElementRef<HTMLDivElement>>;
 
-ngOnInit() {
-  this.manualSearch$.pipe(
-    tap(() => {
-      this.loading = true;
-      this.errorMsg = null;
-      this.spotifyTrack = null;
-      this.existsInDb = null;
-      this.aimsStatusCode = null;
-    }),
-    switchMap((request) => {
-      if (request.type === 'video' && request.file) {
-        return this.similarityService.searchSimilarityByVideo(request.file).pipe(
+  ngOnInit() {
+    this.manualSearch$.pipe(
+      tap(() => {
+        this.loading = true;
+        this.errorMsg = null;
+        this.spotifyTrack = null;
+        this.existsInDb = null;
+        this.aimsStatusCode = null;
+        this.seedTrack = null;
+        this.seedInCatalog = null;
+        this.waveformLoading.clear();
+      }),
+      switchMap((request) => {
+        return this.fetchUpToMaxResults(request).pipe(
           catchError(() => {
-            this.errorMsg = 'Error en busqueda por video. Revisa la consola.';
-            return of([]);
+            this.errorMsg = 'Error en busqueda. Revisa la consola.';
+            return of({ firstData: null, results: [] as any[] });
           })
         );
+      })
+    ).subscribe((payload: { firstData: unknown | null; results: any[] }) => {
+      const data = payload.firstData;
+      this.logBackendResponse(data);
+      this.destroyAllPeaks();
+      this.waveformErrors.clear();
+      this.globalFileWav = this.extractGlobalFileWav(data);
+      this.allResults = this.dedupeResults(payload.results);
+      this.totalCount = this.extractTotalCount(data);
+      this.spotifyTrack = this.extractSpotifyTrack(data);
+      this.existsInDb = this.extractExistsInDb(data);
+      this.aimsStatusCode = this.extractAimsStatusCode(data);
+      const seed = this.extractSeedTrack(data);
+      this.seedInCatalog = seed.inCatalog;
+      this.seedTrack = seed.inCatalog ? seed.track : null;
+      if (this.existsInDb === null && this.seedInCatalog !== null) {
+        this.existsInDb = this.seedInCatalog;
       }
-      if (request.type === 'url' && request.query) {
-        return this.similarityService.searchSimilarityByUrl(request.query).pipe(
-          catchError(() => {
-            this.errorMsg = 'Error en busqueda por URL. Revisa la consola.';
-            return of([]);
-          })
-        );
+      if (this.seedTrack) {
+        this.allResults = this.removeFirstResultByKey(this.allResults, this.getResultStableKey(this.seedTrack));
       }
-      if (request.type === 'prompt' && request.query) {
-        return this.similarityService.searchSimilarityByPrompt(request.query).pipe(
-          catchError(() => {
-            this.errorMsg = 'Error en busqueda por prompt. Revisa la consola.';
-            return of([]);
-          })
-        );
-      }
-      this.errorMsg = 'No se pudo determinar el tipo de busqueda.';
-      return of([]);
-    })
-  ).subscribe((data: unknown) => {
-    console.log('[similarity raw response]', data);
-    this.destroyAllPeaks();
-    this.waveformErrors.clear();
-    this.globalFileWav = this.extractGlobalFileWav(data);
-    this.results = this.normalizeResponse(data);
-    this.spotifyTrack = this.extractSpotifyTrack(data);
-    this.existsInDb = this.extractExistsInDb(data);
-    this.aimsStatusCode = this.extractAimsStatusCode(data);
-    this.loading = false;
-    queueMicrotask(() => {
-      this.initializePeaksForVisibleRows();
+      this.updateResultsSlice();
+      this.loading = false;
+      queueMicrotask(() => {
+        this.initializePeaksForVisibleRows();
+      });
     });
-  });
-}
+  }
+
+  private extractSeedTrack(data: unknown): { inCatalog: boolean | null; track: any | null } {
+    if (!data || typeof data !== 'object') {
+      return { inCatalog: null, track: null };
+    }
+    const record = data as Record<string, unknown>;
+    const seed = record['seed_track'];
+    if (!seed || typeof seed !== 'object') {
+      return { inCatalog: null, track: null };
+    }
+    const s = seed as Record<string, unknown>;
+    const inCatalog = typeof s['in_catalog'] === 'boolean' ? s['in_catalog'] : null;
+    const track = s['track'];
+    if (!track || typeof track !== 'object') {
+      return { inCatalog, track: null };
+    }
+    return { inCatalog, track };
+  }
+
+  private isBackendResponseDebugEnabled(): boolean {
+    try {
+      return localStorage.getItem('debug_similarity_response') === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  private logBackendResponse(data: unknown): void {
+    if (!this.isBackendResponseDebugEnabled()) {
+      return;
+    }
+    // eslint-disable-next-line no-console
+    console.log('[aims similarity response]', data);
+  }
 
   ngAfterViewInit(): void {
     this.audioRefs.changes.subscribe(() => {
@@ -171,7 +217,10 @@ ngOnInit() {
 
     if (this.selectedVideoFile) {
       this.lastSearchLabel = this.selectedVideoName?.trim() || 'Uploaded video';
+      this.searchInput.emit(this.lastSearchLabel);
       this.searched.emit();
+      this.pageNumber = 1;
+      this.lastSearchRequest = { type: 'video', file: this.selectedVideoFile };
       this.manualSearch$.next({ type: 'video', file: this.selectedVideoFile });
       return;
     }
@@ -190,13 +239,148 @@ ngOnInit() {
     this.lastQuery = query;
     this.lastQueryAt = now;
     this.lastSearchLabel = query;
+    this.searchInput.emit(query);
     if (this.isSupportedMediaUrl(query)) {
       this.searched.emit();
+      this.pageNumber = 1;
+      this.lastSearchRequest = { type: 'url', query };
       this.manualSearch$.next({ type: 'url', query });
       return;
     }
     this.searched.emit();
+    this.pageNumber = 1;
+    this.lastSearchRequest = { type: 'prompt', query };
     this.manualSearch$.next({ type: 'prompt', query });
+  }
+
+  get totalPages(): number | null {
+    const total = this.allResults?.length ?? 0;
+    return total > 0 ? Math.max(1, Math.ceil(total / this.pageSize)) : null;
+  }
+
+  get canGoPreviousPage(): boolean {
+    return this.pageNumber > 1;
+  }
+
+  get canGoNextPage(): boolean {
+    const totalPages = this.totalPages;
+    if (totalPages !== null) {
+      return this.pageNumber < totalPages;
+    }
+    return false;
+  }
+
+  private handlePageChange(): void {
+    // Peaks instances are bound to DOM nodes; when paging, Angular can reuse/remove nodes.
+    // Resetting ensures waveforms re-initialize for the new page.
+    this.destroyAllPeaks();
+    this.waveformErrors.clear();
+    this.updateResultsSlice();
+    setTimeout(() => {
+      void this.initializePeaksForVisibleRows();
+    }, 0);
+  }
+
+  goToPreviousPage(): void {
+    if (this.loading || !this.canGoPreviousPage) {
+      return;
+    }
+    this.pageNumber = Math.max(1, this.pageNumber - 1);
+    this.handlePageChange();
+  }
+
+  goToNextPage(): void {
+    if (this.loading || !this.canGoNextPage) {
+      return;
+    }
+    this.pageNumber = this.pageNumber + 1;
+    this.handlePageChange();
+  }
+
+  private updateResultsSlice(): void {
+    const start = (this.pageNumber - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.results = (this.allResults ?? []).slice(start, end);
+  }
+
+  openLicenseTrackModal(track: any): void {
+    this.licenseModalTrack = track;
+    this.licensedTrack = null;
+    this.paidMediaAddOn = false;
+    this.generalTermsOpen = false;
+    const trackedLicensedEl = document.getElementById('track-licensed-modal');
+    const isTrackedVisible = trackedLicensedEl?.classList.contains('show');
+    if (isTrackedVisible) {
+      this.modalService.hideModal('track-licensed-modal');
+      setTimeout(() => this.modalService.showModal('license-track-modal'), 350);
+    } else {
+      this.modalService.showModal('license-track-modal');
+    }
+  }
+
+  confirmLicenseHappyPath(): void {
+    this.licensedTrack = this.licenseModalTrack;
+    this.modalService.hideModal('license-track-modal');
+    setTimeout(() => {
+      this.modalService.showModal('track-licensed-modal');
+    }, 350);
+  }
+
+  resetLicenseFlow(): void {
+    this.licenseModalTrack = null;
+    this.licensedTrack = null;
+    this.paidMediaAddOn = false;
+    this.generalTermsOpen = false;
+  }
+
+  toggleGeneralTerms(): void {
+    this.generalTermsOpen = !this.generalTermsOpen;
+  }
+
+  copyTags(): void {
+    const artist = this.licensedTrack?.artist_canonical ?? '';
+    const track = this.licensedTrack?.track_name ?? this.licensedTrack?.track_name_track ?? '';
+    const tier = this.getTierLabel(this.licensedTrack);
+    const text = `Artist: ${artist}\nTrack: ${track}\nTier: ${tier}`.trim();
+
+    try {
+      navigator.clipboard?.writeText?.(text);
+    } catch {
+      // best-effort only
+    }
+  }
+
+
+  private getPriceId(value: unknown): number | null {
+    const n = Number((value as any)?.price_id ?? value);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  getTierLabel(track: any): string {
+    const id = this.getPriceId(track);
+    if (id === 1) return 'ArtistPromo';
+    if (id === 2) return 'PreClear';
+    if (id === 3) return 'Bid2Clear';
+    return 'PreClear';
+  }
+
+  getTierClass(track: any): string {
+    const id = this.getPriceId(track);
+    if (id === 1) return 'pt2-icon-tier--artistpromo';
+    if (id === 3) return 'pt2-icon-tier--bid2clear';
+    return 'pt2-icon-tier--preclear';
+  }
+
+  getResultThemeClass(track: any): string {
+    const id = this.getPriceId(track);
+    if (id === 1) return 'result-theme--artistpromo';
+    if (id === 3) return 'result-theme--bid2clear';
+    return 'result-theme--preclear';
+  }
+
+  getCountryFlagUrl(code2: string): string {
+    const safe = (code2 ?? '').toString().trim().toLowerCase();
+    return `https://flagcdn.com/16x12/${safe}.png`;
   }
 
   onVideoSelected(event: Event): void {
@@ -314,6 +498,160 @@ ngOnInit() {
     return typeof record['exists_in_db'] === 'boolean' ? record['exists_in_db'] : null;
   }
 
+  private fetchUpToMaxResults(request: { type: 'url' | 'prompt' | 'video'; query?: string; file?: File }) {
+    const pageSize = this.pageSize;
+    const maxPages = Math.max(1, Math.ceil(this.maxPrefetchResults / pageSize));
+    const isValidRequest = (request.type === 'video' && !!request.file)
+      || (request.type === 'url' && !!request.query)
+      || (request.type === 'prompt' && !!request.query);
+
+    if (!isValidRequest) {
+      this.errorMsg = 'No se pudo determinar el tipo de busqueda.';
+      return of({ firstData: null, results: [] as any[] });
+    }
+
+    const fetchPage = (page: number) => {
+      if (request.type === 'video' && request.file) {
+        return this.similarityService.searchSimilarityByVideo(request.file, page, pageSize);
+      }
+      if (request.type === 'url' && request.query) {
+        return this.similarityService.searchSimilarityByUrl(request.query, page, pageSize);
+      }
+      return this.similarityService.searchSimilarityByPrompt(request.query as string, page, pageSize);
+    };
+
+    return defer(() => fetchPage(1)).pipe(
+      map((firstData: unknown) => {
+        const items = this.normalizeResponse(firstData);
+        return { firstData, page: 1, items, lastBatch: items.length };
+      }),
+      expand((state) => {
+        const nextPage = state.page + 1;
+        const shouldStop = nextPage > maxPages
+          || state.items.length >= this.maxPrefetchResults
+          || state.lastBatch < pageSize;
+        if (shouldStop) {
+          return EMPTY;
+        }
+        return fetchPage(nextPage).pipe(
+          map((data: unknown) => {
+            const batch = this.normalizeResponse(data);
+            return {
+              firstData: state.firstData,
+              page: nextPage,
+              items: [...state.items, ...batch],
+              lastBatch: batch.length
+            };
+          })
+        );
+      }),
+      last(),
+      map((state) => ({ firstData: state.firstData, results: state.items.slice(0, this.maxPrefetchResults) }))
+    );
+  }
+
+  private getResultStableKey(track: any): string {
+    const id = track?.id ?? track?.uuid ?? track?.isrc ?? track?.spotify_id;
+    if (id !== null && id !== undefined) {
+      return String(id);
+    }
+    const waveform = track?.waveform ?? track?.waveform_url ?? track?.file_wav;
+    if (typeof waveform === 'string' && waveform.trim()) {
+      return waveform.trim();
+    }
+    const name = (track?.track_name ?? track?.track_name_track ?? track?.name ?? '').toString().trim();
+    const artist = (track?.artist_canonical ?? track?.artist ?? '').toString().trim();
+    return `${name}::${artist}`.toLowerCase();
+  }
+
+  private removeFirstResultByKey(items: any[], key: string): any[] {
+    if (!key) {
+      return items ?? [];
+    }
+    const out: any[] = [];
+    let removed = false;
+    for (const item of items ?? []) {
+      if (!removed && this.getResultStableKey(item) === key) {
+        removed = true;
+        continue;
+      }
+      out.push(item);
+    }
+    return out;
+  }
+
+  private dedupeResults(items: any[]): any[] {
+    const seen = new Set<string>();
+    const out: any[] = [];
+    for (const item of items ?? []) {
+      const key = this.getResultStableKey(item);
+      if (!key || seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      out.push(item);
+    }
+    return out;
+  }
+
+  private extractTotalCount(data: unknown): number | null {
+    if (!data || typeof data !== 'object') {
+      return null;
+    }
+    const record = data as Record<string, unknown>;
+    const directCandidates = ['count', 'total', 'total_count', 'totalResults', 'total_results'];
+    for (const key of directCandidates) {
+      const value = record[key];
+      if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+        return value;
+      }
+    }
+
+    for (const nested of Object.values(record)) {
+      if (nested && typeof nested === 'object') {
+        const found = this.extractTotalCount(nested);
+        if (found !== null) {
+          return found;
+        }
+      }
+    }
+    return null;
+  }
+
+  private formatUsd(amount: number): string {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
+  }
+
+  getTrackLicensePrice(track: any): string | null {
+    const raw = Number(track?.price ?? track?.license_price ?? track?.price_amount);
+    if (!Number.isFinite(raw) || raw <= 0) return null;
+    return this.formatUsd(raw);
+  }
+
+  getLicenseTotal(): string {
+    const base = Number(this.licenseModalTrack?.price ?? this.licenseModalTrack?.license_price ?? this.licenseModalTrack?.price_amount);
+    const id = this.getPriceId(this.licenseModalTrack);
+    const isArtistPromo = id === 1;
+    const addOn = this.paidMediaAddOn ? 300 : 0;
+
+    if (isArtistPromo) {
+      return addOn > 0 ? this.formatUsd(addOn) : 'Free';
+    }
+
+    const baseAmount = Number.isFinite(base) && base > 0 ? base : 1500;
+    const total = baseAmount + addOn;
+    if (total <= 0) return 'Free';
+    return this.formatUsd(total);
+  }
+
+  getLicenseModalSubtitle(track: any): string {
+    const id = this.getPriceId(track);
+    if (id === 1) return 'Cost of license included in your subscription. No extra fee needed.';
+    const price = this.getTrackLicensePrice(track);
+    return price ? `License price: ${price}` : 'Contact our team for pricing details.';
+  }
+
+
   private extractAimsStatusCode(data: unknown): number | null {
     if (!data || typeof data !== 'object') {
       return null;
@@ -396,6 +734,20 @@ ngOnInit() {
   }
 
   getAudienceSizeValue(track: any): number | null {
+    const directCandidates: unknown[] = [
+      track?.audience_size,
+      track?.audience_size_total,
+      track?.audience_total,
+      track?.total_audience,
+      track?.total_followers
+    ];
+    for (const value of directCandidates) {
+      const n = Number(value);
+      if (Number.isFinite(n) && n > 0) {
+        return n;
+      }
+    }
+
     const values = [
       Number(track?.spotify_followers ?? 0),
       Number(track?.tiktok_followers ?? 0),
@@ -414,7 +766,7 @@ ngOnInit() {
   getAudienceSizeIconPath(track: any): string {
     const total = this.getAudienceSizeValue(track);
     if (total === null) {
-      return 'assets/images/icons/large.svg';
+      return 'assets/images/icons/range/users-m.svg';
     }
     if (total < 10_000) {
       return 'assets/images/icons/range/users-l.svg';
@@ -602,6 +954,38 @@ ngOnInit() {
     return 'assets/images/icons/range/volleyball-h.svg';
   }
 
+  getTrackViralityPercentage(track: any): number | null {
+    const candidates: unknown[] = [
+      track?.track_virality,
+      track?.track_virality_percent,
+      track?.virality,
+      track?.virality_percent
+    ];
+
+    for (const value of candidates) {
+      const normalized = typeof value === 'string' ? value.replace('%', '').trim() : value;
+      const n = Number(normalized);
+      if (Number.isFinite(n)) {
+        return Math.max(0, Math.min(100, Number(n.toFixed(1))));
+      }
+    }
+    return null;
+  }
+
+  getTrackViralityIconPath(track: any): string {
+    const percentage = this.getTrackViralityPercentage(track);
+    if (percentage === null) {
+      return 'assets/images/icons/range/gauge-m.svg';
+    }
+    if (percentage <= 33) {
+      return 'assets/images/icons/range/gauge-l.svg';
+    }
+    if (percentage <= 66) {
+      return 'assets/images/icons/range/gauge-m.svg';
+    }
+    return 'assets/images/icons/range/gauge-h.svg';
+  }
+
   toFlagEmoji(code2: string | null | undefined): string {
     if (!code2 || code2.length !== 2) {
       return '';
@@ -617,9 +1001,8 @@ ngOnInit() {
     return String.fromCodePoint(first + OFFSET, second + OFFSET);
   }
 
-  getTrackKey(track: any, index: number): string {
-    const base = (track?.id ?? track?.uuid ?? 'track').toString();
-    return `${base}-${index}`;
+  getTrackKey(track: any, _index: number): string {
+    return this.getResultStableKey(track);
   }
 
   togglePanel(track: any, index: number): void {
@@ -647,6 +1030,17 @@ ngOnInit() {
 
   getWaveformError(track: any, index: number): string | null {
     return this.waveformErrors.get(this.getTrackKey(track, index)) ?? null;
+  }
+
+  isWaveformLoading(track: any, index: number): boolean {
+    const key = this.getTrackKey(track, index);
+    if (!key) {
+      return false;
+    }
+    if (this.waveformErrors.has(key)) {
+      return false;
+    }
+    return this.waveformLoading.has(key);
   }
 
   isTrackPlaying(track: any, index: number): boolean {
@@ -757,13 +1151,14 @@ ngOnInit() {
   }
 
   private async initializePeaksForVisibleRows(): Promise<void> {
-    if (!this.results.length) {
+    const visible = this.seedTrack ? [this.seedTrack, ...this.results] : this.results;
+    if (!visible.length) {
       return;
     }
 
     const Peaks = await this.getPeaksLib();
 
-    this.results.forEach((track, index) => {
+    visible.forEach((track, index) => {
       const key = this.getTrackKey(track, index);
       if (this.peaksInstances.has(key)) {
         return;
@@ -781,6 +1176,7 @@ ngOnInit() {
         return;
       }
 
+      this.waveformLoading.add(key);
       Peaks.init({
         overview: {
           container: overviewElement,
@@ -796,6 +1192,7 @@ ngOnInit() {
         showPlayheadTime: false,
         keyboard: false
       }, (err: unknown, peaksInstance: any) => {
+        this.waveformLoading.delete(key);
         if (err || !peaksInstance) {
           const message = err && typeof err === 'object' && 'message' in err
             ? String((err as { message?: unknown }).message ?? 'Failed to load waveform')
@@ -878,6 +1275,7 @@ ngOnInit() {
       }
     });
     this.peaksInstances.clear();
+    this.waveformLoading.clear();
     this.playingTrackKeys.clear();
     this.openedPanels.clear();
     this.trackTimes.clear();
