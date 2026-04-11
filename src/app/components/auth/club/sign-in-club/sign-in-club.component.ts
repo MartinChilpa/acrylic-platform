@@ -1,22 +1,23 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../../services/auth.service';
-import { AlertService } from '../../../services/alert.service';
-import { NavigationService } from '../../../services/navigation.service';
-import { SocialLoginButtonComponent } from '../social-login-button/social-login-button.component';
+import { AuthService } from '../../../../services/auth.service';
+import { AlertService } from '../../../../services/alert.service';
+import { NavigationService } from '../../../../services/navigation.service';
+import { SocialLoginButtonComponent } from '../../social-login-button/social-login-button.component';
+
 @Component({
-  selector: 'acrylic-sign-in',
+  selector: 'acrylic-sign-in-club',
   standalone: true,
   imports: [
     NgOptimizedImage,
     ReactiveFormsModule,
     SocialLoginButtonComponent
   ],
-  templateUrl: './sign-in.component.html',
-  styleUrl: './sign-in.component.scss'
+  templateUrl: './sign-in-club.component.html',
+  styleUrl: './sign-in-club.component.scss'
 })
-export class SignInComponent implements OnInit {
+export class SignInClubComponent {
   showPassword = false;
   signInForm!: FormGroup;
 
@@ -52,4 +53,5 @@ export class SignInComponent implements OnInit {
         }
       });
   }
+
 }

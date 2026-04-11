@@ -1,0 +1,43 @@
+<div class="expanded-right license-theme" [ngClass]="'license-theme--' + theme">
+  <h4 class="panel-section-title">Licensing</h4>
+
+  <div
+    class="licensing-box licensing-box--v2"
+    [ngClass]="'licensing-box--' + theme">
+    <div class="licensing-box__content">
+      
+      <div class="licensing-box__meta">
+        <div class="licensing-included-label">{{ headline }}</div>
+        <div class="licensing-included-sublabel">{{ subheadline }}</div>
+      </div>
+
+      <button
+        type="button"
+        class="btn-license btn-license--v2"
+        [ngClass]="'btn-license--' + theme"
+        (click)="licenseClick.emit()">
+        {{ ctaLabel }}
+      </button>
+    </div>
+  </div>
+
+  <div class="restriction-row">
+    <div class="restriction-badge">
+      <img src="assets/images/icons/clock-alert.svg" alt="" class="restriction-icon" />
+      <span>Archival Restriction: ABC</span>
+    </div>
+    <button class="btn-help">
+      <img src="assets/images/icons/help.png" alt="" class="help-icon" />
+    </button>
+  </div>
+
+  <div class="restriction-row">
+    <div class="restriction-badge">
+      <img src="assets/images/icons/clock-alert.svg" alt="" class="restriction-icon" />
+      <span>YouTube Restriction: ABC</span>
+    </div>
+    <button class="btn-help">
+      <img src="assets/images/icons/help.png" alt="" class="help-icon" />
+    </button>
+  </div>
+</div>

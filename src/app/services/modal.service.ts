@@ -5,22 +5,36 @@ import { Injectable } from '@angular/core';
 })
 export class ModalService {
 
-  constructor() { }
+  constructor() {}
 
   showModal(id: string) {
-    const modal = document.getElementById(id)
-    if (modal) {
-      const liveUpload = new (window as any).bootstrap.Modal(modal);
-      liveUpload.show();
+    const modal = document.getElementById(id);
+    if (!modal) {
+      return;
     }
+
+    const bootstrap = (window as any).bootstrap;
+    const Modal = bootstrap?.Modal;
+    if (!Modal) {
+      return;
+    }
+
+    const instance = typeof Modal.getOrCreateInstance === 'function'
+      ? Modal.getOrCreateInstance(modal)
+      : new Modal(modal);
+    instance.show();
   }
 
   hideModal(id: string) {
-    const modal = document.getElementById(id)
-    if (modal) {
-      const liveUpload = new (window as any).bootstrap.Modal(modal);
-      liveUpload.hide();
+    const modal = document.getElementById(id);
+    const bootstrap = (window as any).bootstrap;
+    const Modal = bootstrap?.Modal;
+    if (modal && Modal) {
+      const instance = typeof Modal.getOrCreateInstance === 'function'
+        ? Modal.getOrCreateInstance(modal)
+        : new Modal(modal);
+      instance.hide();
     }
-    document.querySelector('.modal-backdrop')?.remove()
+    document.querySelectorAll('.modal-backdrop').forEach((el) => el.remove());
   }
 }

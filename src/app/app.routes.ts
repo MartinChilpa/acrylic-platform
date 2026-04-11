@@ -8,6 +8,7 @@ export const routesNames = {
   DASHBOARD: 'dashboard',
   AUTH: 'auth',
   ACQUIER: 'acquier',
+  LABEL: 'label',
   MY_PROFILE: 'my-profile',
   UPLOAD: 'upload',
   CREATE_SPLITSHEET: 'create-split-sheet',
@@ -28,7 +29,21 @@ export const routes: Routes = [
     path: '',
     redirectTo: 'artist',
     pathMatch: 'full'
-  },{
+  },
+  {
+
+    path: routesNames.LABEL,
+    loadComponent: () => import('./components/layout/layout-page/layout-page.component').then((c) => c.LayoutPageComponent),
+    canActivate: [authGuard],
+    children:[
+      {
+        path: routesNames.HOME,
+        loadComponent: () => import('./components/label/dashboard/dashboard.component').then((c)=>c.DashboardComponent),
+      }
+    ]
+  },
+
+  {
 
     path: routesNames.ACQUIER,
     loadComponent: () => import('./components/layout/acquier/layout-page/layout-page.component').then((c) => c.LayoutPageComponent),

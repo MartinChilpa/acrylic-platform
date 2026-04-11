@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NgClass, NgOptimizedImage } from '@angular/common';
 import { HeaderComponent } from '../../shared/acquier/header/header.component';
 import { SimilaritySearchComponent } from '../dashboard/components/similarity-search/similarity-search.component';
+import { LocalMusicComponent } from '../dashboard/components/local-music/local-music.component';
 
 @Component({
   selector: 'acrylic-dashboard',
@@ -9,7 +10,8 @@ import { SimilaritySearchComponent } from '../dashboard/components/similarity-se
   imports: [
     NgClass,
     HeaderComponent,
-    SimilaritySearchComponent
+    SimilaritySearchComponent,
+    LocalMusicComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -17,5 +19,10 @@ import { SimilaritySearchComponent } from '../dashboard/components/similarity-se
 
 
 export class DashboardComponent {
+  showLocalMusic = true;
+
+  onSimilaritySearched() {
+    this.showLocalMusic = false;
+  }
 
 }

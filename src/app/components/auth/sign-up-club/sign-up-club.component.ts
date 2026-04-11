@@ -39,7 +39,7 @@ export class SignUpClubComponent implements OnInit {
       email: [emailFromQueryParams, [Validators.required, Validators.email]],
       password: ['', Validators.required],
       password_confirm: ['', Validators.required],
-      type: ['club'] 
+      type: ['club', Validators.required]
     }, { validator: this.passwordMatchValidator });
   }
 

@@ -48,6 +48,289 @@
    
     </div>
 
+    <div class="spotify-track-card" *ngIf="spotifyTrack as track">
+      
+      <div class="spotify-track-card__body">
+        <div style="display: flex;">
+          <div style="padding: 4px 17px 0px 5px;">
+            <img class="spotify-track-card__img" [src]="track.image || 'assets/images/others/default.jpg'" alt="Spotify track image" />
+          </div>
+          <div>
+
+          
+            <div class="spotify-track-card__title">
+              {{ track.name }}
+            </div>
+            <div class="spotify-track-card__subtitle">
+              {{ track.artist || (track.artists.length ? track.artists.join(', ') : '') }}
+            </div>
+            <div class="spotify-track-card__meta">
+              <span *ngIf="track.isrc">ISRC: {{ track.isrc }}</span>
+  
+            </div>
+            <div class="spotify-track-card__actions">
+              <!-- <span *ngIf="existsInDb !== null"
+                    class="spotify-track-card__badge"
+                    [class.spotify-track-card__badge--ok]="existsInDb"
+                    [class.spotify-track-card__badge--warn]="!existsInDb">
+                {{ existsInDb ? 'Existe en DB' : 'No existe en DB' }}
+              </span> -->
+              <a *ngIf="spotifyTrackUrl as url" class="spotify-track-card__link" [href]="url" target="_blank" rel="noopener noreferrer">
+                Open in Spotify
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="spotify-track-card__request" *ngIf="existsInDb === false">
+          <div class="spotify-track-card__request-divider"></div>
+          <div class="spotify-track-card__request-row">
+            <div class="spotify-track-card__request-copy">
+              <div class="spotify-track-card__request-title">This track isn't currently in our catalog.</div>
+              <div class="spotify-track-card__request-subtitle">Request it from our licensing team.</div>
+              <div class="spotify-track-card__request-meta">Estimated turnaround: 1–4 weeks</div>
+            </div>
+
+            <button type="button" class="spotify-track-card__request-cta">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="4" y="6.5" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.75"></rect>
+                <path d="M5.5 8.5L12 13.25L18.5 8.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+              <span>Email our licensing team</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+       <div class="seed-track-wrap" *ngIf="seedTrack as seed">
+      <h3 class="results-section__title results-section__title--seed">Your track</h3>
+      <div class="result-card result-row" [ngClass]="getResultThemeClass(seed)">
+        <div class="track-grid">
+          <div>
+            <div class="header-artist">
+              <img class="thumb-image" [src]="getTrackImage(seed)" [alt]="seed.track_name || 'Track thumbnail'" />
+              <div class="pte1">
+                <div class="title-line">
+                  <span>{{ seed.track_name || seed.name || 'Sin titulo' }}</span>
+                </div>
+
+                <div class="div-subtitle">
+                  <p class="subtitle-artist">{{ seed.artist_canonical || 'Artista desconocido' }}</p>
+                  <span class="subtitle-artist subtitle-moods" *ngIf="seed.moods?.length">
+                    {{ seed.moods?.slice(0, 3)?.join(' • ') }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="pt2">
+                 <div class="pt2-icon-tier" [ngClass]="getTierClass(seed)">
+                  {{ getTierLabel(seed) }}
+                </div>
+
+                <div class="pt2-item">
+                  <img class="pt2-icon" [src]="getAudienceSizeIconPath(seed)" alt="Audience size" />
+                  <span class="pt2-label" *ngIf="getAudienceSize(seed) as audience">{{ audience }}</span>
+                </div>
+
+                <div class="pt2-item">
+                  <img class="pt2-icon" [src]="getSportFitIconPath(seed)" alt="Sport Fit" />
+                  <span class="pt2-label"> {{ getAudienceSportFitPercentage(seed) ?? '--' }}%</span>
+                </div>
+                <div class="pt2-item">
+                  <img class="pt2-icon" [src]="getTrackViralityIconPath(seed)" alt="Track virality" />
+                  <span class="pt2-label">{{ getTrackViralityPercentage(seed) ?? '--' }}%</span>
+                </div>
+              </div>
+
+              <div class="pt3" style="flex-direction: row">
+                <div class="wave-shell">
+                  <div class="waveform-box">
+                    <div
+                      class="waveform"
+                      *ngIf="getTrackWaveformUrl(seed); else noWaveformSeed"
+                      #waveOverviewRef
+                      [attr.data-track-key]="getTrackKey(seed, 0)">
+                    </div>
+                    <div class="waveform-loading" *ngIf="isWaveformLoading(seed, 0)">
+                      <div class="waveform-loading__spinner" aria-hidden="true"></div>
+                    </div>
+                    <ng-template #noWaveformSeed>
+                      <div class="waveform-empty">No waveform available</div>
+                    </ng-template>
+                  </div>
+
+                  <div class="wave-controls" *ngIf="getTrackAudioUrl(seed)">
+                    <span class="audio-timer">
+                      {{ getTrackTimerLabel(seed, 0) }}
+                    </span>
+                    <button
+                      class="btn-play-wave"
+                      type="button"
+                      (click)="toggleTrackPlayback(seed, 0)">
+                      {{ isTrackPlaying(seed, 0) ? '⏸' : '▶' }}
+                    </button>
+
+                  </div>
+                </div>
+                <div class="waveform-error" *ngIf="getWaveformError(seed, 0) as waveError">
+                  {{ waveError }}
+                </div>
+                <audio
+                  *ngIf="getTrackAudioUrl(seed) as audioUrl"
+                  class="audio-hidden"
+                  #audioRef
+                  [attr.data-track-key]="getTrackKey(seed, 0)"
+                  [src]="audioUrl"
+                  preload="auto"
+                  (playing)="onTrackAudioPlay(seed, 0, $event)"
+                  (pause)="onTrackAudioPause(seed, 0)"
+                  (loadedmetadata)="onTrackAudioMeta(seed, 0, $event)"
+                  (durationchange)="onTrackAudioMeta(seed, 0, $event)"
+                  (timeupdate)="onTrackAudioTimeUpdate(seed, 0, $event)"
+                  (ended)="onTrackAudioPause(seed, 0)">
+                </audio>
+
+                  <div class="button-section">
+                    <button type="button" class="btn-section-action" aria-label="Add favorite">
+                      <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-section-action"
+                      aria-label="Toggle panel"
+                      (click)="togglePanel(seed, 0)">
+                      <img
+                        [src]="isPanelOpen(seed, 0) ? 'assets/images/icons/panel-top-open.svg' : 'assets/images/icons/panel-top-close.svg'"
+                        [alt]="isPanelOpen(seed, 0) ? 'Open panel' : 'Close panel'" />
+                    </button>
+
+                  </div>
+                </div>
+
+       
+            </div>
+
+
+            <p class="title-audience" *ngIf="isPanelOpen(seed, 0)">Audience Snapshot</p>
+            <div style="display: flex;" *ngIf="isPanelOpen(seed, 0)">
+              <div class="insights-section">
+                <div class="insights-row">
+                  <div class="cities-double">
+                    <div class="cities-col">
+                      <div class="cities-title">Top Countries</div>
+                      <ng-container *ngIf="getTopCountries(seed) as topCountries; else noCountriesSeed">
+                        <div class="city-item" *ngFor="let country of topCountries; let idx = index">
+                          {{ country.flag ? (country.flag + ' ') : '' }}{{ country.name }}
+                        </div>
+                      </ng-container>
+                      <ng-template #noCountriesSeed>
+                        <div class="city-item">1.-No data</div>
+                        <div class="city-item">2.-No data</div>
+                        <div class="city-item">3.-No data</div>
+                      </ng-template>
+                    </div>
+                    <div class="cities-col">
+                      <div class="cities-title">Top Cities</div>
+                      <ng-container *ngIf="getTopCityNames(seed) as topCities; else noCitiesSeed">
+                        <div class="city-item" *ngFor="let city of topCities; let idx = index">
+                          {{ idx + 1 }}. {{ city }}
+                        </div>
+                      </ng-container>
+                      <ng-template #noCitiesSeed>
+                        <div class="city-item">1. -</div>
+                        <div class="city-item">2. -</div>
+                        <div class="city-item">3. -</div>
+                      </ng-template>
+                    </div>
+                  </div>
+
+                  <div class="gender-split" *ngIf="getGenderSplit(seed) as split">
+                    <div class="cities-title">AUDIENCE SPLIT</div>
+                    <div class="gender-legend">
+                      <span>Female {{ split.female }}%</span>
+                      <span>Male {{ split.male }}%</span>
+                    </div>
+                    <div class="gender-track">
+                      <div class="gender-female" [style.width.%]="split.female"></div>
+                      <div class="gender-male" [style.width.%]="split.male"></div>
+                    </div>
+    
+                  </div>
+                </div>
+
+                <div class="insights-bottom">
+                  <div class="insight-item">
+                    
+                    <div class="insight-card">
+                      <div class="data-card__header">Audience Composition</div>
+                      <div class="followers-pie-wrap" *ngIf="getFollowersPieBackground(seed) as pieBackground; else noFollowersMixSeed">
+                        <div class="followers-top-row">
+                          <div class="followers-top-item">
+                            <img class="pt2-icon-audience" [src]="getAudienceSizeIconPath(seed)" alt="Audience size" />
+                            <div class="div-audience-data"> 
+                              <p class="number-follow">Large</p>
+                              <span class="pt2-label-audience" *ngIf="getAudienceSize(seed) as audience">{{ audience }}</span>
+
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="followers-main-row">
+                          <div class="followers-pie" [style.background]="pieBackground"></div>
+                          <div class="followers-legend">
+                            <span class="followers-legend-item" *ngFor="let item of getFollowerBreakdown(seed)">
+                              <span class="followers-dot" [style.background]="item.color"></span>
+                              {{ item.label }} {{ item.percent }}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <ng-template #noFollowersMixSeed>
+                        <div class="insight-placeholder">Audience Composition</div>
+                      </ng-template>
+                    </div>
+                  </div>
+                  <div class="insight-item">
+                    
+                    <div class="insight-card">
+                      <div class="data-card__header">Audience Sport Fit</div>
+                      <div class="sport-fit-content">
+                        <img class="sport-fit-icon" [src]="getSportFitIconPath(seed)" alt="Audience Sport Fit" />
+                        <span class="sport-fit-label">Sport Fit</span>
+                        <span class="sport-fit-value">
+                          {{ getAudienceSportFitPercentage(seed) ?? '--' }}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="insight-item">
+             
+                    <div class="insight-card">
+                      <div class="data-card__header">Track Virality</div>
+                      <div class="sport-fit-content">
+                        <img class="sport-fit-icon" [src]="getTrackViralityIconPath(seed)" alt="Track Virality" />
+                        <span class="sport-fit-label">Virality</span>
+                        <span class="sport-fit-value">
+                          {{ getTrackViralityPercentage(seed) ?? '--' }}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <acrylic-license
+                [priceId]="seed?.price_id"
+                [trackPrice]="seed?.price ?? seed?.license_price ?? seed?.price_amount"
+                (licenseClick)="openLicenseTrackModal(seed)"></acrylic-license>
+
+
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
 
   <div class="search-dropdown" *ngIf="showDropdown">
 
@@ -111,10 +394,8 @@
 
     <div *ngIf="(results?.length ?? 0) > 0">
       <div style="margin: 39px 0px 19px 2px;">
-        <span class="results-count">{{ results.length }} Results for {{ lastSearchLabel }}</span>
+        <span class="results-count">{{ totalCount ?? allResults.length }} Results for {{ lastSearchLabel }}</span>
       </div>
-      <h3 class="results-section__title"> Top matches <span class="results-section__count">(5)</span></h3>
-
     <div class="results-cols-header">
       <div class="rcols-spacer"></div>
       <span class="rcols-label">Tier</span>
@@ -125,7 +406,9 @@
     </div>
     </div>
 
-    <div class="result-card result-row" *ngFor="let result of results; let i = index">
+ 
+
+    <div class="result-card result-row" *ngFor="let result of results; let i = index" [ngClass]="getResultThemeClass(result)">
       <div class="track-grid">
         <div>
           <div class="header-artist">
@@ -144,7 +427,8 @@
             </div>
 
             <div class="pt2">
-              <div class="pt2-icon-tier ">
+               <div class="pt2-icon-tier" [ngClass]="getTierClass(result)">
+                {{ getTierLabel(result) }}
               </div>
 
               <div class="pt2-item">
@@ -157,8 +441,8 @@
                 <span class="pt2-label"> {{ getAudienceSportFitPercentage(result) ?? '--' }}%</span>
               </div>
               <div class="pt2-item">
-                <img class="pt2-icon" src="assets/images/icons/gauge.svg" alt="Platform 4" />
-                <span class="pt2-label">1%</span>
+                <img class="pt2-icon" [src]="getTrackViralityIconPath(result)" alt="Track virality" />
+                <span class="pt2-label">{{ getTrackViralityPercentage(result) ?? '--' }}%</span>
               </div>
             </div>
 
@@ -170,6 +454,9 @@
                     *ngIf="getTrackWaveformUrl(result); else noWaveform"
                     #waveOverviewRef
                     [attr.data-track-key]="getTrackKey(result, i)">
+                  </div>
+                  <div class="waveform-loading" *ngIf="isWaveformLoading(result, i)">
+                    <div class="waveform-loading__spinner" aria-hidden="true"></div>
                   </div>
                   <ng-template #noWaveform>
                     <div class="waveform-empty">No waveform available</div>
@@ -323,12 +610,12 @@
                 <div class="insight-item">
            
                   <div class="insight-card">
-                    <div class="data-card__header">Audience Sport Fit</div>
+                    <div class="data-card__header">Track Virality</div>
                     <div class="sport-fit-content">
-                      <img class="sport-fit-icon" src="assets/images/icons/volleyball.svg" alt="Audience Sport Fit" />
-                      <span class="sport-fit-label">Sport Fit</span>
+                      <img class="sport-fit-icon" [src]="getTrackViralityIconPath(result)" alt="Track Virality" />
+                      <span class="sport-fit-label">Virality</span>
                       <span class="sport-fit-value">
-                        {{ getAudienceSportFitPercentage(result) ?? '--' }}%
+                        {{ getTrackViralityPercentage(result) ?? '--' }}%
                       </span>
                     </div>
                   </div>
@@ -336,41 +623,258 @@
               </div>
             </div>
 
-      <div class="expanded-right">
-        <h4 class="panel-section-title">Licensing</h4>
+            <acrylic-license
+              [priceId]="result?.price_id"
+              [trackPrice]="result?.price ?? result?.license_price ?? result?.price_amount"
+              (licenseClick)="openLicenseTrackModal(result)"></acrylic-license>
 
-        <div class="licensing-box" [class]="'licensing-box--'">
-    
-            <div class="licensing-included-label">Included</div>
-            <div class="licensing-included-sublabel">ABC</div>
-    
-          <button class="btn-license" [class]="'btn-license--' + '--bid2clear'">
-            ABC
-          </button>
-        </div>
-
-        <div class="restriction-badge">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>Archival Restriction: ABC</span>
-          <button class="btn-help">?</button>
-        </div>
-
-        <div class="restriction-badge">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" stroke="currentColor" stroke-width="1.5"/>
-            <polygon points="9.75,15.02 15.5,12 9.75,8.98 9.75,15.02" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          </svg>
-          <span>YouTube Restriction: ABC</span>
-          <button class="btn-help">?</button>
-        </div>
-      </div>
 
           </div>
           
         </div>
       </div>
     </div>
+
+    <div class="d-flex justify-content-between align-items-center px-2 pb-2" *ngIf="(results?.length ?? 0) > 0">
+      <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn bg-light-gray text-primary" (click)="goToPreviousPage()" [disabled]="!canGoPreviousPage || loading">&lt;</button>
+        <span class="p-2">
+          {{ pageNumber }}<ng-container *ngIf="totalPages as tp"> of {{ tp }}</ng-container>
+        </span>
+        <button type="button" class="btn bg-light-gray text-primary" (click)="goToNextPage()" [disabled]="!canGoNextPage || loading">&gt;</button>
+      </div>
+      <div style="font-size: 12px; color: rgba(255,255,255,0.6); padding-right: 6px;">
+        10 per page
+      </div>
+    </div>
+
+    <div
+      class="modal fade license-modal"
+      id="license-track-modal"
+      data-bs-backdrop="static"
+      tabindex="-1"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div
+          class="modal-content license-modal__content"
+          [ngClass]="getResultThemeClass(licenseModalTrack)">
+          <div class="license-modal__top">
+            <div class="license-modal__header">
+              <div class="license-modal__title">License Track</div>
+              <button
+                type="button"
+                class="license-modal__close"
+                data-bs-dismiss="modal"
+                (click)="resetLicenseFlow()">
+                <img src="assets/images/icons/close.svg" alt="" class="license-modal__close-icon" />
+              </button>
+            </div>
+
+            <div class="license-modal__tier">
+              <span class="license-modal__tier-stripe"></span>
+              <span class="license-modal__tier-text">{{ getTierLabel(licenseModalTrack) }}</span>
+            </div>
+
+            <div class="license-modal__subtitle">
+              {{ getLicenseModalSubtitle(licenseModalTrack) }}
+            </div>
+          </div>
+
+          <div class="license-modal__divider"></div>
+
+          <div class="license-modal__body">
+            <div class="license-modal__section-title">Terms & Restrictions</div>
+
+            <div class="license-modal__restriction">
+              <div class="license-modal__restriction-row">
+                <div class="license-modal__restriction-pill">Archival Restriction:</div>
+                <button type="button" class="license-modal__restriction-info">i</button>
+              </div>
+              <div class="license-modal__restriction-bullet">&bull; None</div>
+            </div>
+
+            <div class="license-modal__restriction">
+              <div class="license-modal__restriction-row">
+                <div class="license-modal__restriction-pill">YouTube Restriction:</div>
+                <button type="button" class="license-modal__restriction-info">i</button>
+              </div>
+              <div class="license-modal__restriction-bullet">&bull; None</div>
+            </div>
+
+            <button type="button" class="license-modal__accordion" (click)="toggleGeneralTerms()">
+              <span>General Terms</span>
+              <img
+                class="license-modal__accordion-icon"
+                [src]="generalTermsOpen ? 'assets/images/icons/up-arrow-white.svg' : 'assets/images/icons/down-arrow-white.svg'"
+                alt="" />
+            </button>
+
+            <div class="license-modal__terms" *ngIf="generalTermsOpen">
+              <div class="license-modal__terms-item">
+                &bull; This license covers digital use only, on Licensee's official social media accounts (TikTok, Instagram, YouTube, and any platforms listed in the License), worldwide. Content must be published within 30 days of download.
+              </div>
+              <div class="license-modal__terms-item">
+                &bull; This license may include archival and/or platform-specific restrictions. Delete all content by the archival deadline if applicable, and set any YouTube video to &quot;Unlisted&quot; within the specified window. Review your license terms carefully to ensure compliance.
+              </div>
+              <div class="license-modal__terms-item">
+                &bull; This license covers one (1) main video, up to two (2) tag-ons (max 10 seconds each), one (1) 60-second cut-down, and one (1) 30-second cut-down.
+              </div>
+            </div>
+
+            <div class="license-modal__section-title">Optional Add-On</div>
+            <label class="license-modal__addon" [class.license-modal__addon--checked]="paidMediaAddOn">
+              <input type="checkbox" [(ngModel)]="paidMediaAddOn" />
+              <div class="license-modal__addon-body">
+                <div class="license-modal__addon-title">Paid Media Add-On</div>
+                <div class="license-modal__addon-subtitle">Extend usage for paid advertising campaigns</div>
+                <div class="license-modal__addon-price">+ $300</div>
+              </div>
+            </label>
+
+            <div class="license-modal__contact">
+              <div class="license-modal__contact-text">
+                Need rights not included in this license, such as for a TV campaign or posting on your website? Contact our licensing team.
+              </div>
+              <button type="button" class="license-modal__contact-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.6" />
+                  <path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Email our licensing team</span>
+              </button>
+            </div>
+
+            <div class="license-modal__totals">
+              <div class="license-modal__total-row">
+                <span>Base License</span>
+                <span>{{ getTrackLicensePrice(licenseModalTrack) ?? 'Included' }}</span>
+              </div>
+              <div class="license-modal__total-row" *ngIf="paidMediaAddOn">
+                <span>Paid Media Add-On</span>
+                <span>+ $300</span>
+              </div>
+              <div class="license-modal__total-row license-modal__total-row--strong">
+                <span>Total</span>
+                <span class="license-modal__total-accent">{{ getLicenseTotal() }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="license-modal__footer">
+            <button type="button" class="license-modal__footer-link" data-bs-dismiss="modal" (click)="resetLicenseFlow()">Cancel</button>
+            <button type="button" class="license-modal__footer-primary" (click)="confirmLicenseHappyPath()">License</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade license-modal license-modal--wide"
+      id="track-licensed-modal"
+      data-bs-backdrop="static"
+      tabindex="-1"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div
+          class="modal-content license-modal__content license-modal__content--wide"
+          [ngClass]="getResultThemeClass(licensedTrack)">
+          <div class="license-modal__top">
+            <div class="license-modal__header">
+              <div class="license-modal__title">Track Licensed</div>
+              <button
+                type="button"
+                class="license-modal__close"
+                data-bs-dismiss="modal"
+                (click)="resetLicenseFlow()">
+                <img src="assets/images/icons/close.svg" alt="" class="license-modal__close-icon" />
+              </button>
+            </div>
+
+            <div class="license-modal__tier">
+              <span class="license-modal__tier-stripe"></span>
+              <span class="license-modal__tier-text">{{ getTierLabel(licensedTrack) }}</span>
+            </div>
+
+            <div class="license-modal__subtitle">Your license for this track is confirmed</div>
+          </div>
+
+          <div class="license-modal__divider"></div>
+
+          <div class="license-modal__body license-modal__body--licensed">
+            <div class="license-modal__details">
+              <div class="license-modal__details-row">
+                <span>Artist</span>
+                <span class="license-modal__details-value">{{ licensedTrack?.artist_canonical ?? '-' }}</span>
+              </div>
+              <div class="license-modal__details-row">
+                <span>Track</span>
+                <span class="license-modal__details-value">{{ licensedTrack?.track_name ?? licensedTrack?.track_name_track ?? '-' }}</span>
+              </div>
+              <div class="license-modal__details-row">
+                <span>License Tier</span>
+                <span class="license-modal__details-value license-modal__details-value--accent">{{ getTierLabel(licensedTrack) }}</span>
+              </div>
+            </div>
+
+            <div class="license-modal__tagging">
+              <div class="license-modal__tagging-head">
+                <span class="license-modal__tagging-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 12v7h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M20 4l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M15 4h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <span class="license-modal__tagging-title">Tag Artist & Sound for Optimal Reach & Attribution</span>
+                <button type="button" class="license-modal__restriction-info">i</button>
+              </div>
+              <div class="license-modal__tagging-subtitle">
+                For optimal reach & attribution, copy tags and use each platform's tagging feature.
+              </div>
+              <button type="button" class="license-modal__copy-btn" (click)="copyTags()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M9 9h10v10H9V9Z" stroke="currentColor" stroke-width="1.6" />
+                  <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.6" />
+                </svg>
+                <span>Copy Tags</span>
+              </button>
+            </div>
+
+            <div class="license-modal__license-details">
+              <div class="license-modal__license-details-left">
+                <span class="license-modal__license-details-check" aria-hidden="true">
+                  <img src="assets/images/icons/green-check.svg" alt="" />
+                </span>
+                <div>
+                  <div class="license-modal__license-details-title">License Details</div>
+                  <div class="license-modal__license-details-subtitle">View license details and certificate</div>
+                </div>
+              </div>
+              <button type="button" class="license-modal__outline-btn">Go to Licenses</button>
+            </div>
+
+            <div class="license-modal__contact">
+              <div class="license-modal__contact-text">
+                Need rights not included in this license, such as for a TV campaign or posting on your website? Contact our licensing team.
+              </div>
+              <button type="button" class="license-modal__contact-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.6" />
+                  <path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Email our licensing team</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="license-modal__footer license-modal__footer--spread">
+            <button type="button" class="license-modal__footer-link" data-bs-dismiss="modal" (click)="resetLicenseFlow()">Done</button>
+            <button type="button" class="license-modal__footer-primary" data-bs-dismiss="modal" (click)="resetLicenseFlow()">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
   </div>
 </div>

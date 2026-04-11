@@ -51,6 +51,11 @@ export class AuthService {
     return normalized === 'ARTISTA' || normalized === 'ARTIST';
   }
 
+  isLabelUserType(): boolean {
+    const normalized = this.userType.trim().toUpperCase();
+    return normalized === 'LABEL';
+  }
+
   signIn(credentials: { username: string; password: string }): Observable<ISignInResponse> {
     return this._http.post<ISignInResponse>(this.AUTH_API_URL + '/token/', credentials).pipe(
       switchMap((response: ISignInResponse) => {

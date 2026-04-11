@@ -1,0 +1,55 @@
+<section class="local-music">
+
+  <!-- Header con degradado -->
+  <div class="local-music__header">
+    <div class="local-music__header-text">
+      <h2 class="local-music__title">{{ title }}</h2>
+      <p class="local-music__subtitle">{{ subtitle }}</p>
+    </div>
+  </div>
+
+  <!-- Cards row + See all centrado verticalmente -->
+  <div class="local-music__cards">
+    @for (track of tracks; track track.id) {
+      <div class="lm-card">
+
+        <!-- Imagen grande + flag -->
+        <div class="lm-card__img-wrap">
+          <img class="lm-card__img" [src]="track.image" [alt]="track.title" />
+          <img
+            class="lm-card__flag"
+            [src]="'https://flagcdn.com/24x18/' + track.countryCode + '.png'"
+            [alt]="track.countryCode"
+          />
+        </div>
+
+        <!-- Info -->
+        <div class="lm-card__info">
+          <span class="lm-card__title">{{ track.title }}</span>
+          <span class="lm-card__artist">{{ track.artist }}</span>
+        </div>
+
+        <!-- Player bar -->
+        <!--
+        <div class="lm-card__player" [class]="'lm-card__player--' + track.tier">
+          <div class="lm-waveform">
+            @for (bar of waveBars; track $index) {
+              <div class="lm-waveform__bar" [style.height.px]="bar"></div>
+            }
+          </div>
+          <button class="lm-play" [class]="'lm-play--' + track.tier">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1L9 6L1 11V1Z" fill="white" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        -->
+
+      </div>
+    }
+
+    <!-- See all centrado verticalmente -->
+    <a class="local-music__see-all" href="https://open.spotify.com/playlist/37i9dQZF1DX1F430ihQKsD">See all →</a>
+  </div>
+
+</section>

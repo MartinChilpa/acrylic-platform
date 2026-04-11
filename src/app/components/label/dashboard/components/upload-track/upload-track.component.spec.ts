@@ -2,15 +2,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { SimilaritySearchComponent } from './similarity-search.component';
+import { UploadTrackComponent } from './upload-track.component';
 
-describe('SimilaritySearchComponent', () => {
-  let component: SimilaritySearchComponent;
-  let fixture: ComponentFixture<SimilaritySearchComponent>;
+describe('UploadTrackComponent', () => {
+  let component: UploadTrackComponent;
+  let fixture: ComponentFixture<UploadTrackComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SimilaritySearchComponent],
+      imports: [UploadTrackComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -18,7 +18,7 @@ describe('SimilaritySearchComponent', () => {
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(SimilaritySearchComponent);
+    fixture = TestBed.createComponent(UploadTrackComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
