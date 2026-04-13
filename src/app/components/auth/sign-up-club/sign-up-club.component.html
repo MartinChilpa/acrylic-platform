@@ -1,0 +1,100 @@
+<form [formGroup]="signUpForm">
+    <h1 class="auth-tagline">Create Club Account</h1>
+
+    <div class="row">
+        <div class="col-md-12 col-12 mb-3">
+            <div class="acr-input-label required">Type</div>
+            <select formControlName="type" class="form-control acr-input">
+                <option value="club">Club</option>
+                <option value="label">Label</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12 col-12 mb-3">
+            <div class="acr-input-label required">Club / Institution Name</div>
+            <input type="text" formControlName="first_name" class="form-control acr-input"
+                   placeholder="Enter Club Name (e.g. CF Montréal)" autocomplete="off">
+            @if(signUpForm.get('club_name')?.invalid && (signUpForm.get('club_name')?.dirty || signUpForm.get('club_name')?.touched)) {
+                <div class="acr-input-label small text-danger mt-1">Club name is required.</div>
+            }
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-md-12 col-12 mb-3">
+            <div class="acr-input-label required">Official Email</div>
+            <input type="email" formControlName="email" class="form-control acr-input"
+                   placeholder="Enter Institutional Email" autocomplete="off" 
+                   onfocus="this.removeAttribute('readonly');">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-12 mb-3">
+            <div class="acr-input-label required">Password</div>
+            <div class="position-relative">
+                <input [type]="showPassword ? 'text' : 'password'" formControlName="password"
+                       class="form-control acr-input" placeholder="Enter Password" 
+                       acrylicPasswordValidator="password" autocomplete="off" readonly
+                       onfocus="this.removeAttribute('readonly');">
+                <img src="assets/images/icons/{{ showPassword ? 'eye-slash.svg' : 'eye.svg' }}" 
+                     class="eye-icon" width="16" height="16" (click)="showPassword = !showPassword">
+            </div>
+        </div>
+        <div class="col-md-6 col-12 mb-3">
+            <div class="acr-input-label required">Confirm Password</div>
+            <div class="position-relative">
+                <input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="password_confirm"
+                       class="form-control acr-input" placeholder="Confirm Password" 
+                       autocomplete="off" readonly
+                       onfocus="this.removeAttribute('readonly');">
+                <img src="assets/images/icons/{{ showConfirmPassword ? 'eye-slash.svg' : 'eye.svg' }}" 
+                     class="eye-icon" width="16" height="16" (click)="showConfirmPassword = !showConfirmPassword">
+            </div>
+        </div>
+    </div>
+
+    @if(signUpForm.get('password')?.invalid && (signUpForm.get('password')?.dirty || signUpForm.get('password')?.touched)) {
+        <div class="acr-input-label small text-danger mt-1">
+            @if(signUpForm.get('password')?.errors?.['invalidPassword']?.requiredLength) {
+                <div>Your password must contain at least 8 characters.</div>
+            } @else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasLetter) {
+                <div>Your password must contain at least one letter.</div>
+            } @else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasNumber) {
+                <div>Your password must contain at least one number.</div>
+            } @else if(signUpForm.get('password')?.errors?.['invalidPassword']?.hasSpecialChar) {
+                <div>Your password must contain at least one special character.</div>
+            }
+        </div>
+    }
+
+    <!-- @if(signUpForm.get('password_confirm')?.invalid && 
+        signUpForm.get('password')?.value != signUpForm.get('password_confirm')?.value && 
+        (signUpForm.get('password_confirm')?.dirty || signUpForm.get('password_confirm')?.touched)) {
+        <div class="acr-input-label small text-danger">
+            <div>Password and Confirm Password must be same.</div>
+        </div>
+    } -->
+
+    <div>
+        <button type="button" class="btn w-100 btn-main fw-bold h-50px mt-3" 
+                [disabled]="signUpForm.invalid" (click)="signUp()">
+            Create Club Account
+        </button>
+    </div>
+</form>
+
+<div class="d-flex-center my-3">
+    <div class="line"></div>
+    <div class="mx-3">Or</div>
+    <div class="line"></div>
+</div>
+
+<div class="mt-3">
+    <span>Already have an account?</span>
+    <a class="a-blue ms-2 cursor-pointer" (click)="_navigationService.navigateToSignIn();">Sign In</a>
+</div>

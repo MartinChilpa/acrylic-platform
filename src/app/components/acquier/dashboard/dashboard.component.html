@@ -1,0 +1,22 @@
+<acrylic-header
+  [teamName]="'CF Montréal'"
+  [teamLogo]="'assets/images/icons/logoMontreal.png'"
+  [tagline]="'Tous ensemble, droit devant'"
+  [primaryColor]="'#003DA6'"
+  [secondaryColor]="'#FFFFFF'">
+</acrylic-header>
+
+
+<div class="content-area">
+  <div class="search-section">
+ @if (showLocalMusic) {
+<h2 class="search-title">Start your <span class="search-title__highlight">search</span> right here</h2>
+ }
+<acrylic-similarity-search style="padding: 0;" (searched)="onSimilaritySearched()"> </acrylic-similarity-search>
+
+
+</div>
+ @if (showLocalMusic) {
+  <acrylic-local-music></acrylic-local-music>
+ }
+</div>

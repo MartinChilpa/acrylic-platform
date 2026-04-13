@@ -19,7 +19,7 @@ export class UploadStep3Component {
   @Output() nextStepper = new EventEmitter();
   private _alertService = inject(AlertService);
   UploadFileTextDetails = [
-    { fileDropzoneIcon: '/assets/images/icons/file-audio.svg', fileDropzoneHeader: 'Drop your Track Wav file here or upload it manually', fileDropzoneSize: '', fileDropzoneExternalLink: '' },
+    { fileDropzoneIcon: '/assets/images/icons/file-audio.svg', fileDropzoneHeader: 'Drop your Track WAV/MP3 file here or upload it manually', fileDropzoneSize: '', fileDropzoneExternalLink: '' },
     { fileDropzoneIcon: '/assets/images/icons/drop.svg', fileDropzoneHeader: 'Drop your Cover Art File here or upload it manually', fileDropzoneSize: 'JPG 3000px x 3000px', fileDropzoneExternalLink: '' },
     { fileDropzoneIcon: '/assets/images/icons/file.svg', fileDropzoneHeader: 'Drop your snippets here or upload them manually', fileDropzoneSize: '', fileDropzoneExternalLink: '' },
   ]

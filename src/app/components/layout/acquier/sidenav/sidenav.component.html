@@ -1,0 +1,48 @@
+<nav class="sidenav" [class.expanded]="isExpanded()">
+
+  <!-- HEADER: Logo -->
+<div class="sidenav__header">
+  <img src="assets/images/logos/acrylic-short.png" alt="Acrylic" class="sidenav__logo-icon" />
+  <img src="assets/images/logos/acrylic-white.png" alt="Acrylic" class="sidenav__logo-full" />
+</div>
+
+  <!-- NAV ITEMS -->
+  <ul class="sidenav__nav">
+    <li *ngFor="let item of navItems">
+      <a
+        class="sidenav__item"
+        [class.disabled]="item.disabled"
+        [routerLink]="item.disabled ? null : item.routerLink"
+        routerLinkActive="sidenav__item--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <img
+          class="sidenav__icon"
+          [src]="'assets/images/icons/' + item.icon + '.png'"
+          [alt]="item.label"
+        />
+        <span class="sidenav__label">{{ item.label }}</span>
+        <span *ngIf="item.badge" class="sidenav__badge">{{ item.badge }}</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- FOOTER: Help + Team -->
+  <div class="sidenav__footer">
+    <a class="sidenav__item sidenav__item--help" href="#" >
+      <img src="assets/images/icons/help.png" alt="Sign out" class="sidenav__icon" />
+      <span class="sidenav__label">Question/Feedback</span>
+    </a>
+
+    <a class="sidenav__item sidenav__item--help" href="#" (click)="$event.preventDefault(); signOut()">
+      <img src="assets/images/icons/logOut.svg" alt="Sign out" class="sidenav__icon" />
+      <span class="sidenav__label">Log out</span>
+    </a>
+
+    <div class="sidenav__team">
+      <img src="assets/images/icons/logoMontreal.png" alt="CF Montréal" class="sidenav__team-logo" />
+      <span class="sidenav__label sidenav__team-name">CF Montréal</span>
+    </div>
+  </div>
+
+</nav>

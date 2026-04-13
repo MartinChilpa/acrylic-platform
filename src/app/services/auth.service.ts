@@ -1,7 +1,7 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, of, switchMap } from 'rxjs';
+import { Observable, catchError, map, of, switchMap, throwError } from 'rxjs';
 import { AuthUtils } from '../utils/auth.utils';
 import { NavigationService } from './navigation.service';
 import { ISignInResponse } from '../interfaces/response/sign-in.response';
@@ -12,6 +12,7 @@ import { ISignInResponse } from '../interfaces/response/sign-in.response';
 export class AuthService {
 
   AUTH_API_URL = `${environment.API_URL}/${environment.VERSION}/auth`;
+  ACCOUNT_API_URL = `${environment.API_URL}/${environment.VERSION}/account`;
 
   private _http = inject(HttpClient);
   private _navigationService = inject(NavigationService);
@@ -37,11 +38,39 @@ export class AuthService {
     return localStorage.getItem('refreshToken') ?? '';
   }
 
+  set userType(userType: string) {
+    localStorage.setItem('userType', userType);
+  }
+
+  get userType(): string {
+    return localStorage.getItem('userType') ?? '';
+  }
+
+  isArtistUserType(): boolean {
+    const normalized = this.userType.trim().toUpperCase();
+    return normalized === 'ARTISTA' || normalized === 'ARTIST';
+  }
+
+  isLabelUserType(): boolean {
+    const normalized = this.userType.trim().toUpperCase();
+    return normalized === 'LABEL';
+  }
+
   signIn(credentials: { username: string; password: string }): Observable<ISignInResponse> {
     return this._http.post<ISignInResponse>(this.AUTH_API_URL + '/token/', credentials).pipe(
       switchMap((response: ISignInResponse) => {
         this.setSignInResponse(response);
-        return of(response);
+        return this.getAccountProfile().pipe(
+          map((profile: any) => {
+            this.userType = (profile?.user_type ?? '').toString();
+            return response;
+          }),
+          catchError((error) => {
+            return this.endSession().pipe(
+              switchMap(() => throwError(() => error))
+            );
+          })
+        );
       })
     );
   }
@@ -93,6 +122,7 @@ export class AuthService {
     // Remove the access token from the local storage
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userType');
 
     // Set the logged in to false
     this.IsLoggedIn.set(false);
@@ -102,5 +132,9 @@ export class AuthService {
 
   socialJwtPair(request: any) {
     return this._http.post(`${this.AUTH_API_URL}/social/jwt-pair/`, request)
+  }
+
+  getAccountProfile() {
+    return this._http.get(`${this.ACCOUNT_API_URL}/profile/`);
   }
 }

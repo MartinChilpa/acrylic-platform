@@ -1,0 +1,58 @@
+<form [formGroup]="signInForm" class="div-form">
+    <div class="auth-header">
+        <p class="auth-tagline-s">Sign in</p>
+        <p class="subtitle-auth">Sign in to continue to CF Montréal on Acrylic</p>
+    </div>
+    <ng-container>
+        <div>
+            <div class="acr-input-label required">Email</div>
+            <input type="text" [formControlName]="'username'" class="form-control acr-input" style="background-color: rgba(24, 24, 27, 0.6) !important;"  placeholder="Enter email"
+                autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+            @if(signInForm.get('username')?.invalid && (signInForm.get('username')?.dirty ||
+            signInForm.get('username')?.touched)) {
+            <div class="acr-input-label small text-danger">
+                @if(signInForm.get('username')?.errors?.['email']) {
+                <div> Please enter a valid email. </div>
+                }
+            </div>
+            }
+        </div>
+
+        <div class="my-3">
+            <div class="d-flex-between">
+                <div class="acr-input-label required">Password</div>
+                <a class="d-flex justify-content-end a-blue" (click)="_navigationService.navigateToForgotPassword();">
+                    <small>
+                        Forgot Password?
+                    </small>
+                </a>
+            </div>
+
+            <div class="position-relative">
+                <input
+                    class="form-control acr-input"
+                    style="background-color: rgba(24, 24, 27, 0.6) !important;"
+                    [type]="showPassword ? 'text' : 'password'"
+                    [formControlName]="'password'"
+                    placeholder="Enter Password"
+                    autocomplete="off"
+                    readonly
+                    onfocus="this.removeAttribute('readonly');">
+                <img ngSrc="assets/images/icons/{{ showPassword ? 'eye-slash.svg' : 'eye.svg' }}" class="eye-icon"
+                    width="16" height="16" (click)="showPassword = !showPassword">
+            </div>
+        </div>
+
+
+        <button type="button" class="btn btn-main fw-bold btn-sign-in" [disabled]="signInForm.invalid"
+            (click)="signIn()">Sign In
+        </button>
+    </ng-container>
+
+ 
+
+    <!-- <acrylic-social-login-button></acrylic-social-login-button> -->
+
+
+
+</form>

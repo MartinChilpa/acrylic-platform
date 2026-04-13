@@ -9,7 +9,15 @@ export class NavigationService {
   private _router = inject(Router);
 
   navigateToHome() {
-    this._router.navigate(['home']);
+    this._router.navigate(['artist/home']);
+  }
+
+  navigateToLabelHome() {
+    this._router.navigate(['label/home']);
+  }
+
+  navigateToAcquierDashboard() {
+    this._router.navigate(['acquier/dashboard']);
   }
 
   navigateToSignIn() {
@@ -29,7 +37,7 @@ export class NavigationService {
   }
 
   navigateToSyncList() {
-    this._router.navigateByUrl('my-profile/add-synclist');
+    this._router.navigateByUrl('artist/my-profile/add-synclist');
   }
 
   navigateToEditSyncList(id: string) {
@@ -45,7 +53,7 @@ export class NavigationService {
   }
 
   navigateToEditTracks(id: string, assignPrice: boolean = false) {
-    let routeUrl = `/upload/${id}`
+    let routeUrl = `artist/upload/${id}`
     if (assignPrice) {
       routeUrl += `?p=1`
     }
@@ -73,7 +81,7 @@ export class NavigationService {
   }
 
   navigateToPreviewSplitSheet(id: string) {
-    this._router.navigateByUrl(`/my-split-sheets/review/${id}`);
+    this._router.navigateByUrl(`artist/my-split-sheets/review/${id}`);
   }
 
   navigateToMySplitSheet() {
@@ -85,6 +93,6 @@ export class NavigationService {
   }
 
   navigateToUploadTrack() {
-    this._router.navigate(['upload']);
+    this._router.navigate(['artist/upload']);
   }
 }

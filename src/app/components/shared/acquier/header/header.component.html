@@ -1,0 +1,15 @@
+<div class="team-header" [style.--primary-color]="primaryColor">
+  <div class="team-header__bar">
+    <div class="team-header__inner">
+      <div class="team-header__logo-wrapper">
+        <img *ngIf="teamLogo" [src]="teamLogo" [alt]="teamName" class="team-header__logo" />
+      </div>
+      <div class="team-header__content">
+        <h1 class="team-header__title">{{ teamName }}</h1>
+        <div class="team-header__tagline-wrapper" *ngIf="tagline">
+          <span class="team-header__tagline">{{ tagline | uppercase }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

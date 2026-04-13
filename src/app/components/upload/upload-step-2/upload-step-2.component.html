@@ -85,6 +85,11 @@
                 <div class="acr-input-label required">Email Of Distributor Or Label Contact</div>
                 <input type="text" formControlName="other_distributor_email" class="form-control acr-input"
                     placeholder="Email Of Distributor Or Label Contact" autocomplete="off">
+                @if(form.get('other_distributor_email')?.errors?.['invalidEmail']) {
+                <div class="text-danger mt-1">
+                    Please enter a valid email.
+                </div>
+                }
             </div>
         </div>
         }

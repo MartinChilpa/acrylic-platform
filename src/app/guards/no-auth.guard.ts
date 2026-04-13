@@ -6,14 +6,21 @@ import { NavigationService } from '../services/navigation.service';
 
 export const noAuthGuard: CanActivateFn = (route, state) => {
   const _navigationService = inject(NavigationService);
-  return inject(AuthService).check()
+  const _authService = inject(AuthService);
+  return _authService.check()
     .pipe(
       switchMap((authenticated) => {
         // If the user is not authenticated...
-        if (authenticated) {
+          if (authenticated) {
 
           // Redirect to the home page
-          _navigationService.navigateToHome();
+          if (_authService.isLabelUserType()) {
+            _navigationService.navigateToLabelHome();
+          } else if (_authService.isArtistUserType()) {
+            _navigationService.navigateToHome();
+          } else {
+            _navigationService.navigateToAcquierDashboard();
+          }
 
           // Prevent the access
           return of(false);

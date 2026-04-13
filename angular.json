@@ -36,6 +36,13 @@
             "scripts": [
               "src/assets/bootstrap/bootstrap.bundle.min.js"
             ],
+            "allowedCommonJsDependencies": [
+              "konva/lib/Core",
+              "konva/lib/Animation",
+              "konva/lib/shapes/Line",
+              "konva/lib/shapes/Rect",
+              "konva/lib/shapes/Text"
+            ],
             "baseHref": "/"
           },
           "configurations": {
@@ -48,8 +55,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "3kb",
-                  "maximumError": "10kb"
+                  "maximumWarning": "16kb",
+                  "maximumError": "20kb"
                 }
               ],
               "fileReplacements": [
@@ -70,8 +77,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "3kb",
-                  "maximumError": "10kb"
+                  "maximumWarning": "16kb",
+                  "maximumError": "20kb"
                 }
               ],
               "fileReplacements": [

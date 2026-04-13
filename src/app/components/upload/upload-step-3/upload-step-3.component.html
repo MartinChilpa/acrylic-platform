@@ -18,7 +18,7 @@
         <div class="col-12">
             <acrylic-file-dropzone [fileDropzoneIcon]="UploadFileTextDetails[0].fileDropzoneIcon"
                 [fileDropzoneHeader]="UploadFileTextDetails[0].fileDropzoneHeader"
-                [existingFiles]="[form.get('file_wav')?.value]" [allowExtensions]="['wav']" [accept]="'.wav'"
+                [existingFiles]="[form.get('file_wav')?.value]" [allowExtensions]="['wav', 'mp3']" [accept]="'.wav, .mp3'"
                 (uploadedFileList)="setUploadFile('file_wav', $event)"></acrylic-file-dropzone>
         </div>
         @if (!form.get('track_found')?.value) {

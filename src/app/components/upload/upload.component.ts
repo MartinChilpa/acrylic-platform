@@ -71,8 +71,10 @@ export class UploadComponent implements OnInit, AfterViewInit {
     if (distributor?.value !== 'other') {
       otherEmail?.setErrors(null);
     } else {
-      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-      if (!emailPattern.test(otherEmail?.value)) {
+      const value = (otherEmail?.value ?? '').trim();
+      // Accept modern TLD lengths and common email formats.
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,63}$/;
+      if (!emailPattern.test(value)) {
         otherEmail?.setErrors({ invalidEmail: true });
       }
       else {
