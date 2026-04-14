@@ -40,13 +40,8 @@ export class SignInClubComponent {
       .subscribe({
         next: () => {
           this._alertService.success("Logged in successfully");
-          if (this._authService.isLabelUserType()) {
-            this._navigationService.navigateToLabelHome();
-          } else if (this._authService.isArtistUserType()) {
-            this._navigationService.navigateToHome();
-          } else {
-            this._navigationService.navigateToAcquierDashboard();
-          }
+          // For CF Montréal auth entrypoint, always land on Brand dashboard.
+          this._navigationService.navigateToBrandDashboard();
         },
         error: () => {
           this.signInForm.enable();

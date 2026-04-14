@@ -17,7 +17,7 @@ export class LicenseComponent {
     const id = Number(this.priceId);
     if (id === 1) return 'artistpromo';
     if (id === 3) return 'bid2clear';
-    return 'preclear';
+    return 'artistpromo';
   }
 
   get displayPrice(): string {
@@ -35,7 +35,7 @@ export class LicenseComponent {
   get subheadline(): string {
     if (this.theme === 'artistpromo') return 'Artist promo License';
     if (this.theme === 'bid2clear') return 'Bid2Clear Price';
-    return 'PreClear Price';
+    return 'Artist promo License';
   }
 
   get ctaLabel(): string {

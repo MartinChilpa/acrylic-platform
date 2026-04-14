@@ -7,7 +7,7 @@ export const routesNames = {
   ARTIST: 'artist',
   DASHBOARD: 'dashboard',
   AUTH: 'auth',
-  ACQUIER: 'acquier',
+  BRAND: 'brand',
   LABEL: 'label',
   MY_PROFILE: 'my-profile',
   UPLOAD: 'upload',
@@ -30,6 +30,9 @@ export const routes: Routes = [
     redirectTo: 'artist',
     pathMatch: 'full'
   },
+  // Backwards-compat: keep old "acquier" URLs working.
+  { path: 'acquier', redirectTo: 'brand/dashboard', pathMatch: 'full' },
+  { path: 'acquier/dashboard', redirectTo: 'brand/dashboard', pathMatch: 'full' },
   {
 
     path: routesNames.LABEL,
@@ -45,9 +48,14 @@ export const routes: Routes = [
 
   {
 
-    path: routesNames.ACQUIER,
+    path: routesNames.BRAND,
     loadComponent: () => import('./components/layout/acquier/layout-page/layout-page.component').then((c) => c.LayoutPageComponent),
     children:[
+      {
+        path: routesNames.EMPTY,
+        redirectTo: routesNames.DASHBOARD,
+        pathMatch: 'full',
+      },
       {
         path: routesNames.DASHBOARD,
         loadComponent: () => import('./components/acquier/dashboard/dashboard.component').then((c)=>c.DashboardComponent),
