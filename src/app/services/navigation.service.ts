@@ -17,7 +17,11 @@ export class NavigationService {
   }
 
   navigateToAcquierDashboard() {
-    this._router.navigate(['acquier/dashboard']);
+    this._router.navigate(['brand/dashboard']);
+  }
+
+  navigateToBrandDashboard() {
+    this._router.navigate(['brand/dashboard']);
   }
 
   navigateToSignIn() {

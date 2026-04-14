@@ -48,7 +48,7 @@
    
     </div>
 
-    <div class="spotify-track-card" *ngIf="spotifyTrack as track">
+    <div class="spotify-track-card" *ngIf="(!selectedVideoFile && spotifyTrack) as track">
       
       <div class="spotify-track-card__body">
         <div style="display: flex;">
@@ -390,12 +390,17 @@
 
 
 
-  <div class="results-list" *ngIf="!loading">
+	  <div class="results-list">
 
-    <div *ngIf="(results?.length ?? 0) > 0">
-      <div style="margin: 39px 0px 19px 2px;">
-        <span class="results-count">{{ totalCount ?? allResults.length }} Results for {{ lastSearchLabel }}</span>
-      </div>
+	    <div class="results-loading-inline" *ngIf="loading">
+	      <div class="results-loading-inline__spinner" aria-hidden="true"></div>
+	      <span class="results-loading-inline__text">Searching tracks...</span>
+	    </div>
+	
+	    <div *ngIf="(results?.length ?? 0) > 0">
+		      <div style="margin: 39px 0px 19px 2px;">
+		        <span class="results-count">{{ displayTotalCount }} Results for {{ lastSearchLabel }}</span>
+		      </div>
     <div class="results-cols-header">
       <div class="rcols-spacer"></div>
       <span class="rcols-label">Tier</span>

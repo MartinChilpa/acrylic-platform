@@ -61,6 +61,7 @@ export class SimilaritySearchComponent implements OnInit {
   private openedPanels = new Set<string>();
   private trackTimes = new Map<string, { current: number; duration: number }>();
   private timerRafIds = new Map<string, number>();
+  private peaksInitTimerId: number | null = null;
 
   suggestions: Suggestion[] = [
     { icon: '', type: 'prompt', title: 'Write a prompt', subtitle: 'Rosalia-style dance for chase scene' },
@@ -86,6 +87,9 @@ export class SimilaritySearchComponent implements OnInit {
   showSearchInfo = false;
   loading = false;
   errorMsg: string | null = null;
+  private loadingStartedAt = 0;
+  private loadingEndTimerId: number | null = null;
+  private readonly minLoadingMs = 1800;
 
   licenseModalTrack: any | null = null;
   licensedTrack: any | null = null;
@@ -103,6 +107,7 @@ export class SimilaritySearchComponent implements OnInit {
   ngOnInit() {
     this.manualSearch$.pipe(
       tap(() => {
+        this.startLoadingUi();
         this.loading = true;
         this.errorMsg = null;
         this.spotifyTrack = null;
@@ -141,11 +146,34 @@ export class SimilaritySearchComponent implements OnInit {
         this.allResults = this.removeFirstResultByKey(this.allResults, this.getResultStableKey(this.seedTrack));
       }
       this.updateResultsSlice();
-      this.loading = false;
-      queueMicrotask(() => {
-        this.initializePeaksForVisibleRows();
-      });
+      this.finishLoadingUi();
+      this.schedulePeaksInit();
     });
+  }
+
+  private startLoadingUi(): void {
+    this.loadingStartedAt = Date.now();
+    if (this.loadingEndTimerId !== null) {
+      clearTimeout(this.loadingEndTimerId);
+      this.loadingEndTimerId = null;
+    }
+  }
+
+  private finishLoadingUi(): void {
+    const elapsed = Date.now() - this.loadingStartedAt;
+    const remaining = Math.max(0, this.minLoadingMs - elapsed);
+    if (this.loadingEndTimerId !== null) {
+      clearTimeout(this.loadingEndTimerId);
+    }
+    this.loadingEndTimerId = window.setTimeout(() => {
+      this.loadingEndTimerId = null;
+      // Give the browser a chance to paint the results before removing the loader.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.loading = false;
+        });
+      });
+    }, remaining);
   }
 
   private extractSeedTrack(data: unknown): { inCatalog: boolean | null; track: any | null } {
@@ -184,14 +212,18 @@ export class SimilaritySearchComponent implements OnInit {
 
   ngAfterViewInit(): void {
     this.audioRefs.changes.subscribe(() => {
-      this.initializePeaksForVisibleRows();
+      this.schedulePeaksInit();
     });
     this.waveOverviewRefs.changes.subscribe(() => {
-      this.initializePeaksForVisibleRows();
+      this.schedulePeaksInit();
     });
   }
 
   ngOnDestroy(): void {
+    if (this.loadingEndTimerId !== null) {
+      clearTimeout(this.loadingEndTimerId);
+      this.loadingEndTimerId = null;
+    }
     this.destroyAllPeaks();
     this.clearSelectedVideo();
   }
@@ -276,7 +308,16 @@ export class SimilaritySearchComponent implements OnInit {
     this.destroyAllPeaks();
     this.waveformErrors.clear();
     this.updateResultsSlice();
-    setTimeout(() => {
+    this.schedulePeaksInit();
+  }
+
+  private schedulePeaksInit(): void {
+    if (this.peaksInitTimerId !== null) {
+      clearTimeout(this.peaksInitTimerId);
+    }
+    // Let Angular render first, then initialize Peaks to avoid blocking initial paint.
+    this.peaksInitTimerId = window.setTimeout(() => {
+      this.peaksInitTimerId = null;
       void this.initializePeaksForVisibleRows();
     }, 0);
   }
@@ -295,6 +336,16 @@ export class SimilaritySearchComponent implements OnInit {
     }
     this.pageNumber = this.pageNumber + 1;
     this.handlePageChange();
+  }
+
+  get displayTotalCount(): number {
+    const fetched = this.allResults?.length ?? 0;
+    const total = this.totalCount ?? 0;
+    // Some backends return `count` as page_size; prefer the fetched count in that case.
+    if (total > 0 && total < fetched) {
+      return fetched;
+    }
+    return total > 0 ? total : fetched;
   }
 
   private updateResultsSlice(): void {
@@ -361,21 +412,21 @@ export class SimilaritySearchComponent implements OnInit {
     if (id === 1) return 'ArtistPromo';
     if (id === 2) return 'PreClear';
     if (id === 3) return 'Bid2Clear';
-    return 'PreClear';
+    return 'ArtistPromo';
   }
 
   getTierClass(track: any): string {
     const id = this.getPriceId(track);
     if (id === 1) return 'pt2-icon-tier--artistpromo';
     if (id === 3) return 'pt2-icon-tier--bid2clear';
-    return 'pt2-icon-tier--preclear';
+    return 'pt2-icon-tier--artistpromo';
   }
 
   getResultThemeClass(track: any): string {
     const id = this.getPriceId(track);
     if (id === 1) return 'result-theme--artistpromo';
     if (id === 3) return 'result-theme--bid2clear';
-    return 'result-theme--preclear';
+    return 'result-theme--artistpromo';
   }
 
   getCountryFlagUrl(code2: string): string {
@@ -400,12 +451,19 @@ export class SimilaritySearchComponent implements OnInit {
     }
 
     this.clearSelectedVideo();
+    this.searchQuery = '';
+    this.searchControl.setValue('', { emitEvent: false });
+    this.showDropdown = false;
+    this.showSearchInfo = false;
 
     this.errorMsg = null;
     this.selectedVideoFile = file;
     this.selectedVideoName = file.name;
     this.selectedVideoUrl = URL.createObjectURL(file);
     this.showSearchInfo = false;
+
+    // Allow selecting the same file again.
+    input.value = '';
   }
 
   clearSelectedVideo(): void {
@@ -599,11 +657,20 @@ export class SimilaritySearchComponent implements OnInit {
       return null;
     }
     const record = data as Record<string, unknown>;
-    const directCandidates = ['count', 'total', 'total_count', 'totalResults', 'total_results'];
-    for (const key of directCandidates) {
+    const preferred = ['total_count', 'total_results', 'totalResults', 'total_results_count', 'total'];
+    for (const key of preferred) {
       const value = record[key];
       if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
         return value;
+      }
+    }
+
+    // `count` is ambiguous (can be page_size). Only trust it if it doesn't look like a page count.
+    const count = record['count'];
+    if (typeof count === 'number' && Number.isFinite(count) && count >= 0) {
+      const pageSize = Number(record['page_size'] ?? record['pageSize']);
+      if (!Number.isFinite(pageSize) || pageSize <= 0 || count > pageSize) {
+        return count;
       }
     }
 
@@ -1281,6 +1348,10 @@ export class SimilaritySearchComponent implements OnInit {
     this.trackTimes.clear();
     this.timerRafIds.forEach((rafId) => cancelAnimationFrame(rafId));
     this.timerRafIds.clear();
+    if (this.peaksInitTimerId !== null) {
+      clearTimeout(this.peaksInitTimerId);
+      this.peaksInitTimerId = null;
+    }
   }
 
   private isSupportedMediaUrl(inputUrl: string): boolean {
