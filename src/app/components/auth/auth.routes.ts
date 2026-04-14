@@ -49,7 +49,16 @@ export const AUTH_ROUTES: Routes = [
         ],
     },      
     {
-        path: 'club', // Esto hará que la ruta sea /auth/club/sign-up
+        // Backwards-compat: keep old "club" URLs working.
+        path: 'club',
+        children: [
+          { path: authRoutesNames.EMPTY, redirectTo: '/auth/cfmontreal/sign-in', pathMatch: 'full' },
+          { path: authRoutesNames.SIGNIN, redirectTo: '/auth/cfmontreal/sign-in', pathMatch: 'full' },
+          { path: authRoutesNames.SIGNUP, redirectTo: '/auth/cfmontreal/sign-up', pathMatch: 'full' },
+        ],
+    },
+    {
+        path: 'cfmontreal', // Esto hará que la ruta sea /auth/cfmontreal/sign-in
         loadComponent: () => import('./auth-club-layout/auth-club-layout.component').then(c => c.AuthClubLayoutComponent),
         children: [
         {
