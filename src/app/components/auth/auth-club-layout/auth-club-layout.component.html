@@ -1,19 +1,21 @@
-<section class="auth-club-layout montreal-theme">
+<section class="auth-club-layout">
   <div class="auth-club-layout__panel auth-club-layout__panel--promo">
     <div class="auth-club-layout__promo">
       <div class="auth-club-layout__promo-art">
         <img
           class="auth-club-layout__promo-image"
-          src="assets/images/icons/Montreal.png"
-          alt="CF Montréal" />
+          [src]="promoImageSrc"
+          [alt]="promoImageAlt" />
       </div>
-      <div class="auth-club-layout__promo-tagline">TOUS ENSEMBLE, DROIT DEVANT</div>
+      <div class="auth-club-layout__promo-tagline">{{ promoTagline }}</div>
     </div>
   </div>
   <div class="auth-club-layout__panel auth-club-layout__panel--dark">
     <div class="auth-club-layout__content">
       <router-outlet />
     </div>
+
+    <img src="../../../../assets/images/clubs/gdl/chivas.png" alt="">
 
   </div>
 </section>
