@@ -86,6 +86,7 @@ export class SimilaritySearchComponent implements OnInit {
   allResults: any[] = [];
   private artistCountryFilterCode2: string | null = null;
   noPlayerMatchLabel: string | null = null;
+  optimizationResetKey = 0;
   private lastSearchRequest: { type: 'url' | 'prompt' | 'video'; query?: string; file?: File } | null = null;
   lastSearchLabel = '';
   globalFileWav: string | null = null;
@@ -164,10 +165,33 @@ export class SimilaritySearchComponent implements OnInit {
 
   onOptimizationSelected(selection: string): void {
     const value = (selection ?? '').toString().trim();
-    if (!value || value === 'team') {
+    if (!value) {
       this.artistCountryFilterCode2 = null;
       this.noPlayerMatchLabel = null;
+      this.optimizationResetKey++;
       this.applyCountryFilter();
+      this.pageNumber = 1;
+      this.handlePageChange();
+      return;
+    }
+
+    if (value === 'team') {
+      const teamCountry = (this.brandingService.getActiveBranding().countryCode2 ?? '').toString().trim().toUpperCase();
+      this.artistCountryFilterCode2 = teamCountry || null;
+      this.noPlayerMatchLabel = null;
+
+      const next = this.getFilteredResultsOrNull();
+      if (!next) {
+        this.artistCountryFilterCode2 = null;
+        this.noPlayerMatchLabel = 'No matches for Team.';
+        this.optimizationResetKey++;
+        this.applyCountryFilter();
+        this.pageNumber = 1;
+        this.handlePageChange();
+        return;
+      }
+
+      this.allResults = next;
       this.pageNumber = 1;
       this.handlePageChange();
       return;
@@ -181,7 +205,11 @@ export class SimilaritySearchComponent implements OnInit {
     if (!next) {
       this.artistCountryFilterCode2 = null;
       this.noPlayerMatchLabel = `No matches for ${player?.name ?? 'selected player'}.`;
-      // Keep the current results as-is.
+      // Behave like "Clear optimization": restore the unfiltered results, but show the label.
+      this.optimizationResetKey++;
+      this.applyCountryFilter();
+      this.pageNumber = 1;
+      this.handlePageChange();
       return;
     }
 
