@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, SimpleChanges, inject } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { TeamBrandingService } from '../../../../../../services/team-branding.service';
 
@@ -19,6 +19,7 @@ export class TeamPlayerOptimizationComponent {
   @Input() totalCount: number = 0;
   @Input() label: string = '';
   @Input() players: TeamPlayerOption[] = [];
+  @Input() resetKey = 0;
 
   @Output() optionSelected = new EventEmitter<string>();
 
@@ -51,6 +52,13 @@ export class TeamPlayerOptimizationComponent {
 
   toggleOpen(): void {
     this.isOpen = !this.isOpen;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['resetKey'] && !changes['resetKey'].firstChange) {
+      this.selectedMode = null;
+      this.selectedPlayer = null;
+    }
   }
 
   get activeTeamName(): string {
