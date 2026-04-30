@@ -1,0 +1,80 @@
+<div class="tpo" *ngIf="label">
+  <div class="tpo__summary">
+    <span class="tpo__count">{{ totalCount }} Results for </span>
+    <ng-container *ngIf="formattedLabel.quoted; else unquoted">
+      <span class="tpo__quote">"</span>
+      <span class="tpo__label">{{ label }}</span>
+      <span class="tpo__quote">"</span>
+    </ng-container>
+    <ng-template #unquoted>
+      <span class="tpo__label">{{ label }}</span>
+    </ng-template>
+  </div>
+
+  <div data-property-1="default" data-property-2="dropdown" data-property-3="none" class="tpo__dropdown-root">
+    <button
+      type="button"
+      class="tpo__trigger"
+      [class.tpo__trigger--open]="isOpen"
+      [attr.data-property-1]="'button'"
+      [attr.data-property-2]="isOpen ? 'trigger/expanded' : 'trigger'"
+      (click)="toggleOpen()"
+      [attr.aria-expanded]="isOpen"
+      aria-haspopup="listbox">
+      <div class="tpo__trigger-row">
+        <div class="tpo__trigger-title">Optimize Audience</div>
+        <div class="tpo__trigger-arrow" [class.tpo__trigger-arrow--expanded]="isOpen" aria-hidden="true">
+          <div class="tpo__trigger-arrow-shape"></div>
+        </div>
+      </div>
+    </button>
+
+    <span class="tpo__selection-pill" *ngIf="selectedOptimizationLabel as selected">{{ selected }}</span>
+
+    <div class="tpo__menu" *ngIf="isOpen" role="listbox">
+      <div class="tpo__menu-header">
+        <div class="tpo__menu-header-text">Optimize for</div>
+      </div>
+
+      <div class="tpo__menu-body">
+        <button type="button" class="tpo__menu-btn tpo__menu-btn--team" data-property-1="button" data-property-2="team" (click)="setMode('team')">
+          <div class="tpo__radio">
+            <div class="tpo__radio-box" [class.tpo__radio-box--active]="selectedMode === 'team'"></div>
+          </div>
+          <div class="tpo__menu-copy">
+            <div class="tpo__menu-title">Team</div>
+            <div class="tpo__menu-subtitle">{{ activeTeamName }}</div>
+          </div>
+        </button>
+
+        <button type="button" class="tpo__menu-btn tpo__menu-btn--player" data-property-1="button" data-property-2="player" (click)="setMode('player')">
+          <div class="tpo__radio">
+            <div class="tpo__radio-box" [class.tpo__radio-box--active]="selectedMode === 'player'"></div>
+          </div>
+          <div class="tpo__menu-copy">
+            <div class="tpo__menu-title">{{ selectedPlayer ? selectedPlayer.name : 'Player…' }}</div>
+          </div>
+        </button>
+
+        <div class="tpo__players" *ngIf="selectedMode === 'player'">
+          <button
+            type="button"
+            class="tpo__player-item"
+            *ngFor="let player of players"
+            (click)="selectPlayer(player)">
+            <span class="tpo__player-name">{{ player.name }}</span>
+            <span class="tpo__player-flag">{{ toFlagEmoji(player.countryCode2 ?? '') }}</span>
+          </button>
+          <div class="tpo__players-empty" *ngIf="(players?.length ?? 0) === 0">
+            No players yet
+          </div>
+        </div>
+
+        <button type="button" class="tpo__menu-btn tpo__menu-btn--clear" data-property-1="clear" data-property-2="default" (click)="clearOptimization()">
+          <div class="tpo__clear-icon" aria-hidden="true"></div>
+          <div class="tpo__clear-text">Clear optimization</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

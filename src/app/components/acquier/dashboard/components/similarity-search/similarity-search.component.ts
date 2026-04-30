@@ -7,6 +7,9 @@ import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
 import { LicenseComponent } from '../license/license.component';
+import { TeamPlayerOptimizationComponent } from './team-player-optimization/team-player-optimization.component';
+import { TeamPlayersService, TeamPlayerDto } from '../../../../../services/team-players.service';
+import { TeamBrandingService } from '../../../../../services/team-branding.service';
 interface Suggestion {
   icon: string;
   type: string;
@@ -26,7 +29,7 @@ interface SpotifyTrackInfo {
 @Component({
   selector: 'acrylic-similarity-search',
   standalone: true,
-  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule],
+  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule, TeamPlayerOptimizationComponent],
   templateUrl: './similarity-search.component.html',
   styleUrls: ['./similarity-search.component.base.scss', './similarity-search.component.scss']
 })
@@ -39,6 +42,8 @@ export class SimilaritySearchComponent implements OnInit {
   
   private similarityService = inject(SimilarityUrlService);
   private modalService = inject(ModalService);
+  private teamPlayersService = inject(TeamPlayersService);
+  private brandingService = inject(TeamBrandingService);
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
     { offset: 94.208, duration: 44.184 },
@@ -77,7 +82,10 @@ export class SimilaritySearchComponent implements OnInit {
   pageNumber = 1;
   totalCount: number | null = null;
   maxPrefetchResults = 30;
+  allResultsRaw: any[] = [];
   allResults: any[] = [];
+  private artistCountryFilterCode2: string | null = null;
+  noPlayerMatchLabel: string | null = null;
   private lastSearchRequest: { type: 'url' | 'prompt' | 'video'; query?: string; file?: File } | null = null;
   lastSearchLabel = '';
   globalFileWav: string | null = null;
@@ -101,10 +109,12 @@ export class SimilaritySearchComponent implements OnInit {
   aimsStatusCode: number | null = null;
   seedTrack: any | null = null;
   seedInCatalog: boolean | null = null;
+  teamPlayers: Array<{ id: string; name: string; countryCode2?: string | null }> = [];
   @ViewChildren('audioRef') private audioRefs!: QueryList<ElementRef<HTMLAudioElement>>;
   @ViewChildren('waveOverviewRef') private waveOverviewRefs!: QueryList<ElementRef<HTMLDivElement>>;
 
   ngOnInit() {
+    this.loadClubPlayers();
     this.manualSearch$.pipe(
       tap(() => {
         this.startLoadingUi();
@@ -131,7 +141,7 @@ export class SimilaritySearchComponent implements OnInit {
       this.destroyAllPeaks();
       this.waveformErrors.clear();
       this.globalFileWav = this.extractGlobalFileWav(data);
-      this.allResults = this.dedupeResults(payload.results);
+      this.allResultsRaw = this.dedupeResults(payload.results);
       this.totalCount = this.extractTotalCount(data);
       this.spotifyTrack = this.extractSpotifyTrack(data);
       this.existsInDb = this.extractExistsInDb(data);
@@ -143,11 +153,88 @@ export class SimilaritySearchComponent implements OnInit {
         this.existsInDb = this.seedInCatalog;
       }
       if (this.seedTrack) {
-        this.allResults = this.removeFirstResultByKey(this.allResults, this.getResultStableKey(this.seedTrack));
+        this.allResultsRaw = this.removeFirstResultByKey(this.allResultsRaw, this.getResultStableKey(this.seedTrack));
       }
+      this.applyCountryFilter();
       this.updateResultsSlice();
       this.finishLoadingUi();
       this.schedulePeaksInit();
+    });
+  }
+
+  onOptimizationSelected(selection: string): void {
+    const value = (selection ?? '').toString().trim();
+    if (!value || value === 'team') {
+      this.artistCountryFilterCode2 = null;
+      this.noPlayerMatchLabel = null;
+      this.applyCountryFilter();
+      this.pageNumber = 1;
+      this.handlePageChange();
+      return;
+    }
+
+    const player = this.teamPlayers.find((p) => p.id === value);
+    this.artistCountryFilterCode2 = (player?.countryCode2 ?? null)?.toString().trim().toUpperCase() || null;
+    this.noPlayerMatchLabel = null;
+
+    const next = this.getFilteredResultsOrNull();
+    if (!next) {
+      this.artistCountryFilterCode2 = null;
+      this.noPlayerMatchLabel = `No matches for ${player?.name ?? 'selected player'}.`;
+      // Keep the current results as-is.
+      return;
+    }
+
+    this.allResults = next;
+    this.pageNumber = 1;
+    this.handlePageChange();
+  }
+
+  private applyCountryFilter(): void {
+    const next = this.getFilteredResultsOrNull();
+    if (!next) {
+      this.allResults = this.allResultsRaw;
+      return;
+    }
+    this.allResults = next;
+  }
+
+  private getFilteredResultsOrNull(): any[] | null {
+    const filter = (this.artistCountryFilterCode2 ?? '').toString().trim().toUpperCase();
+    if (!filter) {
+      return this.allResultsRaw;
+    }
+    // Keep tracks without country info ("lo dejamos") while filtering by player origin.
+    const filtered = (this.allResultsRaw ?? []).filter((r) => {
+      const code2 = (r?.artist_country_code2 ?? '').toString().trim().toUpperCase();
+      return !code2 || code2 === filter;
+    });
+    // If nothing matches (and none are missing country), do not apply.
+    const hasAny = filtered.length > 0;
+    if (!hasAny) {
+      return null;
+    }
+    return filtered;
+  }
+
+  private loadClubPlayers(): void {
+    const slug = this.brandingService.getStoredTeamSlugOrNull();
+    if (!slug) {
+      this.teamPlayers = [];
+      return;
+    }
+
+    this.teamPlayersService.getTeamPlayers(slug).pipe(
+      map((resp) => Array.isArray(resp?.players) ? resp.players : []),
+      catchError(() => of([] as TeamPlayerDto[])),
+    ).subscribe((players) => {
+      this.teamPlayers = players
+        .map((p) => ({
+          id: (p?.id ?? '').toString(),
+          name: (p?.name ?? '').toString(),
+          countryCode2: (p?.country_code2 ?? '').toString().trim().toUpperCase() || null,
+        }))
+        .filter((p) => !!p.id && !!p.name);
     });
   }
 
@@ -341,6 +428,9 @@ export class SimilaritySearchComponent implements OnInit {
   get displayTotalCount(): number {
     const fetched = this.allResults?.length ?? 0;
     const total = this.totalCount ?? 0;
+    if (this.artistCountryFilterCode2) {
+      return fetched;
+    }
     // Some backends return `count` as page_size; prefer the fetched count in that case.
     if (total > 0 && total < fetched) {
       return fetched;

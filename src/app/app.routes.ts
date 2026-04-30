@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { noAuthGuard } from './guards/no-auth.guard';
+import { activeTeamBrandingResolver } from './resolvers/active-team-branding.resolver';
 
 export const routesNames = {
   HOME: 'home',
@@ -50,6 +51,9 @@ export const routes: Routes = [
 
     path: routesNames.BRAND,
     loadComponent: () => import('./components/layout/acquier/layout-page/layout-page.component').then((c) => c.LayoutPageComponent),
+    resolve: {
+      branding: activeTeamBrandingResolver
+    },
     children:[
       {
         path: routesNames.EMPTY,
