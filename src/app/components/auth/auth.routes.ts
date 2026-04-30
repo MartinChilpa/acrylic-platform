@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { teamBrandingResolver } from '../../resolvers/team-branding.resolver';
 
 export const authRoutesNames = {
     EMPTY: '',
@@ -58,8 +59,12 @@ export const AUTH_ROUTES: Routes = [
         ],
     },
     {
-        path: 'cfmontreal', // Esto hará que la ruta sea /auth/cfmontreal/sign-in
+        path: ':teamSlug', // Esto hará que la ruta sea /auth/:teamSlug/sign-in
         loadComponent: () => import('./auth-club-layout/auth-club-layout.component').then(c => c.AuthClubLayoutComponent),
+        resolve: {
+            branding: teamBrandingResolver
+        },
+        runGuardsAndResolvers: 'always',
         children: [
         {
             path: 'sign-up', 
