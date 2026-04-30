@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 
 export interface TeamConfigDto {
   slug: string;
+  country_code2?: string | null;
   team_name: string;
   team_logo_url?: string | null;
   tagline?: string | null;

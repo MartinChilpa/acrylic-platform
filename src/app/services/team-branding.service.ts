@@ -3,6 +3,7 @@ import { TeamConfigDto } from './teams-config.service';
 
 export interface TeamBranding {
   slug: string;
+  countryCode2?: string | null;
   teamName: string;
   teamLogo: string;
   tagline: string;
@@ -29,6 +30,7 @@ const DEFAULT_TEAM_SLUG = 'cfmontreal';
 const TEAM_BRANDING: Record<string, TeamBranding> = {
   cfmontreal: {
     slug: 'cfmontreal',
+    countryCode2: 'CA',
     teamName: 'CF Montréal',
     teamLogo: 'assets/images/icons/logoMontreal.png',
     tagline: 'Tous ensemble, droit devant',
@@ -167,6 +169,7 @@ export class TeamBrandingService {
     const slug = (dto?.slug ?? '').toString().trim().toLowerCase() || DEFAULT_TEAM_SLUG;
     const fallback = this.getBranding(slug);
 
+    const countryCode2 = (dto?.country_code2 ?? '').toString().trim().toUpperCase() || fallback.countryCode2 || null;
     const teamName = (dto?.team_name ?? '').toString().trim() || fallback.teamName;
     const teamLogo =
       (dto?.team_logo_url ?? '').toString().trim() ||
@@ -184,6 +187,7 @@ export class TeamBrandingService {
     const branding: TeamBranding = {
       ...fallback,
       slug,
+      countryCode2,
       teamName,
       teamLogo,
       tagline,
