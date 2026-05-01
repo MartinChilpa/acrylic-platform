@@ -13,7 +13,7 @@ export class HeaderComponent {
   @Input() teamName: string = '';
   @Input() teamLogo: string = '';
   @Input() tagline: string = '';
-  @Input() primaryColor: string = '#003DA6';
+  @Input() primaryColor: string = '#AD46FF';
   @Input() secondaryColor: string = '#FFFFFF';
 
   get dynamicStyles() {
