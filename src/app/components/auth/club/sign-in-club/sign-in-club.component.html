@@ -1,7 +1,11 @@
 <form [formGroup]="signInForm" class="div-form">
     <div class="auth-header">
         <p class="auth-tagline-s">Sign in</p>
+        @if (teamName) {
         <p class="subtitle-auth">Sign in to continue to {{ teamName }} on Acrylic</p>
+        } @else {
+        <p class="subtitle-auth">Sign in to continue on Acrylic</p>
+        }
     </div>
     <ng-container>
         <div>

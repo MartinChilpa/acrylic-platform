@@ -552,6 +552,11 @@ export class SimilaritySearchComponent implements OnInit {
     return `https://flagcdn.com/16x12/${safe}.png`;
   }
 
+  getArtistCountryCode2(track: any): string | null {
+    const code2 = (track?.artist_country_code2 ?? '').toString().trim().toUpperCase();
+    return code2.length === 2 ? code2 : null;
+  }
+
   onVideoSelected(event: Event): void {
     const input = event.target as HTMLInputElement | null;
     if (!input) {

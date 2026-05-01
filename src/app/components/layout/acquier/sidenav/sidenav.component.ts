@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { acquierSidenavItems } from '../../../../utils/sidenav-item.utils';
 import { AuthService } from '../../../../services/auth.service';
+import { TeamBrandingService } from '../../../../services/team-branding.service';
 
 @Component({
   selector: 'acrylic-sidenav',
@@ -13,8 +14,17 @@ import { AuthService } from '../../../../services/auth.service';
 })
 export class SidenavComponent {
   private authService = inject(AuthService);
+  private brandingService = inject(TeamBrandingService);
   isExpanded = signal(false);
   navItems = acquierSidenavItems;
+
+  get teamName(): string {
+    return this.brandingService.getActiveBranding().teamName;
+  }
+
+  get teamLogo(): string {
+    return this.brandingService.getActiveBranding().teamLogo;
+  }
 
   @HostListener('mouseenter')
   onMouseEnter() {

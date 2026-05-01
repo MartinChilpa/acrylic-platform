@@ -25,9 +25,32 @@ export interface TeamBranding {
   };
 }
 
-const DEFAULT_TEAM_SLUG = 'cfmontreal';
+const DEFAULT_TEAM_SLUG = 'default';
 
 const TEAM_BRANDING: Record<string, TeamBranding> = {
+  default: {
+    slug: 'default',
+    countryCode2: null,
+    teamName: 'Acrylic',
+    teamLogo: 'assets/images/logos/acrylic-short.png',
+    tagline: '',
+    primaryColor: '#AD46FF',
+    secondaryColor: '#FFFFFF',
+    authPromo: {
+      imageSrc: 'assets/images/logos/acrylic-short.png',
+      imageAlt: 'Acrylic',
+      tagline: '',
+      bodyClass: 'bg-primary-gradient'
+    },
+    sidenav: {
+      background: '#000000',
+      border: '#404040',
+      activeBackground: '#262626',
+      activeBorder: '#FFFFFF',
+      text: '#E5E5E5',
+      mutedText: '#A3A3A3'
+    }
+  },
   cfmontreal: {
     slug: 'cfmontreal',
     countryCode2: 'CA',
