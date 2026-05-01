@@ -124,7 +124,14 @@
               <img class="thumb-image" [src]="getTrackImage(seed)" [alt]="seed.track_name || 'Track thumbnail'" />
               <div class="pte1">
                 <div class="title-line">
-                  <span>{{ seed.track_name || seed.name || 'Sin titulo' }}</span>
+                  <div class="title-line__left">
+                    <span>{{ seed.track_name || seed.name || 'Sin titulo' }}</span>
+                    <img
+                      *ngIf="getArtistCountryCode2(seed) as code2"
+                      class="country-flag"
+                      [src]="getCountryFlagUrl(code2)"
+                      [alt]="code2 + ' flag'" />
+                  </div>
                 </div>
 
                 <div class="div-subtitle">
@@ -430,7 +437,14 @@
             <img class="thumb-image" [src]="getTrackImage(result)" [alt]="result.track_name || 'Track thumbnail'" />
             <div class="pte1">
               <div class="title-line">
-                <span>{{ result.track_name || result.name || 'Sin titulo' }}</span>
+                <div class="title-line__left">
+                  <span>{{ result.track_name || result.name || 'Sin titulo' }}</span>
+                  <img
+                    *ngIf="getArtistCountryCode2(result) as code2"
+                    class="country-flag"
+                    [src]="getCountryFlagUrl(code2)"
+                    [alt]="code2 + ' flag'" />
+                </div>
               </div>
 
               <div class="div-subtitle">

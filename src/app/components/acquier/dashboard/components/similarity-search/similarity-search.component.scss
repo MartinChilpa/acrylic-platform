@@ -45,6 +45,14 @@ $row-pad: 16px;
     font-family: ProximaNova;
 }
 
+.title-line__left {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
 .subtitle-artist{
     color: rgba(255, 255, 255, 0.60);
     font-size: 11px;
