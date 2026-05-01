@@ -25,10 +25,4 @@ export class TeamPlayersService {
     const slug = (teamSlug ?? '').toString().trim().toLowerCase();
     return this.http.get<TeamPlayersResponseDto>(`${this.TEAMS_API_URL}/${slug}/players/`);
   }
-
-  // Convenience method for the demo club.
-  getCfMontrealPlayers() {
-    return this.getTeamPlayers('cfmontreal');
-  }
 }
-

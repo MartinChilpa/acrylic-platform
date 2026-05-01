@@ -15,7 +15,7 @@ export class AuthClubLayoutComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private brandingService = inject(TeamBrandingService);
 
-  branding: TeamBranding = this.brandingService.getBranding('cfmontreal');
+  branding: TeamBranding = this.brandingService.getBranding(this.route.snapshot.paramMap.get('teamSlug'));
   promoImageSrc = this.branding.authPromo.imageSrc;
   promoImageAlt = this.branding.authPromo.imageAlt;
   promoTagline = this.branding.authPromo.tagline;

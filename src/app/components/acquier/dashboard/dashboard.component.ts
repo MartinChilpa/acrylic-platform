@@ -22,11 +22,12 @@ import { TeamBrandingService } from '../../../services/team-branding.service';
 export class DashboardComponent implements OnInit {
   private brandingService = inject(TeamBrandingService);
 
-  teamName = 'CF Montréal';
-  teamLogo = 'assets/images/icons/logoMontreal.png';
-  tagline = 'Tous ensemble, droit devant';
-  primaryColor = '#003DA6';
-  secondaryColor = '#FFFFFF';
+  private initialBranding = this.brandingService.getActiveBranding();
+  teamName = this.initialBranding.teamName;
+  teamLogo = this.initialBranding.teamLogo;
+  tagline = this.initialBranding.tagline;
+  primaryColor = this.initialBranding.primaryColor;
+  secondaryColor = this.initialBranding.secondaryColor;
 
   showLocalMusic = true;
 

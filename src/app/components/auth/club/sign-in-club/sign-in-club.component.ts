@@ -20,10 +20,10 @@ import { TeamBranding } from '../../../../services/team-branding.service';
   templateUrl: './sign-in-club.component.html',
   styleUrl: './sign-in-club.component.scss'
 })
-export class SignInClubComponent {
+export class SignInClubComponent implements OnInit {
   showPassword = false;
   signInForm!: FormGroup;
-  teamName = 'CF Montréal';
+  teamName = '';
 
   private _fb = inject(FormBuilder);
   private _authService = inject(AuthService);
@@ -41,7 +41,7 @@ export class SignInClubComponent {
     const resolvedBranding = this.route.parent?.snapshot.data['branding'] as TeamBranding | undefined;
     const teamSlug = this.route.parent?.snapshot.paramMap.get('teamSlug');
     const branding = resolvedBranding ?? this.brandingService.getBranding(teamSlug);
-    this.teamName = branding.teamName;
+    this.teamName = branding.slug === 'default' ? '' : branding.teamName;
   }
 
   signIn(): void {
@@ -51,7 +51,7 @@ export class SignInClubComponent {
       .subscribe({
         next: () => {
           this._alertService.success("Logged in successfully");
-          // For CF Montréal auth entrypoint, always land on Brand dashboard.
+          // For club auth entrypoints, always land on Brand dashboard.
           const teamSlug = this.route.parent?.snapshot.paramMap.get('teamSlug');
           if (teamSlug) {
             this.brandingService.setActiveTeamSlug(teamSlug);
