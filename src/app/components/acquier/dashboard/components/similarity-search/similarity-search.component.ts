@@ -812,6 +812,15 @@ export class SimilaritySearchComponent implements OnInit {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
   }
 
+  private formatUsdCents(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  }
+
   getTrackLicensePrice(track: any): string | null {
     const raw = Number(track?.price ?? track?.license_price ?? track?.price_amount);
     if (!Number.isFinite(raw) || raw <= 0) return null;
@@ -825,7 +834,7 @@ export class SimilaritySearchComponent implements OnInit {
     const addOn = this.paidMediaAddOn ? 300 : 0;
 
     if (isArtistPromo) {
-      return addOn > 0 ? this.formatUsd(addOn) : 'Free';
+      return addOn > 0 ? this.formatUsd(addOn) : this.formatUsdCents(0);
     }
 
     const baseAmount = Number.isFinite(base) && base > 0 ? base : 1500;
