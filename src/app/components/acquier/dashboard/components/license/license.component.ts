@@ -25,7 +25,7 @@ export class LicenseComponent {
     if (Number.isFinite(raw) && raw > 0) {
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(raw);
     }
-    return '$0.00';
+    return '$1,500';
   }
 
   get headline(): string {
