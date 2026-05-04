@@ -978,10 +978,10 @@ export class SimilaritySearchComponent implements OnInit {
 
   getFollowerBreakdown(track: any): Array<{ label: string; value: number; percent: number; color: string }> {
     const raw = [
-      { label: 'Spotify', value: Number(track?.spotify_followers ?? 0), color: '#22c55e' },
-      { label: 'TikTok', value: Number(track?.tiktok_followers ?? 0), color: '#f43f5e' },
-      { label: 'YouTube', value: Number(track?.youtube_followers ?? 0), color: '#ef4444' },
-      { label: 'Instagram', value: Number(track?.instagram_followers ?? 0), color: '#a855f7' }
+      { label: 'Spotify', value: Number(track?.spotify_followers ?? 0), color: '#E79888' },
+      { label: 'Instagram', value: Number(track?.instagram_followers ?? 0), color: '#8DC4C2' },
+      { label: 'YouTube', value: Number(track?.youtube_followers ?? 0), color: '#FFCC8F' },
+      { label: 'TikTok', value: Number(track?.tiktok_followers ?? 0), color: '#4B6095' }
     ].filter((item) => Number.isFinite(item.value) && item.value > 0);
 
     const total = raw.reduce((sum, item) => sum + item.value, 0);
