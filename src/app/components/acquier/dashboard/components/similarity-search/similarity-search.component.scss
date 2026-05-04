@@ -408,15 +408,6 @@ $row-pad: 16px;
   flex: 0 0 auto;
 }
 
-.followers-pie::after {
-  content: '';
-  position: absolute;
-  inset: 13px;
-  border-radius: 50%;
-  background: #161616;
-  border: 1px solid #2f2f2f;
-}
-
 .followers-legend {
   display: grid;
   flex-wrap: wrap;
