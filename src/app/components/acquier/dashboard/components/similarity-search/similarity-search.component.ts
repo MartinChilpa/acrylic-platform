@@ -830,7 +830,7 @@ export class SimilaritySearchComponent implements OnInit {
   getLicenseTotal(): string {
     const base = Number(this.licenseModalTrack?.price ?? this.licenseModalTrack?.license_price ?? this.licenseModalTrack?.price_amount);
     const id = this.getPriceId(this.licenseModalTrack);
-    const isArtistPromo = id === 1;
+    const isArtistPromo = this.getTierLabel(this.licenseModalTrack) === 'ArtistPromo' || id === 1;
     const addOn = this.paidMediaAddOn ? 300 : 0;
 
     if (isArtistPromo) {
