@@ -27,12 +27,13 @@
     </li>
   </ul>
 
-  <!-- FOOTER: Help + Team -->
-  <div class="sidenav__footer">
-    <a class="sidenav__item sidenav__item--help" href="#" >
-      <img src="assets/images/icons/help.png" alt="Sign out" class="sidenav__icon" />
-      <span class="sidenav__label">Question/Feedback</span>
-    </a>
+	  <!-- FOOTER: Help + Team -->
+	  <div class="sidenav__footer">
+	    <a class="sidenav__item sidenav__item--help disabled" href="#" aria-disabled="true" tabindex="-1">
+	      <img src="assets/images/icons/help.png" alt="Sign out" class="sidenav__icon" />
+	      <span class="sidenav__label">Question/Feedback</span>
+	      <span class="sidenav__badge">Coming Soon</span>
+	    </a>
 
     <a class="sidenav__item sidenav__item--help" href="#" (click)="$event.preventDefault(); signOut()">
       <img src="assets/images/icons/logOut.svg" alt="Sign out" class="sidenav__icon" />
