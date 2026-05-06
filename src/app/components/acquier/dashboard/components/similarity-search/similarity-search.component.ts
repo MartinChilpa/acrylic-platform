@@ -846,7 +846,7 @@ export class SimilaritySearchComponent implements OnInit {
     const id = this.getPriceId(track);
     if (id === 1) return 'Cost of license included in your subscription. No extra fee needed.';
     const price = this.getTrackLicensePrice(track);
-    return price ? `License price: ${price}` : 'Contact our team for pricing details.';
+    return price ? `License price: ${price}` : 'Cost of license included in your subscription. No extra fee needed.';
   }
 
 
