@@ -754,8 +754,8 @@
             <label class="license-modal__addon" [class.license-modal__addon--checked]="paidMediaAddOn">
               <input type="checkbox" [(ngModel)]="paidMediaAddOn" />
               <div class="license-modal__addon-body">
-                <div class="license-modal__addon-title">Paid Media Add-On</div>
-                <div class="license-modal__addon-subtitle">Extend usage for paid advertising campaigns</div>
+                <div class="license-modal__addon-title">Extended Commercial Use</div>
+                <div class="license-modal__addon-subtitle">Extend usage for a commercial campaign (ex: season tickets, co-branded campaign, new jersey or sponsor announcement)</div>
                 <div class="license-modal__addon-price">+ $300</div>
               </div>
             </label>
@@ -898,7 +898,13 @@
 
           <div class="license-modal__footer license-modal__footer--spread">
             <button type="button" class="license-modal__footer-link" data-bs-dismiss="modal" (click)="resetLicenseFlow()">Done</button>
-            <button type="button" class="license-modal__footer-primary" data-bs-dismiss="modal" (click)="resetLicenseFlow()">Download</button>
+            <button
+              type="button"
+              class="license-modal__footer-primary"
+              (click)="downloadLicensedTrack()"
+              [disabled]="downloadingLicensedTrack || !licensedTrack || !getTrackAudioUrl(licensedTrack)">
+              Download
+            </button>
           </div>
         </div>
       </div>
