@@ -6,6 +6,7 @@ import { catchError, expand, last, map, switchMap, tap } from 'rxjs/operators';
 import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
+import { AimsDownloadService } from '../../services/aims-download.service';
 import { LicenseComponent } from '../license/license.component';
 import { TeamPlayerOptimizationComponent } from './team-player-optimization/team-player-optimization.component';
 import { TeamPlayersService, TeamPlayerDto } from '../../../../../services/team-players.service';
@@ -41,6 +42,7 @@ export class SimilaritySearchComponent implements OnInit {
   @Output() searched = new EventEmitter<void>();
   
   private similarityService = inject(SimilarityUrlService);
+  private aimsDownloadService = inject(AimsDownloadService);
   private modalService = inject(ModalService);
   private teamPlayersService = inject(TeamPlayersService);
   private brandingService = inject(TeamBrandingService);
@@ -103,6 +105,7 @@ export class SimilaritySearchComponent implements OnInit {
   licensedTrack: any | null = null;
   paidMediaAddOn = false;
   generalTermsOpen = false;
+  downloadingLicensedTrack = false;
 
   spotifyTrack: SpotifyTrackInfo | null = null;
   existsInDb: boolean | null = null;
@@ -501,6 +504,92 @@ export class SimilaritySearchComponent implements OnInit {
     this.generalTermsOpen = false;
   }
 
+  downloadLicensedTrack(): void {
+    if (!this.licensedTrack) {
+      return;
+    }
+
+    const url = this.getTrackAudioUrl(this.licensedTrack);
+    if (!url) {
+      return;
+    }
+
+    if (this.downloadingLicensedTrack) {
+      return;
+    }
+
+    const filename = this.getTrackDownloadFilename(this.licensedTrack, url);
+    this.downloadingLicensedTrack = true;
+    this.aimsDownloadService.getPresignedDownloadUrl({ url, filename }).subscribe({
+      next: (presignedUrl) => {
+        if (!presignedUrl) {
+          this.errorMsg = 'No se pudo descargar el track.';
+          return;
+        }
+
+        this.triggerDownloadViaIframe(presignedUrl);
+
+        this.modalService.hideModal('track-licensed-modal');
+        this.resetLicenseFlow();
+      },
+      error: () => {
+        this.errorMsg = 'No se pudo descargar el track.';
+        this.downloadingLicensedTrack = false;
+      },
+      complete: () => {
+        this.downloadingLicensedTrack = false;
+      }
+    });
+  }
+
+  private triggerDownloadViaIframe(url: string): void {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    window.setTimeout(() => {
+      iframe.remove();
+    }, 60000);
+  }
+
+  private getTrackDownloadFilename(track: any, url: string): string {
+    const artist = (track?.artist_canonical ?? track?.artist ?? '').toString().trim();
+    const title = (track?.track_name ?? track?.track_name_track ?? track?.name ?? 'track').toString().trim();
+    const base = this.sanitizeFilename(artist ? `${artist} - ${title}` : title) || 'track';
+    const ext = this.extractFileExtension(url) ?? '.wav';
+    return base.toLowerCase().endsWith(ext.toLowerCase()) ? base : `${base}${ext}`;
+  }
+
+  private sanitizeFilename(value: string): string {
+    return (value ?? '')
+      .replace(/[\u0000-\u001f\u007f]+/g, '')
+      .replace(/[\\/:*?"<>|]+/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 120);
+  }
+
+  private extractFileExtension(url: string): string | null {
+    try {
+      const resolved = new URL(url, window.location.href);
+      const last = (resolved.pathname.split('/').pop() ?? '').trim();
+      const dot = last.lastIndexOf('.');
+      if (dot <= 0) {
+        return null;
+      }
+      const ext = last.slice(dot);
+      if (ext.length < 2 || ext.length > 6) {
+        return null;
+      }
+      if (!/^\.[a-z0-9]+$/i.test(ext)) {
+        return null;
+      }
+      return ext.toLowerCase();
+    } catch {
+      return null;
+    }
+  }
+
   toggleGeneralTerms(): void {
     this.generalTermsOpen = !this.generalTermsOpen;
   }
@@ -846,7 +935,7 @@ export class SimilaritySearchComponent implements OnInit {
     const id = this.getPriceId(track);
     if (id === 1) return 'Cost of license included in your subscription. No extra fee needed.';
     const price = this.getTrackLicensePrice(track);
-    return price ? `License price: ${price}` : 'Contact our team for pricing details.';
+    return price ? `License price: ${price}` : 'Cost of license included in your subscription. No extra fee needed.';
   }
 
 
