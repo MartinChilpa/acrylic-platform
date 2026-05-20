@@ -1334,38 +1334,56 @@ export class SimilaritySearchComponent implements OnInit {
     return this.playingTrackKeys.has(this.getTrackKey(track, index));
   }
 
-  toggleTrackPlayback(track: any, index: number): void {
-    const key = this.getTrackKey(track, index);
-    const audioElement = this.audioRefs?.find(ref => ref.nativeElement.dataset['trackKey'] === key)?.nativeElement;
-    if (!audioElement) {
-      return;
-    }
+private currentAudioElement: HTMLAudioElement | null = null;
+private currentTrackKey: string | null = null;
 
-    if (audioElement.paused) {
-      this.playingTrackKeys.add(key);
-      void audioElement.play().catch(() => {
-        this.playingTrackKeys.delete(key);
-      });
-      return;
-    }
-    this.playingTrackKeys.delete(key);
+toggleTrackPlayback(track: any, index: number): void { 
+  const key = this.getTrackKey(track, index); 
+  const audioElement = this.audioRefs?.find(ref => ref.nativeElement.dataset['trackKey'] === key)?.nativeElement; 
+  
+  if (!audioElement) { return; }
+
+  // SI SE REPRODUCE UNA CANCIÓN DISTINTA: Pausamos la que estaba sonando antes
+  if (this.currentAudioElement && this.currentAudioElement !== audioElement) {
+    this.currentAudioElement.pause(); // Esto disparará automáticamente 'onTrackAudioPause' de la canción anterior
+  }
+
+  // Lógica normal de toggle (reproducir/pausar)
+  if (audioElement.paused) {
+    audioElement.play();
+  } else {
     audioElement.pause();
   }
+}
 
-  onTrackAudioPlay(track: any, index: number, event: Event): void {
-    const key = this.getTrackKey(track, index);
-    this.playingTrackKeys.add(key);
-    const audio = event.target as HTMLAudioElement | null;
-    if (audio) {
-      this.startTimerLoop(key, audio);
-    }
-  }
+onTrackAudioPlay(track: any, index: number, event: Event): void { 
+  const key = this.getTrackKey(track, index); 
+  const audio = event.target as HTMLAudioElement | null; 
+  
+  if (audio) { 
+    // Guardamos la referencia de la canción que empieza a sonar ahora
+    this.currentAudioElement = audio;
+    this.currentTrackKey = key;
 
-  onTrackAudioPause(track: any, index: number): void {
-    const key = this.getTrackKey(track, index);
-    this.playingTrackKeys.delete(key);
-    this.stopTimerLoop(key);
+    // Si manejabas un Set de llaves reproduciéndose, lo ideal es limpiarlo para que solo tenga una
+    this.playingTrackKeys.clear(); 
+    this.playingTrackKeys.add(key); 
+    
+    this.startTimerLoop(key, audio); 
+  } 
+} 
+
+onTrackAudioPause(track: any, index: number): void { 
+  const key = this.getTrackKey(track, index); 
+  this.playingTrackKeys.delete(key); 
+  this.stopTimerLoop(key); 
+
+  // Si la canción que se pausó es la actual, limpiamos las referencias
+  if (this.currentTrackKey === key) {
+    this.currentAudioElement = null;
+    this.currentTrackKey = null;
   }
+}
 
   onTrackAudioTimeUpdate(track: any, index: number, event: Event): void {
     const audio = event.target as HTMLAudioElement | null;
