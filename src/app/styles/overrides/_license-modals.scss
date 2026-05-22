@@ -534,10 +534,13 @@
 
 /* ── Copy Tags button ── */
 .license-modal__copy-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  margin-top: 12px;
+  width: 100%;
+  max-width: 220px;
+  margin: 12px auto 0;
   height: 34px;
   padding: 0 14px;
   border-radius: 8px;
@@ -548,11 +551,18 @@
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s, color 0.15s;
 
   &:hover {
     background: rgba(65, 108, 69, 0.18);
   }
+}
+
+.license-modal__copy-btn--copied {
+  border-color: rgba(110, 224, 122, 0.85);
+  background: rgba(65, 108, 69, 0.30);
+  color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(110, 224, 122, 0.16);
 }
 
 /* ── License Details card ── */
