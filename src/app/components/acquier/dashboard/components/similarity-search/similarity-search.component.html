@@ -860,13 +860,25 @@
               <div class="license-modal__tagging-subtitle">
                 For optimal reach & attribution, copy tags and use each platform's tagging feature.
               </div>
-              <button type="button" class="license-modal__copy-btn" (click)="copyTags()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M9 9h10v10H9V9Z" stroke="currentColor" stroke-width="1.6" />
-                  <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.6" />
-                </svg>
-                <span>Copy Tags</span>
+              <button
+                type="button"
+                class="license-modal__copy-btn"
+                [class.license-modal__copy-btn--copied]="tagsCopied"
+                (click)="copyTags()">
+                <ng-container *ngIf="tagsCopied; else copyIcon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </ng-container>
+                <ng-template #copyIcon>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M9 9h10v10H9V9Z" stroke="currentColor" stroke-width="1.6" />
+                    <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.6" />
+                  </svg>
+                </ng-template>
+                <span>{{ tagsCopied ? 'Copied' : 'Copy Tags' }}</span>
               </button>
+              
             </div>
 
             <div class="license-modal__license-details">
