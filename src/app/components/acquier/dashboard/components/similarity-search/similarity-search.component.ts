@@ -106,6 +106,8 @@ export class SimilaritySearchComponent implements OnInit {
   paidMediaAddOn = false;
   generalTermsOpen = false;
   downloadingLicensedTrack = false;
+  tagsCopied = false;
+  private tagsCopiedTimerId: number | null = null;
 
   spotifyTrack: SpotifyTrackInfo | null = null;
   existsInDb: boolean | null = null;
@@ -341,6 +343,10 @@ export class SimilaritySearchComponent implements OnInit {
       clearTimeout(this.loadingEndTimerId);
       this.loadingEndTimerId = null;
     }
+    if (this.tagsCopiedTimerId !== null) {
+      clearTimeout(this.tagsCopiedTimerId);
+      this.tagsCopiedTimerId = null;
+    }
     this.destroyAllPeaks();
     this.clearSelectedVideo();
   }
@@ -502,6 +508,11 @@ export class SimilaritySearchComponent implements OnInit {
     this.licensedTrack = null;
     this.paidMediaAddOn = false;
     this.generalTermsOpen = false;
+    this.tagsCopied = false;
+    if (this.tagsCopiedTimerId !== null) {
+      clearTimeout(this.tagsCopiedTimerId);
+      this.tagsCopiedTimerId = null;
+    }
   }
 
   downloadLicensedTrack(): void {
@@ -595,16 +606,101 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   copyTags(): void {
-    const artist = this.licensedTrack?.artist_canonical ?? '';
-    const track = this.licensedTrack?.track_name ?? this.licensedTrack?.track_name_track ?? '';
-    const tier = this.getTierLabel(this.licensedTrack);
-    const text = `Artist: ${artist}\nTrack: ${track}\nTier: ${tier}`.trim();
+    const handle = this.normalizeInstagramHandle(
+      this.licensedTrack?.instagram_url
+      ?? this.licensedTrack?.instagram
+      ?? this.licensedTrack?.instagram_handle
+      ?? this.licensedTrack?.instagram_username
+    );
+    const text = handle ? `@${handle}` : this.buildDefaultLicenseTagsText();
 
     try {
-      navigator.clipboard?.writeText?.(text);
+      const write = navigator.clipboard?.writeText?.bind(navigator.clipboard);
+      if (write) {
+        const result = write(text) as unknown;
+        if (result && typeof (result as Promise<void>).then === 'function') {
+          (result as Promise<void>)
+            .then(() => this.showTagsCopied())
+            .catch(() => {
+              if (this.legacyCopyText(text)) {
+                this.showTagsCopied();
+              }
+            });
+          return;
+        }
+        this.showTagsCopied();
+        return;
+      }
+
+      if (this.legacyCopyText(text)) {
+        this.showTagsCopied();
+      }
     } catch {
       // best-effort only
     }
+  }
+
+  private showTagsCopied(): void {
+    this.tagsCopied = true;
+    if (this.tagsCopiedTimerId !== null) {
+      clearTimeout(this.tagsCopiedTimerId);
+    }
+    this.tagsCopiedTimerId = window.setTimeout(() => {
+      this.tagsCopiedTimerId = null;
+      this.tagsCopied = false;
+    }, 1800);
+  }
+
+  private legacyCopyText(text: string): boolean {
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', 'true');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const ok = document.execCommand?.('copy') ?? false;
+      document.body.removeChild(textarea);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+
+  private buildDefaultLicenseTagsText(): string {
+    const artist = this.licensedTrack?.artist_canonical ?? '';
+    const track = this.licensedTrack?.track_name ?? this.licensedTrack?.track_name_track ?? '';
+    const tier = this.getTierLabel(this.licensedTrack);
+    return `Artist: ${artist}\nTrack: ${track}\nTier: ${tier}`.trim();
+  }
+
+  private normalizeInstagramHandle(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+    let v = value.trim();
+    if (!v) {
+      return null;
+    }
+
+    try {
+      if (/^https?:\/\//i.test(v)) {
+        const u = new URL(v);
+        v = (u.pathname.split('/').filter(Boolean)[0] ?? '').trim();
+      }
+    } catch {
+      // ignore
+    }
+
+    v = v.replace(/^@+/, '').trim();
+    if (!v) {
+      return null;
+    }
+
+    const normalized = v.replace(/[^a-z0-9._]/gi, '').slice(0, 30);
+    return normalized.length > 0 ? normalized : null;
   }
 
 
