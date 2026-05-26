@@ -37,7 +37,7 @@
       </div>
 
       <div class="tpo__menu-body">
-        <button type="button" class="tpo__menu-btn tpo__menu-btn--team" data-property-1="button" data-property-2="team" (click)="setMode('team')">
+        <button *ngIf="!useCountriesLabel" type="button" class="tpo__menu-btn tpo__menu-btn--team" data-property-1="button" data-property-2="team" (click)="setMode('team')">
           <div class="tpo__radio">
             <div class="tpo__radio-box" [class.tpo__radio-box--active]="selectedMode === 'team'"></div>
           </div>
@@ -52,7 +52,7 @@
             <div class="tpo__radio-box" [class.tpo__radio-box--active]="selectedMode === 'player'"></div>
           </div>
           <div class="tpo__menu-copy">
-            <div class="tpo__menu-title">{{ selectedPlayer ? selectedPlayer.name : (isLfpUser ? 'Countries…' : 'Player…') }}</div>
+            <div class="tpo__menu-title">{{ selectedPlayer ? selectedPlayer.name : (useCountriesLabel ? 'Countries…' : 'Player…') }}</div>
           </div>
         </button>
 

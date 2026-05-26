@@ -1,7 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, Output, SimpleChanges, inject } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { TeamBrandingService } from '../../../../../../services/team-branding.service';
-import { AuthService } from '../../../../../../services/auth.service';
 
 export interface TeamPlayerOption {
   id: string;
@@ -21,11 +20,12 @@ export class TeamPlayerOptimizationComponent {
   @Input() label: string = '';
   @Input() players: TeamPlayerOption[] = [];
   @Input() resetKey = 0;
+  // Team slugs that should show "Countries…" instead of "Player…"
+  @Input() countriesLabelTeamSlugs: string[] = ['lfp'];
 
   @Output() optionSelected = new EventEmitter<string>();
 
   private brandingService = inject(TeamBrandingService);
-  private authService = inject(AuthService);
 
   isOpen = false;
   selectedMode: 'team' | 'player' | null = null;
@@ -67,8 +67,10 @@ export class TeamPlayerOptimizationComponent {
     return this.brandingService.getActiveBranding().teamName || 'Team';
   }
 
-  get isLfpUser(): boolean {
-    return this.authService.userType.trim().toUpperCase() === 'LFP';
+  get useCountriesLabel(): boolean {
+    const slug = this.brandingService.getActiveTeamSlug();
+    const allowed = new Set((this.countriesLabelTeamSlugs ?? []).map((s) => (s ?? '').toString().trim().toLowerCase()).filter(Boolean));
+    return allowed.has((slug ?? '').toString().trim().toLowerCase());
   }
 
   setMode(mode: 'team' | 'player'): void {
