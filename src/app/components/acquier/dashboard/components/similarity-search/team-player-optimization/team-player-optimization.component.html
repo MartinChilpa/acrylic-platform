@@ -57,16 +57,22 @@
         </button>
 
         <div class="tpo__players" *ngIf="selectedMode === 'player'">
+          <input
+            type="text"
+            class="tpo__search-input"
+            placeholder="Search players..."
+            [(ngModel)]="searchQuery"
+            (click)="$event.stopPropagation()" />
           <button
             type="button"
             class="tpo__player-item"
-            *ngFor="let player of players"
+            *ngFor="let player of filteredPlayers"
             (click)="selectPlayer(player)">
             <span class="tpo__player-name">{{ player.name }}</span>
             <span class="tpo__player-flag">{{ toFlagEmoji(player.countryCode2 ?? '') }}</span>
           </button>
-          <div class="tpo__players-empty" *ngIf="(players?.length ?? 0) === 0">
-            No players yet
+          <div class="tpo__players-empty" *ngIf="(filteredPlayers?.length ?? 0) === 0">
+            {{ searchQuery.trim() ? 'No players match your search' : 'No players yet' }}
           </div>
         </div>
 

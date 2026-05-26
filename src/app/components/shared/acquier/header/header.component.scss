@@ -13,7 +13,7 @@
   justify-content: flex-start;
   align-items: center;
   align-self: stretch;
-  border-top: 8px solid #C1C5C8;
+  border-top: 8px solid var(--secondary-color, #C1C5C8);
   background: linear-gradient(92deg, rgba(0,0,0,0.20) 0%, rgba(255,255,255,0.10) 49.52%, rgba(0,0,0,0.20) 100%), var(--primary-color, #003DA6);
   padding-left: 48px;
 }
@@ -78,13 +78,13 @@
   align-items: center;
   gap: 10px;
   border-radius: 16px;
-  background: #C1C5C8;
+  background: var(--secondary-color, #C1C5C8);
   margin-left: auto; 
   margin-right: auto;
 }
 
 .team-header__tagline {
-  color: #003DA6;
+  color: var(--primary-color, #003DA6);
   font-family: 'Glacial Indifference', sans-serif;
   font-size: 16px;
   font-weight: 700;

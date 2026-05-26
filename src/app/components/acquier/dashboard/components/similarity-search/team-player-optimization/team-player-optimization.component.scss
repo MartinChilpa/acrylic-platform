@@ -354,6 +354,37 @@
   line-height: 20px;
 }
 
+.tpo__search-input {
+  width: 100%;
+  padding: 8px 16px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(173, 70, 255, 0.4);
+  border-radius: 8px;
+  background: rgba(173, 70, 255, 0.08);
+  color: #ffffff;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  outline: none;
+  transition: all 160ms ease;
+  box-sizing: border-box;
+}
+
+.tpo__search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.tpo__search-input:hover {
+  border-color: rgba(173, 70, 255, 0.6);
+  background: rgba(173, 70, 255, 0.12);
+}
+
+.tpo__search-input:focus {
+  border-color: rgba(173, 70, 255, 0.8);
+  background: rgba(173, 70, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(173, 70, 255, 0.2);
+}
+
 @media (max-width: 768px) {
   .tpo {
     flex-direction: column;

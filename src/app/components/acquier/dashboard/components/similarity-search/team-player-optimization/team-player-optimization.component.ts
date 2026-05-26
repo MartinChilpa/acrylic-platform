@@ -1,5 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, Output, SimpleChanges, inject } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { TeamBrandingService } from '../../../../../../services/team-branding.service';
 
 export interface TeamPlayerOption {
@@ -11,7 +12,7 @@ export interface TeamPlayerOption {
 @Component({
   selector: 'acrylic-team-player-optimization',
   standalone: true,
-  imports: [NgIf, NgFor],
+  imports: [NgIf, NgFor, FormsModule],
   templateUrl: './team-player-optimization.component.html',
   styleUrl: './team-player-optimization.component.scss'
 })
@@ -28,6 +29,17 @@ export class TeamPlayerOptimizationComponent {
   isOpen = false;
   selectedMode: 'team' | 'player' | null = null;
   selectedPlayer: TeamPlayerOption | null = null;
+  searchQuery = '';
+
+  get filteredPlayers(): TeamPlayerOption[] {
+    if (!this.searchQuery.trim()) {
+      return this.players;
+    }
+    const query = this.searchQuery.toLowerCase();
+    return this.players.filter(player => 
+      player.name.toLowerCase().includes(query)
+    );
+  }
 
   get selectedOptimizationLabel(): string | null {
     if (this.selectedMode === 'team') {
@@ -58,6 +70,7 @@ export class TeamPlayerOptimizationComponent {
     if (changes['resetKey'] && !changes['resetKey'].firstChange) {
       this.selectedMode = null;
       this.selectedPlayer = null;
+      this.searchQuery = '';
     }
   }
 
@@ -67,6 +80,7 @@ export class TeamPlayerOptimizationComponent {
 
   setMode(mode: 'team' | 'player'): void {
     this.selectedMode = mode;
+    this.searchQuery = '';
     if (mode === 'team') {
       this.selectedPlayer = null;
       this.optionSelected.emit('team');
@@ -85,6 +99,7 @@ export class TeamPlayerOptimizationComponent {
   clearOptimization(): void {
     this.selectedMode = null;
     this.selectedPlayer = null;
+    this.searchQuery = '';
     this.optionSelected.emit('');
     this.isOpen = false;
   }

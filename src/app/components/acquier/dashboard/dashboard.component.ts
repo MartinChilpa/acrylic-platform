@@ -28,6 +28,7 @@ export class DashboardComponent implements OnInit {
   tagline = this.initialBranding.tagline;
   primaryColor = this.initialBranding.primaryColor;
   secondaryColor = this.initialBranding.secondaryColor;
+  countryCode2 = this.initialBranding.countryCode2 || '';
 
   showLocalMusic = true;
 
@@ -38,6 +39,7 @@ export class DashboardComponent implements OnInit {
     this.tagline = branding.tagline;
     this.primaryColor = branding.primaryColor;
     this.secondaryColor = branding.secondaryColor;
+    this.countryCode2 = branding.countryCode2 || '';
     this.brandingService.applyCssVars(branding);
   }
 
