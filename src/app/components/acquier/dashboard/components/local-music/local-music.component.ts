@@ -20,15 +20,7 @@ export interface LocalTrack {
   encapsulation: ViewEncapsulation.None,
 })
 export class LocalMusicComponent {
-  title = 'New Local Music';
-  subtitle = "What's cooking in...";
-
-  @Input() set countryCode(code: string) {
-    if (code) {
-      const displayNames = new Intl.DisplayNames(['en'], { type: 'region' });
-      this.subtitle = `What's cooking in ${displayNames.of(code.toUpperCase())}`;
-    }
-  }
+  title = 'New Music by Region';
 
   // Heights (px) for the static waveform bars
   waveBars = [4, 8, 12, 6, 10, 14, 8, 5, 12, 9, 6, 14, 10, 7, 4, 11, 8, 13, 6, 9, 12, 5, 10, 8, 14, 6, 9, 11, 4, 7];
