@@ -71,7 +71,7 @@ export class SimilaritySearchComponent implements OnInit {
   private peaksInitTimerId: number | null = null;
 
   suggestions: Suggestion[] = [
-    { icon: '', type: 'prompt', title: 'Write a prompt', subtitle: 'Rosalia-style dance for chase scene' },
+    { icon: '', type: 'prompt', title: 'Write a prompt', subtitle: 'Hip hop music with winning vibe for epic goal reel'},
     { icon: '', type: 'video', title: 'Upload a video', subtitle: 'up to 60 sec / 60 MB' },
     { icon: '', type: 'link', title: 'Paste a link', subtitle: 'Paste a link. Get matches to similar tracks.' },
     { icon: '', type: 'track', title: 'Find a specific track', subtitle: 'Search title and artist.' },

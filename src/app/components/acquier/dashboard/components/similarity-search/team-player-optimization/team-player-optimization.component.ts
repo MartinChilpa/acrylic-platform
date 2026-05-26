@@ -1,6 +1,7 @@
 import { Component, EventEmitter, HostListener, Input, Output, SimpleChanges, inject } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { TeamBrandingService } from '../../../../../../services/team-branding.service';
+import { AuthService } from '../../../../../../services/auth.service';
 
 export interface TeamPlayerOption {
   id: string;
@@ -24,6 +25,7 @@ export class TeamPlayerOptimizationComponent {
   @Output() optionSelected = new EventEmitter<string>();
 
   private brandingService = inject(TeamBrandingService);
+  private authService = inject(AuthService);
 
   isOpen = false;
   selectedMode: 'team' | 'player' | null = null;
@@ -63,6 +65,10 @@ export class TeamPlayerOptimizationComponent {
 
   get activeTeamName(): string {
     return this.brandingService.getActiveBranding().teamName || 'Team';
+  }
+
+  get isLfpUser(): boolean {
+    return this.authService.userType.trim().toUpperCase() === 'LFP';
   }
 
   setMode(mode: 'team' | 'player'): void {
