@@ -52,7 +52,7 @@
             <div class="tpo__radio-box" [class.tpo__radio-box--active]="selectedMode === 'player'"></div>
           </div>
           <div class="tpo__menu-copy">
-            <div class="tpo__menu-title">{{ selectedPlayer ? selectedPlayer.name : 'Player…' }}</div>
+            <div class="tpo__menu-title">{{ selectedPlayer ? selectedPlayer.name : (isLfpUser ? 'Countries…' : 'Player…') }}</div>
           </div>
         </button>
 
