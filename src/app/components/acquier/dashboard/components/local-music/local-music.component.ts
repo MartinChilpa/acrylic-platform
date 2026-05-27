@@ -20,7 +20,10 @@ export interface LocalTrack {
   encapsulation: ViewEncapsulation.None,
 })
 export class LocalMusicComponent {
+  @Input() countryCode: string = '';
+  
   title = 'New Music by Region';
+  subtitle = '';
 
   // Heights (px) for the static waveform bars
   waveBars = [4, 8, 12, 6, 10, 14, 8, 5, 12, 9, 6, 14, 10, 7, 4, 11, 8, 13, 6, 9, 12, 5, 10, 8, 14, 6, 9, 11, 4, 7];
