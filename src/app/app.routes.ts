@@ -28,8 +28,8 @@ export const routes: Routes = [
 
   {
     path: '',
-    redirectTo: 'artist',
-    pathMatch: 'full'
+    loadComponent: () => import('./components/landing/landing.component').then((c) => c.LandingComponent),
+    pathMatch: 'full',
   },
   // Backwards-compat: keep old "acquier" URLs working.
   { path: 'acquier', redirectTo: 'brand/dashboard', pathMatch: 'full' },
