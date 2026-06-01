@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, HostListener, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { AuthService } from '../../services/auth.service';
 import { AuthUtils } from '../../utils/auth.utils';
 import { NavigationService } from '../../services/navigation.service';
@@ -17,7 +18,19 @@ type FaqTab = 'sports' | 'artists';
   standalone: true,
   imports: [RouterLink, CommonModule],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.scss'
+  styleUrl: './landing.component.scss',
+  animations: [
+    trigger('faqSlide', [
+      transition('void => right', [
+        style({ opacity: 0, transform: 'translateX(18px)' }),
+        animate('240ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 1, transform: 'translateX(0)' }))
+      ]),
+      transition('void => left', [
+        style({ opacity: 0, transform: 'translateX(-18px)' }),
+        animate('240ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 1, transform: 'translateX(0)' }))
+      ])
+    ])
+  ]
 })
 export class LandingComponent implements OnInit {
   private authService = inject(AuthService);
@@ -27,6 +40,7 @@ export class LandingComponent implements OnInit {
   menuOpen = false;
   scrollPosition = 0;
   activeFaqTab: FaqTab = 'sports';
+  faqAnimDir: 'left' | 'right' = 'right';
 
   sportsFaqItems: FAQItem[] = [
     {
@@ -131,6 +145,7 @@ export class LandingComponent implements OnInit {
   }
 
   setFaqTab(tab: FaqTab): void {
+    this.faqAnimDir = tab === 'artists' ? 'right' : 'left';
     this.activeFaqTab = tab;
   }
 

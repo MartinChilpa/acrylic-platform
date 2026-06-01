@@ -343,6 +343,7 @@
       <h2 class="faq__title">Frequently Asked Questions</h2>
 
       <div class="faq__tabs">
+        <div class="faq__tab-indicator" [style.transform]="activeFaqTab === 'artists' ? 'translateX(calc(100% + 4px))' : 'translateX(0)'"></div>
         <button class="faq__tab" [class.faq__tab--active]="activeFaqTab === 'sports'" (click)="setFaqTab('sports')">
           Sports Organizations
         </button>
@@ -351,8 +352,8 @@
         </button>
       </div>
 
-      <div class="faq__items">
-        <ng-container *ngIf="activeFaqTab === 'sports'">
+      <ng-container *ngIf="activeFaqTab === 'sports'">
+        <div class="faq__items" [@faqSlide]="faqAnimDir">
           <details class="faq-item" *ngFor="let item of sportsFaqItems">
             <summary class="faq-item__summary">
               {{ item.question }}
@@ -362,8 +363,10 @@
             </summary>
             <div class="faq-item__content">{{ item.answer }}</div>
           </details>
-        </ng-container>
-        <ng-container *ngIf="activeFaqTab === 'artists'">
+        </div>
+      </ng-container>
+      <ng-container *ngIf="activeFaqTab === 'artists'">
+        <div class="faq__items" [@faqSlide]="faqAnimDir">
           <details class="faq-item" *ngFor="let item of artistsFaqItems">
             <summary class="faq-item__summary">
               {{ item.question }}
@@ -373,8 +376,8 @@
             </summary>
             <div class="faq-item__content">{{ item.answer }}</div>
           </details>
-        </ng-container>
-      </div>
+        </div>
+      </ng-container>
     </div>
   </section>
 
