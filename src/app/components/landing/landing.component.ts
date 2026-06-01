@@ -31,38 +31,47 @@ export class LandingComponent implements OnInit {
   sportsFaqItems: FAQItem[] = [
     {
       question: 'How is Acrylic different from stock music platforms?',
-      answer: 'Stock music libraries offer generic tracks with no real fanbase or audience connection. Acrylic gives you access to real artists whose music resonates with specific demographics — all pre-cleared so you can publish instantly.'
+      answer: 'Stock music is easy to license but generic by design. Acrylic connects you with real artists whose music already has fans, so your content carries an identity your audience can actually connect with. Every track is cleared and ready to use. Our campaigns all landed in the 90th percentile for engagement, with music licensed in clicks.'
     },
     {
       question: 'Do I need a music supervisor or legal team?',
-      answer: 'No. Acrylic handles all rights clearances before you access any track. Every license is built into the platform, so your team can move fast without legal overhead.'
+      answer: 'No. Acrylic handles rights verification, licensing, and clearance. Your content and social teams pick music that presents no legal bottleneck, no back-and-forth with music rightsholders.'
     },
     {
       question: 'What types of content is Acrylic designed for?',
-      answer: 'Acrylic is built for sports social media content — match highlights, player features, behind-the-scenes, fan engagement campaigns, and live event coverage across Instagram, TikTok, YouTube, and more.'
+      answer: 'Mainly for editorial sports social content, in other words content with no intent to sell, no call-to-action. Match highlights, pregame hype, player features, season recaps, behind-the-scenes: content your fans actually watch and share.'
     },
     {
       question: 'How is Acrylic different from TikTok or Instagram commercial music libraries?',
-      answer: 'Platform-native libraries restrict use to their own apps and offer limited licensing. Acrylic gives you cross-platform rights, real artist music, and performance data to match the right track to the right audience.'
+      answer: 'Brands are restricted to a limited, often generic library of music on social platforms with little data to guide their choices. Acrylic licenses fan-backed music brands would not typically have access to, along with data to maximize the performance of every post.'
     }
   ];
 
   artistsFaqItems: FAQItem[] = [
     {
-      question: 'How do I submit my music to Acrylic?',
-      answer: 'Click "Join the Music Catalog" on this page to send us an intro email. Our team reviews submissions and will reach out if your music is a good fit for the platform.'
+      question: 'Who can submit music?',
+      answer: 'Any artist, songwriter, or rightsholder who controls or can authorize both the master recording and publishing rights for use in third-party content. If you share rights with others, all parties need to agree before you submit.'
     },
     {
-      question: 'How does licensing revenue work?',
-      answer: 'Every time a sports organization uses your track, you earn a licensing fee. Acrylic pays artists directly and transparently — no hidden deductions, no waiting.'
+      question: "Can’t sports organizations simply use my music if it’s already available on Instagram or TikTok?",
+      answer: "No. Sports organizations are commercial entities and don't have access to the music on those platforms the way private users do. They need a direct license. Acrylic is the bridge that makes that easy and legal for everyone."
     },
     {
-      question: 'What rights do I keep when licensing through Acrylic?',
-      answer: 'You retain full ownership of your music. Acrylic only handles sync licensing for specific campaigns — your masters and publishing remain entirely yours.'
+      question: 'Will I get paid?',
+      answer: "Yes. Acrylic pays a fee for every placement. The size of that fee depends on the placement tier you select for each song. For example, our ArtistPromo tier offers a limited fee to prioritize exposure and discovery, giving your music premium visibility in high-engagement sports content with a fanbase that's already primed to care. Our Preclear tier includes more upfront compensation. The terms are always clearly stated in the license offer before you sign anything. You pick the tier and the price, and keep 100% of streaming and publishing royalties generated downstream from the placement."
     },
     {
-      question: 'How is my music matched to sports organizations?',
-      answer: 'Our AI analyzes content mood, fanbase demographics, and engagement data to recommend the right track for each campaign. You get exposure to the exact audiences most likely to connect with your sound.'
+      question: 'How will my music be used?',
+      answer: 'Only in editorial sports social content: highlights, game-day posts, player features, and storytelling. No commercial intent, no call-to-action. Your music scores content that fans watch and replay. Any extended commercial use that is considered non-editorial is offered as an opt-in for music rightsholders at onboarding.'
+    },
+
+    {
+      question: "What if I don't control all the rights?",
+      answer: "Do not submit until every rightsholder involved has agreed. When you submit, you'll need to include the email addresses of any co-owners so they also receive the license offer. It's your responsibility to align with them first."
+    },
+    {
+      question: 'Can I exclude certain sports organizations?',
+      answer: 'Yes. During onboarding you can opt out of certain leagues, teams or athletes to ensure they cannot use your music in their content.'
     }
   ];
 
