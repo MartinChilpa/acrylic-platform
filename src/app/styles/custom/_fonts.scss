@@ -14,6 +14,14 @@
 
 
 @font-face {
+    font-family: 'Glacial Indifference';
+    src: url('../../../assets/fonts/Inter/GlacialIndifference-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
     font-family: 'Glacial IndifferenceNormal';
     src: url('../../../assets/fonts/Inter/GlacialIndifference-Bold.otf') format('opentype');
     font-weight: 400;
