@@ -6,24 +6,24 @@
         <div class="navbar__logo">
           <img src="assets/images/logos/acrylic_logo_simple.png" alt="Acrylic Logo" class="navbar__logo-img" />
         </div>
-        <button class="navbar__toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <button class="navbar__toggle" [class.navbar__toggle--open]="menuOpen" (click)="toggleMenu()" aria-label="Toggle navigation" [attr.aria-expanded]="menuOpen">
           <span class="navbar__toggle-icon"></span>
         </button>
-        <ul class="navbar__menu">
+        <ul class="navbar__menu" [class.navbar__menu--open]="menuOpen">
           <li class="navbar__item">
-            <a href="#what-is-acrylic" class="navbar__link">What is Acrylic?</a>
+            <a href="#what-is-acrylic" class="navbar__link" (click)="closeMenu()">What is Acrylic?</a>
           </li>
           <li class="navbar__item">
-            <a href="#how-it-works" class="navbar__link">How It Works</a>
+            <a href="#how-it-works" class="navbar__link" (click)="closeMenu()">How It Works</a>
           </li>
           <li class="navbar__item">
-            <a href="#for-teams" class="navbar__link">For Teams</a>
+            <a href="#for-teams" class="navbar__link" (click)="closeMenu()">For Teams</a>
           </li>
           <li class="navbar__item">
-            <a href="#for-artists" class="navbar__link">For Artists</a>
+            <a href="#for-artists" class="navbar__link" (click)="closeMenu()">For Artists</a>
           </li>
           <li class="navbar__item">
-            <a href="#faq" class="navbar__link">FAQ</a>
+            <a href="#faq" class="navbar__link" (click)="closeMenu()">FAQ</a>
           </li>
         </ul>
         <div class="navbar__cta">
@@ -31,6 +31,7 @@
         </div>
       </div>
     </nav>
+    <div class="navbar__backdrop" [class.navbar__backdrop--visible]="menuOpen" (click)="closeMenu()"></div>
   </header>
 
   <!-- Hero Section -->
