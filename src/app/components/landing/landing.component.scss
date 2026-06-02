@@ -209,10 +209,12 @@ $bp-xl: 1280px;
     padding: 10px 24px;
     white-space: nowrap;
     border-radius: 8px;
+    border: 1px solid transparent;
 
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(152, 16, 250, 0.4);
+    &:hover, &:active {
+      border-color: #F9BFFF;
+      background: linear-gradient(90deg, #B000A9 0%, #5F00A4 100%);
+      box-shadow: 0 10px 15px -3px rgba(173, 70, 255, 0.30);
       color: white;
     }
   }
@@ -420,10 +422,12 @@ $bp-xl: 1280px;
     background: linear-gradient(90deg, #C800DE 0%, #9810FA 100%);
     color: white;
     border-radius: 8px;
+    border: 1px solid transparent;
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px rgba(152, 16, 250, 0.4);
+    &:hover, &:active {
+      border-color: #F9BFFF;
+      background: linear-gradient(90deg, #B000A9 0%, #5F00A4 100%);
+      box-shadow: 0 10px 15px -3px rgba(173, 70, 255, 0.30);
     }
   }
 
@@ -433,8 +437,9 @@ $bp-xl: 1280px;
     border: 2px solid #AD46FF;
     border-radius: 8px;
 
-    &:hover {
-      background: rgba(173, 70, 255, 0.1);
+    &:hover, &:active {
+      border-color: #CC8CFF;
+      background: linear-gradient(90deg, rgba(200, 0, 222, 0.30) 0%, rgba(152, 16, 250, 0.30) 100%);
     }
   }
 
@@ -660,6 +665,10 @@ $bp-xl: 1280px;
   border-radius: 10px;
   border: 1px solid rgba(255, 208, 85, 0.25);
   background: linear-gradient(135deg, rgba(255, 208, 85, 0.03) 0%, rgba(0, 0, 0, 0.28) 50%, rgba(255, 105, 0, 0.03) 100%);
+
+  .brand-card__img {
+    height: 72px;
+  }
 }
 
 .brand-card__img {
@@ -1448,10 +1457,12 @@ $bp-xl: 1280px;
 
   &--primary {
     background: linear-gradient(90deg, #C800DE 0%, #9810FA 100%);
-    border: none;
+    border: 1px solid transparent;
 
-    &:hover {
-      box-shadow: 0 4px 16px rgba(152, 16, 250, 0.4);
+    &:hover, &:active {
+      border-color: #F9BFFF;
+      background: linear-gradient(90deg, #B000A9 0%, #5F00A4 100%);
+      box-shadow: 0 10px 15px -3px rgba(173, 70, 255, 0.30);
     }
   }
 
@@ -1459,8 +1470,9 @@ $bp-xl: 1280px;
     background: transparent;
     border: 2px solid #AD46FF;
 
-    &:hover {
-      background: rgba(173, 70, 255, 0.1);
+    &:hover, &:active {
+      border-color: #CC8CFF;
+      background: linear-gradient(90deg, rgba(200, 0, 222, 0.30) 0%, rgba(152, 16, 250, 0.30) 100%);
     }
   }
 }
