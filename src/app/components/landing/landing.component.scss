@@ -129,23 +129,42 @@ $bp-xl: 1280px;
 }
 
 .navbar__toggle-icon {
-  width: 24px;
-  height: 20px;
+  width: 22px;
+  height: 2px;
+  background: $color-text-primary;
+  border-radius: 1px;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+  transition: background 0.3s ease;
 
   &::before,
-  &::after,
-  & {
+  &::after {
     content: '';
-    display: block;
-    width: 100%;
+    position: absolute;
+    left: 0;
+    width: 22px;
     height: 2px;
     background: $color-text-primary;
-    transition: all 0.3s ease;
     border-radius: 1px;
+    transition: all 0.3s ease;
+  }
+
+  &::before { top: -7px; }
+  &::after { bottom: -7px; }
+}
+
+.navbar__toggle--open {
+  .navbar__toggle-icon {
+    background: transparent;
+
+    &::before {
+      transform: rotate(45deg);
+      top: 0;
+    }
+
+    &::after {
+      transform: rotate(-45deg);
+      bottom: 0;
+    }
   }
 }
 
@@ -190,11 +209,68 @@ $bp-xl: 1280px;
     padding: 10px 24px;
     white-space: nowrap;
     border-radius: 8px;
+    border: 1px solid transparent;
 
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(152, 16, 250, 0.4);
+    &:hover, &:active {
+      border-color: #F9BFFF;
+      background: linear-gradient(90deg, #B000A9 0%, #5F00A4 100%);
+      box-shadow: 0 10px 15px -3px rgba(173, 70, 255, 0.30);
       color: white;
+    }
+  }
+}
+
+// Mobile menu open overlay (phones only)
+@media (max-width: 767px) {
+  .navbar__menu--open {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 12, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid $color-border;
+    padding: 8px 0 16px;
+    z-index: 99;
+    animation: menuSlideDown 0.2s ease forwards;
+
+    .navbar__item {
+      width: 100%;
+    }
+
+    .navbar__link {
+      display: block;
+      padding: 14px 24px;
+      font-size: 17px;
+      color: rgba(255, 255, 255, 0.8);
+      border-radius: 0;
+
+      &:hover {
+        background: rgba(124, 58, 237, 0.12);
+        color: $color-text-primary;
+      }
+    }
+  }
+}
+
+@keyframes menuSlideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.navbar__backdrop {
+  display: none;
+  position: fixed;
+  inset: 64px 0 0 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 98;
+
+  &--visible {
+    @media (max-width: 767px) {
+      display: block;
     }
   }
 }
@@ -205,14 +281,14 @@ $bp-xl: 1280px;
 
 .hero {
   position: relative;
-  padding: 80px 20px;
+  padding: 50px 20px;
   border-bottom: 1px solid #27272A;
   background:
     radial-gradient(ellipse 55% 45% at 5% 25%, rgba(84, 191, 187, 0.38) 0%, transparent 65%),
     radial-gradient(ellipse 45% 55% at 95% 75%, rgba(238, 89, 59, 0.28) 0%, transparent 60%),
     radial-gradient(ellipse 65% 55% at 55% 45%, rgba(173, 70, 255, 0.18) 0%, transparent 70%),
     #0A0A0C;
-  min-height: 600px;
+  min-height: auto;
   display: flex;
   align-items: center;
 
@@ -226,10 +302,14 @@ $bp-xl: 1280px;
   @include container;
   display: flex;
   flex-direction: column;
-  gap: 80px;
+  gap: 40px;
   align-items: center;
   text-align: center;
   width: 100%;
+
+  @media (min-width: $bp-md) {
+    gap: 80px;
+  }
 }
 
 .hero__content {
@@ -243,16 +323,22 @@ $bp-xl: 1280px;
 
 .hero__title {
   margin: 0;
-  font-size: clamp(48px, 8vw, 96px);
+  font-size: clamp(38px, 9vw, 96px);
   font-weight: 700;
   font-family: 'Proxima Nova', sans-serif;
-  line-height: 1;
-  letter-spacing: -2.4px;
+  line-height: 1.05;
+  letter-spacing: -2px;
   color: #FFF;
   text-align: center;
   position: relative;
-  white-space: nowrap;
   text-shadow: -3px -7px 11.4px rgba(255, 165, 101, 0.30);
+
+  @media (min-width: $bp-md) {
+    font-size: clamp(48px, 8vw, 96px);
+    white-space: nowrap;
+    line-height: 1;
+    letter-spacing: -2.4px;
+  }
 }
 
 .hero__subtitle {
@@ -260,11 +346,15 @@ $bp-xl: 1280px;
   color: #CCCCD4;
   text-align: center;
   font-family: 'Glacial Indifference', sans-serif;
-  font-size: 32px;
+  font-size: clamp(20px, 5vw, 32px);
   font-style: normal;
   font-weight: 400;
-  line-height: 36px;
+  line-height: 1.25;
   letter-spacing: 0.396px;
+
+  @media (min-width: $bp-md) {
+    line-height: 36px;
+  }
 }
 
 .hero__description {
@@ -297,9 +387,13 @@ $bp-xl: 1280px;
 
 .hero__logo {
   width: auto;
-  height: 140px;
+  height: 90px;
   object-fit: contain;
   filter: drop-shadow(0 20px 40px rgba(194, 122, 255, 0.2));
+
+  @media (min-width: $bp-md) {
+    height: 140px;
+  }
 }
 
 // ============================================================================
@@ -328,10 +422,12 @@ $bp-xl: 1280px;
     background: linear-gradient(90deg, #C800DE 0%, #9810FA 100%);
     color: white;
     border-radius: 8px;
+    border: 1px solid transparent;
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px rgba(152, 16, 250, 0.4);
+    &:hover, &:active {
+      border-color: #F9BFFF;
+      background: linear-gradient(90deg, #B000A9 0%, #5F00A4 100%);
+      box-shadow: 0 10px 15px -3px rgba(173, 70, 255, 0.30);
     }
   }
 
@@ -341,8 +437,9 @@ $bp-xl: 1280px;
     border: 2px solid #AD46FF;
     border-radius: 8px;
 
-    &:hover {
-      background: rgba(173, 70, 255, 0.1);
+    &:hover, &:active {
+      border-color: #CC8CFF;
+      background: linear-gradient(90deg, rgba(200, 0, 222, 0.30) 0%, rgba(152, 16, 250, 0.30) 100%);
     }
   }
 
@@ -568,6 +665,10 @@ $bp-xl: 1280px;
   border-radius: 10px;
   border: 1px solid rgba(255, 208, 85, 0.25);
   background: linear-gradient(135deg, rgba(255, 208, 85, 0.03) 0%, rgba(0, 0, 0, 0.28) 50%, rgba(255, 105, 0, 0.03) 100%);
+
+  .brand-card__img {
+    height: 72px;
+  }
 }
 
 .brand-card__img {
@@ -1356,10 +1457,12 @@ $bp-xl: 1280px;
 
   &--primary {
     background: linear-gradient(90deg, #C800DE 0%, #9810FA 100%);
-    border: none;
+    border: 1px solid transparent;
 
-    &:hover {
-      box-shadow: 0 4px 16px rgba(152, 16, 250, 0.4);
+    &:hover, &:active {
+      border-color: #F9BFFF;
+      background: linear-gradient(90deg, #B000A9 0%, #5F00A4 100%);
+      box-shadow: 0 10px 15px -3px rgba(173, 70, 255, 0.30);
     }
   }
 
@@ -1367,8 +1470,9 @@ $bp-xl: 1280px;
     background: transparent;
     border: 2px solid #AD46FF;
 
-    &:hover {
-      background: rgba(173, 70, 255, 0.1);
+    &:hover, &:active {
+      border-color: #CC8CFF;
+      background: linear-gradient(90deg, rgba(200, 0, 222, 0.30) 0%, rgba(152, 16, 250, 0.30) 100%);
     }
   }
 }
