@@ -1,0 +1,138 @@
+<div class="projects">
+
+  <!-- Header -->
+  <div class="projects__header">
+    <div class="projects__header-text">
+      <h2 class="projects__title">My Projects</h2>
+      <p class="projects__subtitle">Organize your favorite tracks into project collections</p>
+    </div>
+    <button class="projects__create-btn" (click)="startCreating()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      New Project
+    </button>
+  </div>
+
+  <!-- Inline create form -->
+  <div class="projects__new-form" *ngIf="isCreating">
+    <input
+      class="projects__input"
+      [(ngModel)]="newProjectName"
+      placeholder="Project name"
+      (keyup.enter)="submitCreate()"
+      autofocus />
+    <input
+      class="projects__input"
+      [(ngModel)]="newProjectDesc"
+      placeholder="Description (optional)"
+      (keyup.enter)="submitCreate()" />
+    <div class="projects__new-form-actions">
+      <button class="projects__btn projects__btn--ghost" (click)="cancelCreate()">Cancel</button>
+      <button class="projects__btn projects__btn--primary" (click)="submitCreate()" [disabled]="!newProjectName.trim()">Create</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="projects__loading" *ngIf="loading">
+    <div class="projects__spinner"></div>
+    <span>Loading projects…</span>
+  </div>
+
+  <!-- Projects list -->
+  <div class="projects__section" *ngIf="!loading">
+    <div class="projects__empty" *ngIf="projects.length === 0 && !isCreating">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p>No projects yet. Create one to start organizing your tracks.</p>
+    </div>
+
+    <div class="project-card" *ngFor="let project of projects" [class.project-card--open]="expandedUuid === project.uuid">
+      <!-- Card header -->
+      <div class="project-card__header" (click)="toggleExpand(project.uuid)">
+        <div class="project-card__covers">
+          <img
+            *ngFor="let track of project.tracks.slice(0, 3)"
+            [src]="track.cover_image"
+            [alt]="track.track_name"
+            class="project-card__thumb"
+            (error)="onImgError($event)" />
+          <div class="project-card__thumb project-card__thumb--empty" *ngFor="let _ of getEmptySlots(project)"></div>
+        </div>
+        <div class="project-card__meta">
+          <span class="project-card__name">{{ project.name }}</span>
+          <span class="project-card__count">{{ project.tracks.length }} track{{ project.tracks.length !== 1 ? 's' : '' }}</span>
+        </div>
+        <svg class="project-card__chevron" [class.project-card__chevron--open]="expandedUuid === project.uuid" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- Expanded tracks -->
+      <div class="project-card__tracks" *ngIf="expandedUuid === project.uuid">
+        <div class="project-card__tracks-empty" *ngIf="project.tracks.length === 0">
+          No tracks yet — add favorites to this project below.
+        </div>
+        <div class="project-track" *ngFor="let track of project.tracks">
+          <img [src]="track.cover_image" [alt]="track.track_name" class="project-track__cover" (error)="onImgError($event)" />
+          <div class="project-track__info">
+            <span class="project-track__name">{{ track.track_name }}</span>
+            <span class="project-track__artist">{{ track.artist_name }}</span>
+          </div>
+          <button class="project-track__remove" (click)="removeTrack(project, track)" title="Remove from project" aria-label="Remove track">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorites section -->
+  <div class="favorites" *ngIf="favorites.length > 0">
+    <div class="favorites__header">
+      <h3 class="favorites__title">Saved Tracks</h3>
+      <span class="favorites__count">{{ favorites.length }}</span>
+    </div>
+    <div class="favorites__list">
+      <div class="favorite-card" *ngFor="let fav of favorites">
+        <img [src]="fav.cover_image" [alt]="fav.track_name" class="favorite-card__cover" (error)="onImgError($event)" />
+        <div class="favorite-card__info">
+          <span class="favorite-card__name">{{ fav.track_name }}</span>
+          <span class="favorite-card__artist">{{ fav.artist_name }}</span>
+        </div>
+        <div class="favorite-card__actions">
+          <select
+            class="favorite-card__select"
+            (change)="addToProject($event, fav)"
+            [value]="''"
+            [title]="projects.length === 0 ? 'Create a project first' : 'Add to project'">
+            <option value="" disabled selected>Add to project…</option>
+            <option
+              *ngFor="let p of projects"
+              [value]="p.uuid"
+              [disabled]="isFavoritedInProject(p, fav)">
+              {{ p.name }}{{ isFavoritedInProject(p, fav) ? ' ✓' : '' }}
+            </option>
+          </select>
+          <button class="favorite-card__unfav" (click)="unfavorite(fav)" title="Remove from favorites" aria-label="Remove from favorites">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorites empty state -->
+  <div class="favorites favorites--empty" *ngIf="!loading && favorites.length === 0">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p>Heart tracks in the search to save them here.</p>
+  </div>
+
+</div>

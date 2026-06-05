@@ -11,6 +11,7 @@ import { LicenseComponent } from '../license/license.component';
 import { TeamPlayerOptimizationComponent } from './team-player-optimization/team-player-optimization.component';
 import { TeamPlayersService, TeamPlayerDto } from '../../../../../services/team-players.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
+import { ProjectsService } from '../../../../../services/projects.service';
 interface Suggestion {
   icon: string;
   type: string;
@@ -46,6 +47,9 @@ export class SimilaritySearchComponent implements OnInit {
   private modalService = inject(ModalService);
   private teamPlayersService = inject(TeamPlayersService);
   private brandingService = inject(TeamBrandingService);
+  private projectsService = inject(ProjectsService);
+
+  favoriteTrackUuids = new Set<string>();
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
     { offset: 94.208, duration: 44.184 },
@@ -120,6 +124,7 @@ export class SimilaritySearchComponent implements OnInit {
 
   ngOnInit() {
     this.loadClubPlayers();
+    this.loadFavorites();
     this.manualSearch$.pipe(
       tap(() => {
         this.startLoadingUi();
@@ -247,6 +252,28 @@ export class SimilaritySearchComponent implements OnInit {
       return null;
     }
     return filtered;
+  }
+
+  private loadFavorites(): void {
+    this.projectsService.getFavorites().subscribe({
+      next: (res) => {
+        const favs = Array.isArray(res) ? res as any : (res.results ?? []);
+        this.favoriteTrackUuids = new Set(favs.map((f: any) => f.track_uuid as string));
+      }
+    });
+  }
+
+  toggleFavorite(result: any): void {
+    const uuid: string = result.uuid;
+    this.projectsService.toggleFavorite(uuid).subscribe({
+      next: () => {
+        if (this.favoriteTrackUuids.has(uuid)) {
+          this.favoriteTrackUuids.delete(uuid);
+        } else {
+          this.favoriteTrackUuids.add(uuid);
+        }
+      }
+    });
   }
 
   private loadClubPlayers(): void {

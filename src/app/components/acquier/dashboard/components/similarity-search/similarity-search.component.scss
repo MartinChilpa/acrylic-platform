@@ -184,9 +184,35 @@ $row-pad: 16px;
 }
 
 .btn-section-action img {
-
   height: 30px;
   object-fit: contain;
+}
+
+.btn-favorite {
+  color: rgba(255, 255, 255, 0.8);
+  transition: color 0.2s ease, background 0.2s ease;
+
+  svg path {
+    transition: stroke 0.2s ease, fill 0.2s ease;
+  }
+
+  &:hover {
+    color: #ffffff;
+  }
+
+  &.is-favorited {
+    color: #EF4444;
+    border-color: rgba(239, 68, 68, 0.30);
+    background: rgba(239, 68, 68, 0.08);
+
+    svg path {
+      fill: rgba(239, 68, 68, 0.20);
+    }
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+  }
 }
 
 .tag-line {

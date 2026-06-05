@@ -35,7 +35,7 @@ export const publicSidenavItems = [
 
 export const acquierSidenavItems = [
   { icon: 'home', label: 'Home', routerLink: '/brand/dashboard' },
-  { icon: 'projects', label: 'Projects', routerLink: '/brand/projects', disabled: true, badge: 'Coming Soon' },
+  { icon: 'projects', label: 'Projects', routerLink: '/brand/projects' },
   { icon: 'licenses', label: 'Licenses', routerLink: '/brand/licenses', disabled: true, badge: 'Coming Soon' },
   { icon: 'performance', label: 'Performance', routerLink: '/brand/performance', disabled: true, badge: 'Coming Soon' },
 ];

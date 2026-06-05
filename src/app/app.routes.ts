@@ -7,6 +7,7 @@ export const routesNames = {
   HOME: 'home',
   ARTIST: 'artist',
   DASHBOARD: 'dashboard',
+  PROJECTS: 'projects',
   AUTH: 'auth',
   BRAND: 'brand',
   LABEL: 'label',
@@ -63,6 +64,10 @@ export const routes: Routes = [
       {
         path: routesNames.DASHBOARD,
         loadComponent: () => import('./components/acquier/dashboard/dashboard.component').then((c)=>c.DashboardComponent),
+      },
+      {
+        path: routesNames.PROJECTS,
+        loadComponent: () => import('./components/acquier/dashboard/components/projects/projects.component').then((c)=>c.ProjectsComponent),
       }
     ]
   },
