@@ -2,7 +2,7 @@ import { AfterViewInit, Component, Output, EventEmitter, ElementRef, OnDestroy, 
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { EMPTY, Subject, defer, of } from 'rxjs';
-import { catchError, expand, last, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, expand, last, map, tap } from 'rxjs/operators';
 import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
@@ -133,7 +133,7 @@ export class SimilaritySearchComponent implements OnInit {
         this.seedInCatalog = null;
         this.waveformLoading.clear();
       }),
-      switchMap((request) => {
+      exhaustMap((request) => {
         return this.fetchUpToMaxResults(request).pipe(
           catchError((error) => {
             this.errorMsg = this.getSearchErrorMessage(error);
