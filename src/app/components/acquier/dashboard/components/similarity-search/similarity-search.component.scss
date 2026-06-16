@@ -1,4 +1,25 @@
 $row-cols: 44px 160px 100px 70px 80px 70px 1fr 36px 36px;
+
+.btn-favorite {
+  &.is-favorited img {
+    filter: brightness(0) saturate(100%) invert(29%) sepia(89%) saturate(1597%) hue-rotate(336deg) brightness(101%) contrast(94%);
+  }
+}
+
+.licensed-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: rgba(229, 57, 53, 0.15);
+  color: #E53935;
+  border: 1px solid rgba(229, 57, 53, 0.35);
+  white-space: nowrap;
+}
 $row-gap: 12px;
 $row-pad: 16px;
 
@@ -837,6 +858,93 @@ $row-pad: 16px;
 @media (max-width: 1024px) {
   .metrics, .waveform {
     display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .results-cols-header {
+    display: none;
+  }
+
+  // Grid: thumbnail | title | (metrics hidden) | waveform → 2-row layout
+  .header-artist {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .header-artist .pt2 {
+    display: none;
+  }
+
+  .header-artist .pt3,
+  .header-artist .pte3 {
+    grid-column: 1 / -1;
+  }
+
+  .song-info {
+    width: auto;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .wave-shell {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .button-section {
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  .insights-row {
+    grid-template-columns: 1fr;
+  }
+
+  .insights-section {
+    width: 100%;
+  }
+
+  .gender-split {
+    width: 100%;
+  }
+
+  .spotify-track-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .search-box {
+    height: 52px;
+    padding: 0 12px;
+    border-radius: 12px;
+    gap: 8px;
+  }
+
+  // Buttons: icon-only on mobile (hide label text)
+  .btn-ai-search {
+    padding: 8px;
+    min-width: unset;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+
+    span {
+      display: none;
+    }
+  }
+
+  .btn-ai-search--submit {
+    min-width: unset;
+  }
+
+  .search-dropdown {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .dropdown-suggestions {
+    grid-template-columns: 1fr;
   }
 }
 

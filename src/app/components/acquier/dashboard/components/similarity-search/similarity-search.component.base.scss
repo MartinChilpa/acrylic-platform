@@ -9,6 +9,10 @@
   color: var(--text-main);
   font-family: 'Glacial Indifference', sans-serif;
   padding: 20px;
+
+  @media (max-width: 640px) {
+    padding: 8px 0;
+  }
 }
 
 /* Search Bar */

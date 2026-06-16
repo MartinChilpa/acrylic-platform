@@ -3,6 +3,7 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { EMPTY, Subject, defer, of } from 'rxjs';
 import { catchError, expand, last, map, switchMap, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
@@ -11,6 +12,7 @@ import { LicenseComponent } from '../license/license.component';
 import { TeamPlayerOptimizationComponent } from './team-player-optimization/team-player-optimization.component';
 import { TeamPlayersService, TeamPlayerDto } from '../../../../../services/team-players.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
+import { ProjectsService } from '../../../../../services/projects.service';
 interface Suggestion {
   icon: string;
   type: string;
@@ -41,11 +43,17 @@ export class SimilaritySearchComponent implements OnInit {
   @Output() searchInput = new EventEmitter<string>();
   @Output() searched = new EventEmitter<void>();
   
+  private router = inject(Router);
   private similarityService = inject(SimilarityUrlService);
   private aimsDownloadService = inject(AimsDownloadService);
   private modalService = inject(ModalService);
   private teamPlayersService = inject(TeamPlayersService);
   private brandingService = inject(TeamBrandingService);
+  private projectsService = inject(ProjectsService);
+
+  favoriteTrackIds = new Set<string>();
+  licensedTrackIds = new Set<string>();
+
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
     { offset: 94.208, duration: 44.184 },
@@ -120,6 +128,26 @@ export class SimilaritySearchComponent implements OnInit {
 
   ngOnInit() {
     this.loadClubPlayers();
+    this.projectsService.loadFavorites();
+    this.projectsService.favorites$.subscribe((favs) => {
+      const ids = new Set<string>();
+      favs.forEach(f => {
+        if (f.track_id != null) { ids.add(String(f.track_id)); }
+        if (f.track_uuid) { ids.add(f.track_uuid); }
+      });
+      this.favoriteTrackIds = ids;
+    });
+    this.projectsService.licensedTracks$.subscribe((tracks) => {
+      const ids = new Set<string>();
+      tracks.forEach((t: any) => {
+        if (t.track_id != null) { ids.add(String(t.track_id)); }
+        if (t.track_uuid) { ids.add(t.track_uuid); }
+        if (t.id != null) { ids.add(String(t.id)); }
+        if (t.uuid) { ids.add(t.uuid); }
+      });
+      this.licensedTrackIds = ids;
+    });
+    this.projectsService.loadLicenses();
     this.manualSearch$.pipe(
       tap(() => {
         this.startLoadingUi();
@@ -247,6 +275,16 @@ export class SimilaritySearchComponent implements OnInit {
       return null;
     }
     return filtered;
+  }
+
+  getTrackId(result: any): string {
+    return String(result?.id ?? result?.uuid ?? '');
+  }
+
+  toggleFavorite(result: any): void {
+    const id = result?.id ?? result?.uuid;
+    if (id == null) { return; }
+    this.projectsService.toggleFavorite(id, result).subscribe();
   }
 
   private loadClubPlayers(): void {
@@ -497,10 +535,25 @@ export class SimilaritySearchComponent implements OnInit {
 
   confirmLicenseHappyPath(): void {
     this.licensedTrack = this.licenseModalTrack;
+    if (this.licenseModalTrack) {
+      this.projectsService.addLicensedTrack(this.licenseModalTrack);
+      const trackId = this.licenseModalTrack?.uuid ?? String(this.licenseModalTrack?.id ?? '');
+      if (trackId) {
+        this.projectsService.createLicense(trackId, this.paidMediaAddOn).subscribe({
+          error: () => {}
+        });
+      }
+    }
     this.modalService.hideModal('license-track-modal');
     setTimeout(() => {
       this.modalService.showModal('track-licensed-modal');
     }, 350);
+  }
+
+  goToLicenses(): void {
+    this.modalService.hideModal('track-licensed-modal');
+    this.resetLicenseFlow();
+    this.router.navigate(['/brand/licenses']);
   }
 
   resetLicenseFlow(): void {
