@@ -97,6 +97,7 @@ export class SimilaritySearchComponent implements OnInit {
   showSearchInfo = false;
   loading = false;
   errorMsg: string | null = null;
+  private readonly maxVideoUploadBytes = 60 * 1024 * 1024;
   private loadingStartedAt = 0;
   private loadingEndTimerId: number | null = null;
   private readonly minLoadingMs = 1800;
@@ -134,8 +135,8 @@ export class SimilaritySearchComponent implements OnInit {
       }),
       switchMap((request) => {
         return this.fetchUpToMaxResults(request).pipe(
-          catchError(() => {
-            this.errorMsg = 'Error en busqueda. Revisa la consola.';
+          catchError((error) => {
+            this.errorMsg = this.getSearchErrorMessage(error);
             return of({ firstData: null, results: [] as any[] });
           })
         );
@@ -327,6 +328,17 @@ export class SimilaritySearchComponent implements OnInit {
     }
     // eslint-disable-next-line no-console
     console.log('[aims similarity response]', data);
+  }
+
+  private getSearchErrorMessage(error: unknown): string {
+    const fallback = 'Search could not be completed. Please try again in a few minutes.';
+    if (typeof error !== 'string') {
+      return fallback;
+    }
+    if (/status 0|failed to fetch|cors|unknown error/i.test(error)) {
+      return 'AIMS did not respond in time or the server rejected the request. Try a smaller MP4 or retry in a few minutes.';
+    }
+    return error.trim() || fallback;
   }
 
   ngAfterViewInit(): void {
@@ -752,7 +764,13 @@ export class SimilaritySearchComponent implements OnInit {
     }
 
     if (file.type !== 'video/mp4' && !file.name.toLowerCase().endsWith('.mp4')) {
-      this.errorMsg = 'Solo se permite formato MP4.';
+      this.errorMsg = 'Only MP4 format is allowed.';
+      input.value = '';
+      return;
+    }
+
+    if (file.size > this.maxVideoUploadBytes) {
+      this.errorMsg = 'Video size must be 60 MB or less.';
       input.value = '';
       return;
     }
@@ -871,7 +889,7 @@ export class SimilaritySearchComponent implements OnInit {
       || (request.type === 'prompt' && !!request.query);
 
     if (!isValidRequest) {
-      this.errorMsg = 'No se pudo determinar el tipo de busqueda.';
+      this.errorMsg = 'Could not determine the search type.';
       return of({ firstData: null, results: [] as any[] });
     }
 
@@ -884,6 +902,15 @@ export class SimilaritySearchComponent implements OnInit {
       }
       return this.similarityService.searchSimilarityByPrompt(request.query as string, page, pageSize);
     };
+
+    if (request.type === 'video' && request.file) {
+      return defer(() => this.similarityService.searchSimilarityByVideo(request.file as File, 1, this.maxPrefetchResults)).pipe(
+        map((firstData: unknown) => ({
+          firstData,
+          results: this.normalizeResponse(firstData).slice(0, this.maxPrefetchResults)
+        }))
+      );
+    }
 
     return defer(() => fetchPage(1)).pipe(
       map((firstData: unknown) => {

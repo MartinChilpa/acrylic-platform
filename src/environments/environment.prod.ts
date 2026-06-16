@@ -2,7 +2,7 @@ export const environment = {
     production: true,
     NAME: 'production',
     APP_URL: 'https://app.acrylic.la',
-    API_URL: 'https://platform.acrylic.la/api',
+    API_URL: '/api',
     VERSION: 'v1',
     SENTRY: {
         DSN: 'https://71ca2eac6fbcf06f25ebfcfd2d88b91c@o4507231097126912.ingest.us.sentry.io/4507231097389056',
