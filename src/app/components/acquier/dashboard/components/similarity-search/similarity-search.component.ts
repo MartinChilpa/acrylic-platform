@@ -3,6 +3,7 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { EMPTY, Subject, defer, of } from 'rxjs';
 import { catchError, exhaustMap, expand, last, map, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
@@ -11,6 +12,7 @@ import { LicenseComponent } from '../license/license.component';
 import { TeamPlayerOptimizationComponent } from './team-player-optimization/team-player-optimization.component';
 import { TeamPlayersService, TeamPlayerDto } from '../../../../../services/team-players.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
+import { ProjectsService } from '../../../../../services/projects.service';
 interface Suggestion {
   icon: string;
   type: string;
@@ -41,11 +43,17 @@ export class SimilaritySearchComponent implements OnInit {
   @Output() searchInput = new EventEmitter<string>();
   @Output() searched = new EventEmitter<void>();
   
+  private router = inject(Router);
   private similarityService = inject(SimilarityUrlService);
   private aimsDownloadService = inject(AimsDownloadService);
   private modalService = inject(ModalService);
   private teamPlayersService = inject(TeamPlayersService);
   private brandingService = inject(TeamBrandingService);
+  private projectsService = inject(ProjectsService);
+
+  favoriteTrackIds = new Set<string>();
+  licensedTrackIds = new Set<string>();
+
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
     { offset: 94.208, duration: 44.184 },
@@ -121,6 +129,24 @@ export class SimilaritySearchComponent implements OnInit {
 
   ngOnInit() {
     this.loadClubPlayers();
+    this.projectsService.loadFavorites();
+    this.projectsService.favorites$.subscribe((favs) => {
+      const ids = new Set<string>();
+      favs.forEach(f => {
+        const k = this.projectsService.trackKey(f);
+        if (k) { ids.add(k); }
+      });
+      this.favoriteTrackIds = ids;
+    });
+    this.projectsService.licensedTracks$.subscribe((tracks) => {
+      const ids = new Set<string>();
+      tracks.forEach((t: any) => {
+        const k = this.projectsService.trackKey(t);
+        if (k) { ids.add(k); }
+      });
+      this.licensedTrackIds = ids;
+    });
+    this.projectsService.loadLicenses();
     this.manualSearch$.pipe(
       tap(() => {
         this.startLoadingUi();
@@ -248,6 +274,23 @@ export class SimilaritySearchComponent implements OnInit {
       return null;
     }
     return filtered;
+  }
+
+  getTrackId(result: any): string {
+    // Use the single canonical key shared with ProjectsService so the heart
+    // state matches what gets stored (and never duplicates).
+    return this.projectsService.trackKey(result);
+  }
+
+  toggleFavorite(result: any): void {
+    const id = this.getTrackId(result);
+    if (!id) {
+      console.warn('[SimilaritySearch] toggleFavorite: track has no stable key, skipping', result);
+      return;
+    }
+    this.projectsService.toggleFavorite(id, result).subscribe({
+      error: (err) => console.error('[SimilaritySearch] toggleFavorite request failed', err)
+    });
   }
 
   private loadClubPlayers(): void {
@@ -509,10 +552,25 @@ export class SimilaritySearchComponent implements OnInit {
 
   confirmLicenseHappyPath(): void {
     this.licensedTrack = this.licenseModalTrack;
+    if (this.licenseModalTrack) {
+      this.projectsService.addLicensedTrack(this.licenseModalTrack);
+      const trackId = this.licenseModalTrack?.uuid ?? String(this.licenseModalTrack?.id ?? '');
+      if (trackId) {
+        this.projectsService.createLicense(trackId, this.paidMediaAddOn).subscribe({
+          error: () => {}
+        });
+      }
+    }
     this.modalService.hideModal('license-track-modal');
     setTimeout(() => {
       this.modalService.showModal('track-licensed-modal');
     }, 350);
+  }
+
+  goToLicenses(): void {
+    this.modalService.hideModal('track-licensed-modal');
+    this.resetLicenseFlow();
+    this.router.navigate(['/brand/licenses']);
   }
 
   resetLicenseFlow(): void {
