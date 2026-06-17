@@ -1,0 +1,145 @@
+<div class="result-card result-row" [ngClass]="getResultThemeClass(track)">
+  <div class="track-grid">
+    <div>
+      <div class="header-artist">
+        <img class="thumb-image" [src]="getTrackImage(track)" [alt]="track.track_name || 'Track thumbnail'" />
+
+        <div class="pte1">
+          <div class="title-line">
+            <div class="title-line__left">
+              <span>{{ track.track_name || track.name || 'Sin titulo' }}</span>
+              <img
+                *ngIf="getArtistCountryCode2(track) as code2"
+                class="country-flag"
+                [src]="getCountryFlagUrl(code2)"
+                [alt]="code2 + ' flag'" />
+            </div>
+          </div>
+          <div class="div-subtitle">
+            <p class="subtitle-artist">{{ track.artist_canonical || track.artist_name || 'Artista desconocido' }}</p>
+          </div>
+        </div>
+
+        <div class="pt2">
+          <div class="pt2-icon-tier" [ngClass]="getTierClass(track)">
+            {{ getTierLabel(track) }}
+          </div>
+
+          <div class="pt2-item">
+            <img class="pt2-icon" [src]="getAudienceSizeIconPath(track)" alt="Audience size" />
+            <span class="pt2-label" *ngIf="getAudienceSize(track) as audience">{{ audience }}</span>
+          </div>
+
+          <div class="pt2-item">
+            <img class="pt2-icon" [src]="getSportFitIconPath(track)" alt="Sport Fit" />
+            <span class="pt2-label">{{ getAudienceSportFitPercentage(track) ?? '--' }}%</span>
+          </div>
+
+          <div class="pt2-item">
+            <img class="pt2-icon" [src]="getTrackViralityIconPath(track)" alt="Track virality" />
+            <span class="pt2-label">{{ getTrackViralityPercentage(track) ?? '--' }}%</span>
+          </div>
+        </div>
+
+        <div class="pt3" style="flex-direction: row">
+          <div class="wave-shell">
+            <div class="waveform-box">
+              <div
+                class="waveform"
+                *ngIf="getTrackWaveformUrl(track); else noWaveform"
+                #waveOverviewRef>
+              </div>
+              <div class="waveform-loading" *ngIf="waveformLoading">
+                <div class="waveform-loading__spinner" aria-hidden="true"></div>
+              </div>
+              <ng-template #noWaveform>
+                <div class="waveform-empty">No waveform available</div>
+              </ng-template>
+            </div>
+
+            <div class="wave-controls" *ngIf="getTrackAudioUrl(track)">
+              <span class="audio-timer">{{ timerLabel }}</span>
+              <button class="btn-play-wave" type="button" (click)="toggleTrackPlayback()">
+                {{ isPlaying ? '⏸' : '▶' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="waveform-error" *ngIf="waveformError">{{ waveformError }}</div>
+
+          <audio
+            *ngIf="getTrackAudioUrl(track) as audioUrl"
+            class="audio-hidden"
+            #audioRef
+            [src]="audioUrl"
+            preload="auto"
+            (playing)="onPlay()"
+            (pause)="onPause()"
+            (ended)="onPause()">
+          </audio>
+
+          <div class="button-section">
+            <button
+              type="button"
+              class="btn-section-action btn-favorite"
+              [class.is-favorited]="favorited"
+              (click)="toggleFavorite()"
+              aria-label="Toggle favorite">
+              <ng-container *ngIf="favorited; else heartOutline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M2 9.50004C2.00002 8.38724 2.33759 7.30062 2.96813 6.3837C3.59867 5.46678 4.49252 4.7627 5.53161 4.36444C6.5707 3.96618 7.70616 3.89248 8.78801 4.15308C9.86987 4.41368 10.8472 4.99632 11.591 5.82404C11.6434 5.88005 11.7067 5.92471 11.7771 5.95524C11.8474 5.98577 11.9233 6.00152 12 6.00152C12.0767 6.00152 12.1526 5.98577 12.2229 5.95524C12.2933 5.92471 12.3566 5.88005 12.409 5.82404C13.1504 4.99094 14.128 4.40341 15.2116 4.13964C16.2952 3.87588 17.4335 3.94839 18.4749 4.34752C19.5163 4.74666 20.4114 5.45349 21.0411 6.37394C21.6708 7.29439 22.0053 8.3848 22 9.50004C22 11.79 20.5 13.5 19 15L13.508 20.313C13.3217 20.527 13.0919 20.699 12.834 20.8173C12.5762 20.9357 12.296 20.9979 12.0123 20.9997C11.7285 21.0015 11.4476 20.9429 11.1883 20.8278C10.9289 20.7127 10.697 20.5437 10.508 20.332L5 15C3.5 13.5 2 11.8 2 9.50004Z" fill="white"/>
+                </svg>
+              </ng-container>
+              <ng-template #heartOutline>
+                <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
+              </ng-template>
+            </button>
+
+            <span class="lic-status">
+              <svg *ngIf="licensed" class="lic-status__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20" fill="none">
+                <path d="M5 8L7 10L11 6M13 1C13.5304 1 14.0391 1.21071 14.4142 1.58579C14.7893 1.96086 15 2.46957 15 3V18C14.9999 18.1751 14.9539 18.3472 14.8665 18.4989C14.7791 18.6506 14.6533 18.7767 14.5019 18.8646C14.3504 18.9525 14.1785 18.9991 14.0034 18.9997C13.8283 19.0003 13.6561 18.9549 13.504 18.868L8.992 16.29C8.68987 16.1174 8.34795 16.0266 8 16.0266C7.65205 16.0266 7.31013 16.1174 7.008 16.29L2.496 18.868C2.34394 18.9549 2.17174 19.0003 1.99662 18.9997C1.8215 18.9991 1.64961 18.9525 1.49814 18.8646C1.34667 18.7767 1.22094 18.6506 1.13352 18.4989C1.0461 18.3472 1.00006 18.1751 1 18V3C1 2.46957 1.21071 1.96086 1.58579 1.58579C1.96086 1.21071 2.46957 1 3 1H13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="lic-status__text">{{ licensed ? 'Licensed' : 'Unlicensed' }}</span>
+            </span>
+
+            <button
+              type="button"
+              class="btn-section-action"
+              [class.is-open]="panelOpen"
+              (click)="togglePanel()"
+              aria-label="Toggle license panel">
+              <img
+                [src]="panelOpen ? 'assets/images/icons/panel-top-open.svg' : 'assets/images/icons/panel-top-close.svg'"
+                [alt]="panelOpen ? 'Close panel' : 'Open panel'" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="track-panel" *ngIf="panelOpen">
+      <div class="track-panel__license">
+        <div class="track-panel__info">
+          <span class="track-panel__tier" [ngClass]="getTierClass(track)">{{ getTierLabel(track) }}</span>
+          <span class="track-panel__price" *ngIf="getTrackLicensePrice(track) as price">{{ price }}</span>
+        </div>
+
+        <button
+          *ngIf="!licensed; else alreadyLicensed"
+          type="button"
+          class="track-panel__btn"
+          (click)="licenseTrack()">
+          License this track
+        </button>
+        <ng-template #alreadyLicensed>
+          <span class="track-panel__done">
+            <svg class="lic-status__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20" fill="none">
+              <path d="M5 8L7 10L11 6M13 1C13.5304 1 14.0391 1.21071 14.4142 1.58579C14.7893 1.96086 15 2.46957 15 3V18C14.9999 18.1751 14.9539 18.3472 14.8665 18.4989C14.7791 18.6506 14.6533 18.7767 14.5019 18.8646C14.3504 18.9525 14.1785 18.9991 14.0034 18.9997C13.8283 19.0003 13.6561 18.9549 13.504 18.868L8.992 16.29C8.68987 16.1174 8.34795 16.0266 8 16.0266C7.65205 16.0266 7.31013 16.1174 7.008 16.29L2.496 18.868C2.34394 18.9549 2.17174 19.0003 1.99662 18.9997C1.8215 18.9991 1.64961 18.9525 1.49814 18.8646C1.34667 18.7767 1.22094 18.6506 1.13352 18.4989C1.0461 18.3472 1.00006 18.1751 1 18V3C1 2.46957 1.21071 1.96086 1.58579 1.58579C1.96086 1.21071 2.46957 1 3 1H13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Licensed
+          </span>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

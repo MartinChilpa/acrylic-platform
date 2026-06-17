@@ -7,6 +7,8 @@ export interface IFavoriteResult {
   artist_name: string;
   cover_image: string;
   created: string;
+  /** Full track snapshot so rich UI (waveform, metrics, tier) can render later. */
+  track?: any;
 }
 
 export interface ILicenseResult {

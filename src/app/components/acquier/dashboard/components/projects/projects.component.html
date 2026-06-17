@@ -77,22 +77,8 @@
       <span class="favorites__count">{{ favorites.length }}</span>
     </div>
     <div class="favorites__list">
-      <div class="favorite-card" *ngFor="let fav of favorites">
-        <img [src]="fav.cover_image" [alt]="fav.track_name" class="favorite-card__cover" (error)="onImgError($event)" />
-        <div class="favorite-card__info">
-          <span class="favorite-card__name">{{ fav.track_name }}</span>
-          <span class="favorite-card__artist">{{ fav.artist_name }}</span>
-        </div>
-        <div class="favorite-card__actions">
-          <select class="favorite-card__select" (change)="addToProject($event, fav)" [value]="''"
-            [title]="projects.length === 0 ? 'Create a project first' : 'Add to project'">
-            <option value="" disabled selected>Add to project…</option>
-            <option *ngFor="let p of projects" [value]="p.uuid" [disabled]="isFavoritedInProject(p, fav)">
-              {{ p.name }}{{ isFavoritedInProject(p, fav) ? ' ✓' : '' }}
-            </option>
-          </select>
-          <button class="favorite-card__unfav" (click)="unfavorite(fav)" aria-label="Remove from favorites">♡</button>
-        </div>
+      <div class="favorite-item" *ngFor="let fav of favorites">
+        <acrylic-track-row-projects [track]="rowTrack(fav)"></acrylic-track-row-projects>
       </div>
     </div>
   </div>

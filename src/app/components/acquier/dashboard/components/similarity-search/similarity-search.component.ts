@@ -132,18 +132,16 @@ export class SimilaritySearchComponent implements OnInit {
     this.projectsService.favorites$.subscribe((favs) => {
       const ids = new Set<string>();
       favs.forEach(f => {
-        if (f.track_id != null) { ids.add(String(f.track_id)); }
-        if (f.track_uuid) { ids.add(f.track_uuid); }
+        const k = this.projectsService.trackKey(f);
+        if (k) { ids.add(k); }
       });
       this.favoriteTrackIds = ids;
     });
     this.projectsService.licensedTracks$.subscribe((tracks) => {
       const ids = new Set<string>();
       tracks.forEach((t: any) => {
-        if (t.track_id != null) { ids.add(String(t.track_id)); }
-        if (t.track_uuid) { ids.add(t.track_uuid); }
-        if (t.id != null) { ids.add(String(t.id)); }
-        if (t.uuid) { ids.add(t.uuid); }
+        const k = this.projectsService.trackKey(t);
+        if (k) { ids.add(k); }
       });
       this.licensedTrackIds = ids;
     });
@@ -278,13 +276,20 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   getTrackId(result: any): string {
-    return String(result?.id ?? result?.uuid ?? '');
+    // Use the single canonical key shared with ProjectsService so the heart
+    // state matches what gets stored (and never duplicates).
+    return this.projectsService.trackKey(result);
   }
 
   toggleFavorite(result: any): void {
-    const id = result?.id ?? result?.uuid;
-    if (id == null) { return; }
-    this.projectsService.toggleFavorite(id, result).subscribe();
+    const id = this.getTrackId(result);
+    if (!id) {
+      console.warn('[SimilaritySearch] toggleFavorite: track has no stable key, skipping', result);
+      return;
+    }
+    this.projectsService.toggleFavorite(id, result).subscribe({
+      error: (err) => console.error('[SimilaritySearch] toggleFavorite request failed', err)
+    });
   }
 
   private loadClubPlayers(): void {

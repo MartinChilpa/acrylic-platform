@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { IFavoriteResult, IProjectResult } from '../../../../../interfaces/response/projects.response';
+import { TrackRowProjectsComponent } from '../track-row-projects/track-row-projects.component';
 
 @Component({
   selector: 'acrylic-projects',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TrackRowProjectsComponent],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss',
 })
@@ -103,5 +104,14 @@ export class ProjectsComponent implements OnInit {
 
   onImgError(event: Event): void {
     (event.target as HTMLImageElement).src = 'assets/images/others/default.jpg';
+  }
+
+  /**
+   * The object to feed the track row. Optimistic favorites embed the full track
+   * object; backend favorites expose `track` as a uuid string, so fall back to the
+   * favorite row itself (which carries track_name / artist_name / cover_image).
+   */
+  rowTrack(fav: IFavoriteResult): any {
+    return fav.track && typeof fav.track === 'object' ? fav.track : fav;
   }
 }

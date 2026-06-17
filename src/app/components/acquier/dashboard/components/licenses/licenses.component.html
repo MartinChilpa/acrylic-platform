@@ -11,7 +11,7 @@
     <div class="stat-card">
       <span class="stat-card__label">Active Licenses</span>
       <span class="stat-card__value">{{ activeLicensesCount }}</span>
-      <span class="stat-card__sub">total active</span>
+      <span class="stat-card__sub">across all projects</span>
     </div>
     <div class="stat-card">
       <span class="stat-card__label">Whitelisting in Progress</span>
@@ -19,12 +19,12 @@
       <span class="stat-card__sub">awaiting distributor</span>
     </div>
     <div class="stat-card">
-      <span class="stat-card__label">Usage Links Due</span>
-      <span class="stat-card__value">0</span>
+      <span class="stat-card__label stat-card__label--dim">Usage Links Due</span>
+      <span class="stat-card__value">{{ usageLinksDueCount }}</span>
       <span class="stat-card__sub">awaiting links</span>
     </div>
-    <div class="stat-card stat-card--alert">
-      <span class="stat-card__label">Needs Attention</span>
+    <div class="stat-card">
+      <span class="stat-card__label stat-card__label--dim">Needs Attention</span>
       <span class="stat-card__value stat-card__value--alert">{{ needsAttentionCount }}</span>
       <span class="stat-card__sub">follow-up required</span>
     </div>
@@ -40,14 +40,15 @@
       class="lic-search"
       type="text"
       [(ngModel)]="searchQuery"
-      placeholder="Search licenses, tracks, artists, or ISRC" />
+      placeholder="Search with text or paste content link" />
   </div>
 
-  <!-- Main content: table + detail panel -->
-  <div class="lic-body" [class.lic-body--split]="selectedLicense">
+  <!-- Main content: rows (detail opens as an overlay drawer, list stays put) -->
+  <div class="lic-body">
 
     <!-- Table -->
     <div class="lic-table-wrap">
+
       <!-- Empty state -->
       <div class="lic-empty" *ngIf="licenses.length === 0">
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
@@ -57,103 +58,170 @@
         <p class="lic-empty__sub">License a track from the search to see it here.</p>
       </div>
 
-      <table class="lic-table" *ngIf="licenses.length > 0">
-        <thead>
-          <tr class="lic-table__head">
-            <th>Track</th>
-            <th>Preview</th>
-            <th>Project</th>
-            <th>Licensed</th>
-            <th>Usage Due</th>
-            <th>Type</th>
-            <th>Whitelisting Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="lic-table__row"
-              *ngFor="let lic of filteredLicenses"
-              [class.lic-table__row--active]="selectedLicense?.licenseId === lic.licenseId"
-              (click)="selectLicense(lic)">
+      <!-- Column headings -->
+      <div class="lic-row-head" *ngIf="licenses.length > 0">
+        <span class="lic-row-head__col lic-row-head__col--track">Track</span>
+        <span class="lic-row-head__col lic-row-head__col--preview">Preview</span>
+        <span class="lic-row-head__col lic-row-head__col--date">Licensed</span>
+        <span class="lic-row-head__col lic-row-head__col--due">Usage Due</span>
+        <span class="lic-row-head__col lic-row-head__col--type">Type</span>
+        <span class="lic-row-head__col lic-row-head__col--status">Whitelisting</span>
+        <span class="lic-row-head__col lic-row-head__col--links">Campaign Links</span>
+      </div>
 
-            <td class="lic-col-track">
+      <div class="lic-rows">
+        <div class="lic-row"
+             *ngFor="let lic of filteredLicenses"
+             [class.lic-row--active]="selectedLicense?.licenseId === lic.licenseId"
+             (click)="selectLicense(lic)">
+
+          <div class="lic-col-track">
+            <div class="lic-col-track__cover-wrap">
               <img class="lic-col-track__cover" [src]="getTrackImage(lic.track)" [alt]="lic.track.track_name" (error)="onImgError($event)" />
-              <div class="lic-col-track__info">
-                <span class="lic-col-track__name">{{ lic.track.track_name || lic.track.name || '—' }}</span>
-                <span class="lic-col-track__artist">{{ lic.track.artist_canonical || lic.track.artist_name || '—' }}</span>
-              </div>
-            </td>
-
-            <td class="lic-col-preview">
-              <div class="lic-waveform-placeholder">
-                <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
-                  <rect x="0" y="10" width="2" height="4" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="4" y="7" width="2" height="10" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="8" y="4" width="2" height="16" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="12" y="8" width="2" height="8" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="16" y="5" width="2" height="14" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="20" y="9" width="2" height="6" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="24" y="3" width="2" height="18" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="28" y="7" width="2" height="10" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="32" y="6" width="2" height="12" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="36" y="9" width="2" height="6" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="40" y="4" width="2" height="16" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="44" y="8" width="2" height="8" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="48" y="5" width="2" height="14" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="52" y="10" width="2" height="4" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="56" y="7" width="2" height="10" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="60" y="3" width="2" height="18" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="64" y="9" width="2" height="6" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="68" y="6" width="2" height="12" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="72" y="8" width="2" height="8" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="76" y="11" width="2" height="2" rx="1" fill="rgba(255,255,255,0.25)"/>
-                </svg>
-              </div>
-            </td>
-
-            <td class="lic-col-text">{{ lic.project }}</td>
-            <td class="lic-col-text lic-col-date">{{ lic.licensedAt | date:'MMM d, yyyy' }}</td>
-            <td class="lic-col-text lic-col-due">{{ lic.usageDue ?? '—' }}</td>
-
-            <td class="lic-col-type">
-              <span class="tier-badge" [class]="getTierClass(lic.licenseType)">{{ lic.licenseType }}</span>
-            </td>
-
-            <td class="lic-col-status">
-              <span class="wl-status" [class]="'wl-status--' + lic.whitelistingStatus">
-                <span class="wl-dot"></span>
-                {{ getStatusLabel(lic.whitelistingStatus) }}
+            </div>
+            <div class="lic-col-track__info">
+              <span class="lic-col-track__name">{{ lic.track.track_name || lic.track.name || '—' }}</span>
+              <span class="lic-col-track__artist">
+                <ng-container *ngIf="toFlagEmoji(getArtistCountryCode2(lic.track)) as flag">{{ flag }}&nbsp;</ng-container>
+                {{ lic.track.artist_canonical || lic.track.artist_name || '—' }}
+                <ng-container *ngIf="lic.track.track_name_track"> · {{ lic.track.track_name_track }}</ng-container>
               </span>
-            </td>
+            </div>
+          </div>
 
-            <td class="lic-col-action">
-              <button class="lic-view-btn" (click)="selectLicense(lic); $event.stopPropagation()">View License</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          <div class="lic-col-preview">
+            <div class="lic-waveform" (click)="$event.stopPropagation()">
+              <div class="lic-waveform__bars">
+                <span class="lic-waveform__bar"
+                      *ngFor="let h of getWaveformBars(lic); let i = index"
+                      [class.lic-waveform__bar--active]="isBarActive(lic, i, 32)"
+                      [style.height.px]="h"></span>
+              </div>
+              <span class="lic-waveform__time">{{ getDurationLabel(lic) }}</span>
+              <button type="button"
+                      class="lic-play-btn"
+                      [class]="getPlayButtonClass(lic.licenseType)"
+                      [disabled]="!canPlay(lic)"
+                      (click)="togglePlay(lic, $event)"
+                      [attr.aria-label]="isPlaying(lic) ? 'Pause' : 'Play'">
+                <svg *ngIf="!isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="white"/>
+                </svg>
+                <svg *ngIf="isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="white"/>
+                  <rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="white"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="lic-col-text lic-col-date">{{ lic.licensedAt | date:'MMM d, yyyy' }}</div>
+
+          <div class="lic-col-due" [class.lic-col-due--overdue]="lic.isUsageOverdue">
+            {{ lic.isUsageOverdue ? 'Usage overdue' : (lic.usageDue ?? '—') }}
+          </div>
+
+          <div class="lic-col-type">
+            <span class="tier-badge" [class]="getTierClass(lic.licenseType)">{{ lic.licenseType }}</span>
+          </div>
+
+          <div class="lic-col-status">
+            <span class="wl-status" [class]="'wl-status--' + lic.whitelistingStatus">
+              <span class="wl-dot"></span>
+              {{ getStatusLabel(lic.whitelistingStatus) }}
+            </span>
+          </div>
+
+          <div class="lic-col-links">
+            <span class="links-cell__label" [class.links-cell__label--submitted]="getCampaignSubmittedCount(lic) > 0">
+              {{ getCampaignStatusLabel(lic) }}
+            </span>
+            <div class="links-cell__icons" (click)="$event.stopPropagation()">
+              <button type="button"
+                      class="platform-icon"
+                      *ngFor="let platform of campaignPlatforms"
+                      [class]="'platform-icon--' + getIconStatus(lic, platform.key)"
+                      [attr.aria-label]="(hasLink(lic, platform.key) ? 'Open ' : 'Add ') + platform.label + ' link'"
+                      (click)="onCampaignIconClick(lic, platform.key)">
+
+                <svg *ngIf="platform.key === 'tiktok'" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.01a8.16 8.16 0 0 0 4.77 1.52V7.08a4.85 4.85 0 0 1-1-.39z" fill="currentColor"/>
+                </svg>
+                <svg *ngIf="platform.key === 'instagram'" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 11C3 7.229 3 5.343 4.172 4.172C5.344 3.001 7.229 3 11 3H13C16.771 3 18.657 3 19.828 4.172C20.999 5.344 21 7.229 21 11V13C21 16.771 21 18.657 19.828 19.828C18.656 20.999 16.771 21 13 21H11C7.229 21 5.343 21 4.172 19.828C3.001 18.656 3 16.771 3 13V11Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M16.5 9C17.3284 9 18 8.32843 18 7.5C18 6.67157 17.3284 6 16.5 6C15.6716 6 15 6.67157 15 7.5C15 8.32843 15.6716 9 16.5 9Z" fill="currentColor"/>
+                  <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <svg *ngIf="platform.key === 'youtube'" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M2 12C2 8.7 2 7.05 3.464 6.025C4.93 5 7.286 5 12 5C16.714 5 19.071 5 20.535 6.025C21.999 7.05 22 8.7 22 12C22 15.3 22 16.95 20.535 17.975C19.072 19 16.714 19 12 19C7.286 19 4.929 19 3.464 17.975C1.999 16.95 2 15.3 2 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M10.5 9.90814V14.0921C10.5003 14.146 10.5111 14.1992 10.532 14.2489C10.5528 14.2985 10.5832 14.3436 10.6215 14.3815C10.6598 14.4194 10.7051 14.4493 10.755 14.4697C10.8048 14.4901 10.8582 14.5004 10.912 14.5001C10.9931 14.5011 11.0727 14.4774 11.14 14.4321L14.315 12.3581C14.3715 12.3216 14.418 12.2715 14.4503 12.2125C14.4826 12.1534 14.4996 12.0872 14.4999 12.0199C14.5002 11.9527 14.4837 11.8863 14.452 11.827C14.4202 11.7677 14.3742 11.7172 14.318 11.6801L11.143 9.57014C11.0522 9.50938 10.9412 9.48685 10.8339 9.50744C10.7266 9.52804 10.6318 9.59009 10.57 9.68014C10.524 9.74725 10.4996 9.82679 10.5 9.90814Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="lic-col-action">
+            <button class="lic-view-btn" (click)="selectLicense(lic); $event.stopPropagation()">Details</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Detail panel -->
-    <div class="lic-panel" *ngIf="selectedLicense as lic">
+  <!-- Detail drawer (overlay) -->
+  <div class="lic-drawer-backdrop" *ngIf="selectedLicense" (click)="selectedLicense = null"></div>
+  <div class="lic-panel lic-drawer" *ngIf="selectedLicense as lic">
       <div class="lic-panel__header">
         <div class="lic-panel__track-info">
           <img class="lic-panel__cover" [src]="getTrackImage(lic.track)" (error)="onImgError($event)" [alt]="lic.track.track_name" />
           <div>
             <div class="lic-panel__track-name">{{ lic.track.track_name || lic.track.name || '—' }}</div>
-            <div class="lic-panel__track-artist">{{ lic.track.artist_canonical || lic.track.artist_name || '—' }}</div>
+            <div class="lic-panel__track-artist">
+              {{ lic.track.artist_canonical || lic.track.artist_name || '—' }}
+              <ng-container *ngIf="lic.track.track_name_track"> · {{ lic.track.track_name_track }}</ng-container>
+            </div>
           </div>
         </div>
-        <div class="lic-panel__wl-status">
-          <span class="wl-dot wl-dot--confirmed"></span>
-          <span>Whitelisting Status: {{ getStatusLabel(lic.whitelistingStatus) }}</span>
-        </div>
-        <div class="lic-panel__lic-id">{{ lic.licenseId }}</div>
         <button class="lic-panel__close" (click)="selectedLicense = null" aria-label="Close">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none">
             <path d="M15 5L5 15M5 5L15 15" stroke="rgba(255,255,255,0.5)" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
+      </div>
+
+      <div class="lic-panel__wl-status" [class]="'lic-panel__wl-status--' + lic.whitelistingStatus">
+        <span class="lic-panel__wl-left">
+          <span class="wl-dot" [class]="'wl-dot--' + lic.whitelistingStatus"></span>
+          <span>Whitelisting {{ getStatusLabel(lic.whitelistingStatus) }}</span>
+        </span>
+        <span class="lic-panel__wl-id">{{ lic.licenseId }}</span>
+      </div>
+
+      <!-- Waveform (intentionally placed below the header/status, not at the very top) -->
+      <div class="lic-panel__waveform-wrap">
+        <div class="lic-waveform lic-waveform--lg">
+          <div class="lic-waveform__bars">
+            <span class="lic-waveform__bar"
+                  *ngFor="let h of getWaveformBars(lic, 48); let i = index"
+                  [class.lic-waveform__bar--active]="isBarActive(lic, i, 48)"
+                  [style.height.px]="h"></span>
+          </div>
+          <span class="lic-waveform__time">{{ getDurationLabel(lic) }}</span>
+          <button type="button"
+                  class="lic-play-btn"
+                  [class]="getPlayButtonClass(lic.licenseType)"
+                  [disabled]="!canPlay(lic)"
+                  (click)="togglePlay(lic, $event)"
+                  [attr.aria-label]="isPlaying(lic) ? 'Pause' : 'Play'">
+            <svg *ngIf="!isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="white"/>
+            </svg>
+            <svg *ngIf="isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="white"/>
+              <rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="white"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div class="lic-panel__divider"></div>
@@ -227,47 +295,68 @@
 
       <div class="lic-panel__divider"></div>
 
-      <!-- Submitted Properties -->
+      <!-- Campaign Links and Properties -->
       <div class="lic-panel__section">
-        <div class="lic-panel__section-title">Submitted Properties</div>
-        <div class="lic-panel__row">
-          <span class="lic-panel__key lic-panel__key--platform">
+        <div class="lic-panel__section-title">Campaign Links and Properties</div>
+        <div class="lic-panel__campaign-card">
+        <div class="campaign-link-row" *ngFor="let platform of campaignPlatforms">
+          <span class="campaign-link-row__icon" [class]="'platform-icon--' + getIconStatus(lic, platform.key)">
+            <svg *ngIf="platform.key === 'tiktok'" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.01a8.16 8.16 0 0 0 4.77 1.52V7.08a4.85 4.85 0 0 1-1-.39z" fill="currentColor"/>
+            </svg>
+            <svg *ngIf="platform.key === 'instagram'" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M3 11C3 7.229 3 5.343 4.172 4.172C5.344 3.001 7.229 3 11 3H13C16.771 3 18.657 3 19.828 4.172C20.999 5.344 21 7.229 21 11V13C21 16.771 21 18.657 19.828 19.828C18.656 20.999 16.771 21 13 21H11C7.229 21 5.343 21 4.172 19.828C3.001 18.656 3 16.771 3 13V11Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M16.5 9C17.3284 9 18 8.32843 18 7.5C18 6.67157 17.3284 6 16.5 6C15.6716 6 15 6.67157 15 7.5C15 8.32843 15.6716 9 16.5 9Z" fill="currentColor"/>
+              <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <svg *ngIf="platform.key === 'youtube'" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M2 12C2 8.7 2 7.05 3.464 6.025C4.93 5 7.286 5 12 5C16.714 5 19.071 5 20.535 6.025C21.999 7.05 22 8.7 22 12C22 15.3 22 16.95 20.535 17.975C19.072 19 16.714 19 12 19C7.286 19 4.929 19 3.464 17.975C1.999 16.95 2 15.3 2 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10.5 9.90814V14.0921C10.5003 14.146 10.5111 14.1992 10.532 14.2489C10.5528 14.2985 10.5832 14.3436 10.6215 14.3815C10.6598 14.4194 10.7051 14.4493 10.755 14.4697C10.8048 14.4901 10.8582 14.5004 10.912 14.5001C10.9931 14.5011 11.0727 14.4774 11.14 14.4321L14.315 12.3581C14.3715 12.3216 14.418 12.2715 14.4503 12.2125C14.4826 12.1534 14.4996 12.0872 14.4999 12.0199C14.5002 11.9527 14.4837 11.8863 14.452 11.827C14.4202 11.7677 14.3742 11.7172 14.318 11.6801L11.143 9.57014C11.0522 9.50938 10.9412 9.48685 10.8339 9.50744C10.7266 9.52804 10.6318 9.59009 10.57 9.68014C10.524 9.74725 10.4996 9.82679 10.5 9.90814Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="campaign-link-row__label">{{ platform.label }}</span>
+
+          <!-- Link present: green confirmation pill (opens the link) -->
+          <a *ngIf="hasLink(lic, platform.key)"
+             class="campaign-link-row__added"
+             [href]="getLinkValue(lic, platform.key)" target="_blank" rel="noopener"
+             [title]="getLinkValue(lic, platform.key)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/>
-              <polygon points="9.75,15.02 15.5,12 9.75,8.98 9.75,15.02" fill="white"/>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+              <path d="M8.5 12.5L11 15L15.5 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            YouTube
-          </span>
-          <span class="lic-panel__val">—</span>
-        </div>
-        <div class="lic-panel__row">
-          <span class="lic-panel__key lic-panel__key--platform">
+            Link added
+          </a>
+
+          <!-- Default: Add link button -->
+          <button *ngIf="!hasLink(lic, platform.key) && !isEditingLink(lic, platform.key)"
+                  type="button" class="campaign-link-row__add" (click)="startAddLink(lic, platform.key)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <rect x="2" y="2" width="20" height="20" rx="5" fill="url(#ig-grad)"/>
-              <circle cx="12" cy="12" r="5" stroke="white" stroke-width="1.5" fill="none"/>
-              <circle cx="17.5" cy="6.5" r="1" fill="white"/>
-              <defs>
-                <linearGradient id="ig-grad" x1="2" y1="22" x2="22" y2="2">
-                  <stop offset="0%" stop-color="#f09433"/>
-                  <stop offset="25%" stop-color="#e6683c"/>
-                  <stop offset="50%" stop-color="#dc2743"/>
-                  <stop offset="75%" stop-color="#cc2366"/>
-                  <stop offset="100%" stop-color="#bc1888"/>
-                </linearGradient>
-              </defs>
+              <path d="M9 15L15 9M11 5L12.5 3.5C14.5 1.5 17.5 1.5 19.5 3.5C21.5 5.5 21.5 8.5 19.5 10.5L18 12M13 19L11.5 20.5C9.5 22.5 6.5 22.5 4.5 20.5C2.5 18.5 2.5 15.5 4.5 13.5L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Instagram
-          </span>
-          <span class="lic-panel__val">—</span>
+            Add link
+          </button>
+
+          <!-- Editing: inline input (no browser prompt) -->
+          <div class="campaign-link-edit" *ngIf="!hasLink(lic, platform.key) && isEditingLink(lic, platform.key)">
+            <div class="campaign-link-edit__field" [class.campaign-link-edit__field--error]="linkError">
+              <input #linkBox
+                     class="campaign-link-edit__input"
+                     type="text"
+                     [(ngModel)]="linkInput"
+                     [placeholder]="'Paste ' + platform.label + ' link'"
+                     (keyup.enter)="confirmAddLink(lic, platform.key)"
+                     (keyup.escape)="cancelAddLink()" />
+              <button type="button" class="campaign-link-edit__save" (click)="confirmAddLink(lic, platform.key)">Save</button>
+              <button type="button" class="campaign-link-edit__cancel" (click)="cancelAddLink()" aria-label="Cancel">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                  <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <span class="campaign-link-edit__error" *ngIf="linkError">{{ linkError }}</span>
+          </div>
         </div>
-        <div class="lic-panel__row">
-          <span class="lic-panel__key lic-panel__key--platform">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.01a8.16 8.16 0 0 0 4.77 1.52V7.08a4.85 4.85 0 0 1-1-.39z"/>
-            </svg>
-            TikTok
-          </span>
-          <span class="lic-panel__val">—</span>
         </div>
       </div>
 
@@ -301,7 +390,15 @@
         </div>
       </div>
 
-    </div>
+      <div class="lic-panel__divider"></div>
+
+      <div class="lic-panel__actions">
+        <button type="button"
+                class="lic-panel__btn lic-panel__btn--download"
+                [class]="getDownloadButtonClass(lic.licenseType)"
+                title="Coming soon">Download License</button>
+      </div>
+      <a class="lic-panel__contact" href="mailto:hello@acrylic.la">Contact Acrylic Licensing Team →</a>
 
   </div>
 </div>

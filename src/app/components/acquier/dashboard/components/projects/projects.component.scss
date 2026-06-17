@@ -302,3 +302,32 @@ $radius-sm:     8px;
     p { margin: 0; }
   }
 }
+
+.favorites__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.favorite-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.favorite-item__assign {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.favorite-card__select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #1a1a1a;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  cursor: pointer;
+}
