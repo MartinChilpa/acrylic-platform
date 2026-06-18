@@ -396,7 +396,10 @@
         <button type="button"
                 class="lic-panel__btn lic-panel__btn--download"
                 [class]="getDownloadButtonClass(lic.licenseType)"
-                title="Coming soon">Download License</button>
+                [disabled]="downloadingLicenseId === lic.licenseId"
+                (click)="downloadLicense(lic)">
+          {{ downloadingLicenseId === lic.licenseId ? 'Generating…' : 'Download License' }}
+        </button>
       </div>
       <a class="lic-panel__contact" href="mailto:hello@acrylic.la">Contact Acrylic Licensing Team →</a>
 

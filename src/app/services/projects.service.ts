@@ -24,6 +24,7 @@ import { IFavoriteResult, ILicenseResult, IProjectResult } from '../interfaces/r
  * Licenses
  *   GET  /licenses/                       -> ILicenseResult[] (or { results })
  *   POST /licenses/          body: { track, extended_commercial_use } -> ILicenseResult
+ *   GET  /licenses/{uuid}/pdf/            -> application/pdf (rendered from the HTML template)
  *
  * Response shapes are defined in `interfaces/response/projects.response.ts`.
  *
@@ -183,6 +184,11 @@ export class ProjectsService {
 
   getLicenses(): Observable<ICommonSuccessResponse<ILicenseResult[]>> {
     return this.http.get<ICommonSuccessResponse<ILicenseResult[]>>(`${this.base}/licenses/`);
+  }
+
+  /** License PDF, rendered server-side from the HTML template. */
+  downloadLicensePdf(licenseUuid: string): Observable<Blob> {
+    return this.http.get(`${this.base}/licenses/${licenseUuid}/pdf/`, { responseType: 'blob' });
   }
 
   /* ──────────────────────────── Helpers ──────────────────────────── */

@@ -15,6 +15,8 @@ interface LicenseEntry {
   track: any;
   licensedAt: Date;
   licenseId: string;
+  /** Backend license uuid (present once it comes from GET /licenses/). Needed for the PDF. */
+  licenseUuid?: string;
   licenseType: string;
   whitelistingStatus: 'confirmed' | 'requested' | 'needs-attention' | 'pending';
   project: string;
@@ -52,6 +54,9 @@ export class LicensesComponent implements OnInit, OnDestroy {
   editingPlatform: { licenseId: string; platform: CampaignPlatform } | null = null;
   linkInput = '';
   linkError = '';
+
+  /** licenseId currently being downloaded (for the button loading/disabled state). */
+  downloadingLicenseId: string | null = null;
 
   readonly campaignPlatforms: CampaignPlatformMeta[] = [
     { key: 'youtube', label: 'YouTube', domains: ['youtube.com', 'youtu.be'] },
@@ -119,6 +124,8 @@ export class LicensesComponent implements OnInit, OnDestroy {
       track,
       licensedAt: now,
       licenseId: `ACR-${year}-${month}-${num}`,
+      // Backend license rows (ILicenseResult) carry both uuid + track_uuid; optimistic ones don't.
+      licenseUuid: (track?.uuid && track?.track_uuid) ? track.uuid : undefined,
       licenseType: track.tier_label ?? track.tier ?? 'ArtistPromo',
       whitelistingStatus: 'confirmed',
       project: '—',
@@ -362,5 +369,38 @@ export class LicensesComponent implements OnInit, OnDestroy {
   /** Solid download button colored by license tier. */
   getDownloadButtonClass(type: string): string {
     return 'dl-btn--' + this.getTierClass(type).replace('badge--', '');
+  }
+
+  /**
+   * Downloads the license PDF (rendered server-side from the HTML template).
+   * Wired to `GET /my-club/licenses/{uuid}/pdf/`; no-ops gracefully until the
+   * backend exposes it. Needs the backend license uuid (available once the
+   * license comes from GET /licenses/).
+   */
+  downloadLicense(lic: LicenseEntry): void {
+    if (this.downloadingLicenseId) { return; }
+    const uuid = lic.licenseUuid;
+    if (!uuid) {
+      console.warn('[Licenses] No backend license uuid yet; PDF needs the license persisted first.');
+      return;
+    }
+    this.downloadingLicenseId = lic.licenseId;
+    this.projectsService.downloadLicensePdf(uuid).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `license-${lic.licenseId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        this.downloadingLicenseId = null;
+      },
+      error: (err) => {
+        console.error('[Licenses] downloadLicense failed (endpoint not ready?)', err);
+        this.downloadingLicenseId = null;
+      },
+    });
   }
 }
