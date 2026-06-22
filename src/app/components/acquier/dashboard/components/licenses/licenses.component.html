@@ -397,6 +397,10 @@
                 class="lic-panel__btn lic-panel__btn--download"
                 [class]="getDownloadButtonClass(lic.licenseType)"
                 title="Coming soon">Download License</button>
+        <button type="button"
+                class="lic-panel__btn lic-panel__btn--delete"
+                (click)="deleteLicense(lic.track.uuid || lic.track.id, $event)"
+                title="Delete this license request">Delete License</button>
       </div>
       <a class="lic-panel__contact" href="mailto:hello@acrylic.la">Contact Acrylic Licensing Team →</a>
 

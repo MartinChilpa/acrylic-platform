@@ -348,10 +348,14 @@
               </div>
 
               <acrylic-license
+                *ngIf="!isTrackLicensed(seed)"
                 [priceId]="seed?.price_id"
                 [trackPrice]="seed?.price ?? seed?.license_price ?? seed?.price_amount"
                 (licenseClick)="openLicenseTrackModal(seed)"></acrylic-license>
 
+              <div *ngIf="isTrackLicensed(seed)" style="padding: 12px 16px; background: #f0f0f0; border-radius: 4px; font-size: 14px; color: #666;">
+                ✓ Licensed
+              </div>
 
             </div>
             
@@ -673,9 +677,14 @@
             </div>
 
             <acrylic-license
+              *ngIf="!isTrackLicensed(result)"
               [priceId]="result?.price_id"
               [trackPrice]="result?.price ?? result?.license_price ?? result?.price_amount"
               (licenseClick)="openLicenseTrackModal(result)"></acrylic-license>
+
+            <div *ngIf="isTrackLicensed(result)" style="padding: 12px 16px; background: #f0f0f0; border-radius: 4px; font-size: 14px; color: #666;">
+              ✓ Licensed
+            </div>
 
 
           </div>
@@ -777,16 +786,6 @@
               </div>
             </div>
 
-            <div class="license-modal__section-title">Optional Add-On</div>
-            <label class="license-modal__addon" [class.license-modal__addon--checked]="paidMediaAddOn">
-              <input type="checkbox" [(ngModel)]="paidMediaAddOn" />
-              <div class="license-modal__addon-body">
-                <div class="license-modal__addon-title">Extended Commercial Use</div>
-                <div class="license-modal__addon-subtitle">Extend usage for a commercial campaign (ex: season tickets, co-branded campaign, new jersey or sponsor announcement)</div>
-                <div class="license-modal__addon-price">+ $300</div>
-              </div>
-            </label>
-
             <div class="license-modal__contact">
               <div class="license-modal__contact-text">
                 Need rights not included in this license, such as for a TV campaign or posting on your website? Contact our licensing team.
@@ -804,10 +803,6 @@
               <div class="license-modal__total-row">
                 <span>Base License</span>
                 <span>{{ getTrackLicensePrice(licenseModalTrack) ?? 'Included' }}</span>
-              </div>
-              <div class="license-modal__total-row" *ngIf="paidMediaAddOn">
-                <span>Paid Media Add-On</span>
-                <span>+ $300</span>
               </div>
               <div class="license-modal__total-row license-modal__total-row--strong">
                 <span>Total</span>

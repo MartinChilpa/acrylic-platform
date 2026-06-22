@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChi
 import { NgClass, NgIf } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ProjectsService } from '../../../../../services/projects.service';
+import { LicenseService } from '../../../../../services/license.service';
 
 /**
  * Self-contained replica of the similarity-search result row, reusable anywhere
@@ -22,6 +23,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   @ViewChild('waveOverviewRef') private waveOverviewRef?: ElementRef<HTMLDivElement>;
 
   private projectsService = inject(ProjectsService);
+  private licenseService = inject(LicenseService);
   private subs = new Subscription();
 
   favorited = false;
@@ -48,7 +50,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
       const key = this.getTrackKey();
       this.favorited = favs.some(f => this.matchesKey(f, key));
     }));
-    this.subs.add(this.projectsService.licensedTracks$.subscribe((tracks) => {
+    this.subs.add(this.licenseService.licensedTracks$.subscribe((tracks: any[]) => {
       const key = this.getTrackKey();
       this.licensed = tracks.some((t: any) => this.matchesKey(t, key));
     }));
@@ -84,13 +86,14 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
     this.panelOpen = !this.panelOpen;
   }
 
-  /** Minimal licensing flow: mark the track licensed (optimistic) + persist. */
   licenseTrack(): void {
     if (this.licensed) { return; }
-    this.projectsService.addLicensedTrack(this.track);
     const key = this.getTrackKey();
     if (key) {
-      this.projectsService.createLicense(key, false).subscribe({ error: () => {} });
+      this.licenseService.createLicense(key).subscribe({
+        next: (result) => this.licenseService.addLicensedTrack(result),
+        error: () => {}
+      });
     }
   }
 

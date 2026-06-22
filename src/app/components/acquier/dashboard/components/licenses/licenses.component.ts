@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectsService } from '../../../../../services/projects.service';
+import { LicenseService } from '../../../../../services/license.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
 
 type CampaignPlatform = 'youtube' | 'instagram' | 'tiktok';
@@ -39,6 +40,7 @@ interface CampaignPlatformMeta {
 })
 export class LicensesComponent implements OnInit, OnDestroy {
   private projectsService = inject(ProjectsService);
+  private licenseService = inject(LicenseService);
   private brandingService = inject(TeamBrandingService);
 
   licenses: LicenseEntry[] = [];
@@ -80,7 +82,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
   get needsAttentionCount(): number { return this.licenses.filter(l => l.whitelistingStatus === 'needs-attention' || l.isUsageOverdue).length; }
 
   ngOnInit(): void {
-    this.projectsService.licensedTracks$.subscribe((tracks) => {
+    this.licenseService.licensedTracks$.subscribe((tracks) => {
       const teamName = this.brandingService.getActiveBranding().teamName;
       this.licenses = tracks.map((track, i) => this.buildEntry(track, i, teamName));
       if (this.selectedLicense) {
@@ -89,7 +91,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
       }
     });
     // Hydrate from backend on mount (merges with any in-memory optimistic entries)
-    this.projectsService.loadLicenses();
+    this.licenseService.loadLicenses();
   }
 
   ngOnDestroy(): void {
@@ -142,6 +144,18 @@ export class LicensesComponent implements OnInit, OnDestroy {
 
   selectLicense(license: LicenseEntry): void {
     this.selectedLicense = this.selectedLicense?.licenseId === license.licenseId ? null : license;
+  }
+
+  deleteLicense(licenseUuid: string, event?: Event): void {
+    event?.stopPropagation();
+    if (!confirm('Are you sure you want to delete this license request?')) return;
+
+    this.licenseService.deleteLicense(licenseUuid).subscribe({
+      error: (err) => {
+        console.error('Failed to delete license', err);
+        alert('Failed to delete license. Please try again.');
+      }
+    });
   }
 
   getStatusLabel(status: string): string {

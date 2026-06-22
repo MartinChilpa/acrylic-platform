@@ -834,6 +834,15 @@ $overdue-icon: rgba(255, 255, 255, 0.8);
   &.dl-btn--artist { background: #416C45; border-color: #6FA876; }
 }
 
+/* Delete button — destructive action */
+.lic-panel__btn--delete {
+  color: #fff;
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+
+  &:hover { background: rgba(248, 113, 113, 0.25); }
+}
+
 .lic-panel__contact {
   display: block;
   text-align: center;
