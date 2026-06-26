@@ -115,6 +115,8 @@ export class SimilaritySearchComponent implements OnInit {
   licenseModalTrack: any | null = null;
   licensedTrack: any | null = null;
   generalTermsOpen = false;
+  /** Extended Commercial Use add-on (+$300) selected in the License modal. */
+  paidMediaAddOn = false;
   downloadingLicensedTrack = false;
   tagsCopied = false;
   private tagsCopiedTimerId: number | null = null;
@@ -540,6 +542,7 @@ export class SimilaritySearchComponent implements OnInit {
     this.licenseModalTrack = track;
     this.licensedTrack = null;
     this.generalTermsOpen = false;
+    this.paidMediaAddOn = false;
     const trackedLicensedEl = document.getElementById('track-licensed-modal');
     const isTrackedVisible = trackedLicensedEl?.classList.contains('show');
     if (isTrackedVisible) {
@@ -566,7 +569,7 @@ export class SimilaritySearchComponent implements OnInit {
       return;
     }
 
-    this.licenseService.createLicense(trackId).subscribe({
+    this.licenseService.createLicense(trackId, this.paidMediaAddOn).subscribe({
       next: (result) => {
         console.log('[SimilaritySearch] License created successfully:', result);
         this.licensedTrack = result;
@@ -594,6 +597,7 @@ export class SimilaritySearchComponent implements OnInit {
     this.licenseModalTrack = null;
     this.licensedTrack = null;
     this.generalTermsOpen = false;
+    this.paidMediaAddOn = false;
     this.tagsCopied = false;
     if (this.tagsCopiedTimerId !== null) {
       clearTimeout(this.tagsCopiedTimerId);
@@ -815,6 +819,22 @@ export class SimilaritySearchComponent implements OnInit {
     if (id === 1) return 'result-theme--artistpromo';
     if (id === 3) return 'result-theme--bid2clear';
     return 'result-theme--artistpromo';
+  }
+
+  readonly ecuTooltip =
+    'Extend usage for a commercial campaign (ex: season tickets, co-branded campaign, ' +
+    'new jersey or sponsor announcement)';
+
+  /**
+   * Whether to show the "ECU Available" chip. ECU only ever applies to ArtistPromo
+   * (never PreClear/Bid2Clear).
+   * TODO(backend): gate on the real opt-in flag — only ArtistPromo tracks whose
+   * artist enabled extended commercial use / has no restrictions. Field name TBD
+   * (e.g. `extended_commercial_use` / `commercial_use_enabled`). For now it shows
+   * on ALL ArtistPromo tracks.
+   */
+  isEcuAvailable(track: any): boolean {
+    return this.getTierLabel(track) === 'ArtistPromo';
   }
 
   getCountryFlagUrl(code2: string): string {
@@ -1116,14 +1136,16 @@ export class SimilaritySearchComponent implements OnInit {
     const base = Number(this.licenseModalTrack?.price ?? this.licenseModalTrack?.license_price ?? this.licenseModalTrack?.price_amount);
     const id = this.getPriceId(this.licenseModalTrack);
     const isArtistPromo = this.getTierLabel(this.licenseModalTrack) === 'ArtistPromo' || id === 1;
+    const addOn = this.paidMediaAddOn ? 300 : 0;
 
     if (isArtistPromo) {
-      return this.formatUsdCents(0);
+      return addOn > 0 ? this.formatUsd(addOn) : this.formatUsdCents(0);
     }
 
     const baseAmount = Number.isFinite(base) && base > 0 ? base : 1500;
-    if (baseAmount <= 0) return 'Free';
-    return this.formatUsd(baseAmount);
+    const total = baseAmount + addOn;
+    if (total <= 0) return 'Free';
+    return this.formatUsd(total);
   }
 
   getLicenseModalSubtitle(track: any): string {

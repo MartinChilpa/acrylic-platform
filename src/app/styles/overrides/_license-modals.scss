@@ -351,6 +351,79 @@
   }
 }
 
+/* ── Optional Add-On (Extended Commercial Use) ── */
+.license-modal__addon {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.20);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &--active { border-color: rgba(74, 222, 128, 0.6); }
+}
+
+.license-modal__addon-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.license-modal__addon-box {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.30);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+
+  svg { opacity: 0; transition: opacity 0.15s; }
+}
+
+.license-modal__addon--active .license-modal__addon-box {
+  background: #4ADE80;
+  border-color: #4ADE80;
+
+  svg { opacity: 1; }
+}
+
+.license-modal__addon-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.license-modal__addon-title {
+  color: #FFF;
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.license-modal__addon-desc {
+  color: rgba(255, 255, 255, 0.60);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.license-modal__addon-price {
+  margin-top: 2px;
+  color: #FFF;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* ── Totals ── */
 .license-modal__totals {
   margin-top: 16px;

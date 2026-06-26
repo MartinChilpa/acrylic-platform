@@ -143,8 +143,16 @@
               </div>
 
               <div class="pt2">
-                 <div class="pt2-icon-tier" [ngClass]="getTierClass(seed)">
-                  {{ getTierLabel(seed) }}
+                 <div class="pt2-tier-col">
+                  <div class="pt2-icon-tier" [ngClass]="getTierClass(seed)">
+                    {{ getTierLabel(seed) }}
+                  </div>
+                  <span class="ecu-chip" *ngIf="isEcuAvailable(seed)" [title]="ecuTooltip">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" fill="none">
+                      <path d="M3.66852 0C3.98673 6.79597e-05 4.29188 0.126531 4.51685 0.351573L7.60062 3.43534C7.85634 3.69111 8 4.03798 8 4.39966C8 4.76134 7.85634 5.10822 7.60062 5.36399L5.36399 7.60062C5.10822 7.85634 4.76134 8 4.39966 8C4.03798 8 3.69111 7.85634 3.43534 7.60062L0.351573 4.51685C0.126531 4.29188 6.79597e-05 3.98673 0 3.66852V1.59988C0 1.17556 0.168558 0.768628 0.468593 0.468593C0.768628 0.168558 1.17556 0 1.59988 0H3.66852ZM2.19983 1.39989C1.99802 1.39983 1.80364 1.47605 1.65565 1.61328C1.50767 1.7505 1.41703 1.93859 1.40189 2.13984L1.39989 2.19983C1.39989 2.35804 1.44681 2.5127 1.53471 2.64425C1.62261 2.7758 1.74754 2.87833 1.89371 2.93888C2.03988 2.99942 2.20072 3.01527 2.35589 2.9844C2.51106 2.95353 2.6536 2.87735 2.76547 2.76547C2.87735 2.6536 2.95353 2.51106 2.9844 2.35589C3.01527 2.20072 2.99942 2.03988 2.93888 1.89371C2.87833 1.74754 2.7758 1.62261 2.64425 1.53471C2.5127 1.44681 2.35804 1.39989 2.19983 1.39989Z" fill="#416C45"/>
+                    </svg>
+                    ECU Available
+                  </span>
                 </div>
 
                 <div class="pt2-item">
@@ -472,8 +480,16 @@
             </div>
 
             <div class="pt2">
-               <div class="pt2-icon-tier" [ngClass]="getTierClass(result)">
-                {{ getTierLabel(result) }}
+               <div class="pt2-tier-col">
+                <div class="pt2-icon-tier" [ngClass]="getTierClass(result)">
+                  {{ getTierLabel(result) }}
+                </div>
+                <span class="ecu-chip" *ngIf="isEcuAvailable(result)" [title]="ecuTooltip">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" fill="none">
+                    <path d="M3.66852 0C3.98673 6.79597e-05 4.29188 0.126531 4.51685 0.351573L7.60062 3.43534C7.85634 3.69111 8 4.03798 8 4.39966C8 4.76134 7.85634 5.10822 7.60062 5.36399L5.36399 7.60062C5.10822 7.85634 4.76134 8 4.39966 8C4.03798 8 3.69111 7.85634 3.43534 7.60062L0.351573 4.51685C0.126531 4.29188 6.79597e-05 3.98673 0 3.66852V1.59988C0 1.17556 0.168558 0.768628 0.468593 0.468593C0.768628 0.168558 1.17556 0 1.59988 0H3.66852ZM2.19983 1.39989C1.99802 1.39983 1.80364 1.47605 1.65565 1.61328C1.50767 1.7505 1.41703 1.93859 1.40189 2.13984L1.39989 2.19983C1.39989 2.35804 1.44681 2.5127 1.53471 2.64425C1.62261 2.7758 1.74754 2.87833 1.89371 2.93888C2.03988 2.99942 2.20072 3.01527 2.35589 2.9844C2.51106 2.95353 2.6536 2.87735 2.76547 2.76547C2.87735 2.6536 2.95353 2.51106 2.9844 2.35589C3.01527 2.20072 2.99942 2.03988 2.93888 1.89371C2.87833 1.74754 2.7758 1.62261 2.64425 1.53471C2.5127 1.44681 2.35804 1.39989 2.19983 1.39989Z" fill="#416C45"/>
+                  </svg>
+                  ECU Available
+                </span>
               </div>
 
               <div class="pt2-item">
@@ -786,6 +802,24 @@
               </div>
             </div>
 
+            <!-- Optional Add-On: Extended Commercial Use (ArtistPromo / ECU-eligible only) -->
+            <ng-container *ngIf="isEcuAvailable(licenseModalTrack)">
+              <div class="license-modal__section-title">Optional Add-On</div>
+              <label class="license-modal__addon" [class.license-modal__addon--active]="paidMediaAddOn">
+                <input type="checkbox" name="ecuAddon" class="license-modal__addon-input" [(ngModel)]="paidMediaAddOn" />
+                <span class="license-modal__addon-box" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                    <path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0A0A0A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="license-modal__addon-text">
+                  <span class="license-modal__addon-title">Extended Commercial Use</span>
+                  <span class="license-modal__addon-desc">Extend usage for a commercial campaign (ex: season tickets, co-branded campaign, new jersey or sponsor announcement)</span>
+                  <span class="license-modal__addon-price">+ $300</span>
+                </span>
+              </label>
+            </ng-container>
+
             <div class="license-modal__contact">
               <div class="license-modal__contact-text">
                 Need rights not included in this license, such as for a TV campaign or posting on your website? Contact our licensing team.
@@ -803,6 +837,10 @@
               <div class="license-modal__total-row">
                 <span>Base License</span>
                 <span>{{ getTrackLicensePrice(licenseModalTrack) ?? 'Included' }}</span>
+              </div>
+              <div class="license-modal__total-row" *ngIf="paidMediaAddOn">
+                <span>Extended Commercial Use</span>
+                <span>+ $300</span>
               </div>
               <div class="license-modal__total-row license-modal__total-row--strong">
                 <span>Total</span>

@@ -45,9 +45,10 @@ export class LicenseService {
     }
   }
 
-  createLicense(trackUuid: string): Observable<ILicenseResult> {
+  createLicense(trackUuid: string, extendedCommercialUse = false): Observable<ILicenseResult> {
     const payload = {
       track: trackUuid,
+      extended_commercial_use: extendedCommercialUse,
     };
 
     console.log('[LicenseService] createLicense called', { trackUuid, payload });
