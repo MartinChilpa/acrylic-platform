@@ -9,6 +9,10 @@
   color: var(--text-main);
   font-family: 'Glacial Indifference', sans-serif;
   padding: 20px;
+
+  @media (max-width: 640px) {
+    padding: 8px 0;
+  }
 }
 
 /* Search Bar */
@@ -141,6 +145,18 @@
   border: 1px solid #2f2f2f;
   background: #141414;
   color: #cfcfcf;
+  font-size: 12px;
+}
+
+.similarity-error {
+  width: min(100%, 720px);
+  margin: 12px auto 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.22);
+  color: #fecaca;
+  font-family: "Inter", sans-serif;
   font-size: 12px;
 }
 

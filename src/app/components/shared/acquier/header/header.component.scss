@@ -96,3 +96,29 @@
     transform: none;
   }
 }
+
+@media (max-width: 640px) {
+  .team-header__bar {
+    height: 110px;
+    padding-left: 20px;
+  }
+
+  .team-header__logo-wrapper {
+    width: 72px;
+    height: 72px;
+    transform: none;
+  }
+
+  .team-header__title {
+    font-size: 28px;
+  }
+
+  .team-header__tagline {
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .team-header__tagline-wrapper {
+    padding: 3px 10px;
+  }
+}

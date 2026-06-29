@@ -211,9 +211,17 @@
                 </audio>
 
                   <div class="button-section">
-                    <button type="button" class="btn-section-action" aria-label="Add favorite">
-                      <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
+                    <button type="button" class="btn-section-action btn-favorite" [class.is-favorited]="favoriteTrackIds.has(getTrackId(seed))" (click)="toggleFavorite(seed)" aria-label="Add favorite">
+                      <ng-container *ngIf="favoriteTrackIds.has(getTrackId(seed)); else seedHeartOutline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M2 9.50004C2.00002 8.38724 2.33759 7.30062 2.96813 6.3837C3.59867 5.46678 4.49252 4.7627 5.53161 4.36444C6.5707 3.96618 7.70616 3.89248 8.78801 4.15308C9.86987 4.41368 10.8472 4.99632 11.591 5.82404C11.6434 5.88005 11.7067 5.92471 11.7771 5.95524C11.8474 5.98577 11.9233 6.00152 12 6.00152C12.0767 6.00152 12.1526 5.98577 12.2229 5.95524C12.2933 5.92471 12.3566 5.88005 12.409 5.82404C13.1504 4.99094 14.128 4.40341 15.2116 4.13964C16.2952 3.87588 17.4335 3.94839 18.4749 4.34752C19.5163 4.74666 20.4114 5.45349 21.0411 6.37394C21.6708 7.29439 22.0053 8.3848 22 9.50004C22 11.79 20.5 13.5 19 15L13.508 20.313C13.3217 20.527 13.0919 20.699 12.834 20.8173C12.5762 20.9357 12.296 20.9979 12.0123 20.9997C11.7285 21.0015 11.4476 20.9429 11.1883 20.8278C10.9289 20.7127 10.697 20.5437 10.508 20.332L5 15C3.5 13.5 2 11.8 2 9.50004Z" fill="white"/>
+                        </svg>
+                      </ng-container>
+                      <ng-template #seedHeartOutline>
+                        <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
+                      </ng-template>
                     </button>
+                    <span *ngIf="licensedTrackIds.has(getTrackId(seed))" class="licensed-badge">Licensed</span>
                     <button
                       type="button"
                       class="btn-section-action"
@@ -340,10 +348,14 @@
               </div>
 
               <acrylic-license
+                *ngIf="!isTrackLicensed(seed)"
                 [priceId]="seed?.price_id"
                 [trackPrice]="seed?.price ?? seed?.license_price ?? seed?.price_amount"
                 (licenseClick)="openLicenseTrackModal(seed)"></acrylic-license>
 
+              <div *ngIf="isTrackLicensed(seed)" style="padding: 12px 16px; background: #f0f0f0; border-radius: 4px; font-size: 14px; color: #666;">
+                ✓ Licensed
+              </div>
 
             </div>
             
@@ -407,6 +419,10 @@
 
     </div>
   </div>
+
+    <div class="similarity-error" *ngIf="errorMsg">
+      {{ errorMsg }}
+    </div>
 
 
 
@@ -524,9 +540,17 @@
               </audio>
 
                 <div class="button-section">
-                  <button type="button" class="btn-section-action" aria-label="Add favorite">
-                    <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
+                  <button type="button" class="btn-section-action btn-favorite" [class.is-favorited]="favoriteTrackIds.has(getTrackId(result))" (click)="toggleFavorite(result)" aria-label="Add favorite">
+                    <ng-container *ngIf="favoriteTrackIds.has(getTrackId(result)); else resultHeartOutline">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 9.50004C2.00002 8.38724 2.33759 7.30062 2.96813 6.3837C3.59867 5.46678 4.49252 4.7627 5.53161 4.36444C6.5707 3.96618 7.70616 3.89248 8.78801 4.15308C9.86987 4.41368 10.8472 4.99632 11.591 5.82404C11.6434 5.88005 11.7067 5.92471 11.7771 5.95524C11.8474 5.98577 11.9233 6.00152 12 6.00152C12.0767 6.00152 12.1526 5.98577 12.2229 5.95524C12.2933 5.92471 12.3566 5.88005 12.409 5.82404C13.1504 4.99094 14.128 4.40341 15.2116 4.13964C16.2952 3.87588 17.4335 3.94839 18.4749 4.34752C19.5163 4.74666 20.4114 5.45349 21.0411 6.37394C21.6708 7.29439 22.0053 8.3848 22 9.50004C22 11.79 20.5 13.5 19 15L13.508 20.313C13.3217 20.527 13.0919 20.699 12.834 20.8173C12.5762 20.9357 12.296 20.9979 12.0123 20.9997C11.7285 21.0015 11.4476 20.9429 11.1883 20.8278C10.9289 20.7127 10.697 20.5437 10.508 20.332L5 15C3.5 13.5 2 11.8 2 9.50004Z" fill="white"/>
+                      </svg>
+                    </ng-container>
+                    <ng-template #resultHeartOutline>
+                      <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
+                    </ng-template>
                   </button>
+                  <span *ngIf="licensedTrackIds.has(getTrackId(result))" class="licensed-badge">Licensed</span>
                   <button
                     type="button"
                     class="btn-section-action"
@@ -653,9 +677,14 @@
             </div>
 
             <acrylic-license
+              *ngIf="!isTrackLicensed(result)"
               [priceId]="result?.price_id"
               [trackPrice]="result?.price ?? result?.license_price ?? result?.price_amount"
               (licenseClick)="openLicenseTrackModal(result)"></acrylic-license>
+
+            <div *ngIf="isTrackLicensed(result)" style="padding: 12px 16px; background: #f0f0f0; border-radius: 4px; font-size: 14px; color: #666;">
+              ✓ Licensed
+            </div>
 
 
           </div>
@@ -757,16 +786,6 @@
               </div>
             </div>
 
-            <div class="license-modal__section-title">Optional Add-On</div>
-            <label class="license-modal__addon" [class.license-modal__addon--checked]="paidMediaAddOn">
-              <input type="checkbox" [(ngModel)]="paidMediaAddOn" />
-              <div class="license-modal__addon-body">
-                <div class="license-modal__addon-title">Extended Commercial Use</div>
-                <div class="license-modal__addon-subtitle">Extend usage for a commercial campaign (ex: season tickets, co-branded campaign, new jersey or sponsor announcement)</div>
-                <div class="license-modal__addon-price">+ $300</div>
-              </div>
-            </label>
-
             <div class="license-modal__contact">
               <div class="license-modal__contact-text">
                 Need rights not included in this license, such as for a TV campaign or posting on your website? Contact our licensing team.
@@ -784,10 +803,6 @@
               <div class="license-modal__total-row">
                 <span>Base License</span>
                 <span>{{ getTrackLicensePrice(licenseModalTrack) ?? 'Included' }}</span>
-              </div>
-              <div class="license-modal__total-row" *ngIf="paidMediaAddOn">
-                <span>Paid Media Add-On</span>
-                <span>+ $300</span>
               </div>
               <div class="license-modal__total-row license-modal__total-row--strong">
                 <span>Total</span>
@@ -896,7 +911,7 @@
                   <div class="license-modal__license-details-subtitle">View license details and certificate</div>
                 </div>
               </div>
-              <button type="button" class="license-modal__outline-btn">Go to Licenses</button>
+              <button type="button" class="license-modal__outline-btn" (click)="goToLicenses()">Go to Licenses</button>
             </div>
 
             <div class="license-modal__contact">

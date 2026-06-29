@@ -1,0 +1,106 @@
+<div class="license-platform-modal__overlay" (click)="onClose()"></div>
+
+<div class="license-platform-modal__content">
+  <!-- Header -->
+  <div class="license-platform-modal__top">
+    <div class="license-platform-modal__header">
+      <div>
+        <h2 class="license-platform-modal__title">Choose Platforms</h2>
+        <p class="license-platform-modal__subtitle">
+          Which platforms do you plan to use this music on?
+        </p>
+      </div>
+      <button class="license-platform-modal__close" (click)="onClose()" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="license-platform-modal__body">
+    <!-- Track Info -->
+    <div class="license-platform-modal__track-info" *ngIf="trackName || trackArtist">
+      <div class="license-platform-modal__track-image" *ngIf="coverImage">
+        <img [src]="coverImage" [alt]="trackName" />
+      </div>
+      <div class="license-platform-modal__track-details">
+        <p class="license-platform-modal__track-name">{{ trackName }}</p>
+        <p class="license-platform-modal__track-artist">{{ trackArtist }}</p>
+      </div>
+    </div>
+
+    <!-- Platform Selection -->
+    <div class="license-platform-modal__section">
+      <div class="license-platform-modal__platforms-list">
+        <!-- Available Platforms -->
+        <div *ngFor="let platform of availablePlatforms"
+             class="license-platform-modal__platform-item"
+             [class.license-platform-modal__platform-item--selected]="isPlatformSelected(platform.key)">
+
+          <input
+            type="checkbox"
+            [id]="'platform-' + platform.key"
+            [checked]="isPlatformSelected(platform.key)"
+            (change)="togglePlatform(platform.key)"
+            class="license-platform-modal__platform-checkbox"
+            [disabled]="platform.key === 'other' && !platform.url"
+          />
+
+          <label [for]="'platform-' + platform.key'" class="license-platform-modal__platform-label">
+            <span class="license-platform-modal__platform-icon">{{ platform.icon }}</span>
+            <span class="license-platform-modal__platform-name">{{ platform.label }}</span>
+            <span class="license-platform-modal__platform-url" *ngIf="platform.url && platform.key !== 'other'">
+              {{ platform.url }}
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Other URL Input -->
+      <div *ngIf="showOtherInput" class="license-platform-modal__other-input">
+        <input
+          type="url"
+          placeholder="Enter your URL (e.g., https://example.com)"
+          [(ngModel)]="otherUrl"
+          class="license-platform-modal__other-input-field"
+        />
+      </div>
+
+      <!-- Select All -->
+      <button
+        type="button"
+        class="license-platform-modal__select-all"
+        (click)="toggleSelectAll()"
+      >
+        <span class="license-platform-modal__select-all-checkbox">
+          <svg *ngIf="allSelected" width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 5L4.5 8.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span>{{ allSelected ? 'Deselect All' : 'Select All' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="license-platform-modal__footer">
+    <button
+      type="button"
+      class="license-platform-modal__footer-link"
+      (click)="onClose()"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="license-platform-modal__footer-primary"
+      (click)="onSubmit()"
+      [disabled]="!isValid || isLoading"
+    >
+      <span *ngIf="!isLoading">Continue</span>
+      <span *ngIf="isLoading">Submitting...</span>
+    </button>
+  </div>
+</div>
