@@ -31,7 +31,11 @@ export class SimilarityUrlService {
   private uploadSimilarityVideo(videoFile: File) {
     const formData = new FormData();
     formData.append('video_file', videoFile);
-    return this.http.post<{ hash: string }>(`${this.API_URL}/similarity-video-upload/`, formData);
+    return this.http.post<{ hash: string }>(`${this.API_URL}/similarity-video-upload/`, formData, {
+      // Do not set Content-Type manually for FormData uploads.
+      // Angular / browser must generate the multipart boundary.
+      headers: undefined
+    });
   }
 
   private searchSimilarityByHash(hash: string, page: number = 1, pageSize: number = 10) {
