@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, Output, EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { EMPTY, Subject, defer, of } from 'rxjs';
-import { catchError, exhaustMap, expand, last, map, tap } from 'rxjs/operators';
+import { EMPTY, Subject, defer, of, throwError, timer } from 'rxjs';
+import { catchError, exhaustMap, expand, last, map, retry, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ModalService } from '../../../../../services/modal.service';
 
@@ -979,6 +979,12 @@ export class SimilaritySearchComponent implements OnInit {
 
     if (request.type === 'video' && request.file) {
       return defer(() => this.similarityService.searchSimilarityByVideo(request.file as File, 1, this.maxPrefetchResults)).pipe(
+        retry({
+          count: 1,
+          delay: (error: unknown) => this.shouldRetryVideoUpload(error)
+            ? timer(900)
+            : throwError(() => error)
+        }),
         map((firstData: unknown) => ({
           firstData,
           results: this.normalizeResponse(firstData).slice(0, this.maxPrefetchResults)
@@ -1014,6 +1020,21 @@ export class SimilaritySearchComponent implements OnInit {
       last(),
       map((state) => ({ firstData: state.firstData, results: state.items.slice(0, this.maxPrefetchResults) }))
     );
+  }
+
+  private shouldRetryVideoUpload(error: unknown): boolean {
+    const message = typeof error === 'string'
+      ? error
+      : (typeof (error as { message?: unknown })?.message === 'string'
+        ? String((error as { message: string }).message)
+        : '');
+    const normalized = message.toLowerCase();
+    return /\b(499|502|503|504)\b/.test(normalized)
+      || normalized.includes('status 0')
+      || normalized.includes('failed to fetch')
+      || normalized.includes('err_failed')
+      || normalized.includes('timeout')
+      || normalized.includes('timed out');
   }
 
   private getResultStableKey(track: any): string {
