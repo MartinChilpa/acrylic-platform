@@ -1,8 +1,21 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpEvent, HttpEventType, HttpResponse, HttpHeaders } from '@angular/common/http';
-import { Observable, of, EMPTY } from 'rxjs';
-import { filter, map, switchMap, mergeMap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
+import { firstValueFrom, from } from 'rxjs';
+
+interface MultipartInitiateResponse {
+  upload_id: string;
+  part_size: number;
+}
+
+interface MultipartPresignResponse {
+  parts: Array<{ part_number: number; url: string }>;
+}
+
+interface UploadedPart {
+  part_number: number;
+  etag: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -29,69 +42,102 @@ export class SimilarityUrlService {
     });
   }
 
-  /**
-   * Upload the file using the AIMS contract. Uses `file` as the multipart field
-   * and includes `X-User-Id` header when available. Returns upload events so
-   * callers can track progress.
-   */
-  private uploadSimilarityVideo(videoFile: File): Observable<HttpEvent<any>> {
-    const formData = new FormData();
-    formData.append('video_file', videoFile);
-
-    return this.http.post<any>(`${this.API_URL}/similarity-video-upload/`, formData, {
-      // Let the browser set the Content-Type boundary.
-      reportProgress: true,
-      observe: 'events'
-    });
-  }
-
-  private searchSimilarityByHash(hash: string, page: number = 1, pageSize: number = 10) {
-    return this.http.post<any>(`${this.API_URL}/similarity-video-search/`, {
-      hash,
-      page,
-      page_size: pageSize,
-    });
-  }
-
-  /**
-   * Legacy endpoint: single-call upload+search. Returns the same similarity
-   * response shape as the split flow.
-   */
-  searchSimilarityByVideoLegacy(videoFile: File, page: number = 1, pageSize: number = 10) {
-    const fd = new FormData();
-    fd.append('video_file', videoFile);
-    fd.append('page', String(page));
-    fd.append('page_size', String(pageSize));
-    return this.http.post<any>(`${this.API_URL}/similarity-video/`, fd);
-  }
-
-  /**
-   * Upload with progress, then run search and emit either progress objects
-   * `{ progress: number }` or final `{ results }` object. Useful for UI.
-   */
-  uploadAndSearchWithProgress(videoFile: File, page: number = 1, pageSize: number = 10): Observable<any> {
-    return this.uploadSimilarityVideo(videoFile).pipe(
-      mergeMap((ev) => {
-        if (ev.type === HttpEventType.UploadProgress && ev.total) {
-          return of({ progress: Math.round(100 * (ev.loaded / ev.total)) });
-        }
-        if (ev.type === HttpEventType.Response) {
-          const hash = (ev as HttpResponse<any>).body?.hash ?? '';
-          return this.searchSimilarityByHash(hash, page, pageSize).pipe(
-            map((res) => ({ results: res }))
-          );
-        }
-        return EMPTY;
-      })
-    );
-  }
-
-  /** Upload then search. Waits for the upload `HttpResponse` to extract the hash. */
   searchSimilarityByVideo(videoFile: File, page: number = 1, pageSize: number = 10) {
-    return this.uploadSimilarityVideo(videoFile).pipe(
-      filter((ev: HttpEvent<any>): ev is HttpResponse<any> => ev.type === HttpEventType.Response),
-      map((ev: HttpResponse<any>) => (ev.body?.hash ?? (ev as any).hash ?? '')),
-      switchMap((hash: string) => this.searchSimilarityByHash(hash, page, pageSize))
-    );
+    return from(this.searchSimilarityByVideoMultipart(videoFile, page, pageSize));
+  }
+
+  private async searchSimilarityByVideoMultipart(videoFile: File, page: number, pageSize: number) {
+    let uploadId: string | null = null;
+    try {
+      const initiate = await firstValueFrom(this.http.post<MultipartInitiateResponse>(
+        `${this.API_URL}/video-multipart/initiate/`,
+        {
+          filename: videoFile.name,
+          content_type: videoFile.type || 'application/octet-stream',
+          size_bytes: videoFile.size
+        }
+      ));
+      uploadId = initiate.upload_id;
+
+      const partSize = initiate.part_size;
+      const partNumbers = this.getPartNumbers(videoFile.size, partSize);
+      const presigned = await firstValueFrom(this.http.post<MultipartPresignResponse>(
+        `${this.API_URL}/video-multipart/presign-parts/`,
+        {
+          upload_id: uploadId,
+          part_numbers: partNumbers
+        }
+      ));
+
+      const uploadedParts = await this.uploadPartsToS3(videoFile, partSize, presigned.parts);
+      return await firstValueFrom(this.http.post<any[]>(
+        `${this.API_URL}/video-multipart/complete/`,
+        {
+          upload_id: uploadId,
+          parts: uploadedParts,
+          page,
+          page_size: pageSize
+        }
+      ));
+    } catch (error) {
+      if (uploadId) {
+        await this.abortMultipartUpload(uploadId);
+      }
+      throw error;
+    }
+  }
+
+  private getPartNumbers(size: number, partSize: number): number[] {
+    const count = Math.max(1, Math.ceil(size / partSize));
+    return Array.from({ length: count }, (_, index) => index + 1);
+  }
+
+  private async uploadPartsToS3(
+    videoFile: File,
+    partSize: number,
+    parts: Array<{ part_number: number; url: string }>
+  ): Promise<UploadedPart[]> {
+    const sortedParts = [...parts].sort((a, b) => a.part_number - b.part_number);
+    const uploadedParts: UploadedPart[] = [];
+    let nextIndex = 0;
+    const concurrency = Math.min(3, sortedParts.length);
+
+    const uploadNext = async (): Promise<void> => {
+      const currentIndex = nextIndex;
+      nextIndex += 1;
+      const part = sortedParts[currentIndex];
+      if (!part) {
+        return;
+      }
+
+      const start = (part.part_number - 1) * partSize;
+      const end = Math.min(start + partSize, videoFile.size);
+      const blob = videoFile.slice(start, end);
+      const response = await fetch(part.url, {
+        method: 'PUT',
+        body: blob
+      });
+      if (!response.ok) {
+        throw new Error(`S3 upload part ${part.part_number} failed with status ${response.status}`);
+      }
+
+      const etag = response.headers.get('ETag');
+      if (!etag) {
+        throw new Error('S3 did not expose an ETag header for the uploaded part.');
+      }
+      uploadedParts.push({ part_number: part.part_number, etag });
+      await uploadNext();
+    };
+
+    await Promise.all(Array.from({ length: concurrency }, () => uploadNext()));
+    return uploadedParts.sort((a, b) => a.part_number - b.part_number);
+  }
+
+  private async abortMultipartUpload(uploadId: string): Promise<void> {
+    try {
+      await firstValueFrom(this.http.post(`${this.API_URL}/video-multipart/abort/`, { upload_id: uploadId }));
+    } catch {
+      // Best-effort cleanup only; preserve the original upload error.
+    }
   }
 }
