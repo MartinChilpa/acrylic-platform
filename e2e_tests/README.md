@@ -58,4 +58,3 @@ Ensure the uploaded file path in the spec (`e2e_tests/fixtures/sample-video.mp4`
 - Tests run serially (one after the other), not in parallel, to avoid stress on the AIMS API.
 - `global-setup.ts` creates a test user and logs in once before all tests run, saving the session to `.auth/user.json` (gitignored).
 - All subsequent tests reuse that authenticated session via Playwright's `storageState`.
-- No `ACRYLIC_CORE_PATH` env var needed — tests communicate with the backend over HTTP, so repo layout doesn't matter. This design survives GitHub Actions where each repo is checked out in isolation.

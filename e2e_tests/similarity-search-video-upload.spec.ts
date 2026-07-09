@@ -38,16 +38,16 @@ test.describe('Video Upload Similarity Search', () => {
     expect(count).toBeGreaterThan(0);
   });
 
-  // test('Test 2: Client-side validation — reject non-MP4 files', async ({ page }) => {
-  //   // Upload a non-video file
-  //   await page.locator('input[type="file"]').setInputFiles('e2e_tests/fixtures/not-a-video.txt');
+  test('Test 2: Client-side validation — reject non-MP4 files', async ({ page }) => {
+    // Upload a non-video file
+    await page.locator('input[type="file"]').setInputFiles('e2e_tests/fixtures/not-a-video.txt');
 
-  //   // Verify error message appears
-  //   const errorMsg = page.locator('.similarity-error');
-  //   await expect(errorMsg).toBeVisible();
-  //   await expect(errorMsg).toContainText('Only MP4 format is allowed');
+    // Verify error message appears
+    const errorMsg = page.locator('.similarity-error');
+    await expect(errorMsg).toBeVisible();
+    await expect(errorMsg).toContainText('Only MP4 format is allowed');
 
-  //   // Verify video preview did NOT appear (since file was rejected)
-  //   await expect(page.locator('.video-preview-player')).not.toBeVisible();
-  // });
+    // Verify video preview did NOT appear (since file was rejected)
+    await expect(page.locator('.video-preview-player')).not.toBeVisible();
+  });
 });
