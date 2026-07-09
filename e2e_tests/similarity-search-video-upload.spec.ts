@@ -8,11 +8,11 @@ test.describe('Video Upload Similarity Search', () => {
 
   test('Test 1: Happy path — upload valid video and get similarity results', async ({ page }) => {
     // Upload a valid video file
-    await page.locator('input[type="file"]').setInputFiles('e2e_tests/fixtures/sample-video.mp4');
+    await page.locator('input[type="file"]').setInputFiles('e2e_tests/fixtures/Visite Manoir Ronald Mcdonnald v3.mp4');
 
     // Wait for the video preview to appear and verify it shows the uploaded filename
     await expect(page.locator('.video-preview-player')).toBeVisible();
-    await expect(page.locator('.video-preview-name')).toContainText('sample-video.mp4');
+    await expect(page.locator('.video-preview-name')).toContainText('Visite Manoir Ronald Mcdonnald v3.mp4');
 
     // Verify the search button is enabled and can be clicked
     const searchButton = page.locator('[data-testid="video-search-button"]');
