@@ -10,7 +10,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "heroku-postbuild": "ng build --configuration=$NODE_ENV && npm run sentry:sourcemaps",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT dist/acrylic-app/browser && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT dist/acrylic-app/browser"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT dist/acrylic-app/browser && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT dist/acrylic-app/browser",
+    "e2e": "playwright test --project=chromium",
+    "e2e:ui": "playwright test --ui --project=chromium"
   },
   "private": true,
   "dependencies": {

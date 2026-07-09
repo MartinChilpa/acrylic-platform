@@ -26,6 +26,7 @@
                             background: #ffffff;
                             border: 1.5px solid;"
       class="btn-ai-search"
+      data-testid="video-upload-button"
       (click)="videoFileInput.click()">
           <img
             class="btn-ai-search__icon"
@@ -36,6 +37,7 @@
         </button>
         <button
           class="btn-ai-search btn-ai-search--submit"
+          data-testid="video-search-button"
           [class.btn-ai-search--active]="canSearch"
           (click)="search()"
           [disabled]="!canSearch">
