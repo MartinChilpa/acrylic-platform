@@ -36,3 +36,15 @@
     color: transparent;
   }
 }
+
+@media (max-width: 640px) {
+  .content-area {
+    padding: 16px;
+    gap: 24px;
+  }
+
+  .search-title {
+    font-size: 22px;
+    line-height: 32px;
+  }
+}

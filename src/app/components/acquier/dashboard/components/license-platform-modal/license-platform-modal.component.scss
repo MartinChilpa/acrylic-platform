@@ -1,0 +1,429 @@
+// Platform Modal - License Whitelisting
+// Uses design system from _license-modals.scss
+
+.license-platform-modal__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.license-platform-modal__content {
+  background: #141414;
+  border-radius: 16px;
+  border: 2px solid #416C45;
+  color: #FFF;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    border-radius: 12px;
+  }
+}
+
+// Header
+.license-platform-modal__top {
+  padding: 24px 28px;
+  background: linear-gradient(135deg, rgba(65, 108, 69, 0.15) 0%, rgba(65, 108, 69, 0.05) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.license-platform-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.license-platform-modal__title {
+  margin: 0;
+  font-family: 'Proxima Nova', 'Glacial Indifference', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 32px;
+  color: #FFF;
+}
+
+.license-platform-modal__subtitle {
+  margin: 8px 0 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.70);
+  line-height: 18px;
+}
+
+.license-platform-modal__close {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.70);
+  transition: color 0.15s, transform 0.15s;
+
+  &:hover {
+    color: #FFF;
+    transform: scale(1.1);
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+// Body
+.license-platform-modal__body {
+  padding: 28px;
+  overflow-y: auto;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+  }
+}
+
+// Track Info
+.license-platform-modal__track-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(65, 108, 69, 0.10);
+  border: 1px solid rgba(65, 108, 69, 0.20);
+}
+
+.license-platform-modal__track-image {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.3);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.license-platform-modal__track-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.license-platform-modal__track-name {
+  margin: 0;
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #FFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.license-platform-modal__track-artist {
+  margin: 4px 0 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Section
+.license-platform-modal__section {
+  margin-top: 0;
+}
+
+// Platforms List
+.license-platform-modal__platforms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.license-platform-modal__platform-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  &.license-platform-modal__platform-item--selected {
+    border-color: #81C784;
+    background: rgba(65, 108, 69, 0.15);
+  }
+}
+
+.license-platform-modal__platform-checkbox {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: #81C784;
+  border-radius: 4px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.license-platform-modal__platform-label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.license-platform-modal__platform-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.license-platform-modal__platform-name {
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.license-platform-modal__platform-url {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+// Other URL Input
+.license-platform-modal__other-input {
+  margin-top: 12px;
+  animation: slideUp 0.2s ease-out;
+}
+
+.license-platform-modal__other-input-field {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFF;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  transition: all 0.15s;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.40);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #81C784;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 2px rgba(129, 199, 132, 0.15);
+  }
+}
+
+// Select All Button
+.license-platform-modal__select-all {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.80);
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #FFF;
+  }
+}
+
+.license-platform-modal__select-all-checkbox {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  border: 1.5px solid currentColor;
+  background: rgba(129, 199, 132, 0.20);
+  color: #81C784;
+  flex-shrink: 0;
+  transition: all 0.15s;
+
+  svg {
+    width: 12px;
+    height: 10px;
+  }
+}
+
+// Footer
+.license-platform-modal__footer {
+  padding: 16px 28px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.20);
+
+  @media (max-width: 768px) {
+    padding: 14px 20px 18px;
+    flex-direction: column;
+  }
+}
+
+.license-platform-modal__footer-link {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.70);
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s;
+
+  &:hover {
+    color: #FFF;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    order: 2;
+  }
+}
+
+.license-platform-modal__footer-primary {
+  height: 40px;
+  padding: 0 24px;
+  border-radius: 8px;
+  border: 2px solid #81C784;
+  background: #81C784;
+  color: #000;
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: #95D99C;
+    border-color: #95D99C;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(129, 199, 132, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.50;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    order: 1;
+  }
+}

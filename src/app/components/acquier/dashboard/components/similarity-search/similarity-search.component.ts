@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, Output, EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { EMPTY, Subject, defer, of } from 'rxjs';
-import { catchError, exhaustMap, expand, last, map, tap } from 'rxjs/operators';
+import { EMPTY, Subject, defer, of, throwError, timer } from 'rxjs';
+import { catchError, exhaustMap, expand, last, map, retry, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
@@ -11,6 +12,8 @@ import { LicenseComponent } from '../license/license.component';
 import { TeamPlayerOptimizationComponent } from './team-player-optimization/team-player-optimization.component';
 import { TeamPlayersService, TeamPlayerDto } from '../../../../../services/team-players.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
+import { ProjectsService } from '../../../../../services/projects.service';
+import { LicenseService } from '../../../../../services/license.service';
 interface Suggestion {
   icon: string;
   type: string;
@@ -41,11 +44,18 @@ export class SimilaritySearchComponent implements OnInit {
   @Output() searchInput = new EventEmitter<string>();
   @Output() searched = new EventEmitter<void>();
   
+  private router = inject(Router);
   private similarityService = inject(SimilarityUrlService);
   private aimsDownloadService = inject(AimsDownloadService);
   private modalService = inject(ModalService);
   private teamPlayersService = inject(TeamPlayersService);
   private brandingService = inject(TeamBrandingService);
+  private projectsService = inject(ProjectsService);
+  private licenseService = inject(LicenseService);
+
+  favoriteTrackIds = new Set<string>();
+  licensedTrackIds = new Set<string>();
+
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
     { offset: 94.208, duration: 44.184 },
@@ -104,7 +114,6 @@ export class SimilaritySearchComponent implements OnInit {
 
   licenseModalTrack: any | null = null;
   licensedTrack: any | null = null;
-  paidMediaAddOn = false;
   generalTermsOpen = false;
   downloadingLicensedTrack = false;
   tagsCopied = false;
@@ -121,6 +130,24 @@ export class SimilaritySearchComponent implements OnInit {
 
   ngOnInit() {
     this.loadClubPlayers();
+    this.projectsService.loadFavorites();
+    this.projectsService.favorites$.subscribe((favs) => {
+      const ids = new Set<string>();
+      favs.forEach(f => {
+        const k = this.projectsService.trackKey(f);
+        if (k) { ids.add(k); }
+      });
+      this.favoriteTrackIds = ids;
+    });
+    this.licenseService.licensedTracks$.subscribe((tracks) => {
+      const ids = new Set<string>();
+      tracks.forEach((t: any) => {
+        const k = this.licenseService.trackKey(t);
+        if (k) { ids.add(k); }
+      });
+      this.licensedTrackIds = ids;
+    });
+    this.licenseService.loadLicenses();
     this.manualSearch$.pipe(
       tap(() => {
         this.startLoadingUi();
@@ -248,6 +275,23 @@ export class SimilaritySearchComponent implements OnInit {
       return null;
     }
     return filtered;
+  }
+
+  getTrackId(result: any): string {
+    // Use the single canonical key shared with ProjectsService so the heart
+    // state matches what gets stored (and never duplicates).
+    return this.projectsService.trackKey(result);
+  }
+
+  toggleFavorite(result: any): void {
+    const id = this.getTrackId(result);
+    if (!id) {
+      console.warn('[SimilaritySearch] toggleFavorite: track has no stable key, skipping', result);
+      return;
+    }
+    this.projectsService.toggleFavorite(id, result).subscribe({
+      error: (err) => console.error('[SimilaritySearch] toggleFavorite request failed', err)
+    });
   }
 
   private loadClubPlayers(): void {
@@ -495,7 +539,6 @@ export class SimilaritySearchComponent implements OnInit {
   openLicenseTrackModal(track: any): void {
     this.licenseModalTrack = track;
     this.licensedTrack = null;
-    this.paidMediaAddOn = false;
     this.generalTermsOpen = false;
     const trackedLicensedEl = document.getElementById('track-licensed-modal');
     const isTrackedVisible = trackedLicensedEl?.classList.contains('show');
@@ -508,17 +551,48 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   confirmLicenseHappyPath(): void {
+    console.log('[SimilaritySearch] confirmLicenseHappyPath called');
+    if (!this.licenseModalTrack) {
+      console.warn('[SimilaritySearch] licenseModalTrack is null/undefined');
+      return;
+    }
+
     this.licensedTrack = this.licenseModalTrack;
-    this.modalService.hideModal('license-track-modal');
-    setTimeout(() => {
-      this.modalService.showModal('track-licensed-modal');
-    }, 350);
+    const trackId = this.licenseModalTrack?.uuid ?? this.licenseModalTrack?.track_uuid ?? this.licenseModalTrack?.id ?? this.licenseModalTrack?.track_id ?? this.licenseModalTrack?.isrc ?? this.licenseModalTrack?.spotify_id;
+    console.log('[SimilaritySearch] trackId:', trackId);
+
+    if (!trackId) {
+      console.warn('[SimilaritySearch] trackId is empty, skipping license creation');
+      return;
+    }
+
+    this.licenseService.createLicense(trackId).subscribe({
+      next: (result) => {
+        console.log('[SimilaritySearch] License created successfully:', result);
+        this.licensedTrack = result;
+        this.licenseService.addLicensedTrack(result);
+        this.modalService.hideModal('license-track-modal');
+        setTimeout(() => {
+          this.modalService.showModal('track-licensed-modal');
+        }, 350);
+      },
+      error: (err) => {
+        console.error('[SimilaritySearch] License creation failed:', err);
+        this.licensedTrack = null;
+        this.modalService.hideModal('license-track-modal');
+      }
+    });
+  }
+
+  goToLicenses(): void {
+    this.modalService.hideModal('track-licensed-modal');
+    this.resetLicenseFlow();
+    this.router.navigate(['/brand/licenses']);
   }
 
   resetLicenseFlow(): void {
     this.licenseModalTrack = null;
     this.licensedTrack = null;
-    this.paidMediaAddOn = false;
     this.generalTermsOpen = false;
     this.tagsCopied = false;
     if (this.tagsCopiedTimerId !== null) {
@@ -905,6 +979,12 @@ export class SimilaritySearchComponent implements OnInit {
 
     if (request.type === 'video' && request.file) {
       return defer(() => this.similarityService.searchSimilarityByVideo(request.file as File, 1, this.maxPrefetchResults)).pipe(
+        retry({
+          count: 1,
+          delay: (error: unknown) => this.shouldRetryVideoUpload(error)
+            ? timer(900)
+            : throwError(() => error)
+        }),
         map((firstData: unknown) => ({
           firstData,
           results: this.normalizeResponse(firstData).slice(0, this.maxPrefetchResults)
@@ -940,6 +1020,21 @@ export class SimilaritySearchComponent implements OnInit {
       last(),
       map((state) => ({ firstData: state.firstData, results: state.items.slice(0, this.maxPrefetchResults) }))
     );
+  }
+
+  private shouldRetryVideoUpload(error: unknown): boolean {
+    const message = typeof error === 'string'
+      ? error
+      : (typeof (error as { message?: unknown })?.message === 'string'
+        ? String((error as { message: string }).message)
+        : '');
+    const normalized = message.toLowerCase();
+    return /\b(499|502|503|504)\b/.test(normalized)
+      || normalized.includes('status 0')
+      || normalized.includes('failed to fetch')
+      || normalized.includes('err_failed')
+      || normalized.includes('timeout')
+      || normalized.includes('timed out');
   }
 
   private getResultStableKey(track: any): string {
@@ -1042,16 +1137,14 @@ export class SimilaritySearchComponent implements OnInit {
     const base = Number(this.licenseModalTrack?.price ?? this.licenseModalTrack?.license_price ?? this.licenseModalTrack?.price_amount);
     const id = this.getPriceId(this.licenseModalTrack);
     const isArtistPromo = this.getTierLabel(this.licenseModalTrack) === 'ArtistPromo' || id === 1;
-    const addOn = this.paidMediaAddOn ? 300 : 0;
 
     if (isArtistPromo) {
-      return addOn > 0 ? this.formatUsd(addOn) : this.formatUsdCents(0);
+      return this.formatUsdCents(0);
     }
 
     const baseAmount = Number.isFinite(base) && base > 0 ? base : 1500;
-    const total = baseAmount + addOn;
-    if (total <= 0) return 'Free';
-    return this.formatUsd(total);
+    if (baseAmount <= 0) return 'Free';
+    return this.formatUsd(baseAmount);
   }
 
   getLicenseModalSubtitle(track: any): string {
@@ -1413,6 +1506,11 @@ export class SimilaritySearchComponent implements OnInit {
 
   getTrackKey(track: any, _index: number): string {
     return this.getResultStableKey(track);
+  }
+
+  isTrackLicensed(track: any): boolean {
+    const key = this.getTrackKey(track, 0);
+    return this.licensedTrackIds.has(key);
   }
 
   togglePanel(track: any, index: number): void {
