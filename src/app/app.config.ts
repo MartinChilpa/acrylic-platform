@@ -7,6 +7,7 @@ import { loaderInterceptor } from './interceptors/loader.interceptor';
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { provideSentryProviders } from './providers/sentry.provider';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { translocoProviders } from './transloco.config';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,6 +17,7 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([ loaderInterceptor, authInterceptor, errorInterceptor ]),
     ),
+    ...translocoProviders,
     {
       provide: 'sentryProviders',
       useFactory: provideSentryProviders,

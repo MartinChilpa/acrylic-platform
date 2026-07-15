@@ -1,0 +1,2 @@
+This is not a video file.
+It's just a text file used to test client-side file-type validation.
