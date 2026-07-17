@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { EMPTY, Subject, defer, of, throwError, timer } from 'rxjs';
 import { catchError, exhaustMap, expand, last, map, retry, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { TranslocoModule } from '@jsverse/transloco';
 import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
@@ -33,7 +34,7 @@ interface SpotifyTrackInfo {
 @Component({
   selector: 'acrylic-similarity-search',
   standalone: true,
-  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule, TeamPlayerOptimizationComponent],
+  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule, TeamPlayerOptimizationComponent, TranslocoModule],
   templateUrl: './similarity-search.component.html',
   styleUrls: ['./similarity-search.component.base.scss', './similarity-search.component.scss']
 })
