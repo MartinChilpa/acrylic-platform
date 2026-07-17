@@ -1,3 +1,5 @@
 {
-  "test.key": "Hola, esta es una cadena de prueba en español"
+  "test.key": "Hola, esta es una cadena de prueba en español",
+  "licenses.title": "Licencias",
+  "licenses.subtitle": "Consulta las licencias, los derechos de uso y el estado de la lista blanca para tu equipo."
 }

@@ -1,3 +1,5 @@
 {
-  "test.key": "Hello, this is a test string in English"
+  "test.key": "Hello, this is a test string in English",
+  "licenses.title": "Licenses",
+  "licenses.subtitle": "Track licenses, usage rights, and whitelisting status for your team."
 }

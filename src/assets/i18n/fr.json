@@ -1,3 +1,5 @@
 {
-  "test.key": "Bonjour, ceci est une chaîne de test en français"
+  "test.key": "Bonjour, ceci est une chaîne de test en français",
+  "licenses.title": "Licences",
+  "licenses.subtitle": "Suivez les licences, les droits d'utilisation et le statut de liste blanche pour votre équipe."
 }
