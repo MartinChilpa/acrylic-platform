@@ -65,5 +65,19 @@
   "similaritySearch.modal.termsRestrictions": "Terms & Restrictions",
   "similaritySearch.modal.archivalRestriction": "Archival Restriction:",
   "similaritySearch.modal.youtubeRestriction": "YouTube Restriction:",
-  "similaritySearch.modal.generalTerms": "General Terms"
+  "similaritySearch.modal.generalTerms": "General Terms",
+  "similaritySearch.labels.tier": "Tier",
+  "similaritySearch.labels.audienceSize": "Audience Size",
+  "similaritySearch.labels.audienceSportsFit": "Audience Sports Fit",
+  "similaritySearch.labels.trackVirality": "Track Virality",
+  "similaritySearch.labels.artist": "Artist",
+  "similaritySearch.labels.track": "Track",
+  "similaritySearch.labels.licenseTier": "License Tier",
+  "similaritySearch.sections.audienceSnapshot": "Audience Snapshot",
+  "similaritySearch.sections.audienceComposition": "Audience Composition",
+  "similaritySearch.sections.audienceSportsFit": "Audience Sports Fit",
+  "similaritySearch.sections.trackVirality": "Track Virality",
+  "similaritySearch.sections.topCountries": "Top Countries",
+  "similaritySearch.sections.topCities": "Top Cities",
+  "similaritySearch.sections.audienceSplit": "AUDIENCE SPLIT"
 }

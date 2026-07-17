@@ -65,5 +65,19 @@
   "similaritySearch.modal.termsRestrictions": "Términos y Restricciones",
   "similaritySearch.modal.archivalRestriction": "Restricción de Archivo:",
   "similaritySearch.modal.youtubeRestriction": "Restricción de YouTube:",
-  "similaritySearch.modal.generalTerms": "Términos Generales"
+  "similaritySearch.modal.generalTerms": "Términos Generales",
+  "similaritySearch.labels.tier": "Nivel",
+  "similaritySearch.labels.audienceSize": "Tamaño de Audiencia",
+  "similaritySearch.labels.audienceSportsFit": "Compatibilidad Deportiva de Audiencia",
+  "similaritySearch.labels.trackVirality": "Viralidad de la Pista",
+  "similaritySearch.labels.artist": "Artista",
+  "similaritySearch.labels.track": "Pista",
+  "similaritySearch.labels.licenseTier": "Nivel de Licencia",
+  "similaritySearch.sections.audienceSnapshot": "Instantánea de Audiencia",
+  "similaritySearch.sections.audienceComposition": "Composición de Audiencia",
+  "similaritySearch.sections.audienceSportsFit": "Compatibilidad Deportiva de Audiencia",
+  "similaritySearch.sections.trackVirality": "Viralidad de la Pista",
+  "similaritySearch.sections.topCountries": "Países Principales",
+  "similaritySearch.sections.topCities": "Ciudades Principales",
+  "similaritySearch.sections.audienceSplit": "DIVISIÓN DE AUDIENCIA"
 }

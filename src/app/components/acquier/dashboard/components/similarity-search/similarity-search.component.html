@@ -239,13 +239,13 @@
             </div>
 
 
-            <p class="title-audience" *ngIf="isPanelOpen(seed, 0)">Audience Snapshot</p>
+            <p class="title-audience" *ngIf="isPanelOpen(seed, 0)">{{ 'similaritySearch.sections.audienceSnapshot' | transloco }}</p>
             <div style="display: flex;" *ngIf="isPanelOpen(seed, 0)">
               <div class="insights-section">
                 <div class="insights-row">
                   <div class="cities-double">
                     <div class="cities-col">
-                      <div class="cities-title">Top Countries</div>
+                      <div class="cities-title">{{ 'similaritySearch.sections.topCountries' | transloco }}</div>
                       <ng-container *ngIf="getTopCountries(seed) as topCountries; else noCountriesSeed">
                         <div class="city-item" *ngFor="let country of topCountries; let idx = index">
                           {{ country.flag ? (country.flag + ' ') : '' }}{{ country.name }}
@@ -258,7 +258,7 @@
                       </ng-template>
                     </div>
                     <div class="cities-col">
-                      <div class="cities-title">Top Cities</div>
+                      <div class="cities-title">{{ 'similaritySearch.sections.topCities' | transloco }}</div>
                       <ng-container *ngIf="getTopCityNames(seed) as topCities; else noCitiesSeed">
                         <div class="city-item" *ngFor="let city of topCities; let idx = index">
                           {{ idx + 1 }}. {{ city }}
@@ -273,7 +273,7 @@
                   </div>
 
                   <div class="gender-split" *ngIf="getGenderSplit(seed) as split">
-                    <div class="cities-title">AUDIENCE SPLIT</div>
+                    <div class="cities-title">{{ 'similaritySearch.sections.audienceSplit' | transloco }}</div>
                     <div class="gender-legend">
                       <span>Female {{ split.female }}%</span>
                       <span>Male {{ split.male }}%</span>
@@ -290,7 +290,7 @@
                   <div class="insight-item">
                     
                     <div class="insight-card">
-                      <div class="data-card__header">Audience Composition</div>
+                      <div class="data-card__header">{{ 'similaritySearch.sections.audienceComposition' | transloco }}</div>
                       <div class="followers-pie-wrap" *ngIf="getFollowersPieBackground(seed) as pieBackground; else noFollowersMixSeed">
                         <div class="followers-top-row">
                           <div class="followers-top-item">
@@ -321,7 +321,7 @@
                   <div class="insight-item">
                     
                     <div class="insight-card">
-                      <div class="data-card__header">Audience Sports Fit</div>
+                      <div class="data-card__header">{{ 'similaritySearch.sections.audienceSportsFit' | transloco }}</div>
                       <div class="sport-fit-content">
                         <img class="sport-fit-icon" [src]="getSportFitIconPath(seed)" alt="Audience Sport Fit" />
                         <span class="sport-fit-label">Sports Fit</span>
@@ -334,7 +334,7 @@
                   <div class="insight-item">
              
                     <div class="insight-card">
-                      <div class="data-card__header">Track Virality</div>
+                      <div class="data-card__header">{{ 'similaritySearch.sections.trackVirality' | transloco }}</div>
                       <div class="sport-fit-content">
                         <img class="sport-fit-icon" [src]="getTrackViralityIconPath(seed)" alt="Track Virality" />
                         <span class="sport-fit-label">Virality</span>
@@ -436,10 +436,10 @@
 	    <div *ngIf="(results?.length ?? 0) > 0">
     <div class="results-cols-header">
       <div class="rcols-spacer"></div>
-      <span class="rcols-label">Tier</span>
-      <span class="rcols-label">Audience Size</span>
-      <span class="rcols-label">Audience Sports Fit</span>
-      <span class="rcols-label">Track Virality</span>
+      <span class="rcols-label">{{ 'similaritySearch.labels.tier' | transloco }}</span>
+      <span class="rcols-label">{{ 'similaritySearch.labels.audienceSize' | transloco }}</span>
+      <span class="rcols-label">{{ 'similaritySearch.labels.audienceSportsFit' | transloco }}</span>
+      <span class="rcols-label">{{ 'similaritySearch.labels.trackVirality' | transloco }}</span>
       <div class="rcols-right"></div>
     </div>
     </div>
@@ -574,7 +574,7 @@
               <div class="insights-row">
                 <div class="cities-double">
                   <div class="cities-col">
-                    <div class="cities-title">Top Countries</div>
+                    <div class="cities-title">{{ 'similaritySearch.sections.topCountries' | transloco }}</div>
                     <ng-container *ngIf="getTopCountries(result) as topCountries; else noCountries">
                       <div class="city-item" *ngFor="let country of topCountries; let idx = index">
                         {{ country.flag ? (country.flag + ' ') : '' }}{{ country.name }}
@@ -650,7 +650,7 @@
                 <div class="insight-item">
                   
                   <div class="insight-card">
-                    <div class="data-card__header">Audience Sports Fit</div>
+                    <div class="data-card__header">{{ 'similaritySearch.sections.audienceSportsFit' | transloco }}</div>
                     <div class="sport-fit-content">
                       <img class="sport-fit-icon" [src]="getSportFitIconPath(result)" alt="Audience Sports Fit" />
                       <span class="sport-fit-label">Sports Fit</span>
@@ -857,15 +857,15 @@
           <div class="license-modal__body license-modal__body--licensed">
             <div class="license-modal__details">
               <div class="license-modal__details-row">
-                <span>Artist</span>
+                <span>{{ 'similaritySearch.labels.artist' | transloco }}</span>
                 <span class="license-modal__details-value">{{ licensedTrack?.artist_canonical ?? '-' }}</span>
               </div>
               <div class="license-modal__details-row">
-                <span>Track</span>
+                <span>{{ 'similaritySearch.labels.track' | transloco }}</span>
                 <span class="license-modal__details-value">{{ licensedTrack?.track_name ?? licensedTrack?.track_name_track ?? '-' }}</span>
               </div>
               <div class="license-modal__details-row">
-                <span>License Tier</span>
+                <span>{{ 'similaritySearch.labels.licenseTier' | transloco }}</span>
                 <span class="license-modal__details-value license-modal__details-value--accent">{{ getTierLabel(licensedTrack) }}</span>
               </div>
             </div>
