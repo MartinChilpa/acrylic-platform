@@ -1,14 +1,17 @@
 import { NgClass } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'acrylic-license',
   standalone: true,
-   imports: [NgClass],
+   imports: [NgClass, TranslocoModule],
 
   templateUrl: './license.component.html',
   styleUrl: './license.component.scss'
 })
 export class LicenseComponent {
+  private transloco = inject(TranslocoService);
+
   @Input() priceId: number | string | null | undefined;
   @Input() trackPrice: number | string | null | undefined;
   @Output() licenseClick = new EventEmitter<void>();
@@ -33,13 +36,14 @@ export class LicenseComponent {
   }
 
   get subheadline(): string {
-    if (this.theme === 'artistpromo') return 'Artist promo License';
-    if (this.theme === 'bid2clear') return 'Bid2Clear Price';
-    return 'Artist promo License';
+    if (this.theme === 'artistpromo') return this.transloco.translate('license.artistPromoLicense');
+    if (this.theme === 'bid2clear') return this.transloco.translate('license.bid2clearPrice');
+    return this.transloco.translate('license.artistPromoLicense');
   }
 
   get ctaLabel(): string {
-    return this.theme === 'artistpromo' ? 'License' : `License for ${this.displayPrice}`;
+    if (this.theme === 'artistpromo') return this.transloco.translate('license.licenseCta');
+    return this.transloco.translate('license.licenseForPrice', { price: this.displayPrice });
   }
 
 }

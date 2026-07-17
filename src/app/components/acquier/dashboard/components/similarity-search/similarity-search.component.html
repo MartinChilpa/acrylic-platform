@@ -12,7 +12,7 @@
         (focus)="onSearchInputFocus()"
         (input)="onSearchInputChange()"
         (blur)="onSearchInputBlur()"
-        placeholder="Type anything or paste a link / upload a file"
+        [placeholder]="'similaritySearch.search.placeholder' | transloco"
       />
   
         <input
@@ -100,8 +100,8 @@
           <div class="spotify-track-card__request-row">
             <div class="spotify-track-card__request-copy">
               <div class="spotify-track-card__request-title">{{ 'similaritySearch.messages.trackNotInCatalog' | transloco }}</div>
-              <div class="spotify-track-card__request-subtitle">Request it from our licensing team.</div>
-              <div class="spotify-track-card__request-meta">Estimated turnaround: 1–4 weeks</div>
+              <div class="spotify-track-card__request-subtitle">{{ 'similaritySearch.messages.requestFromTeam' | transloco }}</div>
+              <div class="spotify-track-card__request-meta">{{ 'similaritySearch.messages.estimatedTurnaround' | transloco }}</div>
             </div>
 
             <a href="mailto:hello@acrylic.la" class="spotify-track-card__request-cta">
@@ -109,14 +109,14 @@
                 <rect x="4" y="6.5" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.75"></rect>
                 <path d="M5.5 8.5L12 13.25L18.5 8.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
               </svg>
-              <span>Email our licensing team</span>
+              <span>{{ 'similaritySearch.messages.emailLicensingTeam' | transloco }}</span>
             </a>
           </div>
         </div>
       </div>
     </div>
        <div class="seed-track-wrap" *ngIf="seedTrack as seed">
-      <h3 class="results-section__title results-section__title--seed">Your track</h3>
+      <h3 class="results-section__title results-section__title--seed">{{ 'similaritySearch.labels.yourTrack' | transloco }}</h3>
       <div class="result-card result-row" [ngClass]="getResultThemeClass(seed)">
         <div class="track-grid">
           <div>
@@ -430,7 +430,7 @@
 
 	    <div class="results-loading-inline" *ngIf="loading">
 	      <div class="results-loading-inline__spinner" aria-hidden="true"></div>
-	      <span class="results-loading-inline__text">Searching tracks...</span>
+	      <span class="results-loading-inline__text">{{ 'similaritySearch.messages.searchingTracks' | transloco }}</span>
 	    </div>
 	
 	    <div *ngIf="(results?.length ?? 0) > 0">
@@ -697,12 +697,12 @@
       <div class="d-flex align-items-center gap-2">
         <button type="button" class="btn bg-light-gray text-primary" (click)="goToPreviousPage()" [disabled]="!canGoPreviousPage || loading">&lt;</button>
         <span class="p-2">
-          {{ pageNumber }}<ng-container *ngIf="totalPages as tp"> of {{ tp }}</ng-container>
+          {{ pageNumber }}<ng-container *ngIf="totalPages as tp"> {{ 'similaritySearch.pagination.of' | transloco }} {{ tp }}</ng-container>
         </span>
         <button type="button" class="btn bg-light-gray text-primary" (click)="goToNextPage()" [disabled]="!canGoNextPage || loading">&gt;</button>
       </div>
       <div style="font-size: 12px; color: rgba(255,255,255,0.6); padding-right: 6px;">
-        10 per page
+        {{ 'similaritySearch.pagination.perPage' | transloco }}
       </div>
     </div>
 
@@ -776,19 +776,19 @@
 
             <div class="license-modal__terms" *ngIf="generalTermsOpen">
               <div class="license-modal__terms-item">
-                &bull; This license covers digital use only, on Licensee's official social media accounts (TikTok, Instagram, YouTube, and any platforms listed in the License), worldwide. Content must be published within 30 days of download.
+                &bull; {{ 'similaritySearch.terms.term1' | transloco }}
               </div>
               <div class="license-modal__terms-item">
-                &bull; This license may include archival and/or platform-specific restrictions. Delete all content by the archival deadline if applicable, and set any YouTube video to &quot;Unlisted&quot; within the specified window. Review your license terms carefully to ensure compliance.
+                &bull; {{ 'similaritySearch.terms.term2' | transloco }}
               </div>
               <div class="license-modal__terms-item">
-                &bull; This license covers one (1) main video, up to two (2) tag-ons (max 10 seconds each), one (1) 60-second cut-down, and one (1) 30-second cut-down.
+                &bull; {{ 'similaritySearch.terms.term3' | transloco }}
               </div>
             </div>
 
             <div class="license-modal__contact">
               <div class="license-modal__contact-text">
-                Need rights not included in this license, such as for a TV campaign or posting on your website? Contact our licensing team.
+                {{ 'similaritySearch.messages.needMoreRights' | transloco }}
               </div>
               <a href="mailto:hello@acrylic.la" class="license-modal__contact-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -801,11 +801,11 @@
 
             <div class="license-modal__totals">
               <div class="license-modal__total-row">
-                <span>Base License</span>
-                <span>{{ getTrackLicensePrice(licenseModalTrack) ?? 'Included' }}</span>
+                <span>{{ 'similaritySearch.modal.baseLicense' | transloco }}</span>
+                <span>{{ getTrackLicensePrice(licenseModalTrack) ?? ('similaritySearch.modal.included' | transloco) }}</span>
               </div>
               <div class="license-modal__total-row license-modal__total-row--strong">
-                <span>Total</span>
+                <span>{{ 'similaritySearch.modal.total' | transloco }}</span>
                 <span class="license-modal__total-accent">{{ getLicenseTotal() }}</span>
               </div>
             </div>
@@ -896,7 +896,7 @@
                 <ng-template #downloadIcon>
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="15" viewBox="0 0 12 15" fill="none" aria-hidden="true"><path d="M7.375 0.500002H1.875C1.51033 0.500002 1.16059 0.647502 0.902728 0.910053C0.644866 1.1726 0.5 1.5287 0.5 1.9V13.1C0.5 13.4713 0.644866 13.8274 0.902728 14.0899C1.16059 14.3525 1.51033 14.5 1.875 14.5H10.125C10.4897 14.5 10.8394 14.3525 11.0973 14.0899C11.3551 13.8274 11.5 13.4713 11.5 13.1V4.7M7.375 0.500002C7.59263 0.499643 7.80818 0.543124 8.00924 0.62794C8.2103 0.712757 8.39289 0.837234 8.5465 0.994202L11.0132 3.5058C11.1678 3.66226 11.2904 3.84834 11.374 4.05331C11.4575 4.25829 11.5004 4.47808 11.5 4.7M7.375 0.500002V4C7.375 4.18565 7.44743 4.3637 7.57636 4.49498C7.70529 4.62625 7.88016 4.7 8.0625 4.7L11.5 4.7M6 11.7V7.5M8.0625 9.6L6 11.7L3.9375 9.6" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </ng-template>
-                <span>{{ tagsCopied ? 'Copied' : 'Download Tags' }}</span>
+                <span>{{ tagsCopied ? ('similaritySearch.buttons.copied' | transloco) : ('similaritySearch.buttons.downloadTags' | transloco) }}</span>
               </button>
               
             </div>
@@ -907,16 +907,16 @@
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20" fill="none"><path d="M5 8L7 10L11 6M13 1C13.5304 1 14.0391 1.21071 14.4142 1.58579C14.7893 1.96086 15 2.46957 15 3V18C14.9999 18.1751 14.9539 18.3472 14.8665 18.4989C14.7791 18.6506 14.6533 18.7767 14.5019 18.8646C14.3504 18.9525 14.1785 18.9991 14.0034 18.9997C13.8283 19.0003 13.6561 18.9549 13.504 18.868L8.992 16.29C8.68987 16.1174 8.34795 16.0266 8 16.0266C7.65205 16.0266 7.31013 16.1174 7.008 16.29L2.496 18.868C2.34394 18.9549 2.17174 19.0003 1.99662 18.9997C1.8215 18.9991 1.64961 18.9525 1.49814 18.8646C1.34667 18.7767 1.22094 18.6506 1.13352 18.4989C1.0461 18.3472 1.00006 18.1751 1 18V3C1 2.46957 1.21071 1.96086 1.58579 1.58579C1.96086 1.21071 2.46957 1 3 1H13Z" stroke="#81C784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
                 <div>
-                  <div class="license-modal__license-details-title">License Details</div>
-                  <div class="license-modal__license-details-subtitle">View license details and certificate</div>
+                  <div class="license-modal__license-details-title">{{ 'similaritySearch.modal.licenseDetails' | transloco }}</div>
+                  <div class="license-modal__license-details-subtitle">{{ 'similaritySearch.modal.viewLicenseDetails' | transloco }}</div>
                 </div>
               </div>
-              <button type="button" class="license-modal__outline-btn" (click)="goToLicenses()">Go to Licenses</button>
+              <button type="button" class="license-modal__outline-btn" (click)="goToLicenses()">{{ 'similaritySearch.buttons.goToLicenses' | transloco }}</button>
             </div>
 
             <div class="license-modal__contact">
               <div class="license-modal__contact-text">
-                Need rights not included in this license, such as for a TV campaign or posting on your website? Contact our licensing team.
+                {{ 'similaritySearch.messages.needMoreRights' | transloco }}
               </div>
               <a href="mailto:hello@acrylic.la" class="license-modal__contact-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
