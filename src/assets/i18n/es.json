@@ -61,5 +61,9 @@
   "similaritySearch.modal.trackLicensed": "Pista Licenciada",
   "similaritySearch.modal.license": "Licenciar",
   "similaritySearch.modal.cancel": "Cancelar",
-  "similaritySearch.modal.done": "Listo"
+  "similaritySearch.modal.done": "Listo",
+  "similaritySearch.modal.termsRestrictions": "Términos y Restricciones",
+  "similaritySearch.modal.archivalRestriction": "Restricción de Archivo:",
+  "similaritySearch.modal.youtubeRestriction": "Restricción de YouTube:",
+  "similaritySearch.modal.generalTerms": "Términos Generales"
 }

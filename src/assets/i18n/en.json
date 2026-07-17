@@ -61,5 +61,9 @@
   "similaritySearch.modal.trackLicensed": "Track Licensed",
   "similaritySearch.modal.license": "License",
   "similaritySearch.modal.cancel": "Cancel",
-  "similaritySearch.modal.done": "Done"
+  "similaritySearch.modal.done": "Done",
+  "similaritySearch.modal.termsRestrictions": "Terms & Restrictions",
+  "similaritySearch.modal.archivalRestriction": "Archival Restriction:",
+  "similaritySearch.modal.youtubeRestriction": "YouTube Restriction:",
+  "similaritySearch.modal.generalTerms": "General Terms"
 }

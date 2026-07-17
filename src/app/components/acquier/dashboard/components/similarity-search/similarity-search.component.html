@@ -744,11 +744,11 @@
           <div class="license-modal__divider"></div>
 
           <div class="license-modal__body">
-            <div class="license-modal__section-title">Terms & Restrictions</div>
+            <div class="license-modal__section-title">{{ 'similaritySearch.modal.termsRestrictions' | transloco }}</div>
 
             <div class="license-modal__restriction">
               <div class="license-modal__restriction-row">
-                <div class="license-modal__restriction-pill">Archival Restriction:</div>
+                <div class="license-modal__restriction-pill">{{ 'similaritySearch.modal.archivalRestriction' | transloco }}</div>
                 <button type="button" class="license-modal__restriction-info">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 12.2V9M9 5.8H9.008M17 9C17 13.4183 13.4183 17 9 17C4.58172 17 1 13.4183 1 9C1 4.58172 4.58172 1 9 1C13.4183 1 17 4.58172 17 9Z" stroke="white" stroke-opacity="0.8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
@@ -758,7 +758,7 @@
 
             <div class="license-modal__restriction">
               <div class="license-modal__restriction-row">
-                <div class="license-modal__restriction-pill">YouTube Restriction:</div>
+                <div class="license-modal__restriction-pill">{{ 'similaritySearch.modal.youtubeRestriction' | transloco }}</div>
                 <button type="button" class="license-modal__restriction-info">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 12.2V9M9 5.8H9.008M17 9C17 13.4183 13.4183 17 9 17C4.58172 17 1 13.4183 1 9C1 4.58172 4.58172 1 9 1C13.4183 1 17 4.58172 17 9Z" stroke="white" stroke-opacity="0.8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
@@ -767,7 +767,7 @@
             </div>
 
             <button type="button" class="license-modal__accordion" (click)="toggleGeneralTerms()">
-              <span>General Terms</span>
+              <span>{{ 'similaritySearch.modal.generalTerms' | transloco }}</span>
               <img
                 class="license-modal__accordion-icon"
                 [src]="generalTermsOpen ? 'assets/images/icons/up-arrow-white.svg' : 'assets/images/icons/down-arrow-white.svg'"
