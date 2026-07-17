@@ -99,7 +99,7 @@
           <div class="spotify-track-card__request-divider"></div>
           <div class="spotify-track-card__request-row">
             <div class="spotify-track-card__request-copy">
-              <div class="spotify-track-card__request-title">This track isn't currently in our catalog.</div>
+              <div class="spotify-track-card__request-title">{{ 'similaritySearch.messages.trackNotInCatalog' | transloco }}</div>
               <div class="spotify-track-card__request-subtitle">Request it from our licensing team.</div>
               <div class="spotify-track-card__request-meta">Estimated turnaround: 1–4 weeks</div>
             </div>
@@ -175,7 +175,7 @@
                       <div class="waveform-loading__spinner" aria-hidden="true"></div>
                     </div>
                     <ng-template #noWaveformSeed>
-                      <div class="waveform-empty">No waveform available</div>
+                      <div class="waveform-empty">{{ 'similaritySearch.messages.noWaveform' | transloco }}</div>
                     </ng-template>
                   </div>
 
@@ -504,7 +504,7 @@
                     <div class="waveform-loading__spinner" aria-hidden="true"></div>
                   </div>
                   <ng-template #noWaveform>
-                    <div class="waveform-empty">No waveform available</div>
+                    <div class="waveform-empty">{{ 'similaritySearch.messages.noWaveform' | transloco }}</div>
                   </ng-template>
                 </div>
 
@@ -875,7 +875,7 @@
                 <span class="license-modal__tagging-icon" aria-hidden="true">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.66667 10.2632C3.66667 12.4496 4.41523 14.5771 5.8 16.3263C6.0829 16.6837 6.50405 16.9199 6.97081 16.9831C7.43756 17.0462 7.91169 16.9312 8.28889 16.6632C8.66609 16.3951 8.91545 15.9962 8.98213 15.554C9.04881 15.1118 8.92734 14.6626 8.64444 14.3053C7.72127 13.1391 7.22222 11.7208 7.22222 10.2632M5.44444 3.52632V10.2632M8.11111 3.52632C10.8146 3.59229 13.4568 2.7579 15.5778 1.16842C15.7098 1.07459 15.8669 1.01745 16.0313 1.0034C16.1957 0.989358 16.361 1.01896 16.5086 1.0889C16.6563 1.15884 16.7805 1.26635 16.8672 1.39938C16.954 1.53242 17 1.68572 17 1.84211V11.9474C17 12.1038 16.954 12.2571 16.8672 12.3901C16.7805 12.5231 16.6563 12.6306 16.5086 12.7006C16.361 12.7705 16.1957 12.8001 16.0313 12.7861C15.8669 12.772 15.7098 12.7149 15.5778 12.621C13.4568 11.0316 10.8146 10.1972 8.11111 10.2632H2.77778C2.30628 10.2632 1.8541 10.0857 1.5207 9.76986C1.1873 9.45401 1 9.02562 1 8.57894V5.21052C1 4.76384 1.1873 4.33546 1.5207 4.01961C1.8541 3.70376 2.30628 3.52632 2.77778 3.52632H8.11111Z" stroke="#81C784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
-                <span class="license-modal__tagging-title">Tag Artist & Sound for Optimal Reach & Attribution</span>
+                <span class="license-modal__tagging-title">{{ 'similaritySearch.callouts.tagArtist' | transloco }}</span>
                 <button type="button" class="license-modal__restriction-info">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 12.2V9M9 5.8H9.008M17 9C17 13.4183 13.4183 17 9 17C4.58172 17 1 13.4183 1 9C1 4.58172 4.58172 1 9 1C13.4183 1 17 4.58172 17 9Z" stroke="white" stroke-opacity="0.8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>

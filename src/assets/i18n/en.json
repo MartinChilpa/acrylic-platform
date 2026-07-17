@@ -79,5 +79,8 @@
   "similaritySearch.sections.trackVirality": "Track Virality",
   "similaritySearch.sections.topCountries": "Top Countries",
   "similaritySearch.sections.topCities": "Top Cities",
-  "similaritySearch.sections.audienceSplit": "AUDIENCE SPLIT"
+  "similaritySearch.sections.audienceSplit": "AUDIENCE SPLIT",
+  "similaritySearch.messages.noWaveform": "No waveform available",
+  "similaritySearch.messages.trackNotInCatalog": "This track isn't currently in our catalog.",
+  "similaritySearch.callouts.tagArtist": "Tag Artist & Sound for Optimal Reach & Attribution"
 }

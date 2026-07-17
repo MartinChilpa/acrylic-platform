@@ -79,5 +79,8 @@
   "similaritySearch.sections.trackVirality": "Viralité de la Piste",
   "similaritySearch.sections.topCountries": "Pays Principaux",
   "similaritySearch.sections.topCities": "Villes Principales",
-  "similaritySearch.sections.audienceSplit": "RÉPARTITION DE L'AUDIENCE"
+  "similaritySearch.sections.audienceSplit": "RÉPARTITION DE L'AUDIENCE",
+  "similaritySearch.messages.noWaveform": "Forme d'onde non disponible",
+  "similaritySearch.messages.trackNotInCatalog": "Cette piste ne figure pas actuellement dans notre catalogue.",
+  "similaritySearch.callouts.tagArtist": "Identifiez l'Artiste et le Son pour une Portée et une Attribution Optimales"
 }

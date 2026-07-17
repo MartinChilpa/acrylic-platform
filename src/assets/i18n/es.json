@@ -79,5 +79,8 @@
   "similaritySearch.sections.trackVirality": "Viralidad de la Pista",
   "similaritySearch.sections.topCountries": "Países Principales",
   "similaritySearch.sections.topCities": "Ciudades Principales",
-  "similaritySearch.sections.audienceSplit": "DIVISIÓN DE AUDIENCIA"
+  "similaritySearch.sections.audienceSplit": "DIVISIÓN DE AUDIENCIA",
+  "similaritySearch.messages.noWaveform": "Forma de onda no disponible",
+  "similaritySearch.messages.trackNotInCatalog": "Esta pista no está actualmente en nuestro catálogo.",
+  "similaritySearch.callouts.tagArtist": "Etiqueta Artista y Sonido para Mayor Alcance y Atribución"
 }
