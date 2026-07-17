@@ -56,5 +56,10 @@
   "dashboard.searchTitleEnd": "right here",
   "similaritySearch.buttons.upload": "Upload",
   "similaritySearch.buttons.search": "Search",
-  "similaritySearch.buttons.searching": "Searching..."
+  "similaritySearch.buttons.searching": "Searching...",
+  "similaritySearch.modal.licenseTrack": "License Track",
+  "similaritySearch.modal.trackLicensed": "Track Licensed",
+  "similaritySearch.modal.license": "License",
+  "similaritySearch.modal.cancel": "Cancel",
+  "similaritySearch.modal.done": "Done"
 }

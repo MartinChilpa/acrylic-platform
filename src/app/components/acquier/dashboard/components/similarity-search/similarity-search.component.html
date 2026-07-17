@@ -718,7 +718,7 @@
           [ngClass]="getResultThemeClass(licenseModalTrack)">
           <div class="license-modal__top">
             <div class="license-modal__header">
-              <div class="license-modal__title">License Track</div>
+              <div class="license-modal__title">{{ 'similaritySearch.modal.licenseTrack' | transloco }}</div>
               <button
                 type="button"
                 class="license-modal__close"
@@ -812,8 +812,8 @@
           </div>
 
           <div class="license-modal__footer">
-            <button type="button" class="license-modal__footer-link" data-bs-dismiss="modal" (click)="resetLicenseFlow()">Cancel</button>
-            <button type="button" class="license-modal__footer-primary" (click)="confirmLicenseHappyPath()">License</button>
+            <button type="button" class="license-modal__footer-link" data-bs-dismiss="modal" (click)="resetLicenseFlow()">{{ 'similaritySearch.modal.cancel' | transloco }}</button>
+            <button type="button" class="license-modal__footer-primary" (click)="confirmLicenseHappyPath()">{{ 'similaritySearch.modal.license' | transloco }}</button>
           </div>
         </div>
       </div>
@@ -831,7 +831,7 @@
           [ngClass]="getResultThemeClass(licensedTrack)">
           <div class="license-modal__top">
             <div class="license-modal__header">
-              <div class="license-modal__title">Track Licensed</div>
+              <div class="license-modal__title">{{ 'similaritySearch.modal.trackLicensed' | transloco }}</div>
               <button
                 type="button"
                 class="license-modal__close"
@@ -929,7 +929,7 @@
           </div>
 
           <div class="license-modal__footer license-modal__footer--spread">
-            <button type="button" class="license-modal__footer-link" data-bs-dismiss="modal" (click)="resetLicenseFlow()">Done</button>
+            <button type="button" class="license-modal__footer-link" data-bs-dismiss="modal" (click)="resetLicenseFlow()">{{ 'similaritySearch.modal.done' | transloco }}</button>
             <button
               type="button"
               class="license-modal__footer-primary"

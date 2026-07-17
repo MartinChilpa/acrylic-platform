@@ -56,5 +56,10 @@
   "dashboard.searchTitleEnd": "aquí",
   "similaritySearch.buttons.upload": "Cargar",
   "similaritySearch.buttons.search": "Buscar",
-  "similaritySearch.buttons.searching": "Buscando..."
+  "similaritySearch.buttons.searching": "Buscando...",
+  "similaritySearch.modal.licenseTrack": "Licenciar Pista",
+  "similaritySearch.modal.trackLicensed": "Pista Licenciada",
+  "similaritySearch.modal.license": "Licenciar",
+  "similaritySearch.modal.cancel": "Cancelar",
+  "similaritySearch.modal.done": "Listo"
 }

@@ -56,5 +56,10 @@
   "dashboard.searchTitleEnd": "ici",
   "similaritySearch.buttons.upload": "Importer",
   "similaritySearch.buttons.search": "Rechercher",
-  "similaritySearch.buttons.searching": "Recherche en cours..."
+  "similaritySearch.buttons.searching": "Recherche en cours...",
+  "similaritySearch.modal.licenseTrack": "Licencier la Piste",
+  "similaritySearch.modal.trackLicensed": "Piste Licenciée",
+  "similaritySearch.modal.license": "Licencier",
+  "similaritySearch.modal.cancel": "Annuler",
+  "similaritySearch.modal.done": "Fait"
 }
