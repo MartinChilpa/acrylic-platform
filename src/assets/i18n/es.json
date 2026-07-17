@@ -50,5 +50,8 @@
   "licenses.actions.deleteLicense": "Eliminar Licencia",
   "licenses.actions.comingSoon": "Próximamente",
   "licenses.actions.deleteLicenseTitle": "Eliminar esta solicitud de licencia",
-  "licenses.actions.contactTeam": "Contactar Equipo de Licenciamiento de Acrylic"
+  "licenses.actions.contactTeam": "Contactar Equipo de Licenciamiento de Acrylic",
+  "dashboard.searchTitleStart": "Inicia tu",
+  "dashboard.searchTitleHighlight": "búsqueda",
+  "dashboard.searchTitleEnd": "aquí"
 }
