@@ -53,5 +53,8 @@
   "licenses.actions.contactTeam": "Contact Acrylic Licensing Team",
   "dashboard.searchTitleStart": "Start your",
   "dashboard.searchTitleHighlight": "search",
-  "dashboard.searchTitleEnd": "right here"
+  "dashboard.searchTitleEnd": "right here",
+  "similaritySearch.buttons.upload": "Upload",
+  "similaritySearch.buttons.search": "Search",
+  "similaritySearch.buttons.searching": "Searching..."
 }

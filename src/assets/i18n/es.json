@@ -53,5 +53,8 @@
   "licenses.actions.contactTeam": "Contactar Equipo de Licenciamiento de Acrylic",
   "dashboard.searchTitleStart": "Inicia tu",
   "dashboard.searchTitleHighlight": "búsqueda",
-  "dashboard.searchTitleEnd": "aquí"
+  "dashboard.searchTitleEnd": "aquí",
+  "similaritySearch.buttons.upload": "Cargar",
+  "similaritySearch.buttons.search": "Buscar",
+  "similaritySearch.buttons.searching": "Buscando..."
 }
