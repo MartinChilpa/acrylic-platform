@@ -5,9 +5,9 @@
   <div class="license-platform-modal__top">
     <div class="license-platform-modal__header">
       <div>
-        <h2 class="license-platform-modal__title">Choose Platforms</h2>
+        <h2 class="license-platform-modal__title">{{ 'licensePlatformModal.title' | transloco }}</h2>
         <p class="license-platform-modal__subtitle">
-          Which platforms do you plan to use this music on?
+          {{ 'licensePlatformModal.subtitle' | transloco }}
         </p>
       </div>
       <button class="license-platform-modal__close" (click)="onClose()" aria-label="Close">
@@ -62,7 +62,7 @@
       <div *ngIf="showOtherInput" class="license-platform-modal__other-input">
         <input
           type="url"
-          placeholder="Enter your URL (e.g., https://example.com)"
+          [placeholder]="'licensePlatformModal.urlPlaceholder' | transloco"
           [(ngModel)]="otherUrl"
           class="license-platform-modal__other-input-field"
         />
@@ -79,7 +79,7 @@
             <path d="M1 5L4.5 8.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </span>
-        <span>{{ allSelected ? 'Deselect All' : 'Select All' }}</span>
+        <span>{{ allSelected ? ('licensePlatformModal.deselectAll' | transloco) : ('licensePlatformModal.selectAll' | transloco) }}</span>
       </button>
     </div>
   </div>
@@ -91,7 +91,7 @@
       class="license-platform-modal__footer-link"
       (click)="onClose()"
     >
-      Cancel
+      {{ 'licensePlatformModal.cancel' | transloco }}
     </button>
     <button
       type="button"
@@ -99,8 +99,8 @@
       (click)="onSubmit()"
       [disabled]="!isValid || isLoading"
     >
-      <span *ngIf="!isLoading">Continue</span>
-      <span *ngIf="isLoading">Submitting...</span>
+      <span *ngIf="!isLoading">{{ 'licensePlatformModal.continue' | transloco }}</span>
+      <span *ngIf="isLoading">{{ 'licensePlatformModal.submitting' | transloco }}</span>
     </button>
   </div>
 </div>
