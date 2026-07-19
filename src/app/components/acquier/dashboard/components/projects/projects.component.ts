@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { IFavoriteResult, IProjectResult } from '../../../../../interfaces/response/projects.response';
 import { TrackRowProjectsComponent } from '../track-row-projects/track-row-projects.component';
@@ -8,7 +9,7 @@ import { TrackRowProjectsComponent } from '../track-row-projects/track-row-proje
 @Component({
   selector: 'acrylic-projects',
   standalone: true,
-  imports: [CommonModule, FormsModule, TrackRowProjectsComponent],
+  imports: [CommonModule, FormsModule, TranslocoModule, TrackRowProjectsComponent],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss',
 })

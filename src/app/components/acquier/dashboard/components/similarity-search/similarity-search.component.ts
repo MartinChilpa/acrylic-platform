@@ -81,12 +81,19 @@ export class SimilaritySearchComponent implements OnInit {
   private timerRafIds = new Map<string, number>();
   private peaksInitTimerId: number | null = null;
 
-  suggestions: Suggestion[] = [
-    { icon: '', type: 'prompt', title: 'Write a prompt', subtitle: 'Hip hop music with winning vibe for epic goal reel'},
-    { icon: '', type: 'video', title: 'Upload a video', subtitle: 'up to 60 sec / 60 MB' },
-    { icon: '', type: 'link', title: 'Paste a link', subtitle: 'Paste a link. Get matches to similar tracks.' },
-    { icon: '', type: 'track', title: 'Find a specific track', subtitle: 'Search title and artist.' },
+  suggestionKeys = [
+    { icon: '', type: 'prompt', titleKey: 'similaritySearch.dropdown.writePrompt', subtitleKey: 'similaritySearch.dropdown.writePromptDesc'},
+    { icon: '', type: 'video', titleKey: 'similaritySearch.dropdown.uploadVideo', subtitleKey: 'similaritySearch.dropdown.uploadVideoDesc' },
+    { icon: '', type: 'link', titleKey: 'similaritySearch.dropdown.pasteLink', subtitleKey: 'similaritySearch.dropdown.pasteLinkDesc' },
+    { icon: '', type: 'track', titleKey: 'similaritySearch.dropdown.findTrack', subtitleKey: 'similaritySearch.dropdown.findTrackDesc' },
   ];
+
+  suggestions: Suggestion[] = this.suggestionKeys.map(s => ({
+    icon: s.icon,
+    type: s.type,
+    title: s.titleKey,
+    subtitle: s.subtitleKey
+  }));
 
   
   results: any[] = [];
