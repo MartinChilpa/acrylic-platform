@@ -6,6 +6,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { loaderInterceptor } from './interceptors/loader.interceptor';
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { provideSentryProviders } from './providers/sentry.provider';
+import { provideAmplitudeProviders } from './providers/amplitude.provider';
 import { authInterceptor } from './interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
@@ -19,6 +20,11 @@ export const appConfig: ApplicationConfig = {
     {
       provide: 'sentryProviders',
       useFactory: provideSentryProviders,
+      deps: [PLATFORM_ID],
+    },
+    {
+      provide: 'amplitudeProviders',
+      useFactory: provideAmplitudeProviders,
       deps: [PLATFORM_ID],
     }
   ]

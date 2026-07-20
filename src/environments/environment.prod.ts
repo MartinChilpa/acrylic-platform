@@ -11,5 +11,6 @@ export const environment = {
             /^https:\/\/app\.acrylic\.la\//,
         ]
     },
-    GOOGLE_CLIENT_ID: '718561277877-9aoajc2etskkmirb136ivgknuv2gjbsn.apps.googleusercontent.com'
+    GOOGLE_CLIENT_ID: '718561277877-9aoajc2etskkmirb136ivgknuv2gjbsn.apps.googleusercontent.com',
+    AMPLITUDE_API_KEY: '5377a5317a2f38fbe04907f68d9eaa11'
 };

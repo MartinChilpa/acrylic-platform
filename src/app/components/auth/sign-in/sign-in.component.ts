@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AuthService } from '../../../services/auth.service';
 import { AlertService } from '../../../services/alert.service';
 import { NavigationService } from '../../../services/navigation.service';
+import { AmplitudeService } from '../../../services/amplitude.service';
 import { SocialLoginButtonComponent } from '../social-login-button/social-login-button.component';
 @Component({
   selector: 'acrylic-sign-in',
@@ -23,6 +24,7 @@ export class SignInComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _authService = inject(AuthService);
   private _alertService = inject(AlertService);
+  private _amplitudeService = inject(AmplitudeService);
   public _navigationService = inject(NavigationService);
 
   ngOnInit(): void {
@@ -48,6 +50,7 @@ export class SignInComponent implements OnInit {
           }
         },
         error: () => {
+          this._amplitudeService.trackEvent('Login Failed');
           this.signInForm.enable();
         }
       });

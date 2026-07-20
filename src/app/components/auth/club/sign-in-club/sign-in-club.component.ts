@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../services/auth.service';
 import { AlertService } from '../../../../services/alert.service';
 import { NavigationService } from '../../../../services/navigation.service';
+import { AmplitudeService } from '../../../../services/amplitude.service';
 import { TeamBrandingService } from '../../../../services/team-branding.service';
 import { SocialLoginButtonComponent } from '../../social-login-button/social-login-button.component';
 import { TeamBranding } from '../../../../services/team-branding.service';
@@ -28,6 +29,7 @@ export class SignInClubComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _authService = inject(AuthService);
   private _alertService = inject(AlertService);
+  private _amplitudeService = inject(AmplitudeService);
   public _navigationService = inject(NavigationService);
   private route = inject(ActivatedRoute);
   private brandingService = inject(TeamBrandingService);
@@ -60,6 +62,7 @@ export class SignInClubComponent implements OnInit {
           this._navigationService.navigateToBrandDashboard();
         },
         error: () => {
+          this._amplitudeService.trackEvent('Login Failed');
           this.signInForm.enable();
         }
       });
