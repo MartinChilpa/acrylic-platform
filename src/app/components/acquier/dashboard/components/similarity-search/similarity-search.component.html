@@ -12,6 +12,7 @@
         (focus)="onSearchInputFocus()"
         (input)="onSearchInputChange()"
         (blur)="onSearchInputBlur()"
+        (keyup.enter)="canSearch && search()"
         [placeholder]="'similaritySearch.search.placeholder' | transloco"
       />
   
