@@ -809,16 +809,90 @@ $row-pad: 16px;
 
 .search-box {
   display: flex;
-  height: 72px;
-  padding: 0 24px;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
   border-radius: 16px;
   background: #FFFFFF;
   box-shadow: 0 10px 15px -3px rgba(0,0,0,0.10), 0 4px 6px -4px rgba(0,0,0,0.10);
   width: 100%;
   box-sizing: border-box;
+}
+
+.search-box__row {
+  display: flex;
+  height: 72px;
+  padding: 0 24px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.video-attached {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 68px;
+  margin: 0 20px 20px;
+  padding: 0 20px 0 18px;
+  border-radius: 16px;
+  background: #F6F4FA;
+  box-sizing: border-box;
+}
+
+.video-attached__icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.video-attached__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.video-attached__name {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: normal;
+  color: #17141C;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.video-attached__status {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: #770CB4;
+}
+
+.video-attached__remove {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 160ms ease;
+
+  &:hover {
+    background: rgba(64, 56, 71, 0.08);
+  }
 }
 
 .search-box-wrap {
@@ -915,10 +989,20 @@ $row-pad: 16px;
   }
 
   .search-box {
+    border-radius: 12px;
+  }
+
+  .search-box__row {
     height: 52px;
     padding: 0 12px;
-    border-radius: 12px;
     gap: 8px;
+  }
+
+  .video-attached {
+    height: 60px;
+    margin: 0 12px 12px;
+    padding: 0 12px;
+    gap: 12px;
   }
 
   // Buttons: icon-only on mobile (hide label text)

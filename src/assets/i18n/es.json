@@ -81,6 +81,7 @@
   "similaritySearch.sections.topCities": "Ciudades Principales",
   "similaritySearch.sections.audienceSplit": "DIVISIÓN DE AUDIENCIA",
   "similaritySearch.messages.noWaveform": "Forma de onda no disponible",
+  "similaritySearch.messages.readyToSearch": "Listo para buscar",
   "similaritySearch.messages.trackNotInCatalog": "Esta pista no está actualmente en nuestro catálogo.",
   "similaritySearch.callouts.tagArtist": "Etiqueta Artista y Sonido para Mayor Alcance y Atribución",
   "similaritySearch.search.placeholder": "Escribe algo o pega un enlace / carga un archivo",
