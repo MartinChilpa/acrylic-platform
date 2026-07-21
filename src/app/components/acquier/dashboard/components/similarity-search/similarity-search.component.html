@@ -1,7 +1,8 @@
 <div class="dashboard-container">
   <div class="search-header">
     <div class="search-box-wrap">
-    <div class="search-box" [class.search-box--active]="searchQuery" [class.search-box--has-attachment]="selectedVideoFile">
+    <!-- Default composer (idle / video attached, pre-search) -->
+    <div class="search-box" *ngIf="!videoSearched" [class.search-box--active]="searchQuery" [class.search-box--has-attachment]="selectedVideoFile">
     <div class="search-box__row">
     <svg class="search-ai-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
       <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
@@ -68,6 +69,73 @@
         </svg>
       </button>
     </div>
+    </div>
+
+    <!-- Compact composer (video search active) -->
+    <div class="search-box search-box--compact" *ngIf="videoSearched">
+      <div class="search-box__compact-row">
+        <div class="video-attached video-attached--inline">
+          <span class="video-attached__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M15.1667 5.83301H7C5.067 5.83301 3.5 7.40001 3.5 9.33301V18.6663C3.5 20.5993 5.067 22.1663 7 22.1663H15.1667C17.0997 22.1663 18.6667 20.5993 18.6667 18.6663V9.33301C18.6667 7.40001 17.0997 5.83301 15.1667 5.83301Z" stroke="#B62EFF" stroke-width="2.1"/>
+              <path d="M18.6641 11.667L24.4974 8.16699V19.8337L18.6641 16.3337V11.667Z" stroke="#B62EFF" stroke-width="2.1" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div class="video-attached__info">
+            <span class="video-attached__name">{{ selectedVideoName }}</span>
+            <span class="video-attached__status">{{ 'similaritySearch.messages.successfullyUploaded' | transloco }}</span>
+          </div>
+          <button type="button" class="video-attached__remove" (click)="removeVideoSearch()" [attr.aria-label]="'similaritySearch.buttons.removeVideo' | transloco">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15" stroke="#403847" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 5L15 15" stroke="#403847" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <button
+          class="btn-ai-search btn-ai-search--submit btn-ai-search--active"
+          (click)="search()"
+          [disabled]="loading">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 14L11.1334 11.1333" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>{{ loading ? ('similaritySearch.buttons.searching' | transloco) : ('similaritySearch.buttons.search' | transloco) }}</span>
+        </button>
+      </div>
+      <p class="composer-helper">{{ 'similaritySearch.messages.removeVideoHelper' | transloco }}</p>
+    </div>
+
+    <!-- Wide integrated video preview (video search active) -->
+    <div class="video-preview" *ngIf="videoSearched && selectedVideoUrl">
+      <div class="video-preview__frame">
+        <video
+          #videoPreviewRef
+          class="video-preview__player"
+          [src]="selectedVideoUrl"
+          playsinline
+          (loadedmetadata)="onVideoMeta($event)"
+          (timeupdate)="onVideoTimeUpdate($event)"
+          (play)="videoPlaying = true"
+          (pause)="videoPlaying = false"
+          (click)="toggleVideoPlayback()">
+        </video>
+        <span class="video-preview__name">{{ selectedVideoName }}</span>
+        <span class="video-preview__badge">{{ 'similaritySearch.labels.videoBadge' | transloco }}</span>
+        <div class="video-preview__controls">
+          <span class="video-preview__time">{{ formatVideoTime(videoCurrentTime) }} / {{ formatVideoTime(videoDuration) }}</span>
+          <div class="video-preview__progress" (click)="seekVideo($event)">
+            <div class="video-preview__progress-fill" [style.width.%]="videoProgressPercent"></div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="video-preview__remove" (click)="removeVideoSearch()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ 'similaritySearch.buttons.removeVideo' | transloco }}</span>
+      </button>
     </div>
 
     <acrylic-team-player-optimization

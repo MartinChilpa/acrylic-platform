@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Output, EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component, Output, EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { EMPTY, Subject, defer, of, throwError, timer } from 'rxjs';
@@ -112,6 +112,11 @@ export class SimilaritySearchComponent implements OnInit {
   selectedVideoFile: File | null = null;
   selectedVideoUrl: string | null = null;
   selectedVideoName: string | null = null;
+  videoSearched = false;
+  videoDuration = 0;
+  videoCurrentTime = 0;
+  videoPlaying = false;
+  @ViewChild('videoPreviewRef') private videoPreviewRef?: ElementRef<HTMLVideoElement>;
   showSearchInfo = false;
   loading = false;
   errorMsg: string | null = null;
@@ -439,6 +444,7 @@ export class SimilaritySearchComponent implements OnInit {
       this.searchInput.emit(this.lastSearchLabel);
       this.searched.emit();
       this.pageNumber = 1;
+      this.videoSearched = true;
       this.lastSearchRequest = { type: 'video', file: this.selectedVideoFile };
       this.manualSearch$.next({ type: 'video', file: this.selectedVideoFile });
       return;
@@ -876,6 +882,74 @@ export class SimilaritySearchComponent implements OnInit {
     this.selectedVideoFile = null;
     this.selectedVideoName = null;
     this.selectedVideoUrl = null;
+    this.videoSearched = false;
+    this.videoDuration = 0;
+    this.videoCurrentTime = 0;
+    this.videoPlaying = false;
+  }
+
+  // Removes the video and clears its search results, returning to the default composer.
+  removeVideoSearch(): void {
+    this.clearSelectedVideo();
+    this.destroyAllPeaks();
+    this.allResultsRaw = [];
+    this.allResults = [];
+    this.results = [];
+    this.totalCount = null;
+    this.seedTrack = null;
+    this.spotifyTrack = null;
+    this.lastSearchLabel = '';
+    this.errorMsg = null;
+    this.artistCountryFilterCode2 = null;
+    this.noPlayerMatchLabel = null;
+  }
+
+  onVideoMeta(event: Event): void {
+    const video = event.target as HTMLVideoElement | null;
+    if (!video) { return; }
+    this.videoDuration = Number.isFinite(video.duration) ? video.duration : 0;
+    this.videoCurrentTime = video.currentTime;
+  }
+
+  onVideoTimeUpdate(event: Event): void {
+    const video = event.target as HTMLVideoElement | null;
+    if (!video) { return; }
+    this.videoCurrentTime = video.currentTime;
+  }
+
+  toggleVideoPlayback(): void {
+    const video = this.videoPreviewRef?.nativeElement;
+    if (!video) { return; }
+    if (video.paused) {
+      video.play();
+      this.videoPlaying = true;
+    } else {
+      video.pause();
+      this.videoPlaying = false;
+    }
+  }
+
+  seekVideo(event: MouseEvent): void {
+    const video = this.videoPreviewRef?.nativeElement;
+    if (!video || !this.videoDuration) { return; }
+    const track = event.currentTarget as HTMLElement;
+    const rect = track.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    video.currentTime = ratio * this.videoDuration;
+    this.videoCurrentTime = video.currentTime;
+  }
+
+  get videoProgressPercent(): number {
+    if (!this.videoDuration) { return 0; }
+    return Math.min(100, (this.videoCurrentTime / this.videoDuration) * 100);
+  }
+
+  formatVideoTime(seconds: number): string {
+    if (!Number.isFinite(seconds) || seconds < 0) { return '0:00'; }
+    const total = Math.floor(seconds);
+    const mins = Math.floor(total / 60);
+    const secs = total % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
   onSearchInputFocus(): void {
