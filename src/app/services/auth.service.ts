@@ -5,6 +5,7 @@ import { Observable, catchError, map, of, switchMap, throwError } from 'rxjs';
 import { AuthUtils } from '../utils/auth.utils';
 import { NavigationService } from './navigation.service';
 import { ISignInResponse } from '../interfaces/response/sign-in.response';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class AuthService {
 
   private _http = inject(HttpClient);
   private _navigationService = inject(NavigationService);
+  private _translocoService = inject(TranslocoService);
   public IsLoggedIn: WritableSignal<boolean> = signal(false);
 
   constructor() {
@@ -63,6 +65,9 @@ export class AuthService {
         return this.getAccountProfile().pipe(
           map((profile: any) => {
             this.userType = (profile?.user_type ?? '').toString();
+            const language = profile?.language ?? 'en';
+            this._translocoService.setActiveLang(language);
+            localStorage.setItem('activeLanguage', language);
             return response;
           }),
           catchError((error) => {

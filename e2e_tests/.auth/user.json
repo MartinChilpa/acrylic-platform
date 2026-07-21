@@ -1,0 +1,22 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:4200",
+      "localStorage": [
+        {
+          "name": "accessToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzgzNjEyNDg2LCJpYXQiOjE3ODM2MDg4ODYsImp0aSI6Ijc1ZjVjNjBjZTUyMDRkYTJhNGJhOTg2ZmViOTc0ZDY4IiwidXNlcl9pZCI6Mjd9.uwYrlB23W2RFOywJmagdHjndEkb4oSjIxkjZj4CExwk"
+        },
+        {
+          "name": "refreshToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc4MzY5NTI4NiwiaWF0IjoxNzgzNjA4ODg2LCJqdGkiOiJkYzE2OTJhZThiY2U0ZTY1YTVjZDk0ZWJmZjZhYzU0YyIsInVzZXJfaWQiOjI3fQ.5tMurZnHZdiB5_wNZpc3sgLk2wS4yLgakO3-wZ_m31Q"
+        },
+        {
+          "name": "userType",
+          "value": "CLUB"
+        }
+      ]
+    }
+  ]
+}
