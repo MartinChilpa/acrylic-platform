@@ -698,7 +698,10 @@ export class SimilaritySearchComponent implements OnInit {
       ?? this.licensedTrack?.instagram_handle
       ?? this.licensedTrack?.instagram_username
     );
-    const text = handle ? `@${handle}` : this.buildDefaultLicenseTagsText();
+    if (!handle) {
+      return;
+    }
+    const text = `@${handle}`;
 
     try {
       const write = navigator.clipboard?.writeText?.bind(navigator.clipboard);
@@ -753,13 +756,6 @@ export class SimilaritySearchComponent implements OnInit {
     } catch {
       return false;
     }
-  }
-
-  private buildDefaultLicenseTagsText(): string {
-    const artist = this.licensedTrack?.artist_canonical ?? '';
-    const track = this.licensedTrack?.track_name ?? this.licensedTrack?.track_name_track ?? '';
-    const tier = this.getTierLabel(this.licensedTrack);
-    return `Artist: ${artist}\nTrack: ${track}\nTier: ${tier}`.trim();
   }
 
   private normalizeInstagramHandle(value: unknown): string | null {
