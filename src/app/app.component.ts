@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 import { LoaderComponent } from './components/shared/loader/loader.component';
 import { LoaderService } from './services/loader.service';
 import { AlertComponent } from './components/shared/alert/alert.component';
+import { LanguageSyncService } from './services/language-sync.service';
 
 @Component({
   selector: 'app-root',
@@ -18,4 +19,5 @@ import { AlertComponent } from './components/shared/alert/alert.component';
 })
 export class AppComponent {
   public _loadingService = inject(LoaderService);
+  private _languageSyncService = inject(LanguageSyncService);
 }
