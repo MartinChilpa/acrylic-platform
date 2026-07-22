@@ -559,14 +559,15 @@ export class SimilaritySearchComponent implements OnInit {
 
     this.licensedTrack = this.licenseModalTrack;
     const trackId = this.licenseModalTrack?.uuid ?? this.licenseModalTrack?.track_uuid ?? this.licenseModalTrack?.id ?? this.licenseModalTrack?.track_id ?? this.licenseModalTrack?.isrc ?? this.licenseModalTrack?.spotify_id;
-    console.log('[SimilaritySearch] trackId:', trackId);
+    const extendedCommercialUse = this.licenseModalTrack?.extended_commercial_use ?? false;
+    console.log('[SimilaritySearch] trackId:', trackId, 'extendedCommercialUse:', extendedCommercialUse);
 
     if (!trackId) {
       console.warn('[SimilaritySearch] trackId is empty, skipping license creation');
       return;
     }
 
-    this.licenseService.createLicense(trackId).subscribe({
+    this.licenseService.createLicense(trackId, extendedCommercialUse).subscribe({
       next: (result) => {
         console.log('[SimilaritySearch] License created successfully:', result);
         this.licensedTrack = result;

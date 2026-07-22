@@ -6,6 +6,7 @@ export interface IFavoriteResult {
   track_name: string;
   artist_name: string;
   cover_image: string;
+  extended_commercial_use?: boolean;
   created: string;
   /** Full track snapshot so rich UI (waveform, metrics, tier) can render later. */
   track?: any;

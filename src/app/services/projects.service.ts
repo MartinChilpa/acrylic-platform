@@ -53,12 +53,14 @@ export class ProjectsService {
         track_name: snap.track_name ?? snap.name ?? '',
         artist_name: snap.artist_canonical ?? snap.artist_name ?? '',
         cover_image: snap.cover_image ?? snap.image_url ?? '',
+        extended_commercial_use: (snap.extendedCommercialUse ?? snap.extended_commercial_use) ?? false,
         created: new Date().toISOString(),
         track: trackSnapshot ?? undefined,
       };
       this.setFavorites([tempFav, ...previous]);
     }
 
+    // Toggle favorite (backend reads extended flag from Track globally)
     return this.http.post<any>(`${this.base}/favorites/toggle/`, { track_uuid: key }).pipe(
       tap(() => this.loadFavorites()),
       catchError((err) => {

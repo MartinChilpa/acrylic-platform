@@ -81,6 +81,19 @@
         </span>
         <span>{{ allSelected ? 'Deselect All' : 'Select All' }}</span>
       </button>
+      
+      <!-- Optional Add-On: show only when track supports extended commercial use -->
+      <div *ngIf="extendedCommercialUse" class="license-platform-modal__section">
+        <div class="license-platform-modal__section-title">Optional Add-On</div>
+        <label class="license-platform-modal__addon" [class.license-platform-modal__addon--checked]="paidMediaAddOn">
+          <input type="checkbox" [(ngModel)]="paidMediaAddOn" />
+          <div class="license-platform-modal__addon-body">
+            <div class="license-platform-modal__addon-title">Extended Commercial Use</div>
+            <div class="license-platform-modal__addon-subtitle">Extend usage for a commercial campaign (ex: season tickets, co-branded campaign, new jersey or sponsor announcement)</div>
+            <div class="license-platform-modal__addon-price">+ $300</div>
+          </div>
+        </label>
+      </div>
     </div>
   </div>
 

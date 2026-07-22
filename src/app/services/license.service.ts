@@ -45,12 +45,15 @@ export class LicenseService {
     }
   }
 
-  createLicense(trackUuid: string): Observable<ILicenseResult> {
-    const payload = {
+  createLicense(trackUuid: string, extendedCommercialUse = false): Observable<ILicenseResult> {
+    const payload: any = {
       track: trackUuid,
     };
+    if (extendedCommercialUse) {
+      payload.extended_commercial_use = true;
+    }
 
-    console.log('[LicenseService] createLicense called', { trackUuid, payload });
+    console.log('[LicenseService] createLicense called', { trackUuid, extendedCommercialUse, payload });
 
     return this.http.post<ILicenseResult>(`${this.base}/licenses/`, payload);
   }

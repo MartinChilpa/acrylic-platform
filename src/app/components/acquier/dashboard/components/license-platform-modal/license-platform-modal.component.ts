@@ -28,6 +28,9 @@ export class LicensePlatformModalComponent implements OnInit {
   @Input() clubPlatforms: { instagram?: string; tiktok?: string; youtube?: string; other?: string } = {};
   @Input() extendedCommercialUse: boolean = false;
 
+  // Local state for the paid media add-on (Extended Commercial Use opt-in)
+  paidMediaAddOn: boolean = false;
+
   @Output() close = new EventEmitter<void>();
   @Output() submit = new EventEmitter<{ selected_platforms: string[]; other_url?: string }>();
   @Output() success = new EventEmitter<any>();
@@ -108,7 +111,8 @@ export class LicensePlatformModalComponent implements OnInit {
     this.isLoading = true;
     const platforms = Array.from(this.selectedPlatforms);
 
-    this.projectsService.createLicense(this.trackUuid, platforms, this.extendedCommercialUse).subscribe({
+    // Send whether the user opted into the paid media add-on
+    this.projectsService.createLicense(this.trackUuid, platforms, this.paidMediaAddOn).subscribe({
       next: (license) => {
         // Optimistically add to list immediately
         this.projectsService.addLicensedTrack(license);
