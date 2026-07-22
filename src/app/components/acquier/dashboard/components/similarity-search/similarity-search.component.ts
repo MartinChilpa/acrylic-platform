@@ -583,7 +583,7 @@ export class SimilaritySearchComponent implements OnInit {
     this.licenseService.createLicense(trackId).subscribe({
       next: (result) => {
         console.log('[SimilaritySearch] License created successfully:', result);
-        this.licensedTrack = result;
+        this.licensedTrack = { ...this.licenseModalTrack, ...result };
         this.licenseService.addLicensedTrack(result);
         this.modalService.hideModal('license-track-modal');
         setTimeout(() => {
