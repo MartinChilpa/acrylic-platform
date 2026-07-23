@@ -68,6 +68,15 @@ export class AuthService {
             const uuid = profile?.uuid;
             if (uuid) {
               this._amplitudeService.identifyUser(uuid);
+              this._amplitudeService.setUserProperties({
+                user_type: profile?.user_type,
+                club_name: profile?.club?.club_name,
+                club_id: profile?.club?.uuid,
+                country_code: profile?.country_code,
+                contract_signed: profile?.contract_signed,
+                is_active: profile?.is_active,
+                created_date: profile?.created,
+              });
               this._amplitudeService.trackEvent('Login Succeeded', { userType: this.userType });
             }
             return response;

@@ -8,13 +8,17 @@ import { environment } from '../../environments/environment';
 export class AmplitudeService {
   private initialized = false;
 
+  constructor() {
+    this.init();
+  }
+
   init(): void {
     if (this.initialized) return;
 
     try {
       amplitude.init(environment.AMPLITUDE_API_KEY, {
         defaultTracking: {
-          pageViews: false,
+          pageViews: true,
           sessions: true,
           formInteractions: false,
           fileDownloads: false,
@@ -23,7 +27,7 @@ export class AmplitudeService {
       });
       this.initialized = true;
       if (!environment.production) {
-        console.debug('[Amplitude] SDK initialized');
+        console.log('[Amplitude] SDK initialized');
       }
     } catch (error) {
       console.error('[Amplitude] Failed to initialize:', error);
@@ -35,7 +39,7 @@ export class AmplitudeService {
     try {
       amplitude.setUserId(uuid);
       if (!environment.production) {
-        console.debug('[Amplitude] User identified:', uuid);
+        console.log('[Amplitude] User identified:', uuid);
       }
     } catch (error) {
       console.error('[Amplitude] Failed to identify user:', error);
@@ -47,10 +51,28 @@ export class AmplitudeService {
     try {
       amplitude.track(name, props);
       if (!environment.production) {
-        console.debug('[Amplitude]', name, props);
+        console.log('[Amplitude]', name, props);
       }
     } catch (error) {
       console.error('[Amplitude] Failed to track event:', error);
+    }
+  }
+
+  setUserProperties(properties: Record<string, unknown>): void {
+    if (!this.initialized) return;
+    try {
+      const identifyEvent = new amplitude.Identify();
+      Object.entries(properties).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          identifyEvent.set(key, value as string | number | boolean);
+        }
+      });
+      amplitude.identify(identifyEvent);
+      if (!environment.production) {
+        console.log('[Amplitude] User properties set:', properties);
+      }
+    } catch (error) {
+      console.error('[Amplitude] Failed to set user properties:', error);
     }
   }
 
@@ -59,7 +81,7 @@ export class AmplitudeService {
     try {
       amplitude.reset();
       if (!environment.production) {
-        console.debug('[Amplitude] User reset');
+        console.log('[Amplitude] User reset');
       }
     } catch (error) {
       console.error('[Amplitude] Failed to reset user:', error);
