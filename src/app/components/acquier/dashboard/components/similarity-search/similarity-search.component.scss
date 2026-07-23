@@ -940,12 +940,25 @@ $row-pad: 16px;
 }
 
 .video-preview__frame {
+  /* Span most of the content area (from just past the sidenav to near the right
+     edge), leaving ~80px of breathing room on each side. The frame is centered
+     on the content area (search-section is centered inside it), so the margins
+     stay even. --acr-sidenav-w (set globally) tracks the sidenav width, so the
+     video re-adjusts automatically when the sidenav expands on hover. */
   position: relative;
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100vw - var(--acr-sidenav-w, 64px) - 160px);
+  transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1);
   aspect-ratio: 111 / 47;
+  max-height: 82vh;
   border-radius: 24px;
   overflow: hidden;
   background: #000;
+
+  @media (max-width: 640px) {
+    width: calc(100vw - 32px);
+  }
 }
 
 .video-preview__player {
