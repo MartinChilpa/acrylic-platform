@@ -34,13 +34,17 @@ export class ProjectsComponent implements OnInit {
   private loadAll(): void {
     this.loading = true;
     this.projectsService.loadFavorites();
-    this.projectsService.getProjects().subscribe({
-      next: (res) => {
-        this.projects = Array.isArray(res) ? (res as any) : (res.results ?? []);
-        this.loading = false;
-      },
-      error: () => { this.loading = false; }
-    });
+    // Temporarily disable projects list fetch (backend endpoint returns 404).
+    // this.projectsService.getProjects().subscribe({
+    //   next: (res) => {
+    //     this.projects = Array.isArray(res) ? (res as any) : (res.results ?? []);
+    //     this.loading = false;
+    //   },
+    //   error: () => { this.loading = false; }
+    // });
+
+    // Ensure UI stops showing a loading state while backend is unavailable.
+    this.loading = false;
   }
 
   toggleExpand(uuid: string): void {
@@ -108,11 +112,13 @@ export class ProjectsComponent implements OnInit {
   }
 
   /**
-   * The object to feed the track row. Optimistic favorites embed the full track
-   * object; backend favorites expose `track` as a uuid string, so fall back to the
-   * favorite row itself (which carries track_name / artist_name / cover_image).
+   * The object to feed the track row.
+   * - Optimistic favorites embed the full track object.
+   * - Backend favorites may embed nested `track` payloads.
+   * - If no rich snapshot exists, render the base favorite row.
    */
   rowTrack(fav: IFavoriteResult): any {
-    return fav.track && typeof fav.track === 'object' ? fav.track : fav;
+    const candidate = fav.track && typeof fav.track === 'object' ? fav.track : fav;
+    return candidate?.track && typeof candidate.track === 'object' ? candidate.track : candidate;
   }
 }
