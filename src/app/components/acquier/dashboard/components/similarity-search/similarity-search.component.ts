@@ -965,7 +965,8 @@ export class SimilaritySearchComponent implements OnInit {
     if (query.length > 0 && this.selectedVideoFile) {
       this.clearSelectedVideo();
     }
-    this.showDropdown = true;
+    // Hide the suggestions box as soon as the user starts typing.
+    this.showDropdown = query.length === 0;
     this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
   }
 
