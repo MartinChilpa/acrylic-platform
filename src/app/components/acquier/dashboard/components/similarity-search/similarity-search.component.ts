@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { EMPTY, Subject, defer, of, throwError, timer } from 'rxjs';
 import { catchError, exhaustMap, expand, last, map, retry, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
@@ -53,6 +53,7 @@ export class SimilaritySearchComponent implements OnInit {
   private brandingService = inject(TeamBrandingService);
   private projectsService = inject(ProjectsService);
   private licenseService = inject(LicenseService);
+  private transloco = inject(TranslocoService);
 
   favoriteTrackIds = new Set<string>();
   licensedTrackIds = new Set<string>();
@@ -1227,9 +1228,9 @@ export class SimilaritySearchComponent implements OnInit {
 
   getLicenseModalSubtitle(track: any): string {
     const id = this.getPriceId(track);
-    if (id === 1) return 'Cost of license included in your subscription. No extra fee needed.';
+    if (id === 1) return this.transloco.translate('licenseModal.costIncluded');
     const price = this.getTrackLicensePrice(track);
-    return price ? `License price: ${price}` : 'Cost of license included in your subscription. No extra fee needed.';
+    return price ? `${this.transloco.translate('licenseModal.licensePrice')}: ${price}` : this.transloco.translate('licenseModal.costIncluded');
   }
 
 

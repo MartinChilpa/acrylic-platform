@@ -1,6 +1,6 @@
 <div class="tpo" *ngIf="label">
   <div class="tpo__summary">
-    <span class="tpo__count">{{ totalCount }} Results for </span>
+    <span class="tpo__count">{{ totalCount }} {{ 'teamPlayerOptimization.resultsFor' | transloco }} </span>
     <ng-container *ngIf="formattedLabel.quoted; else unquoted">
       <span class="tpo__quote">"</span>
       <span class="tpo__label">{{ label }}</span>
@@ -22,7 +22,7 @@
       [attr.aria-expanded]="isOpen"
       aria-haspopup="listbox">
       <div class="tpo__trigger-row">
-        <div class="tpo__trigger-title">Optimize Audience</div>
+        <div class="tpo__trigger-title">{{ 'teamPlayerOptimization.optimizeAudience' | transloco }}</div>
         <div class="tpo__trigger-arrow" [class.tpo__trigger-arrow--expanded]="isOpen" aria-hidden="true">
           <div class="tpo__trigger-arrow-shape"></div>
         </div>
@@ -33,7 +33,7 @@
 
     <div class="tpo__menu" *ngIf="isOpen" role="listbox">
       <div class="tpo__menu-header">
-        <div class="tpo__menu-header-text">Optimize for</div>
+        <div class="tpo__menu-header-text">{{ 'teamPlayerOptimization.optimizeFor' | transloco }}</div>
       </div>
 
       <div class="tpo__menu-body">
@@ -42,7 +42,7 @@
             <div class="tpo__radio-box" [class.tpo__radio-box--active]="selectedMode === 'team'"></div>
           </div>
           <div class="tpo__menu-copy">
-            <div class="tpo__menu-title">Team</div>
+            <div class="tpo__menu-title">{{ 'teamPlayerOptimization.team' | transloco }}</div>
             <div class="tpo__menu-subtitle">{{ activeTeamName }}</div>
           </div>
         </button>
@@ -52,7 +52,7 @@
             <div class="tpo__radio-box" [class.tpo__radio-box--active]="selectedMode === 'player'"></div>
           </div>
           <div class="tpo__menu-copy">
-            <div class="tpo__menu-title">{{ selectedPlayer ? selectedPlayer.name : (useCountriesLabel ? 'Countries…' : 'Player…') }}</div>
+            <div class="tpo__menu-title">{{ selectedPlayer ? selectedPlayer.name : (useCountriesLabel ? ('teamPlayerOptimization.countries' | transloco) : ('teamPlayerOptimization.player' | transloco) + '…') }}</div>
           </div>
         </button>
 
@@ -66,13 +66,13 @@
             <span class="tpo__player-flag">{{ toFlagEmoji(player.countryCode2 ?? '') }}</span>
           </button>
           <div class="tpo__players-empty" *ngIf="(players?.length ?? 0) === 0">
-            No players yet
+            {{ 'teamPlayerOptimization.noPlayers' | transloco }}
           </div>
         </div>
 
         <button type="button" class="tpo__menu-btn tpo__menu-btn--clear" data-property-1="clear" data-property-2="default" (click)="clearOptimization()">
           <div class="tpo__clear-icon" aria-hidden="true"></div>
-          <div class="tpo__clear-text">Clear optimization</div>
+          <div class="tpo__clear-text">{{ 'teamPlayerOptimization.clearOptimization' | transloco }}</div>
         </button>
       </div>
     </div>

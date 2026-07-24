@@ -1,5 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, Output, SimpleChanges, inject } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
+import { TranslocoModule } from '@jsverse/transloco';
 import { TeamBrandingService } from '../../../../../../services/team-branding.service';
 
 export interface TeamPlayerOption {
@@ -11,7 +12,7 @@ export interface TeamPlayerOption {
 @Component({
   selector: 'acrylic-team-player-optimization',
   standalone: true,
-  imports: [NgIf, NgFor],
+  imports: [NgIf, NgFor, TranslocoModule],
   templateUrl: './team-player-optimization.component.html',
   styleUrl: './team-player-optimization.component.scss'
 })
