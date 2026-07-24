@@ -1147,6 +1147,16 @@ export class SimilaritySearchComponent implements OnInit {
     });
   }
 
+  private trackResultAppeared(result: any, index: number): void {
+    if (!this.currentSearchId) return;
+    this.amplitudeService.trackEvent('Aims Result Appeared', {
+      search_id: this.currentSearchId,
+      track_id: this.getTrackId(result),
+      position_in_results: index,
+      match_score: result?.match_score ?? null,
+    });
+  }
+
   private extractTotalCount(data: unknown): number | null {
     if (!data || typeof data !== 'object') {
       return null;
@@ -1657,14 +1667,29 @@ onTrackAudioPlay(track: any, index: number, event: Event): void {
     this.playingTrackKeys.add(key);
 
     this.trackResultInteraction(track, 'play', index);
+    // Always track play, regardless of search context
+    this.amplitudeService.trackEvent('Aims Track Played', {
+      search_id: this.currentSearchId ?? 'no_search',
+      track_id: this.getTrackId(track),
+      position_in_results: index,
+      match_score: track.match_score ?? null,
+    });
     this.startTimerLoop(key, audio);
   }
-} 
+}
 
-onTrackAudioPause(track: any, index: number): void { 
-  const key = this.getTrackKey(track, index); 
-  this.playingTrackKeys.delete(key); 
-  this.stopTimerLoop(key); 
+onTrackAudioPause(track: any, index: number): void {
+  const key = this.getTrackKey(track, index);
+  this.playingTrackKeys.delete(key);
+  this.stopTimerLoop(key);
+
+  // Always track pause, regardless of search context
+  this.amplitudeService.trackEvent('Aims Track Paused', {
+    search_id: this.currentSearchId ?? 'no_search',
+    track_id: this.getTrackId(track),
+    position_in_results: index,
+    match_score: track.match_score ?? null,
+  });
 
   // Si la canción que se pausó es la actual, limpiamos las referencias
   if (this.currentTrackKey === key) {

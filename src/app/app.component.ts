@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 import { LoaderComponent } from './components/shared/loader/loader.component';
 import { LoaderService } from './services/loader.service';
 import { AlertComponent } from './components/shared/alert/alert.component';
+import { AnalyticsRouterService } from './services/analytics-router.service';
 
 @Component({
   selector: 'app-root',
@@ -18,4 +19,13 @@ import { AlertComponent } from './components/shared/alert/alert.component';
 })
 export class AppComponent {
   public _loadingService = inject(LoaderService);
+  private _analyticsRouterService = inject(AnalyticsRouterService);
+
+  constructor() {
+    console.log('[AppComponent] Constructor - scheduling analytics init');
+    setTimeout(() => {
+      console.log('[AppComponent] Timeout fired - calling analytics init');
+      this._analyticsRouterService.init();
+    }, 100);
+  }
 }

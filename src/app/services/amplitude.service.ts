@@ -20,8 +20,8 @@ export class AmplitudeService {
         defaultTracking: {
           pageViews: true,
           sessions: true,
-          formInteractions: false,
-          fileDownloads: false,
+          formInteractions: true,
+          fileDownloads: true,
         },
         autocapture: false,
       });

@@ -17,15 +17,7 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([ loaderInterceptor, authInterceptor, errorInterceptor ]),
     ),
-    {
-      provide: 'sentryProviders',
-      useFactory: provideSentryProviders,
-      deps: [PLATFORM_ID],
-    },
-    {
-      provide: 'amplitudeProviders',
-      useFactory: provideAmplitudeProviders,
-      deps: [PLATFORM_ID],
-    }
+    provideSentryProviders(true),
+    provideAmplitudeProviders(true),
   ]
 };

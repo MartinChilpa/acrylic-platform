@@ -1,22 +1,24 @@
 import { isPlatformServer } from '@angular/common';
-import { APP_INITIALIZER } from '@angular/core';
-import { inject } from '@angular/core';
+import { APP_INITIALIZER, Provider } from '@angular/core';
 import { AmplitudeService } from '../services/amplitude.service';
 import { AnalyticsRouterService } from '../services/analytics-router.service';
 
-export function provideAmplitudeProviders(platformId: object): unknown[] {
-  if (isPlatformServer(platformId)) {
+export function provideAmplitudeProviders(isClient: boolean): Provider[] {
+  console.log('[Provider] provideAmplitudeProviders called, isClient:', isClient);
+
+  if (!isClient) {
     return [];
   }
 
   return [
+    AmplitudeService,
+    AnalyticsRouterService,
     {
       provide: APP_INITIALIZER,
-      useFactory: () => {
+      useFactory: (amplitudeService: AmplitudeService, analyticsRouterService: AnalyticsRouterService) => {
+        console.log('[Provider] APP_INITIALIZER factory running');
         return () => {
-          const amplitudeService = inject(AmplitudeService);
-          const analyticsRouterService = inject(AnalyticsRouterService);
-
+          console.log('[Provider] Initializing Amplitude and Analytics');
           amplitudeService.init();
           analyticsRouterService.init();
         };
