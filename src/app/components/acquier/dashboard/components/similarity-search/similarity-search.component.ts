@@ -585,6 +585,11 @@ export class SimilaritySearchComponent implements OnInit {
     this.licenseModalTrack = track;
     this.licensedTrack = null;
     this.generalTermsOpen = false;
+    this.amplitudeService.trackEvent('Aims License Clicked', {
+      search_id: this.currentSearchId ?? 'no_search',
+      track_id: this.getTrackId(track),
+      match_score: track?.match_score ?? null,
+    });
     const trackedLicensedEl = document.getElementById('track-licensed-modal');
     const isTrackedVisible = trackedLicensedEl?.classList.contains('show');
     if (isTrackedVisible) {
@@ -1596,6 +1601,12 @@ export class SimilaritySearchComponent implements OnInit {
       return;
     }
     this.openedPanels.add(key);
+    this.amplitudeService.trackEvent('Aims Track Expanded', {
+      search_id: this.currentSearchId ?? 'no_search',
+      track_id: this.getTrackId(track),
+      position_in_results: index,
+      match_score: track?.match_score ?? null,
+    });
   }
 
   isPanelOpen(track: any, index: number): boolean {

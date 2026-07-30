@@ -15,6 +15,7 @@
   "private": true,
   "dependencies": {
     "@amplitude/analytics-browser": "^2.45.2",
+    "@amplitude/plugin-session-replay-browser": "^1.33.7",
     "@angular/animations": "^17.3.0",
     "@angular/common": "^17.3.0",
     "@angular/compiler": "^17.3.0",

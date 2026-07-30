@@ -1,6 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import * as amplitude from '@amplitude/analytics-browser';
+import { sessionReplayPlugin } from '@amplitude/plugin-session-replay-browser';
 import { environment } from '../../environments/environment';
+
+// Testing-phase setting: recording 100% of sessions is fine while this app
+// only has internal/test users. Revisit before real user traffic (cost +
+// privacy) — see plan doc for context.
+const SESSION_REPLAY_SAMPLE_RATE = 1.0;
 
 @Injectable({
   providedIn: 'root',
@@ -8,14 +14,17 @@ import { environment } from '../../environments/environment';
 export class AmplitudeService {
   private initialized = false;
 
-  constructor() {
-    this.init();
-  }
-
+  // Initialization is triggered explicitly via APP_INITIALIZER (see
+  // amplitude.provider.ts), not from this constructor. Calling init() from
+  // both places risked the SDK being set up twice before the `initialized`
+  // guard could take effect, which can desync the session/device ID pairing
+  // used by Session Replay ("Session Unavailable: mismatching Device ID /
+  // Session ID" in the Amplitude dashboard).
   init(): void {
     if (this.initialized) return;
 
     try {
+      amplitude.add(sessionReplayPlugin({ sampleRate: SESSION_REPLAY_SAMPLE_RATE }));
       amplitude.init(environment.AMPLITUDE_API_KEY, {
         defaultTracking: {
           pageViews: true,
@@ -28,6 +37,7 @@ export class AmplitudeService {
       this.initialized = true;
       if (!environment.production) {
         console.log('[Amplitude] SDK initialized');
+        console.log('[Amplitude] Session Replay plugin registered, sampleRate:', SESSION_REPLAY_SAMPLE_RATE);
       }
     } catch (error) {
       console.error('[Amplitude] Failed to initialize:', error);
