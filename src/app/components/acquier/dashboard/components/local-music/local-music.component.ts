@@ -1,5 +1,6 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslocoModule } from '@jsverse/transloco';
 
 export interface LocalTrack {
   id: string;
@@ -14,15 +15,12 @@ export interface LocalTrack {
 @Component({
   selector: 'acrylic-local-music',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoModule],
   templateUrl: './local-music.component.html',
   styleUrl: './local-music.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
 export class LocalMusicComponent {
-  title = 'New Local Music';
-  subtitle = " ";
-
   // Heights (px) for the static waveform bars
   waveBars = [4, 8, 12, 6, 10, 14, 8, 5, 12, 9, 6, 14, 10, 7, 4, 11, 8, 13, 6, 9, 12, 5, 10, 8, 14, 6, 9, 11, 4, 7];
 

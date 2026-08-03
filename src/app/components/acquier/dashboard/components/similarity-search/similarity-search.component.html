@@ -366,8 +366,8 @@
                         <div class="followers-top-row">
                           <div class="followers-top-item">
                             <img class="pt2-icon-audience" [src]="getAudienceSizeIconPath(seed)" alt="Audience size" />
-                            <div class="div-audience-data"> 
-                              <p class="number-follow">Large</p>
+                            <div class="div-audience-data">
+                              <p class="number-follow">{{ 'trackInsights.large' | transloco }}</p>
                               <span class="pt2-label-audience" *ngIf="getAudienceSize(seed) as audience">{{ audience }}</span>
 
                             </div>
@@ -385,7 +385,7 @@
                         </div>
                       </div>
                       <ng-template #noFollowersMixSeed>
-                        <div class="insight-placeholder">Audience Composition</div>
+                        <div class="insight-placeholder">{{ 'trackInsights.audienceComposition' | transloco }}</div>
                       </ng-template>
                     </div>
                   </div>
@@ -395,7 +395,7 @@
                       <div class="data-card__header">{{ 'similaritySearch.sections.audienceSportsFit' | transloco }}</div>
                       <div class="sport-fit-content">
                         <img class="sport-fit-icon" [src]="getSportFitIconPath(seed)" alt="Audience Sport Fit" />
-                        <span class="sport-fit-label">Sports Fit</span>
+                        <span class="sport-fit-label">{{ 'trackInsights.sportsFit' | transloco }}</span>
                         <span class="sport-fit-value">
                           {{ getAudienceSportFitPercentage(seed) ?? '--' }}%
                         </span>
@@ -408,7 +408,7 @@
                       <div class="data-card__header">{{ 'similaritySearch.sections.trackVirality' | transloco }}</div>
                       <div class="sport-fit-content">
                         <img class="sport-fit-icon" [src]="getTrackViralityIconPath(seed)" alt="Track Virality" />
-                        <span class="sport-fit-label">Virality</span>
+                        <span class="sport-fit-label">{{ 'trackInsights.virality' | transloco }}</span>
                         <span class="sport-fit-value">
                           {{ getTrackViralityPercentage(seed) ?? '--' }}%
                         </span>
@@ -627,7 +627,7 @@
           </div>
 
 
-          <p class="title-audience" *ngIf="isPanelOpen(result, i)">Audience Snapshot</p>
+          <p class="title-audience" *ngIf="isPanelOpen(result, i)">{{ 'trackCard.audienceSnapshot' | transloco }}</p>
           <div style="display: flex;" *ngIf="isPanelOpen(result, i)">
             <div class="insights-section">
               <div class="insights-row">
@@ -678,13 +678,13 @@
                 <div class="insight-item">
                   
                   <div class="insight-card">
-                    <div class="data-card__header">Audience Composition</div>
+                    <div class="data-card__header">{{ 'trackInsights.audienceComposition' | transloco }}</div>
                     <div class="followers-pie-wrap" *ngIf="getFollowersPieBackground(result) as pieBackground; else noFollowersMix">
                       <div class="followers-top-row">
                         <div class="followers-top-item">
                           <img class="pt2-icon-audience" [src]="getAudienceSizeIconPath(result)" alt="Audience size" />
-                          <div class="div-audience-data"> 
-                            <p class="number-follow">Large</p>
+                          <div class="div-audience-data">
+                            <p class="number-follow">{{ 'trackInsights.large' | transloco }}</p>
                             <span class="pt2-label-audience" *ngIf="getAudienceSize(result) as audience">{{ audience }}</span>
 
                           </div>
@@ -702,7 +702,7 @@
                       </div>
                     </div>
                     <ng-template #noFollowersMix>
-                      <div class="insight-placeholder">Audience Composition</div>
+                      <div class="insight-placeholder">{{ 'trackInsights.audienceComposition' | transloco }}</div>
                     </ng-template>
                   </div>
                 </div>
@@ -712,7 +712,7 @@
                     <div class="data-card__header">{{ 'similaritySearch.sections.audienceSportsFit' | transloco }}</div>
                     <div class="sport-fit-content">
                       <img class="sport-fit-icon" [src]="getSportFitIconPath(result)" alt="Audience Sports Fit" />
-                      <span class="sport-fit-label">Sports Fit</span>
+                      <span class="sport-fit-label">{{ 'trackInsights.sportsFit' | transloco }}</span>
                       <span class="sport-fit-value">
                         {{ getAudienceSportFitPercentage(result) ?? '--' }}%
                       </span>
@@ -720,12 +720,12 @@
                   </div>
                 </div>
                 <div class="insight-item">
-           
+
                   <div class="insight-card">
-                    <div class="data-card__header">Track Virality</div>
+                    <div class="data-card__header">{{ 'similaritySearch.sections.trackVirality' | transloco }}</div>
                     <div class="sport-fit-content">
                       <img class="sport-fit-icon" [src]="getTrackViralityIconPath(result)" alt="Track Virality" />
-                      <span class="sport-fit-label">Virality</span>
+                      <span class="sport-fit-label">{{ 'trackInsights.virality' | transloco }}</span>
                       <span class="sport-fit-value">
                         {{ getTrackViralityPercentage(result) ?? '--' }}%
                       </span>
@@ -812,7 +812,7 @@
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 12.2V9M9 5.8H9.008M17 9C17 13.4183 13.4183 17 9 17C4.58172 17 1 13.4183 1 9C1 4.58172 4.58172 1 9 1C13.4183 1 17 4.58172 17 9Z" stroke="white" stroke-opacity="0.8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
               </div>
-              <div class="license-modal__restriction-bullet">&bull; None</div>
+              <div class="license-modal__restriction-bullet">&bull; {{ 'licenseModal.none' | transloco }}</div>
             </div>
 
             <div class="license-modal__restriction">
@@ -822,7 +822,7 @@
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 12.2V9M9 5.8H9.008M17 9C17 13.4183 13.4183 17 9 17C4.58172 17 1 13.4183 1 9C1 4.58172 4.58172 1 9 1C13.4183 1 17 4.58172 17 9Z" stroke="white" stroke-opacity="0.8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
               </div>
-              <div class="license-modal__restriction-bullet">&bull; None</div>
+              <div class="license-modal__restriction-bullet">&bull; {{ 'licenseModal.none' | transloco }}</div>
             </div>
 
             <button type="button" class="license-modal__accordion" (click)="toggleGeneralTerms()">
@@ -854,7 +854,7 @@
                   <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.6" />
                   <path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                <span>Email our licensing team</span>
+                <span>{{ 'licenseModal.emailTeam' | transloco }}</span>
               </a>
             </div>
 
@@ -982,7 +982,7 @@
                   <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.6" />
                   <path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                <span>Email our licensing team</span>
+                <span>{{ 'licenseModal.emailTeam' | transloco }}</span>
               </a>
             </div>
           </div>
