@@ -21,5 +21,6 @@ export const appConfig: ApplicationConfig = {
     ),
     provideSentryProviders(true),
     provideAmplitudeProviders(true),
+    ...translocoProviders,
   ]
 };
