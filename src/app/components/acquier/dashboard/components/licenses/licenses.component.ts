@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { LicenseService } from '../../../../../services/license.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
@@ -34,7 +35,7 @@ interface CampaignPlatformMeta {
 @Component({
   selector: 'acrylic-licenses',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoModule],
   templateUrl: './licenses.component.html',
   styleUrl: './licenses.component.scss',
 })

@@ -6,6 +6,7 @@ import { AuthUtils } from '../utils/auth.utils';
 import { NavigationService } from './navigation.service';
 import { AmplitudeService } from './amplitude.service';
 import { ISignInResponse } from '../interfaces/response/sign-in.response';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root'

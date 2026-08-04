@@ -8,6 +8,8 @@ import { errorInterceptor } from './interceptors/error.interceptor';
 import { provideSentryProviders } from './providers/sentry.provider';
 import { provideAmplitudeProviders } from './providers/amplitude.provider';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { languageInterceptor } from './interceptors/language.interceptor';
+import { translocoProviders } from './transloco.config';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(
       withFetch(),
-      withInterceptors([ loaderInterceptor, authInterceptor, errorInterceptor ]),
+      withInterceptors([ loaderInterceptor, languageInterceptor, authInterceptor, errorInterceptor ]),
     ),
     provideSentryProviders(true),
     provideAmplitudeProviders(true),

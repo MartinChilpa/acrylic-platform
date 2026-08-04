@@ -1,9 +1,10 @@
-import { AfterViewInit, Component, Output, EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component, Output, EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { EMPTY, Subject, defer, of, throwError, timer } from 'rxjs';
 import { catchError, exhaustMap, expand, last, map, retry, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { TranslocoModule } from '@jsverse/transloco';
 import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
@@ -34,7 +35,7 @@ interface SpotifyTrackInfo {
 @Component({
   selector: 'acrylic-similarity-search',
   standalone: true,
-  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule, TeamPlayerOptimizationComponent],
+  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule, TeamPlayerOptimizationComponent, TranslocoModule],
   templateUrl: './similarity-search.component.html',
   styleUrls: ['./similarity-search.component.base.scss', './similarity-search.component.scss']
 })
@@ -85,12 +86,19 @@ export class SimilaritySearchComponent implements OnInit {
   private timerRafIds = new Map<string, number>();
   private peaksInitTimerId: number | null = null;
 
-  suggestions: Suggestion[] = [
-    { icon: '', type: 'prompt', title: 'Write a prompt', subtitle: 'Hip hop music with winning vibe for epic goal reel'},
-    { icon: '', type: 'video', title: 'Upload a video', subtitle: 'up to 60 sec / 60 MB' },
-    { icon: '', type: 'link', title: 'Paste a link', subtitle: 'Paste a link. Get matches to similar tracks.' },
-    { icon: '', type: 'track', title: 'Find a specific track', subtitle: 'Search title and artist.' },
+  suggestionKeys = [
+    { icon: '', type: 'prompt', titleKey: 'similaritySearch.dropdown.writePrompt', subtitleKey: 'similaritySearch.dropdown.writePromptDesc'},
+    { icon: '', type: 'video', titleKey: 'similaritySearch.dropdown.uploadVideo', subtitleKey: 'similaritySearch.dropdown.uploadVideoDesc' },
+    { icon: '', type: 'link', titleKey: 'similaritySearch.dropdown.pasteLink', subtitleKey: 'similaritySearch.dropdown.pasteLinkDesc' },
+    { icon: '', type: 'track', titleKey: 'similaritySearch.dropdown.findTrack', subtitleKey: 'similaritySearch.dropdown.findTrackDesc' },
   ];
+
+  suggestions: Suggestion[] = this.suggestionKeys.map(s => ({
+    icon: s.icon,
+    type: s.type,
+    title: s.titleKey,
+    subtitle: s.subtitleKey
+  }));
 
   
   results: any[] = [];
@@ -109,6 +117,11 @@ export class SimilaritySearchComponent implements OnInit {
   selectedVideoFile: File | null = null;
   selectedVideoUrl: string | null = null;
   selectedVideoName: string | null = null;
+  videoSearched = false;
+  videoDuration = 0;
+  videoCurrentTime = 0;
+  videoPlaying = false;
+  @ViewChild('videoPreviewRef') private videoPreviewRef?: ElementRef<HTMLVideoElement>;
   showSearchInfo = false;
   loading = false;
   errorMsg: string | null = null;
@@ -461,6 +474,7 @@ export class SimilaritySearchComponent implements OnInit {
       this.searchInput.emit(this.lastSearchLabel);
       this.searched.emit();
       this.pageNumber = 1;
+      this.videoSearched = true;
       this.lastSearchRequest = { type: 'video', file: this.selectedVideoFile };
       this.amplitudeService.trackEvent('Aims Search Submitted', {
         search_id: this.currentSearchId,
@@ -620,7 +634,7 @@ export class SimilaritySearchComponent implements OnInit {
     this.licenseService.createLicense(trackId).subscribe({
       next: (result) => {
         console.log('[SimilaritySearch] License created successfully:', result);
-        this.licensedTrack = result;
+        this.licensedTrack = { ...this.licenseModalTrack, ...result };
         this.licenseService.addLicensedTrack(result);
         this.modalService.hideModal('license-track-modal');
         setTimeout(() => {
@@ -749,7 +763,10 @@ export class SimilaritySearchComponent implements OnInit {
       ?? this.licensedTrack?.instagram_handle
       ?? this.licensedTrack?.instagram_username
     );
-    const text = handle ? `@${handle}` : this.buildDefaultLicenseTagsText();
+    if (!handle) {
+      return;
+    }
+    const text = `@${handle}`;
 
     try {
       const write = navigator.clipboard?.writeText?.bind(navigator.clipboard);
@@ -804,13 +821,6 @@ export class SimilaritySearchComponent implements OnInit {
     } catch {
       return false;
     }
-  }
-
-  private buildDefaultLicenseTagsText(): string {
-    const artist = this.licensedTrack?.artist_canonical ?? '';
-    const track = this.licensedTrack?.track_name ?? this.licensedTrack?.track_name_track ?? '';
-    const tier = this.getTierLabel(this.licensedTrack);
-    return `Artist: ${artist}\nTrack: ${track}\nTier: ${tier}`.trim();
   }
 
   private normalizeInstagramHandle(value: unknown): string | null {
@@ -923,6 +933,74 @@ export class SimilaritySearchComponent implements OnInit {
     this.selectedVideoFile = null;
     this.selectedVideoName = null;
     this.selectedVideoUrl = null;
+    this.videoSearched = false;
+    this.videoDuration = 0;
+    this.videoCurrentTime = 0;
+    this.videoPlaying = false;
+  }
+
+  // Removes the video and clears its search results, returning to the default composer.
+  removeVideoSearch(): void {
+    this.clearSelectedVideo();
+    this.destroyAllPeaks();
+    this.allResultsRaw = [];
+    this.allResults = [];
+    this.results = [];
+    this.totalCount = null;
+    this.seedTrack = null;
+    this.spotifyTrack = null;
+    this.lastSearchLabel = '';
+    this.errorMsg = null;
+    this.artistCountryFilterCode2 = null;
+    this.noPlayerMatchLabel = null;
+  }
+
+  onVideoMeta(event: Event): void {
+    const video = event.target as HTMLVideoElement | null;
+    if (!video) { return; }
+    this.videoDuration = Number.isFinite(video.duration) ? video.duration : 0;
+    this.videoCurrentTime = video.currentTime;
+  }
+
+  onVideoTimeUpdate(event: Event): void {
+    const video = event.target as HTMLVideoElement | null;
+    if (!video) { return; }
+    this.videoCurrentTime = video.currentTime;
+  }
+
+  toggleVideoPlayback(): void {
+    const video = this.videoPreviewRef?.nativeElement;
+    if (!video) { return; }
+    if (video.paused) {
+      video.play();
+      this.videoPlaying = true;
+    } else {
+      video.pause();
+      this.videoPlaying = false;
+    }
+  }
+
+  seekVideo(event: MouseEvent): void {
+    const video = this.videoPreviewRef?.nativeElement;
+    if (!video || !this.videoDuration) { return; }
+    const track = event.currentTarget as HTMLElement;
+    const rect = track.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    video.currentTime = ratio * this.videoDuration;
+    this.videoCurrentTime = video.currentTime;
+  }
+
+  get videoProgressPercent(): number {
+    if (!this.videoDuration) { return 0; }
+    return Math.min(100, (this.videoCurrentTime / this.videoDuration) * 100);
+  }
+
+  formatVideoTime(seconds: number): string {
+    if (!Number.isFinite(seconds) || seconds < 0) { return '0:00'; }
+    const total = Math.floor(seconds);
+    const mins = Math.floor(total / 60);
+    const secs = total % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
   onSearchInputFocus(): void {

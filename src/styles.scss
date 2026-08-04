@@ -9,3 +9,13 @@
     linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)),
     url('/assets/images/bg-sports-content.png') center / cover no-repeat !important;
 }
+
+/* Current sidenav width, exposed so full-width content (e.g. the similarity
+   search video preview) can size itself against the content area and react
+   automatically when the sidenav expands on hover. */
+.acquier-layout {
+  --acr-sidenav-w: 64px;
+}
+.acquier-layout:has(.sidenav.expanded) {
+  --acr-sidenav-w: 256px;
+}
