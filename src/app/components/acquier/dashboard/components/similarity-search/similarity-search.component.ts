@@ -9,6 +9,7 @@ import { ModalService } from '../../../../../services/modal.service';
 
 import { SimilarityUrlService } from '../../services/similarity-url.service';
 import { AimsDownloadService } from '../../services/aims-download.service';
+import { AmplitudeService } from '../../../../../services/amplitude.service';
 import { LicenseComponent } from '../license/license.component';
 import { TeamPlayerOptimizationComponent } from './team-player-optimization/team-player-optimization.component';
 import { TeamPlayersService, TeamPlayerDto } from '../../../../../services/team-players.service';
@@ -49,6 +50,7 @@ export class SimilaritySearchComponent implements OnInit {
   private similarityService = inject(SimilarityUrlService);
   private aimsDownloadService = inject(AimsDownloadService);
   private modalService = inject(ModalService);
+  private amplitudeService = inject(AmplitudeService);
   private teamPlayersService = inject(TeamPlayersService);
   private brandingService = inject(TeamBrandingService);
   private projectsService = inject(ProjectsService);
@@ -57,6 +59,9 @@ export class SimilaritySearchComponent implements OnInit {
 
   favoriteTrackIds = new Set<string>();
   licensedTrackIds = new Set<string>();
+  private searchesWithFirstInteraction = new Set<string>();
+  private currentSearchId: string | null = null;
+  private currentSearchSubmittedAt: number | null = null;
 
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
@@ -206,6 +211,27 @@ export class SimilaritySearchComponent implements OnInit {
       this.updateResultsSlice();
       this.finishLoadingUi();
       this.schedulePeaksInit();
+
+      // Track Amplitude event for search results
+      if (this.currentSearchId) {
+        const top3Results = this.allResultsRaw.slice(0, 3);
+        const top3MatchScores = top3Results.map((r) => r.match_score ?? null);
+        const nonNullScores = top3MatchScores.filter((s) => s !== null);
+        const avgTop3MatchScore =
+          nonNullScores.length > 0
+            ? nonNullScores.reduce((a, b) => (a as number) + (b as number), 0) / nonNullScores.length
+            : null;
+        this.amplitudeService.trackEvent('Aims Search Results Returned', {
+          search_id: this.currentSearchId,
+          search_type: this.lastSearchRequest?.type ?? null,
+          result_count: this.allResultsRaw.length,
+          zero_results: this.allResultsRaw.length === 0,
+          top_3_match_scores: top3MatchScores,
+          avg_top_3_match_score: avgTop3MatchScore,
+          exists_in_db: this.existsInDb,
+          error: null,
+        });
+      }
     });
   }
 
@@ -303,6 +329,7 @@ export class SimilaritySearchComponent implements OnInit {
       console.warn('[SimilaritySearch] toggleFavorite: track has no stable key, skipping', result);
       return;
     }
+    this.trackResultInteraction(result, 'favorite');
     this.projectsService.toggleFavorite(id, result).subscribe({
       error: (err) => console.error('[SimilaritySearch] toggleFavorite request failed', err)
     });
@@ -439,6 +466,9 @@ export class SimilaritySearchComponent implements OnInit {
   search() {
     const query = (this.searchControl.value ?? '').trim();
     const now = Date.now();
+    this.currentSearchId = crypto.randomUUID();
+    this.currentSearchSubmittedAt = now;
+    this.searchesWithFirstInteraction.delete(this.currentSearchId);
 
     if (this.selectedVideoFile) {
       this.lastSearchLabel = this.selectedVideoName?.trim() || 'Uploaded video';
@@ -447,6 +477,11 @@ export class SimilaritySearchComponent implements OnInit {
       this.pageNumber = 1;
       this.videoSearched = true;
       this.lastSearchRequest = { type: 'video', file: this.selectedVideoFile };
+      this.amplitudeService.trackEvent('Aims Search Submitted', {
+        search_id: this.currentSearchId,
+        search_type: 'video',
+        query_length: null,
+      });
       this.manualSearch$.next({ type: 'video', file: this.selectedVideoFile });
       return;
     }
@@ -470,12 +505,22 @@ export class SimilaritySearchComponent implements OnInit {
       this.searched.emit();
       this.pageNumber = 1;
       this.lastSearchRequest = { type: 'url', query };
+      this.amplitudeService.trackEvent('Aims Search Submitted', {
+        search_id: this.currentSearchId,
+        search_type: 'url',
+        query_length: query.length,
+      });
       this.manualSearch$.next({ type: 'url', query });
       return;
     }
     this.searched.emit();
     this.pageNumber = 1;
     this.lastSearchRequest = { type: 'prompt', query };
+    this.amplitudeService.trackEvent('Aims Search Submitted', {
+      search_id: this.currentSearchId,
+      search_type: 'prompt',
+      query_length: query.length,
+    });
     this.manualSearch$.next({ type: 'prompt', query });
   }
 
@@ -555,6 +600,11 @@ export class SimilaritySearchComponent implements OnInit {
     this.licenseModalTrack = track;
     this.licensedTrack = null;
     this.generalTermsOpen = false;
+    this.amplitudeService.trackEvent('Aims License Clicked', {
+      search_id: this.currentSearchId ?? 'no_search',
+      track_id: this.getTrackId(track),
+      match_score: track?.match_score ?? null,
+    });
     const trackedLicensedEl = document.getElementById('track-licensed-modal');
     const isTrackedVisible = trackedLicensedEl?.classList.contains('show');
     if (isTrackedVisible) {
@@ -581,6 +631,7 @@ export class SimilaritySearchComponent implements OnInit {
       return;
     }
 
+    this.trackResultInteraction(this.licenseModalTrack, 'license');
     this.licenseService.createLicense(trackId).subscribe({
       next: (result) => {
         console.log('[SimilaritySearch] License created successfully:', result);
@@ -1160,6 +1211,36 @@ export class SimilaritySearchComponent implements OnInit {
     return out;
   }
 
+  private trackResultInteraction(result: any, action: 'favorite' | 'play' | 'license', index?: number): void {
+    if (!this.currentSearchId) return;
+    const trackId = this.getTrackId(result);
+    const positionInResults = index ?? (this.results?.indexOf(result) ?? -1);
+    const isFirstInteraction = !this.searchesWithFirstInteraction.has(this.currentSearchId);
+    if (isFirstInteraction) {
+      this.searchesWithFirstInteraction.add(this.currentSearchId);
+    }
+    const timeToFirstInteractionMs = isFirstInteraction && this.currentSearchSubmittedAt ? Date.now() - this.currentSearchSubmittedAt : null;
+    this.amplitudeService.trackEvent('Aims Result Interacted', {
+      search_id: this.currentSearchId,
+      track_id: trackId,
+      position_in_results: positionInResults >= 0 ? positionInResults : null,
+      action,
+      match_score: result?.match_score ?? null,
+      is_first_interaction: isFirstInteraction,
+      time_to_first_interaction_ms: timeToFirstInteractionMs,
+    });
+  }
+
+  private trackResultAppeared(result: any, index: number): void {
+    if (!this.currentSearchId) return;
+    this.amplitudeService.trackEvent('Aims Result Appeared', {
+      search_id: this.currentSearchId,
+      track_id: this.getTrackId(result),
+      position_in_results: index,
+      match_score: result?.match_score ?? null,
+    });
+  }
+
   private extractTotalCount(data: unknown): number | null {
     if (!data || typeof data !== 'object') {
       return null;
@@ -1599,6 +1680,12 @@ export class SimilaritySearchComponent implements OnInit {
       return;
     }
     this.openedPanels.add(key);
+    this.amplitudeService.trackEvent('Aims Track Expanded', {
+      search_id: this.currentSearchId ?? 'no_search',
+      track_id: this.getTrackId(track),
+      position_in_results: index,
+      match_score: track?.match_score ?? null,
+    });
   }
 
   isPanelOpen(track: any, index: number): boolean {
@@ -1656,27 +1743,43 @@ toggleTrackPlayback(track: any, index: number): void {
   }
 }
 
-onTrackAudioPlay(track: any, index: number, event: Event): void { 
-  const key = this.getTrackKey(track, index); 
-  const audio = event.target as HTMLAudioElement | null; 
-  
-  if (audio) { 
+onTrackAudioPlay(track: any, index: number, event: Event): void {
+  const key = this.getTrackKey(track, index);
+  const audio = event.target as HTMLAudioElement | null;
+
+  if (audio) {
     // Guardamos la referencia de la canción que empieza a sonar ahora
     this.currentAudioElement = audio;
     this.currentTrackKey = key;
 
     // Si manejabas un Set de llaves reproduciéndose, lo ideal es limpiarlo para que solo tenga una
-    this.playingTrackKeys.clear(); 
-    this.playingTrackKeys.add(key); 
-    
-    this.startTimerLoop(key, audio); 
-  } 
-} 
+    this.playingTrackKeys.clear();
+    this.playingTrackKeys.add(key);
 
-onTrackAudioPause(track: any, index: number): void { 
-  const key = this.getTrackKey(track, index); 
-  this.playingTrackKeys.delete(key); 
-  this.stopTimerLoop(key); 
+    this.trackResultInteraction(track, 'play', index);
+    // Always track play, regardless of search context
+    this.amplitudeService.trackEvent('Aims Track Played', {
+      search_id: this.currentSearchId ?? 'no_search',
+      track_id: this.getTrackId(track),
+      position_in_results: index,
+      match_score: track.match_score ?? null,
+    });
+    this.startTimerLoop(key, audio);
+  }
+}
+
+onTrackAudioPause(track: any, index: number): void {
+  const key = this.getTrackKey(track, index);
+  this.playingTrackKeys.delete(key);
+  this.stopTimerLoop(key);
+
+  // Always track pause, regardless of search context
+  this.amplitudeService.trackEvent('Aims Track Paused', {
+    search_id: this.currentSearchId ?? 'no_search',
+    track_id: this.getTrackId(track),
+    position_in_results: index,
+    match_score: track.match_score ?? null,
+  });
 
   // Si la canción que se pausó es la actual, limpiamos las referencias
   if (this.currentTrackKey === key) {

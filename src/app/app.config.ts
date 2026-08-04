@@ -6,6 +6,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { loaderInterceptor } from './interceptors/loader.interceptor';
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { provideSentryProviders } from './providers/sentry.provider';
+import { provideAmplitudeProviders } from './providers/amplitude.provider';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { languageInterceptor } from './interceptors/language.interceptor';
 import { translocoProviders } from './transloco.config';
@@ -18,11 +19,8 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([ loaderInterceptor, languageInterceptor, authInterceptor, errorInterceptor ]),
     ),
+    provideSentryProviders(true),
+    provideAmplitudeProviders(true),
     ...translocoProviders,
-    {
-      provide: 'sentryProviders',
-      useFactory: provideSentryProviders,
-      deps: [PLATFORM_ID],
-    }
   ]
 };

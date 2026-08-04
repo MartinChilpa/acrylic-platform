@@ -1,10 +1,9 @@
-import { isPlatformServer } from "@angular/common";
 import { APP_INITIALIZER, ErrorHandler } from "@angular/core";
 import { Router } from "@angular/router";
 import * as Sentry from '@sentry/angular-ivy';
 
-export function provideSentryProviders(platformId: object): unknown[] {
-    if (isPlatformServer(platformId)) {
+export function provideSentryProviders(isClient: boolean): unknown[] {
+    if (!isClient) {
       return [];
     }
     return [
