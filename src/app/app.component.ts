@@ -20,12 +20,4 @@ import { AnalyticsRouterService } from './services/analytics-router.service';
 export class AppComponent {
   public _loadingService = inject(LoaderService);
   private _analyticsRouterService = inject(AnalyticsRouterService);
-
-  constructor() {
-    console.log('[AppComponent] Constructor - scheduling analytics init');
-    setTimeout(() => {
-      console.log('[AppComponent] Timeout fired - calling analytics init');
-      this._analyticsRouterService.init();
-    }, 100);
-  }
 }

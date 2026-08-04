@@ -35,10 +35,6 @@ export class AmplitudeService {
         autocapture: false,
       });
       this.initialized = true;
-      if (!environment.production) {
-        console.log('[Amplitude] SDK initialized');
-        console.log('[Amplitude] Session Replay plugin registered, sampleRate:', SESSION_REPLAY_SAMPLE_RATE);
-      }
     } catch (error) {
       console.error('[Amplitude] Failed to initialize:', error);
     }
@@ -48,9 +44,6 @@ export class AmplitudeService {
     if (!this.initialized) return;
     try {
       amplitude.setUserId(uuid);
-      if (!environment.production) {
-        console.log('[Amplitude] User identified:', uuid);
-      }
     } catch (error) {
       console.error('[Amplitude] Failed to identify user:', error);
     }
@@ -60,9 +53,6 @@ export class AmplitudeService {
     if (!this.initialized) return;
     try {
       amplitude.track(name, props);
-      if (!environment.production) {
-        console.log('[Amplitude]', name, props);
-      }
     } catch (error) {
       console.error('[Amplitude] Failed to track event:', error);
     }
@@ -78,9 +68,6 @@ export class AmplitudeService {
         }
       });
       amplitude.identify(identifyEvent);
-      if (!environment.production) {
-        console.log('[Amplitude] User properties set:', properties);
-      }
     } catch (error) {
       console.error('[Amplitude] Failed to set user properties:', error);
     }
@@ -90,9 +77,6 @@ export class AmplitudeService {
     if (!this.initialized) return;
     try {
       amplitude.reset();
-      if (!environment.production) {
-        console.log('[Amplitude] User reset');
-      }
     } catch (error) {
       console.error('[Amplitude] Failed to reset user:', error);
     }
