@@ -106,7 +106,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   /* ---------- imagery / metadata ---------- */
 
   getTrackImage(track: any): string {
-    const coverImage = track?.cover_image;
+    const coverImage = track?.cover_image ?? track?.image_url;
     if (typeof coverImage === 'string' && coverImage.trim().length > 0) {
       return coverImage;
     }
@@ -263,7 +263,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   /* ---------- audio / waveform ---------- */
 
   getTrackAudioUrl(track: any): string | null {
-    const source = track?.file_wav;
+    const source = track?.file_wav ?? track?.audio_url ?? track?.file_mp3;
     return typeof source === 'string' && source.length > 0 ? source : null;
   }
 

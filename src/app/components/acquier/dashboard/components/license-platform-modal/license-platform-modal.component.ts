@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ProjectsService } from '../../../../../services/projects.service';
 
 export interface PlatformOption {
@@ -13,12 +14,13 @@ export interface PlatformOption {
 @Component({
   selector: 'acrylic-license-platform-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoModule],
   templateUrl: './license-platform-modal.component.html',
   styleUrl: './license-platform-modal.component.scss'
 })
 export class LicensePlatformModalComponent implements OnInit {
   private projectsService = inject(ProjectsService);
+  private transloco = inject(TranslocoService);
 
   @Input() trackUuid: string = '';
   @Input() trackName: string = '';
@@ -45,10 +47,10 @@ export class LicensePlatformModalComponent implements OnInit {
 
   private initializePlatforms() {
     this.platformOptions = [
-      { key: 'instagram', label: 'Instagram', icon: '📱', url: this.clubPlatforms['instagram'] },
-      { key: 'tiktok', label: 'TikTok', icon: '♪', url: this.clubPlatforms['tiktok'] },
-      { key: 'youtube', label: 'YouTube', icon: '▶', url: this.clubPlatforms['youtube'] },
-      { key: 'other', label: 'Other Platform', icon: '🔗', url: this.clubPlatforms['other'] }
+      { key: 'instagram', label: this.transloco.translate('licensePlatformModal.instagram'), icon: '📱', url: this.clubPlatforms['instagram'] },
+      { key: 'tiktok', label: this.transloco.translate('licensePlatformModal.tiktok'), icon: '♪', url: this.clubPlatforms['tiktok'] },
+      { key: 'youtube', label: this.transloco.translate('licensePlatformModal.youtube'), icon: '▶', url: this.clubPlatforms['youtube'] },
+      { key: 'other', label: this.transloco.translate('licensePlatformModal.otherPlatform'), icon: '🔗', url: this.clubPlatforms['other'] }
     ];
   }
 

@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { NgClass, NgOptimizedImage } from '@angular/common';
+import { TranslocoModule } from '@jsverse/transloco';
 import { HeaderComponent } from '../../shared/acquier/header/header.component';
 import { SimilaritySearchComponent } from '../dashboard/components/similarity-search/similarity-search.component';
 import { LocalMusicComponent } from '../dashboard/components/local-music/local-music.component';
@@ -10,6 +11,7 @@ import { TeamBrandingService } from '../../../services/team-branding.service';
   standalone: true,
   imports: [
     NgClass,
+    TranslocoModule,
     HeaderComponent,
     SimilaritySearchComponent,
     LocalMusicComponent

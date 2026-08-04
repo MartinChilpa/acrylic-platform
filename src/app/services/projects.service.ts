@@ -10,16 +10,13 @@ export class ProjectsService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.API_URL}/${environment.VERSION}/my-club`;
   private readonly keepOnError = !environment.production;
+  private readonly favoritesStorageKey = 'acrylic_favorites_cache';
 
   private favoritesSubject = new BehaviorSubject<IFavoriteResult[]>([]);
   favorites$ = this.favoritesSubject.asObservable();
 
   constructor() {
-    try {
-      Object.keys(localStorage)
-        .filter(k => k.startsWith('acrylic_favorites'))
-        .forEach(k => localStorage.removeItem(k));
-    } catch { }
+    this.restoreFavoritesFromStorage();
   }
 
   loadFavorites(): void {
@@ -126,7 +123,33 @@ export class ProjectsService {
     return order.map(k => byKey.get(k)!);
   }
 
+  private restoreFavoritesFromStorage(): void {
+    try {
+      const raw = localStorage.getItem(this.favoritesStorageKey);
+      if (!raw) { return; }
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) { return; }
+      this.favoritesSubject.next(parsed as IFavoriteResult[]);
+    } catch {
+      // ignore invalid or inaccessible storage
+    }
+  }
+
+  private saveFavoritesToStorage(favs: IFavoriteResult[]): void {
+    try {
+      if (!favs || !favs.length) {
+        localStorage.removeItem(this.favoritesStorageKey);
+      } else {
+        localStorage.setItem(this.favoritesStorageKey, JSON.stringify(favs));
+      }
+    } catch {
+      // ignore storage write errors
+    }
+  }
+
   private setFavorites(favs: IFavoriteResult[]): void {
-    this.favoritesSubject.next(this.mergeFavorites(favs, []));
+    const merged = this.mergeFavorites(favs, []);
+    this.favoritesSubject.next(merged);
+    this.saveFavoritesToStorage(merged);
   }
 }

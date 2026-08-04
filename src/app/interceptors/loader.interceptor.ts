@@ -5,11 +5,13 @@ import { finalize } from 'rxjs';
 
 export const loaderInterceptor: HttpInterceptorFn = (req, next) => {
   const loadingService = inject(LoaderService);
-  if (!loadingService.hideLoading()) {
-    loadingService.isLoading.set(true);
+
+  if (!loadingService.getHideLoading()) {
+    Promise.resolve().then(() => loadingService.setLoading(true));
   }
+
   return next(req).pipe(
     finalize(() => {
-      loadingService.isLoading.set(false);
+      Promise.resolve().then(() => loadingService.setLoading(false));
     }));
 };

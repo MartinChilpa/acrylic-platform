@@ -2,31 +2,31 @@
 
   <!-- Header -->
   <div class="lic-header">
-    <h2 class="lic-title">Licenses</h2>
-    <p class="lic-subtitle">Track licenses, usage rights, and whitelisting status for your team.</p>
+    <h2 class="lic-title">{{ 'licenses.title' | transloco }}</h2>
+    <p class="lic-subtitle">{{ 'licenses.subtitle' | transloco }}</p>
   </div>
 
   <!-- Stats -->
   <div class="lic-stats">
     <div class="stat-card">
-      <span class="stat-card__label">Active Licenses</span>
+      <span class="stat-card__label">{{ 'licenses.stats.activeLicenses' | transloco }}</span>
       <span class="stat-card__value">{{ activeLicensesCount }}</span>
-      <span class="stat-card__sub">across all projects</span>
+      <span class="stat-card__sub">{{ 'licenses.stats.acrossAllProjects' | transloco }}</span>
     </div>
     <div class="stat-card">
-      <span class="stat-card__label">Whitelisting in Progress</span>
+      <span class="stat-card__label">{{ 'licenses.stats.whitelistingInProgress' | transloco }}</span>
       <span class="stat-card__value">{{ whitelistingInProgressCount }}</span>
-      <span class="stat-card__sub">awaiting distributor</span>
+      <span class="stat-card__sub">{{ 'licenses.stats.awaitingDistributor' | transloco }}</span>
     </div>
     <div class="stat-card">
-      <span class="stat-card__label stat-card__label--dim">Usage Links Due</span>
+      <span class="stat-card__label stat-card__label--dim">{{ 'licenses.stats.usageLinksDue' | transloco }}</span>
       <span class="stat-card__value">{{ usageLinksDueCount }}</span>
-      <span class="stat-card__sub">awaiting links</span>
+      <span class="stat-card__sub">{{ 'licenses.stats.awaitingLinks' | transloco }}</span>
     </div>
     <div class="stat-card">
-      <span class="stat-card__label stat-card__label--dim">Needs Attention</span>
+      <span class="stat-card__label stat-card__label--dim">{{ 'licenses.stats.needsAttention' | transloco }}</span>
       <span class="stat-card__value stat-card__value--alert">{{ needsAttentionCount }}</span>
-      <span class="stat-card__sub">follow-up required</span>
+      <span class="stat-card__sub">{{ 'licenses.stats.followUpRequired' | transloco }}</span>
     </div>
   </div>
 
@@ -40,7 +40,7 @@
       class="lic-search"
       type="text"
       [(ngModel)]="searchQuery"
-      placeholder="Search with text or paste content link" />
+      [placeholder]="'licenses.search.placeholder' | transloco" />
   </div>
 
   <!-- Main content: rows (detail opens as an overlay drawer, list stays put) -->
@@ -54,19 +54,19 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
           <path d="M5 8L7 10L11 6M13 1C13.5304 1 14.0391 1.21071 14.4142 1.58579C14.7893 1.96086 15 2.46957 15 3V18C14.9999 18.1751 14.9539 18.3472 14.8665 18.4989C14.7791 18.6506 14.6533 18.7767 14.5019 18.8646C14.3504 18.9525 14.1785 18.9991 14.0034 18.9997C13.8283 19.0003 13.6561 18.9549 13.504 18.868L8.992 16.29C8.68987 16.1174 8.34795 16.0266 8 16.0266C7.65205 16.0266 7.31013 16.1174 7.008 16.29L2.496 18.868C2.34394 18.9549 2.17174 19.0003 1.99662 18.9997C1.8215 18.9991 1.64961 18.9525 1.49814 18.8646C1.34667 18.7767 1.22094 18.6506 1.13352 18.4989C1.0461 18.3472 1.00006 18.1751 1 18V3C1 2.46957 1.21071 1.96086 1.58579 1.58579C1.96086 1.21071 2.46957 1 3 1H13Z" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <p>No licenses yet.</p>
-        <p class="lic-empty__sub">License a track from the search to see it here.</p>
+        <p>{{ 'licenses.empty.title' | transloco }}</p>
+        <p class="lic-empty__sub">{{ 'licenses.empty.subtitle' | transloco }}</p>
       </div>
 
       <!-- Column headings -->
       <div class="lic-row-head" *ngIf="licenses.length > 0">
-        <span class="lic-row-head__col lic-row-head__col--track">Track</span>
-        <span class="lic-row-head__col lic-row-head__col--preview">Preview</span>
-        <span class="lic-row-head__col lic-row-head__col--date">Licensed</span>
-        <span class="lic-row-head__col lic-row-head__col--due">Usage Due</span>
-        <span class="lic-row-head__col lic-row-head__col--type">Type</span>
-        <span class="lic-row-head__col lic-row-head__col--status">Whitelisting</span>
-        <span class="lic-row-head__col lic-row-head__col--links">Campaign Links</span>
+        <span class="lic-row-head__col lic-row-head__col--track">{{ 'licenses.table.headers.track' | transloco }}</span>
+        <span class="lic-row-head__col lic-row-head__col--preview">{{ 'licenses.table.headers.preview' | transloco }}</span>
+        <span class="lic-row-head__col lic-row-head__col--date">{{ 'licenses.table.headers.licensed' | transloco }}</span>
+        <span class="lic-row-head__col lic-row-head__col--due">{{ 'licenses.table.headers.usageDue' | transloco }}</span>
+        <span class="lic-row-head__col lic-row-head__col--type">{{ 'licenses.table.headers.type' | transloco }}</span>
+        <span class="lic-row-head__col lic-row-head__col--status">{{ 'licenses.table.headers.whitelisting' | transloco }}</span>
+        <span class="lic-row-head__col lic-row-head__col--links">{{ 'licenses.table.headers.campaignLinks' | transloco }}</span>
       </div>
 
       <div class="lic-rows">
@@ -118,7 +118,7 @@
           <div class="lic-col-text lic-col-date">{{ lic.licensedAt | date:'MMM d, yyyy' }}</div>
 
           <div class="lic-col-due" [class.lic-col-due--overdue]="lic.isUsageOverdue">
-            {{ lic.isUsageOverdue ? 'Usage overdue' : (lic.usageDue ?? '—') }}
+            {{ lic.isUsageOverdue ? ('licenses.table.usageOverdue' | transloco) : (lic.usageDue ?? '—') }}
           </div>
 
           <div class="lic-col-type">
@@ -161,7 +161,7 @@
           </div>
 
           <div class="lic-col-action">
-            <button class="lic-view-btn" (click)="selectLicense(lic); $event.stopPropagation()">Details</button>
+            <button class="lic-view-btn" (click)="selectLicense(lic); $event.stopPropagation()">{{ 'licenses.table.details' | transloco }}</button>
           </div>
         </div>
       </div>
@@ -192,7 +192,7 @@
       <div class="lic-panel__wl-status" [class]="'lic-panel__wl-status--' + lic.whitelistingStatus">
         <span class="lic-panel__wl-left">
           <span class="wl-dot" [class]="'wl-dot--' + lic.whitelistingStatus"></span>
-          <span>Whitelisting {{ getStatusLabel(lic.whitelistingStatus) }}</span>
+          <span>{{ 'licenses.panel.whitelisting' | transloco }} {{ getStatusLabel(lic.whitelistingStatus) }}</span>
         </span>
         <span class="lic-panel__wl-id">{{ lic.licenseId }}</span>
       </div>
@@ -228,25 +228,25 @@
 
       <!-- License Details -->
       <div class="lic-panel__section">
-        <div class="lic-panel__section-title">License Details</div>
+        <div class="lic-panel__section-title">{{ 'licenses.panel.licenseDetails' | transloco }}</div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">License ID</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.licenseID' | transloco }}</span>
           <span class="lic-panel__val">{{ lic.licenseId }}</span>
         </div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">License Type</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.licenseType' | transloco }}</span>
           <span class="tier-badge" [class]="getTierClass(lic.licenseType)">{{ lic.licenseType }}</span>
         </div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">Club / Team</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.clubTeam' | transloco }}</span>
           <span class="lic-panel__val">{{ lic.teamName }}</span>
         </div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">Project / Campaign</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.projectCampaign' | transloco }}</span>
           <span class="lic-panel__val">{{ lic.project }}</span>
         </div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">Date Licensed</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.dateLicensed' | transloco }}</span>
           <span class="lic-panel__val">{{ formatDate(lic.licensedAt) }}</span>
         </div>
       </div>
@@ -255,25 +255,25 @@
 
       <!-- Track Information -->
       <div class="lic-panel__section">
-        <div class="lic-panel__section-title">Track Information</div>
+        <div class="lic-panel__section-title">{{ 'licenses.panel.trackInformation' | transloco }}</div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">ISRC</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.isrc' | transloco }}</span>
           <span class="lic-panel__val">{{ lic.track.isrc || '—' }}</span>
         </div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">Distributor</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.distributor' | transloco }}</span>
           <span class="lic-panel__val">{{ lic.track.distributor || '—' }}</span>
         </div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">Duration</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.duration' | transloco }}</span>
           <span class="lic-panel__val">{{ formatDuration(lic.track) }}</span>
         </div>
         <div class="lic-panel__row" *ngIf="lic.track.spotify_url || lic.track.spotify_id">
-          <span class="lic-panel__key">Spotify</span>
-          <a class="lic-panel__link" [href]="lic.track.spotify_url" target="_blank" rel="noopener">Open in Spotify ↗</a>
+          <span class="lic-panel__key">{{ 'licenses.panel.spotify' | transloco }}</span>
+          <a class="lic-panel__link" [href]="lic.track.spotify_url" target="_blank" rel="noopener">{{ 'licenses.panel.openInSpotify' | transloco }} ↗</a>
         </div>
         <div class="lic-panel__row" *ngIf="!lic.track.spotify_url && !lic.track.spotify_id">
-          <span class="lic-panel__key">Spotify</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.spotify' | transloco }}</span>
           <span class="lic-panel__val">—</span>
         </div>
       </div>
@@ -282,14 +282,14 @@
 
       <!-- Whitelisting Request -->
       <div class="lic-panel__section">
-        <div class="lic-panel__section-title">Whitelisting Request</div>
+        <div class="lic-panel__section-title">{{ 'licenses.panel.whitelistingRequest' | transloco }}</div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">Date Requested</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.dateRequested' | transloco }}</span>
           <span class="lic-panel__val">—</span>
         </div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">Processing Window</span>
-          <span class="lic-panel__val">24–72 hours</span>
+          <span class="lic-panel__key">{{ 'licenses.panel.processingWindow' | transloco }}</span>
+          <span class="lic-panel__val">{{ 'licenses.panel.processingWindowValue' | transloco }}</span>
         </div>
       </div>
 
@@ -297,7 +297,7 @@
 
       <!-- Campaign Links and Properties -->
       <div class="lic-panel__section">
-        <div class="lic-panel__section-title">Campaign Links and Properties</div>
+        <div class="lic-panel__section-title">{{ 'licenses.panel.campaignLinksProperties' | transloco }}</div>
         <div class="lic-panel__campaign-card">
         <div class="campaign-link-row" *ngFor="let platform of campaignPlatforms">
           <span class="campaign-link-row__icon" [class]="'platform-icon--' + getIconStatus(lic, platform.key)">
@@ -325,7 +325,7 @@
               <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
               <path d="M8.5 12.5L11 15L15.5 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Link added
+            {{ 'licenses.campaign.linkAdded' | transloco }}
           </a>
 
           <!-- Default: Add link button -->
@@ -334,7 +334,7 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <path d="M9 15L15 9M11 5L12.5 3.5C14.5 1.5 17.5 1.5 19.5 3.5C21.5 5.5 21.5 8.5 19.5 10.5L18 12M13 19L11.5 20.5C9.5 22.5 6.5 22.5 4.5 20.5C2.5 18.5 2.5 15.5 4.5 13.5L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Add link
+            {{ 'licenses.campaign.addLink' | transloco }}
           </button>
 
           <!-- Editing: inline input (no browser prompt) -->
@@ -364,26 +364,26 @@
 
       <!-- Timeline -->
       <div class="lic-panel__section">
-        <div class="lic-panel__section-title">Timeline</div>
+        <div class="lic-panel__section-title">{{ 'licenses.panel.timeline' | transloco }}</div>
         <div class="lic-timeline">
           <div class="lic-timeline__item">
             <span class="lic-timeline__dot lic-timeline__dot--done"></span>
             <div class="lic-timeline__content">
-              <span class="lic-timeline__label">License generated</span>
+              <span class="lic-timeline__label">{{ 'licenses.timeline.licenseGenerated' | transloco }}</span>
               <span class="lic-timeline__date">{{ lic.licensedAt | date:'MMM d, yyyy · h:mm a' }}</span>
             </div>
           </div>
           <div class="lic-timeline__item lic-timeline__item--muted">
             <span class="lic-timeline__dot"></span>
             <div class="lic-timeline__content">
-              <span class="lic-timeline__label">Whitelisting request sent</span>
+              <span class="lic-timeline__label">{{ 'licenses.timeline.whitelistingRequestSent' | transloco }}</span>
               <span class="lic-timeline__date">—</span>
             </div>
           </div>
           <div class="lic-timeline__item lic-timeline__item--muted">
             <span class="lic-timeline__dot"></span>
             <div class="lic-timeline__content">
-              <span class="lic-timeline__label">Distributor acknowledged</span>
+              <span class="lic-timeline__label">{{ 'licenses.timeline.distributorAcknowledged' | transloco }}</span>
               <span class="lic-timeline__date">—</span>
             </div>
           </div>
@@ -396,13 +396,13 @@
         <button type="button"
                 class="lic-panel__btn lic-panel__btn--download"
                 [class]="getDownloadButtonClass(lic.licenseType)"
-                title="Coming soon">Download License</button>
+                [title]="'licenses.actions.comingSoon' | transloco">{{ 'licenses.actions.downloadLicense' | transloco }}</button>
         <button type="button"
                 class="lic-panel__btn lic-panel__btn--delete"
                 (click)="deleteLicense(lic.track.uuid || lic.track.id, $event)"
-                title="Delete this license request">Delete License</button>
+                [title]="'licenses.actions.deleteLicenseTitle' | transloco">{{ 'licenses.actions.deleteLicense' | transloco }}</button>
       </div>
-      <a class="lic-panel__contact" href="mailto:hello@acrylic.la">Contact Acrylic Licensing Team →</a>
+      <a class="lic-panel__contact" href="mailto:hello@acrylic.la">{{ 'licenses.actions.contactTeam' | transloco }} →</a>
 
   </div>
 </div>
