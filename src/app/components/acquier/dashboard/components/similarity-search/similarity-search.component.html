@@ -87,6 +87,27 @@
       <p class="composer-helper">{{ 'similaritySearch.messages.removeVideoHelper' | transloco }}</p>
     </div>
 
+    <!-- Spotify link hint: suggest YouTube for better similarity analysis -->
+    <div class="spotify-hint" *ngIf="showSpotifyHint">
+      <span class="spotify-hint__icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 13.5V9.5M10 6.5H10.008" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <div class="spotify-hint__text">
+        <span class="spotify-hint__title">{{ 'similaritySearch.spotifyHint.title' | transloco }}</span>
+        <span class="spotify-hint__subtitle">{{ 'similaritySearch.spotifyHint.subtitle' | transloco }}</span>
+      </div>
+      <button type="button" class="spotify-hint__cta" (click)="openYouTube()">
+        <span>{{ 'similaritySearch.spotifyHint.cta' | transloco }}</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <path d="M12.5 3.33h4.17v4.17M17.5 2.5L8.33 11.67" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15 11.25v4.58c0 .46-.18.9-.51 1.23-.32.32-.76.5-1.22.5H4.17c-.46 0-.9-.18-1.23-.5-.32-.33-.5-.77-.5-1.23V6.67c0-.46.18-.9.5-1.23.33-.32.77-.5 1.23-.5h4.58" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
     <!-- Wide integrated video preview (video search active) -->
     <div class="video-preview" *ngIf="videoSearched && selectedVideoUrl">
       <div class="video-preview__frame">
@@ -446,9 +467,12 @@
     <div class="dropdown-suggestions">
       <div class="dropdown-item" *ngFor="let suggestion of suggestions">
         <div class="dropdown-item__icon">
-          <svg *ngIf="suggestion.type === 'prompt'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <polyline points="14,2 14,8 20,8" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg *ngIf="suggestion.type === 'prompt'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M12.5026 1.66602H5.0026C4.56058 1.66602 4.13665 1.84161 3.82409 2.15417C3.51153 2.46673 3.33594 2.89065 3.33594 3.33268V16.666C3.33594 17.108 3.51153 17.532 3.82409 17.8445C4.13665 18.1571 4.56058 18.3327 5.0026 18.3327H15.0026C15.4446 18.3327 15.8686 18.1571 16.1811 17.8445C16.4937 17.532 16.6693 17.108 16.6693 16.666V5.83268L12.5026 1.66602Z" stroke="#AD46FF" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11.6641 1.66602V4.99935C11.6641 5.44138 11.8397 5.8653 12.1522 6.17786C12.4648 6.49042 12.8887 6.66602 13.3307 6.66602H16.6641" stroke="#AD46FF" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8.33073 7.5H6.66406" stroke="#AD46FF" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.3307 10.834H6.66406" stroke="#AD46FF" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.3307 14.166H6.66406" stroke="#AD46FF" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <svg *ngIf="suggestion.type === 'video'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
             <polygon points="23,7 16,12 23,17" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -459,13 +483,13 @@
             <path d="M21 21L16.65 16.65" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
           <svg *ngIf="suggestion.type === 'link'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <svg *ngIf="suggestion.type === 'track'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M9 18V5l12-2v13" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             <circle cx="6" cy="18" r="3" stroke="#AD46FF" stroke-width="1.5"/>
             <circle cx="18" cy="16" r="3" stroke="#AD46FF" stroke-width="1.5"/>
+          </svg>
+          <svg *ngIf="suggestion.type === 'track'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#AD46FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <div class="dropdown-item__text">
