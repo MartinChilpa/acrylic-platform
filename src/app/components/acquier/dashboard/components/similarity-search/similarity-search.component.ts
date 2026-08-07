@@ -12,6 +12,7 @@ import { AimsDownloadService } from '../../services/aims-download.service';
 import { AmplitudeService } from '../../../../../services/amplitude.service';
 import { LicenseComponent } from '../license/license.component';
 import { TeamPlayerOptimizationComponent } from './team-player-optimization/team-player-optimization.component';
+import { SortFilterComponent } from './sort-filter/sort-filter.component';
 import { TeamPlayersService, TeamPlayerDto } from '../../../../../services/team-players.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
 import { ProjectsService } from '../../../../../services/projects.service';
@@ -35,7 +36,7 @@ interface SpotifyTrackInfo {
 @Component({
   selector: 'acrylic-similarity-search',
   standalone: true,
-  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule, TeamPlayerOptimizationComponent, TranslocoModule],
+  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule, TeamPlayerOptimizationComponent, SortFilterComponent, TranslocoModule],
   templateUrl: './similarity-search.component.html',
   styleUrls: ['./similarity-search.component.base.scss', './similarity-search.component.scss']
 })
@@ -112,6 +113,8 @@ export class SimilaritySearchComponent implements OnInit {
   private artistCountryFilterCode2: string | null = null;
   noPlayerMatchLabel: string | null = null;
   optimizationResetKey = 0;
+  private activeSort: 'audience_size' | 'sports_fit' | 'virality' | '' = '';
+  sortResetKey = 0;
   private lastSearchRequest: { type: 'url' | 'prompt' | 'video'; query?: string; file?: File } | null = null;
   lastSearchLabel = '';
   globalFileWav: string | null = null;
@@ -241,6 +244,8 @@ export class SimilaritySearchComponent implements OnInit {
       this.artistCountryFilterCode2 = null;
       this.noPlayerMatchLabel = null;
       this.optimizationResetKey++;
+      this.activeSort = '';
+      this.sortResetKey++;
       this.applyCountryFilter();
       this.pageNumber = 1;
       this.handlePageChange();
@@ -257,6 +262,8 @@ export class SimilaritySearchComponent implements OnInit {
         this.artistCountryFilterCode2 = null;
         this.noPlayerMatchLabel = 'No matches for Team.';
         this.optimizationResetKey++;
+        this.activeSort = '';
+        this.sortResetKey++;
         this.applyCountryFilter();
         this.pageNumber = 1;
         this.handlePageChange();
@@ -279,6 +286,8 @@ export class SimilaritySearchComponent implements OnInit {
       this.noPlayerMatchLabel = `No matches for ${player?.name ?? 'selected player'}.`;
       // Behave like "Clear optimization": restore the unfiltered results, but show the label.
       this.optimizationResetKey++;
+      this.activeSort = '';
+      this.sortResetKey++;
       this.applyCountryFilter();
       this.pageNumber = 1;
       this.handlePageChange();
@@ -290,6 +299,14 @@ export class SimilaritySearchComponent implements OnInit {
     this.handlePageChange();
   }
 
+  onSortSelected(sortKey: string): void {
+    this.activeSort = sortKey as typeof this.activeSort;
+    this.applyCountryFilter();
+    this.applySort();
+    this.pageNumber = 1;
+    this.handlePageChange();
+  }
+
   private applyCountryFilter(): void {
     const next = this.getFilteredResultsOrNull();
     if (!next) {
@@ -297,6 +314,17 @@ export class SimilaritySearchComponent implements OnInit {
       return;
     }
     this.allResults = next;
+  }
+
+  private applySort(): void {
+    if (!this.activeSort) return;
+    const getters: Record<string, (t: any) => number | null> = {
+      audience_size: (t) => this.getAudienceSizeValue(t),
+      sports_fit: (t) => this.getAudienceSportFitPercentage(t),
+      virality: (t) => this.getTrackViralityPercentage(t),
+    };
+    const getValue = getters[this.activeSort];
+    this.allResults = [...this.allResults].sort((a, b) => (getValue(b) ?? -Infinity) - (getValue(a) ?? -Infinity));
   }
 
   private getFilteredResultsOrNull(): any[] | null {
@@ -954,6 +982,8 @@ export class SimilaritySearchComponent implements OnInit {
     this.errorMsg = null;
     this.artistCountryFilterCode2 = null;
     this.noPlayerMatchLabel = null;
+    this.activeSort = '';
+    this.sortResetKey++;
   }
 
   onVideoMeta(event: Event): void {
