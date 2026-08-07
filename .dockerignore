@@ -1,0 +1,14 @@
+node_modules
+dist
+.angular
+.git
+playwright-report
+test-results
+e2e_tests
+.env
+.env.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
