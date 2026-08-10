@@ -1,0 +1,39 @@
+<div class="sort-filter">
+  <button
+    class="sort-filter__trigger"
+    (click)="toggleOpen()"
+    [class.sort-filter__trigger--active]="selectedSort">
+    <span class="sort-filter__trigger-label">
+      Sort by: <strong>{{ selectedSortLabel || 'None' }}</strong>
+    </span>
+    <svg class="sort-filter__trigger-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none">
+      <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div class="sort-filter__dropdown" *ngIf="isOpen">
+    <div class="sort-filter__menu">
+      <div class="sort-filter__menu-group">
+        <button
+          *ngFor="let option of sortOptions"
+          class="sort-filter__menu-item"
+          [class.sort-filter__menu-item--selected]="selectedSort === option.id"
+          (click)="selectSort(option.id)">
+          <span class="sort-filter__menu-item-radio">
+            <span *ngIf="selectedSort === option.id" class="sort-filter__menu-item-radio-dot"></span>
+          </span>
+          <span class="sort-filter__menu-item-label">{{ option.label }}</span>
+        </button>
+      </div>
+
+      <div class="sort-filter__menu-divider" *ngIf="selectedSort"></div>
+
+      <button
+        *ngIf="selectedSort"
+        class="sort-filter__menu-item sort-filter__menu-item--clear"
+        (click)="clearSort()">
+        <span class="sort-filter__menu-item-label">Clear</span>
+      </button>
+    </div>
+  </div>
+</div>

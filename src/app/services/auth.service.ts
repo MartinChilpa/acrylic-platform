@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, of, switchMap, throwError } from 'rxjs';
 import { AuthUtils } from '../utils/auth.utils';
 import { NavigationService } from './navigation.service';
+import { AmplitudeService } from './amplitude.service';
 import { ISignInResponse } from '../interfaces/response/sign-in.response';
 import { TranslocoService } from '@jsverse/transloco';
 
@@ -17,7 +18,7 @@ export class AuthService {
 
   private _http = inject(HttpClient);
   private _navigationService = inject(NavigationService);
-  private _translocoService = inject(TranslocoService);
+  private _amplitudeService = inject(AmplitudeService);
   public IsLoggedIn: WritableSignal<boolean> = signal(false);
 
   constructor() {
@@ -65,9 +66,20 @@ export class AuthService {
         return this.getAccountProfile().pipe(
           map((profile: any) => {
             this.userType = (profile?.user_type ?? '').toString();
-            const language = profile?.language ?? 'en';
-            this._translocoService.setActiveLang(language);
-            localStorage.setItem('activeLanguage', language);
+            const uuid = profile?.uuid;
+            if (uuid) {
+              this._amplitudeService.identifyUser(uuid);
+              this._amplitudeService.setUserProperties({
+                user_type: profile?.user_type,
+                club_name: profile?.club?.club_name,
+                club_id: profile?.club?.uuid,
+                country_code: profile?.country_code,
+                contract_signed: profile?.contract_signed,
+                is_active: profile?.is_active,
+                created_date: profile?.created,
+              });
+              this._amplitudeService.trackEvent('Login Succeeded', { userType: this.userType });
+            }
             return response;
           }),
           catchError((error) => {
@@ -81,6 +93,8 @@ export class AuthService {
   }
 
   signOut() {
+    this._amplitudeService.trackEvent('Logout');
+    this._amplitudeService.resetUser();
     this.endSession();
     this._navigationService.navigateToSignIn();
   }

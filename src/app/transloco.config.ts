@@ -6,14 +6,10 @@ import { tap, catchError } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
-	constructor(private http: HttpClient) {
-		console.log('TranslocoHttpLoader instantiated');
-	}
+	constructor(private http: HttpClient) {}
 
 	getTranslation(lang: string): Observable<Translation> {
-		console.log(`TranslocoHttpLoader.getTranslation called for lang: ${lang}`);
 		return this.http.get<Translation>(`/assets/i18n/${lang}.json`).pipe(
-			tap(() => console.log(`Loaded i18n/${lang}.json successfully`)),
 			catchError((err) => {
 				console.error(`Failed to load i18n/${lang}.json:`, err);
 				throw err;
@@ -28,10 +24,8 @@ export class TranslocoInitializer {
 
 	init(): void {
 		const storedLang = localStorage.getItem('activeLanguage') || 'en';
-		console.log(`[TranslocoInitializer] Initializing with language: ${storedLang}`);
 		this.transloco.setDefaultLang(storedLang);
 		this.transloco.setActiveLang(storedLang);
-		console.log(`[TranslocoInitializer] Active language set to: ${this.transloco.getActiveLang()}`);
 	}
 }
 

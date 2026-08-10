@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { LicenseService } from '../../../../../services/license.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
@@ -43,6 +43,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
   private projectsService = inject(ProjectsService);
   private licenseService = inject(LicenseService);
   private brandingService = inject(TeamBrandingService);
+  private transloco = inject(TranslocoService);
 
   licenses: LicenseEntry[] = [];
   selectedLicense: LicenseEntry | null = null;
@@ -140,7 +141,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
     if (daysLeft <= 0) {
       return { label: null, overdue: true };
     }
-    return { label: `${daysLeft} ${daysLeft === 1 ? 'day' : 'days'} left`, overdue: false };
+    return { label: `${daysLeft} ${daysLeft === 1 ? 'día' : 'días'} restante`, overdue: false };
   }
 
   selectLicense(license: LicenseEntry): void {
@@ -161,12 +162,13 @@ export class LicensesComponent implements OnInit, OnDestroy {
 
   getStatusLabel(status: string): string {
     const map: Record<string, string> = {
-      'confirmed': 'Confirmed',
-      'requested': 'Requested',
-      'needs-attention': 'Needs Attention',
-      'pending': 'Pending',
+      'confirmed': 'licenses.status.confirmed',
+      'requested': 'licenses.status.requested',
+      'needs-attention': 'licenses.status.needsAttention',
+      'pending': 'licenses.status.pending',
     };
-    return map[status] ?? status;
+    const key = map[status] ?? status;
+    return this.transloco.translate(key);
   }
 
   getTierClass(type: string): string {
@@ -307,7 +309,10 @@ export class LicensesComponent implements OnInit, OnDestroy {
 
   getCampaignStatusLabel(lic: LicenseEntry): string {
     const count = this.getCampaignSubmittedCount(lic);
-    return count > 0 ? `${count}+ submitted` : 'Pending';
+    if (count > 0) {
+      return `${count}+ ${this.transloco.translate('licenses.campaign.submitted')}`;
+    }
+    return this.transloco.translate('licenses.campaign.pending');
   }
 
   getIconStatus(lic: LicenseEntry, platform: CampaignPlatform): IconStatus {
