@@ -2,7 +2,19 @@ import { Translation, TranslocoLoader, provideTransloco, TranslocoService } from
 import { HttpClient } from '@angular/common/http';
 import { Injectable, APP_INITIALIZER } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
+
+const SUPPORTED_LANGS = ['en', 'es', 'fr'];
+
+function normalizeLanguage(lang: string | null): string {
+	if (!lang) return 'en';
+	const normalized = lang.toString().trim().toLowerCase();
+	if (SUPPORTED_LANGS.includes(normalized)) {
+		return normalized;
+	}
+	const primary = normalized.split(/[-_]/)[0];
+	return SUPPORTED_LANGS.includes(primary) ? primary : 'en';
+}
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
@@ -12,6 +24,9 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 		return this.http.get<Translation>(`/assets/i18n/${lang}.json`).pipe(
 			catchError((err) => {
 				console.error(`Failed to load i18n/${lang}.json:`, err);
+				if (lang !== 'en') {
+					return this.http.get<Translation>(`/assets/i18n/en.json`);
+				}
 				throw err;
 			})
 		);
@@ -23,8 +38,8 @@ export class TranslocoInitializer {
 	constructor(private transloco: TranslocoService) {}
 
 	init(): void {
-		const storedLang = localStorage.getItem('activeLanguage') || 'en';
-		this.transloco.setDefaultLang(storedLang);
+		const storedLang = normalizeLanguage(localStorage.getItem('activeLanguage'));
+		this.transloco.setDefaultLang('en');
 		this.transloco.setActiveLang(storedLang);
 	}
 }
@@ -32,7 +47,7 @@ export class TranslocoInitializer {
 export const translocoProviders = [
 	provideTransloco({
 		config: {
-			availableLangs: ['en', 'es', 'fr'],
+			availableLangs: SUPPORTED_LANGS,
 			defaultLang: 'en',
 			fallbackLang: 'en',
 			reRenderOnLangChange: true,

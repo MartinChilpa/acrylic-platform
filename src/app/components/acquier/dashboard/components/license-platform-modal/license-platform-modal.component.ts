@@ -28,7 +28,7 @@ export class LicensePlatformModalComponent implements OnInit {
   @Input() coverImage: string = '';
   @Input() trackData: any = {};
   @Input() clubPlatforms: { instagram?: string; tiktok?: string; youtube?: string; other?: string } = {};
-  @Input() extendedCommercialUse: boolean = false;
+  @Input() extendedCommercialUse: boolean = true;
 
   @Output() close = new EventEmitter<void>();
   @Output() submit = new EventEmitter<{ selected_platforms: string[]; other_url?: string }>();

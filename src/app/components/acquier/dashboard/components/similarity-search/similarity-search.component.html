@@ -875,9 +875,31 @@
               </div>
             </div>
 
+            <div *ngIf="showExtendedCommercialUseOption" class="license-modal__addon-wrap">
+              <div class="license-modal__addon-label">Optional Add-On</div>
+              <div class="license-modal__addon" [class.license-modal__addon--checked]="extendedCommercialUse">
+                <input
+                  id="extended-commercial-use"
+                  type="checkbox"
+                  [(ngModel)]="extendedCommercialUse"
+                  aria-label="Extended Commercial Use"
+                />
+                <div class="license-modal__addon-body">
+                  <div class="license-modal__addon-title">Extended Commercial Use</div>
+                  <div class="license-modal__addon-subtitle">
+                    Extend usage for a commercial campaign (ex: season tickets, co-branded campaign, new jersey or sponsor announcement)
+                  </div>
+                  <div class="license-modal__addon-price">+ $300</div>
+                </div>
+              </div>
+            </div>
+
+
+
             <div class="license-modal__contact">
               <div class="license-modal__contact-text">
                 {{ 'similaritySearch.messages.needMoreRights' | transloco }}
+                hola
               </div>
               <a href="mailto:hello@acrylic.la" class="license-modal__contact-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
