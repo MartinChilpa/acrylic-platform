@@ -137,6 +137,7 @@ export class SimilaritySearchComponent implements OnInit {
 
   licenseModalTrack: any | null = null;
   licensedTrack: any | null = null;
+  extendedCommercialUse = false;
   generalTermsOpen = false;
   downloadingLicensedTrack = false;
   tagsCopied = false;
@@ -627,9 +628,19 @@ export class SimilaritySearchComponent implements OnInit {
     this.results = (this.allResults ?? []).slice(start, end);
   }
 
+  get showExtendedCommercialUseOption(): boolean {
+    const track = this.licenseModalTrack ?? {};
+    return Boolean(
+      track?.extended_commercial_use === true ||
+      track?.external_commercial_use === true ||
+      track?.extendedCommercialUse === true
+    );
+  }
+
   openLicenseTrackModal(track: any): void {
     this.licenseModalTrack = track;
     this.licensedTrack = null;
+    this.extendedCommercialUse = false;
     this.generalTermsOpen = false;
     this.amplitudeService.trackEvent('Aims License Clicked', {
       search_id: this.currentSearchId ?? 'no_search',
@@ -663,7 +674,7 @@ export class SimilaritySearchComponent implements OnInit {
     }
 
     this.trackResultInteraction(this.licenseModalTrack, 'license');
-    this.licenseService.createLicense(trackId).subscribe({
+    this.licenseService.createLicense(trackId, this.extendedCommercialUse).subscribe({
       next: (result) => {
         console.log('[SimilaritySearch] License created successfully:', result);
         this.licensedTrack = { ...this.licenseModalTrack, ...result };
@@ -690,6 +701,7 @@ export class SimilaritySearchComponent implements OnInit {
   resetLicenseFlow(): void {
     this.licenseModalTrack = null;
     this.licensedTrack = null;
+    this.extendedCommercialUse = false;
     this.generalTermsOpen = false;
     this.tagsCopied = false;
     if (this.tagsCopiedTimerId !== null) {
@@ -1076,7 +1088,32 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   private normalizeResponse(data: unknown): any[] {
-    return this.findArrayInPayload(data) ?? [];
+    const items = this.findArrayInPayload(data) ?? [];
+    return items.map((item) => this.normalizeResultItem(item));
+  }
+
+  private normalizeResultItem(item: unknown): any {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      return item;
+    }
+
+    const normalized = { ...(item as Record<string, unknown>) };
+    const externalUse = normalized['external_commercial_use'] ?? normalized['externalCommercialUse'];
+
+    if (externalUse === undefined) {
+      normalized['external_commercial_use'] = false;
+    } else if (typeof externalUse !== 'boolean') {
+      if (typeof externalUse === 'string') {
+        normalized['external_commercial_use'] = externalUse.trim().toLowerCase() === 'true';
+      } else if (typeof externalUse === 'number') {
+        normalized['external_commercial_use'] = externalUse !== 0;
+      } else {
+        normalized['external_commercial_use'] = Boolean(externalUse);
+      }
+    }
+
+    normalized['externalCommercialUse'] = normalized['external_commercial_use'];
+    return normalized;
   }
 
   private extractGlobalFileWav(data: unknown): string | null {

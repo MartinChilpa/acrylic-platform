@@ -251,6 +251,22 @@
 }
 
 /* ── Add-on ── */
+.license-modal__addon-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.license-modal__addon-label {
+  color: rgba(255, 255, 255, 0.80);
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px;
+}
+
 .license-modal__addon {
   display: flex;
   gap: 12px;
@@ -260,7 +276,6 @@
   background: rgba(255, 255, 255, 0.03);
   align-items: flex-start;
   cursor: pointer;
-  margin-top: 8px;
 }
 
 .license-modal__addon--checked {
