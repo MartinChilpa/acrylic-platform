@@ -137,6 +137,7 @@ export class SimilaritySearchComponent implements OnInit {
 
   licenseModalTrack: any | null = null;
   licensedTrack: any | null = null;
+  licenseModalSubtitle: string | null = null;
   extendedCommercialUse = false;
   generalTermsOpen = false;
   downloadingLicensedTrack = false;
@@ -640,6 +641,7 @@ export class SimilaritySearchComponent implements OnInit {
   openLicenseTrackModal(track: any): void {
     this.licenseModalTrack = track;
     this.licensedTrack = null;
+    this.licenseModalSubtitle = this.getLicenseModalSubtitle(track);
     this.extendedCommercialUse = false;
     this.generalTermsOpen = false;
     this.amplitudeService.trackEvent('Aims License Clicked', {
@@ -701,6 +703,7 @@ export class SimilaritySearchComponent implements OnInit {
   resetLicenseFlow(): void {
     this.licenseModalTrack = null;
     this.licensedTrack = null;
+    this.licenseModalSubtitle = null;
     this.extendedCommercialUse = false;
     this.generalTermsOpen = false;
     this.tagsCopied = false;
@@ -1381,13 +1384,16 @@ export class SimilaritySearchComponent implements OnInit {
     const id = this.getPriceId(this.licenseModalTrack);
     const isArtistPromo = this.getTierLabel(this.licenseModalTrack) === 'ArtistPromo' || id === 1;
 
+    const addon = this.extendedCommercialUse ? 300 : 0;
+
     if (isArtistPromo) {
-      return this.formatUsdCents(0);
+      return this.formatUsdCents(addon);
     }
 
     const baseAmount = Number.isFinite(base) && base > 0 ? base : 1500;
     if (baseAmount <= 0) return 'Free';
-    return this.formatUsd(baseAmount);
+    const total = baseAmount + addon;
+    return this.formatUsdCents(total);
   }
 
   getLicenseModalSubtitle(track: any): string {
