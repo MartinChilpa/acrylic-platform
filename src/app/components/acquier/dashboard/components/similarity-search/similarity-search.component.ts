@@ -1379,6 +1379,41 @@ export class SimilaritySearchComponent implements OnInit {
     return this.formatUsd(raw);
   }
 
+  getTrackRestrictionValue(field: 'archival' | 'youtube_restriction'): string {
+    const track = this.licenseModalTrack;
+    const candidates = field === 'archival'
+      ? ['archival', 'archival_restriction', 'archive_restriction']
+      : ['youtube_restriction', 'youtubeRestriction'];
+
+    for (const key of candidates) {
+      const value = track?.[key];
+      if (value === null || value === undefined || value === '') {
+        continue;
+      }
+      if (typeof value === 'boolean') {
+        return value ? 'Yes' : 'None';
+      }
+      const text = String(value).trim();
+      if (text) {
+        return this.normalizeRestrictionValue(text);
+      }
+    }
+
+    return 'None';
+  }
+
+  private normalizeRestrictionValue(value: string | null | undefined): string {
+    const text = (value ?? '').toString().trim();
+    if (!text) {
+      return 'None';
+    }
+    const lower = text.toLowerCase();
+    if (lower.includes('none')) {
+      return 'None';
+    }
+    return text.replace(/\s+months?$/i, '').trim() || 'None';
+  }
+
   getLicenseTotal(): string {
     const base = Number(this.licenseModalTrack?.price ?? this.licenseModalTrack?.license_price ?? this.licenseModalTrack?.price_amount);
     const id = this.getPriceId(this.licenseModalTrack);

@@ -184,5 +184,6 @@
   "licenseModal.licensePrice": "Precio de licencia",
   "licenseModal.none": "Ninguno",
   "licenseModal.emailTeam": "Envíe un correo electrónico a nuestro equipo de licencias",
-  "trackCard.audienceSnapshot": "Instantánea de Audiencia"
+  "trackCard.audienceSnapshot": "Instantánea de Audiencia",
+  "licenses.restriction.month": "meses"
 }

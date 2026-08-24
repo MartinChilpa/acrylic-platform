@@ -183,5 +183,6 @@
   "licenseModal.licensePrice": "Prix de la licence",
   "licenseModal.none": "Aucun",
   "licenseModal.emailTeam": "Envoyez un e-mail à notre équipe de licences",
-  "trackCard.audienceSnapshot": "Aperçu de l'Audience"
+  "trackCard.audienceSnapshot": "Aperçu de l'Audience",
+  "licenses.restriction.month": "mois"
 }
