@@ -183,5 +183,6 @@
   "licenses.status.needsAttention": "Needs Attention",
   "licenses.status.pending": "Pending",
   "licenses.campaign.submitted": "submitted",
-  "licenses.campaign.pending": "Pending"
+  "licenses.campaign.pending": "Pending",
+  "licenses.restriction.month": "months"
 }

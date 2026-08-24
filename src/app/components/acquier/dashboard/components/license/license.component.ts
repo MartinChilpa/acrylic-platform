@@ -12,6 +12,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 export class LicenseComponent {
   private transloco = inject(TranslocoService);
 
+  @Input() track: any | null = null;
   @Input() priceId: number | string | null | undefined;
   @Input() trackPrice: number | string | null | undefined;
   @Output() licenseClick = new EventEmitter<void>();
@@ -44,6 +45,56 @@ export class LicenseComponent {
   get ctaLabel(): string {
     if (this.theme === 'artistpromo') return this.transloco.translate('license.licenseCta');
     return this.transloco.translate('license.licenseForPrice', { price: this.displayPrice });
+  }
+
+  getArchivalRestrictionText(): string {
+    const value = this.getRestrictionValue(['archival', 'archival_restriction', 'archive_restriction']);
+    return this.buildRestrictionBadgeText('Archival Restriction', value);
+  }
+
+  getYoutubeRestrictionText(): string {
+    const value = this.getRestrictionValue(['youtube_restriction', 'youtubeRestriction']);
+    return this.buildRestrictionBadgeText('YouTube Restriction', value);
+  }
+
+  private buildRestrictionBadgeText(label: string, value: string): string {
+    const normalizedValue = this.normalizeRestrictionValue(value);
+    if (!this.shouldShowRestrictionMonths(normalizedValue)) {
+      return `${label}: ${normalizedValue}`;
+    }
+    return `${label}: ${normalizedValue} ${this.transloco.translate('licenses.restriction.month')}`;
+  }
+
+  private shouldShowRestrictionMonths(value: string): boolean {
+    if (!value) return false;
+    return !/none/i.test(value) && !/months?/i.test(value);
+  }
+
+  private normalizeRestrictionValue(value: string | null | undefined): string {
+    const text = (value ?? '').toString().trim();
+    if (!text) {
+      return 'None';
+    }
+    const lower = text.toLowerCase();
+    if (lower.includes('none')) {
+      return 'None';
+    }
+    return text.replace(/\s+months?$/i, '').trim() || 'None';
+  }
+
+  private getRestrictionValue(keys: string[]): string {
+    for (const key of keys) {
+      const value = this.track?.[key];
+      if (value === null || value === undefined || value === '') {
+        continue;
+      }
+      if (typeof value === 'boolean') {
+        return value ? 'Yes' : 'None';
+      }
+      const text = String(value).trim();
+      return text || 'None';
+    }
+    return 'None';
   }
 
 }
