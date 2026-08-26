@@ -241,8 +241,11 @@
               </div>
 
               <div class="pt2">
-                 <div class="pt2-icon-tier" [ngClass]="getTierClass(seed)">
-                  {{ getTierLabel(seed) }}
+                 <div class="tier-stack">
+                   <div class="pt2-icon-tier" [ngClass]="getTierClass(seed)">
+                    {{ getTierLabel(seed) }}
+                  </div>
+                  <span *ngIf="licensedTrackIds.has(getTrackId(seed))" class="licensed-badge licensed-badge--stacked">Licensed</span>
                 </div>
 
                 <div class="pt2-item">
@@ -319,7 +322,6 @@
                         <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
                       </ng-template>
                     </button>
-                    <span *ngIf="licensedTrackIds.has(getTrackId(seed))" class="licensed-badge">Licensed</span>
                     <button
                       type="button"
                       class="btn-section-action"
@@ -561,8 +563,11 @@
             </div>
 
             <div class="pt2">
-               <div class="pt2-icon-tier" [ngClass]="getTierClass(result)">
-                {{ getTierLabel(result) }}
+               <div class="tier-stack">
+                 <div class="pt2-icon-tier" [ngClass]="getTierClass(result)">
+                  {{ getTierLabel(result) }}
+                </div>
+                <span *ngIf="licensedTrackIds.has(getTrackId(result))" class="licensed-badge licensed-badge--stacked">Licensed</span>
               </div>
 
               <div class="pt2-item">
@@ -639,7 +644,6 @@
                       <img src="assets/images/icons/heart-plus.svg" alt="Add favorite" />
                     </ng-template>
                   </button>
-                  <span *ngIf="licensedTrackIds.has(getTrackId(result))" class="licensed-badge">Licensed</span>
                   <button
                     type="button"
                     class="btn-section-action"

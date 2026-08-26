@@ -141,7 +141,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
     if (daysLeft <= 0) {
       return { label: null, overdue: true };
     }
-    return { label: `${daysLeft} ${daysLeft === 1 ? 'día' : 'días'} restante`, overdue: false };
+    return { label: `${daysLeft} ${daysLeft === 1 ? 'day' : 'days'} left`, overdue: false };
   }
 
   selectLicense(license: LicenseEntry): void {
