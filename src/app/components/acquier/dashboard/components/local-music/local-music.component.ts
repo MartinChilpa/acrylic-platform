@@ -8,7 +8,7 @@ export interface LocalTrack {
   artist: string;
   image: string;
   countryCode: string;
-  duration: string;
+  duration?: string;
   tier: 'bid2clear' | 'preclear' | 'artistpromo';
 }
 
@@ -27,47 +27,42 @@ export class LocalMusicComponent {
   tracks: LocalTrack[] = [
     {
       id: '1',
-      title: 'No Signal Zone',
-      artist: 'Soul Jungle',
-      image: 'https://i.scdn.co/image/ab6761610000e5ebf8b0c80d26401a1f91016fc5',
-      countryCode: 'sn',
-      duration: '2:17',
+      title: 'Adriano',
+      artist: 'Ameka Zrai',
+      image: 'https://mixdecale.com/wp-content/uploads/2026/05/ameka-zrai-mixdecale.jpg',
+      countryCode: 'ci',
       tier: 'artistpromo',
     },
     {
       id: '2',
-      title: 'Open a Door',
-      artist: 'Boztown',
-      image: 'https://lastfm.freetls.fastly.net/i/u/ar0/b83844231cf0c97c121d599ffb9596c2.jpg',
-      countryCode: 'fr',
-      duration: '3:13',
+      title: 'NAS',
+      artist: 'Didi B',
+      image: 'https://skinfama.com/wp-content/uploads/2023/09/Didi-B-1-1024x1024.jpeg',
+      countryCode: 'ci',
       tier: 'artistpromo',
     },
    {
       id: '3',
-      title: 'Barca Breeze',
-      artist: 'Rosia!',
-      image: 'https://i.scdn.co/image/ab6761610000e5ebcd6a74ebd0df02840654b19c',
-      countryCode: 'gb',
-      duration: '2:44',
+      title: 'Sans Pression',
+      artist: 'Himra',
+      image: 'https://cdn.prod.website-files.com/6486dfb1011e5a5c884cf4da/69d4e7fef43fd3a0a180dd60_470326014_18472340152053191_4515865898048579381_n.jpg',
+      countryCode: 'ci',
       tier: 'artistpromo',
     },
 {
       id: '4',
-      title: 'Are you with me',
-      artist: 'Jesse Mac Cormack, Pollena',
-      image: 'https://i.scdn.co/image/ab6761610000e5eb3a840a2036cd462e5edad8c2',
-      countryCode: 'jp',
-      duration: '5:02',
-      tier: 'preclear',
+      title: 'Ye Mama',
+      artist: 'Toofan',
+      image: 'https://cdn-images.dzcdn.net/images/artist/60e7c9d880ed722a3ac6d0f8f25f944d/1900x1900-000000-80-0-0.jpg',
+      countryCode: 'tg',
+      tier: 'artistpromo',
     },
  {
       id: '5',
-      title: 'Pangolin',
-      artist: 'Em9',
-      image: 'https://i.scdn.co/image/ab6761610000e5eb1808b725a89d5ddc172201c8',
-      countryCode: 'es',
-      duration: '2:55',
+      title: 'Kabableke',
+      artist: 'Serge Beynaud',
+      image: 'https://bookingagentinfo.com/wp-content/uploads/2024/02/ab6761610000e5ebcdea6c7145cb5dfd5930512b.jpg',
+      countryCode: 'ci',
       tier: 'artistpromo',
     },
   ];
