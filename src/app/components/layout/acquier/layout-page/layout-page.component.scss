@@ -1,14 +1,22 @@
 .acquier-layout {
   display: flex;
-  height: 100%;
+  // 100dvh tracks the dynamic viewport (address bar) on iOS/Android; the
+  // 100vh line is the fallback for browsers without dvh support.
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: #0a0a0a;
 }
 
 .acquier-content {
   flex: 1;
+  // min-height/width: 0 lets this flex item shrink so overflow-y actually
+  // scrolls instead of the content being cut off with no way to scroll.
+  min-width: 0;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 
   @media (max-width: 640px) {
     padding-bottom: 60px;
