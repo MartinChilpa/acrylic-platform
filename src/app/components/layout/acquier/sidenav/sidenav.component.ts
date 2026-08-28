@@ -30,12 +30,21 @@ export class SidenavComponent {
 
   @HostListener('mouseenter')
   onMouseEnter() {
+    // On touch devices a tap fires mouseenter and would expand the sidenav,
+    // covering the whole screen. Keep it icon-only there.
+    if (this.isTouchDevice()) { return; }
     this.isExpanded.set(true);
   }
 
   @HostListener('mouseleave')
   onMouseLeave() {
     this.isExpanded.set(false);
+  }
+
+  private isTouchDevice(): boolean {
+    return typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(hover: none)').matches;
   }
 
   getLabelKey(label: string): string {

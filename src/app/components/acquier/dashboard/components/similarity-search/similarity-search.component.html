@@ -340,7 +340,7 @@
 
 
             <p class="title-audience" *ngIf="isPanelOpen(seed, 0)">{{ 'similaritySearch.sections.audienceSnapshot' | transloco }}</p>
-            <div style="display: flex;" *ngIf="isPanelOpen(seed, 0)">
+            <div class="insights-panel-row" style="display: flex;" *ngIf="isPanelOpen(seed, 0)">
               <div class="insights-section">
                 <div class="insights-row">
                   <div class="cities-double">
@@ -661,7 +661,7 @@
 
 
           <p class="title-audience" *ngIf="isPanelOpen(result, i)">{{ 'trackCard.audienceSnapshot' | transloco }}</p>
-          <div style="display: flex;" *ngIf="isPanelOpen(result, i)">
+          <div class="insights-panel-row" style="display: flex;" *ngIf="isPanelOpen(result, i)">
             <div class="insights-section">
               <div class="insights-row">
                 <div class="cities-double">

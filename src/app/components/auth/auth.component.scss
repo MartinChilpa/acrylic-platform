@@ -25,7 +25,8 @@
 }
 
 .auth-section {
-    height: calc(100vh - 70px);
+    min-height: calc(100vh - 70px);
+    min-height: calc(100dvh - 70px);
 }
 
 .auth-h-auto{

@@ -1160,6 +1160,9 @@ $row-pad: 16px;
 
 .search-input {
   flex: 1;
+  // Let the input shrink below its placeholder width so the buttons stay
+  // inside the box on narrow screens (otherwise the search button overflows).
+  min-width: 0;
   border: none;
   outline: none;
   background: transparent;
@@ -1219,12 +1222,36 @@ $row-pad: 16px;
     flex: 0 0 auto;
   }
 
+  // Expanded "Audience Snapshot" panel: stack everything so the charts don't
+  // overlap on narrow screens.
+  .insights-panel-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .insights-panel-row > acrylic-license {
+    width: 100%;
+  }
+
   .insights-row {
     grid-template-columns: 1fr;
   }
 
   .insights-section {
     width: 100%;
+  }
+
+  .insights-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .insight-card {
+    height: auto;
+    min-height: 120px;
+  }
+
+  .cities-double {
+    grid-template-columns: 1fr 1fr;
   }
 
   .gender-split {
