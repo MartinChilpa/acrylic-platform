@@ -73,6 +73,7 @@ export class SimilaritySearchComponent implements OnInit {
   
   searchQuery: string = '';
   showDropdown: boolean = false;
+  showSpotifyHint: boolean = false;
   private sameQueryCooldownMs = 3000;
   private lastQuery = '';
   private lastQueryAt = 0;
@@ -497,6 +498,8 @@ export class SimilaritySearchComponent implements OnInit {
     this.currentSearchId = crypto.randomUUID();
     this.currentSearchSubmittedAt = now;
     this.searchesWithFirstInteraction.delete(this.currentSearchId);
+    // Dismiss the Spotify → YouTube hint once a search is triggered.
+    this.showSpotifyHint = false;
 
     if (this.selectedVideoFile) {
       this.lastSearchLabel = this.selectedVideoName?.trim() || 'Uploaded video';
@@ -1037,7 +1040,8 @@ export class SimilaritySearchComponent implements OnInit {
   onSearchInputFocus(): void {
     const query = (this.searchControl.value ?? '').trim();
     this.searchQuery = query;
-    this.showDropdown = true;
+    this.showDropdown = query.length === 0;
+    this.showSpotifyHint = this.isSpotifyUrl(query);
     this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
   }
 
@@ -1047,8 +1051,20 @@ export class SimilaritySearchComponent implements OnInit {
     if (query.length > 0 && this.selectedVideoFile) {
       this.clearSelectedVideo();
     }
-    this.showDropdown = true;
+    // Hide the suggestions box as soon as the user starts typing.
+    this.showDropdown = query.length === 0;
+    // Surface the Spotify → YouTube hint as soon as a Spotify link is detected.
+    this.showSpotifyHint = this.isSpotifyUrl(query);
     this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
+  }
+
+  private isSpotifyUrl(query: string): boolean {
+    return /(^|\/\/|\.)spotify\.com/i.test((query ?? '').trim());
+  }
+
+  // Opens YouTube in a new tab while preserving the Acrylic search input.
+  openYouTube(): void {
+    window.open('https://www.youtube.com', '_blank', 'noopener,noreferrer');
   }
 
   onSearchInputBlur(): void {

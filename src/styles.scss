@@ -10,6 +10,15 @@
     url('/assets/images/bg-sports-content.png') center / cover no-repeat !important;
 }
 
+/* Full-screen shells (platform + club auth) manage their own edges. Drop the
+   global 10px body padding on those pages so 100dvh layouts fit exactly on
+   mobile (iOS/Android) instead of overflowing by the padding and leaving a
+   stray scroll gap. Other pages keep the global padding. */
+body:has(.acquier-layout),
+body:has(.auth-club-layout) {
+  padding: 0;
+}
+
 /* Current sidenav width, exposed so full-width content (e.g. the similarity
    search video preview) can size itself against the content area and react
    automatically when the sidenav expands on hover. */

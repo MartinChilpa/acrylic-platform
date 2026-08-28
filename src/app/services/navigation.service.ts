@@ -24,7 +24,13 @@ export class NavigationService {
     this._router.navigate(['brand/dashboard']);
   }
 
-  navigateToSignIn() {
+  navigateToSignIn(teamSlug?: string | null) {
+    const slug = (teamSlug ?? '').toString().trim();
+    if (slug) {
+      // Club-scoped sign-in, e.g. /auth/as-monaco-fc/sign-in
+      this._router.navigate(['auth', slug, 'sign-in']);
+      return;
+    }
     this._router.navigate(['auth/sign-in']);
   }
 

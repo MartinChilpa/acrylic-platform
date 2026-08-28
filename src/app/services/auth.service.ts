@@ -5,6 +5,7 @@ import { Observable, catchError, map, of, switchMap, throwError } from 'rxjs';
 import { AuthUtils } from '../utils/auth.utils';
 import { NavigationService } from './navigation.service';
 import { AmplitudeService } from './amplitude.service';
+import { TeamBrandingService } from './team-branding.service';
 import { ISignInResponse } from '../interfaces/response/sign-in.response';
 import { TranslocoService } from '@jsverse/transloco';
 
@@ -19,6 +20,7 @@ export class AuthService {
   private _http = inject(HttpClient);
   private _navigationService = inject(NavigationService);
   private _amplitudeService = inject(AmplitudeService);
+  private _teamBrandingService = inject(TeamBrandingService);
   public IsLoggedIn: WritableSignal<boolean> = signal(false);
 
   constructor() {
@@ -95,8 +97,11 @@ export class AuthService {
   signOut() {
     this._amplitudeService.trackEvent('Logout');
     this._amplitudeService.resetUser();
+    // Capture the club slug before clearing the session so we can send the user
+    // back to their club's sign-in (e.g. /auth/as-monaco-fc/sign-in).
+    const teamSlug = this._teamBrandingService.getStoredTeamSlugOrNull();
     this.endSession();
-    this._navigationService.navigateToSignIn();
+    this._navigationService.navigateToSignIn(teamSlug);
   }
 
   check(): Observable<boolean> {
