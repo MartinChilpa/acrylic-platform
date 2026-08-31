@@ -4,9 +4,9 @@ import { Injectable, APP_INITIALIZER } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-const SUPPORTED_LANGS = ['en', 'es', 'fr'];
+export const SUPPORTED_LANGS = ['en', 'es', 'fr'];
 
-function normalizeLanguage(lang: string | null): string {
+export function normalizeLanguage(lang: string | null): string {
 	if (!lang) return 'en';
 	const normalized = lang.toString().trim().toLowerCase();
 	if (SUPPORTED_LANGS.includes(normalized)) {

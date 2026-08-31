@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { AuthService } from './auth.service';
+import { normalizeLanguage } from '../transloco.config';
 
 @Injectable({
   providedIn: 'root'
@@ -38,21 +39,29 @@ export class LanguageSyncService {
     checkLanguageChange();
   }
 
+  // Pull the account's language (account_account.language) from the backend and
+  // make it the source of truth, overriding any stale value in localStorage.
   syncLanguageFromBackend(): void {
     if (this.authService.IsLoggedIn()) {
       this.authService.getAccountProfile().subscribe({
         next: (profile: any) => {
-          const backendLang = profile?.language ?? 'en';
-          if (backendLang !== this.lastLang) {
-            localStorage.setItem('activeLanguage', backendLang);
-            this.lastLang = backendLang;
-            this.transloco.setActiveLang(backendLang);
-          }
+          this.applyLanguage(profile?.language);
         },
         error: (err) => {
           console.error('[LanguageSyncService] Failed to fetch profile:', err.status);
         }
       });
+    }
+  }
+
+  // Normalizes and applies a language (from the account profile) to both
+  // localStorage and the active Transloco language.
+  applyLanguage(lang: string | null | undefined): void {
+    const normalized = normalizeLanguage(lang ?? null);
+    if (normalized !== this.lastLang || this.transloco.getActiveLang() !== normalized) {
+      localStorage.setItem('activeLanguage', normalized);
+      this.lastLang = normalized;
+      this.transloco.setActiveLang(normalized);
     }
   }
 }

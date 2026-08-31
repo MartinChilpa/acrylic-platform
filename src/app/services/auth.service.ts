@@ -8,6 +8,7 @@ import { AmplitudeService } from './amplitude.service';
 import { TeamBrandingService } from './team-branding.service';
 import { ISignInResponse } from '../interfaces/response/sign-in.response';
 import { TranslocoService } from '@jsverse/transloco';
+import { normalizeLanguage } from '../transloco.config';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,7 @@ export class AuthService {
   private _navigationService = inject(NavigationService);
   private _amplitudeService = inject(AmplitudeService);
   private _teamBrandingService = inject(TeamBrandingService);
+  private _transloco = inject(TranslocoService);
   public IsLoggedIn: WritableSignal<boolean> = signal(false);
 
   constructor() {
@@ -68,6 +70,11 @@ export class AuthService {
         return this.getAccountProfile().pipe(
           map((profile: any) => {
             this.userType = (profile?.user_type ?? '').toString();
+            // Apply the account's language (account_account.language) so the UI
+            // matches the account, not whatever stale value is in localStorage.
+            const lang = normalizeLanguage(profile?.language ?? null);
+            localStorage.setItem('activeLanguage', lang);
+            this._transloco.setActiveLang(lang);
             const uuid = profile?.uuid;
             if (uuid) {
               this._amplitudeService.identifyUser(uuid);
