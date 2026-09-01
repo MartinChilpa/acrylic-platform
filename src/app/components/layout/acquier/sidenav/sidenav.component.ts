@@ -30,9 +30,9 @@ export class SidenavComponent {
 
   @HostListener('mouseenter')
   onMouseEnter() {
-    // On touch devices a tap fires mouseenter and would expand the sidenav,
-    // covering the whole screen. Keep it icon-only there.
-    if (this.isTouchDevice()) { return; }
+    // Don't expand on touch devices (a tap fires mouseenter) or on mobile
+    // widths, where the sidenav becomes a fixed bottom tab bar.
+    if (this.isTouchDevice() || this.isCompactViewport()) { return; }
     this.isExpanded.set(true);
   }
 
@@ -45,6 +45,10 @@ export class SidenavComponent {
     return typeof window !== 'undefined'
       && typeof window.matchMedia === 'function'
       && window.matchMedia('(hover: none)').matches;
+  }
+
+  private isCompactViewport(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth <= 640;
   }
 
   getLabelKey(label: string): string {
