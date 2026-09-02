@@ -660,38 +660,18 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   confirmLicenseHappyPath(): void {
-    console.log('[SimilaritySearch] confirmLicenseHappyPath called');
     if (!this.licenseModalTrack) {
-      console.warn('[SimilaritySearch] licenseModalTrack is null/undefined');
       return;
     }
-
-    this.licensedTrack = this.licenseModalTrack;
-    const trackId = this.licenseModalTrack?.uuid ?? this.licenseModalTrack?.track_uuid ?? this.licenseModalTrack?.id ?? this.licenseModalTrack?.track_id ?? this.licenseModalTrack?.isrc ?? this.licenseModalTrack?.spotify_id;
-    console.log('[SimilaritySearch] trackId:', trackId);
-
-    if (!trackId) {
-      console.warn('[SimilaritySearch] trackId is empty, skipping license creation');
-      return;
-    }
-
+    // Do NOT create the license here — nothing is persisted to the DB until the
+    // user actually downloads. This just opens the "Track Licensed" modal whose
+    // Download button commits the license (createLicense + mark-downloaded).
     this.trackResultInteraction(this.licenseModalTrack, 'license');
-    this.licenseService.createLicense(trackId, this.extendedCommercialUse).subscribe({
-      next: (result) => {
-        console.log('[SimilaritySearch] License created successfully:', result);
-        this.licensedTrack = { ...this.licenseModalTrack, ...result };
-        this.licenseService.addLicensedTrack(result);
-        this.modalService.hideModal('license-track-modal');
-        setTimeout(() => {
-          this.modalService.showModal('track-licensed-modal');
-        }, 350);
-      },
-      error: (err) => {
-        console.error('[SimilaritySearch] License creation failed:', err);
-        this.licensedTrack = null;
-        this.modalService.hideModal('license-track-modal');
-      }
-    });
+    this.licensedTrack = this.licenseModalTrack;
+    this.modalService.hideModal('license-track-modal');
+    setTimeout(() => {
+      this.modalService.showModal('track-licensed-modal');
+    }, 350);
   }
 
   goToLicenses(): void {
@@ -727,17 +707,42 @@ export class SimilaritySearchComponent implements OnInit {
       return;
     }
 
+    const trackUuid = this.licensedTrack?.uuid ?? this.licensedTrack?.track_uuid ?? this.licensedTrack?.id ?? this.licensedTrack?.track_id ?? this.licensedTrack?.isrc ?? this.licensedTrack?.spotify_id;
     const filename = this.getTrackDownloadFilename(this.licensedTrack, url);
     this.downloadingLicensedTrack = true;
+
+    // Persist the license only now, at download time (nothing is written to the
+    // DB when the user merely confirms). Then mark it downloaded so it appears
+    // in the Licenses tab / "licensed" tag, and finally download the file.
+    this.licenseService.createLicense(trackUuid, this.extendedCommercialUse).subscribe({
+      next: (license) => {
+        this.licenseService.markDownloaded(license.uuid).pipe(retry(1)).subscribe({
+          next: () => this.licenseService.loadLicenses(),
+          error: (err) => {
+            console.error('[SimilaritySearch] mark-downloaded failed', err);
+            this.licenseService.loadLicenses();
+          },
+        });
+        this.performLicensedDownload(url, filename);
+      },
+      error: (err) => {
+        // e.g. a license already exists for this track — still let the user
+        // download and refresh the list so it shows.
+        console.error('[SimilaritySearch] createLicense at download failed', err);
+        this.licenseService.loadLicenses();
+        this.performLicensedDownload(url, filename);
+      }
+    });
+  }
+
+  private performLicensedDownload(url: string, filename: string): void {
     this.aimsDownloadService.getPresignedDownloadUrl({ url, filename }).subscribe({
       next: (presignedUrl) => {
         if (!presignedUrl) {
           this.errorMsg = 'No se pudo descargar el track.';
           return;
         }
-
         this.triggerDownloadViaIframe(presignedUrl);
-
         this.modalService.hideModal('track-licensed-modal');
         this.resetLicenseFlow();
       },

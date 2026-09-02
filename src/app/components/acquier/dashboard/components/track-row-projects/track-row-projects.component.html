@@ -124,13 +124,24 @@
           <span class="track-panel__price" *ngIf="getTrackLicensePrice(track) as price">{{ price }}</span>
         </div>
 
-        <button
-          *ngIf="!licensed; else alreadyLicensed"
-          type="button"
-          class="track-panel__btn"
-          (click)="licenseTrack()">
-          License this track
-        </button>
+        <ng-container *ngIf="!licensed; else alreadyLicensed">
+          <button
+            *ngIf="!pendingDownload; else downloadBtn"
+            type="button"
+            class="track-panel__btn"
+            (click)="licenseTrack()">
+            License this track
+          </button>
+          <ng-template #downloadBtn>
+            <button
+              type="button"
+              class="track-panel__btn"
+              (click)="downloadTrack()"
+              [disabled]="downloadingTrack">
+              {{ downloadingTrack ? 'Downloading…' : 'Download track' }}
+            </button>
+          </ng-template>
+        </ng-container>
         <ng-template #alreadyLicensed>
           <span class="track-panel__done">
             <svg class="lic-status__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20" fill="none">

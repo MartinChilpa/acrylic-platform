@@ -19,6 +19,7 @@
   -webkit-overflow-scrolling: touch;
 
   @media (max-width: 640px) {
-    padding-bottom: 60px;
+    // Clear the fixed bottom tab bar.
+    padding-bottom: 76px;
   }
 }
