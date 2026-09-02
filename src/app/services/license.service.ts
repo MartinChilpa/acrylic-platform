@@ -56,6 +56,15 @@ export class LicenseService {
     return this.http.post<ILicenseResult>(`${this.base}/licenses/`, payload);
   }
 
+  /**
+   * Marks a license as downloaded on the backend. Only after this does the
+   * license show in GET /licenses/ (and thus in the Licenses tab / "licensed"
+   * tag). Idempotent and safe to retry.
+   */
+  markDownloaded(licenseUuid: string): Observable<ILicenseResult> {
+    return this.http.post<ILicenseResult>(`${this.base}/licenses/${licenseUuid}/mark-downloaded/`, {});
+  }
+
   getLicenses(): Observable<ICommonSuccessResponse<ILicenseResult[]>> {
     return this.http.get<ICommonSuccessResponse<ILicenseResult[]>>(`${this.base}/licenses/`);
   }

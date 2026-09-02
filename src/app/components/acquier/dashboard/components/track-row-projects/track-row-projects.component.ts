@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
-import { Subscription } from 'rxjs';
+import { Subscription, retry } from 'rxjs';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { LicenseService } from '../../../../../services/license.service';
+import { AimsDownloadService } from '../../services/aims-download.service';
 
 /**
  * Self-contained replica of the similarity-search result row, reusable anywhere
@@ -24,11 +25,16 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
 
   private projectsService = inject(ProjectsService);
   private licenseService = inject(LicenseService);
+  private aimsDownloadService = inject(AimsDownloadService);
   private subs = new Subscription();
 
   favorited = false;
   licensed = false;
   panelOpen = false;
+  // Two-step flow: "License this track" → arms download; then "Download" commits
+  // the license (createLicense + mark-downloaded) and downloads the file.
+  pendingDownload = false;
+  downloadingTrack = false;
 
   isPlaying = false;
   timerLabel = '0:00';
@@ -86,15 +92,70 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
     this.panelOpen = !this.panelOpen;
   }
 
+  // Step 1: arm the download (no DB write yet). Turns the "License this track"
+  // button into a "Download" button, matching the home flow.
   licenseTrack(): void {
     if (this.licensed) { return; }
+    this.pendingDownload = true;
+  }
+
+  // Step 2: commit the license (persist now) + mark downloaded + download.
+  downloadTrack(): void {
+    if (this.licensed || this.downloadingTrack) { return; }
     const key = this.getTrackKey();
-    if (key) {
-      this.licenseService.createLicense(key).subscribe({
-        next: (result) => this.licenseService.addLicensedTrack(result),
-        error: () => {}
-      });
-    }
+    const url = this.getTrackAudioUrl(this.track);
+    if (!key || !url) { return; }
+
+    this.downloadingTrack = true;
+    this.licenseService.createLicense(key).subscribe({
+      next: (license) => {
+        this.licenseService.markDownloaded(license.uuid).pipe(retry(1)).subscribe({
+          next: () => this.licenseService.loadLicenses(),
+          error: () => this.licenseService.loadLicenses(),
+        });
+        this.performDownload(url);
+      },
+      error: (err) => {
+        // e.g. a license already exists — still download and refresh the list.
+        console.error('[TrackRowProjects] createLicense at download failed', err);
+        this.licenseService.loadLicenses();
+        this.performDownload(url);
+      }
+    });
+  }
+
+  private performDownload(url: string): void {
+    const filename = this.getDownloadFilename(url);
+    this.aimsDownloadService.getPresignedDownloadUrl({ url, filename }).subscribe({
+      next: (presignedUrl) => {
+        if (presignedUrl) {
+          this.triggerDownloadViaIframe(presignedUrl);
+        }
+        this.pendingDownload = false;
+        this.downloadingTrack = false;
+      },
+      error: () => { this.downloadingTrack = false; },
+    });
+  }
+
+  private triggerDownloadViaIframe(url: string): void {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    window.setTimeout(() => iframe.remove(), 60000);
+  }
+
+  private getDownloadFilename(url: string): string {
+    const artist = (this.track?.artist_canonical ?? this.track?.artist ?? this.track?.artist_name ?? '').toString().trim();
+    const title = (this.track?.track_name ?? this.track?.name ?? 'track').toString().trim();
+    const base = (artist ? `${artist} - ${title}` : title)
+      .replace(/[\\/:*?"<>|]+/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 120) || 'track';
+    const ext = url.toLowerCase().includes('.mp3') ? '.mp3' : '.wav';
+    return base.toLowerCase().endsWith(ext) ? base : `${base}${ext}`;
   }
 
   getTrackLicensePrice(track: any): string | null {
