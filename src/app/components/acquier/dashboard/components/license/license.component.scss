@@ -41,6 +41,15 @@
   --btn-color: #000000;
 }
 
+/* PreClear Price tier (Figma "node-id=912-63853&m=dev"): primary #023185. */
+.license-theme--preclear {
+  --license-bg: rgba(2, 49, 133, 0.30);
+  --license-accent: #023185;
+  --restriction-bg: rgba(2, 49, 133, 0.40);
+  --btn-bg: #C5DAFF;
+  --btn-color: #000000;
+}
+
 .license-theme--artistpromo {
   --license-bg: rgba(65, 108, 69, 0.30);
   --license-accent: #416C45;
@@ -104,7 +113,8 @@
   line-height: 32px;
 }
 
-.license-theme--artistpromo .licensing-box--v2 .licensing-included-label {
+.license-theme--artistpromo .licensing-box--v2 .licensing-included-label,
+.license-theme--preclear .licensing-box--v2 .licensing-included-label {
   font-family: 'Glacial IndifferenceNormal';
   font-size: 18px;
   font-style: normal;
@@ -205,6 +215,15 @@
 .license-theme .btn-license--v2 {
   background: var(--btn-bg);
   color: var(--btn-color);
+}
+
+/* Same metrics as Artist Promo; only the fixed width gives way, since
+   "License for $1,500" does not fit in 113.734px. */
+.license-theme--preclear .btn-license--v2 {
+  width: auto;
+  min-width: 113.734px;
+  max-width: 100%;
+  white-space: nowrap;
 }
 
 .restriction-badge {

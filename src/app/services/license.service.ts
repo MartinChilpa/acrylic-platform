@@ -21,6 +21,20 @@ export class LicenseService {
   private licensedTracksSubject = new BehaviorSubject<any[]>([]);
   licensedTracks$ = this.licensedTracksSubject.asObservable();
 
+  /**
+   * Tier remembered per track at license time.
+   *
+   * ILicenseResult carries no price_id / price_temp, so a license row coming
+   * back from GET /my-club/licenses/ cannot say which tier it belongs to and the
+   * Licenses tab would fall back to the Artist Promo badge and colours. We keep
+   * what the track said when it was licensed, keyed by the canonical trackKey.
+   *
+   * TODO(backend): drop this once the license rows expose the tier themselves —
+   * resolveLicenseType() already prefers any server-provided value over this.
+   */
+  private static readonly TIER_STORAGE_KEY = 'acrylic.licenseTiers';
+  private tierByTrackKey = new Map<string, string>(this.readTierStorage());
+
   /* ──────────────────────────── Licenses ──────────────────────────── */
 
   loadLicenses(): void {
@@ -85,6 +99,41 @@ export class LicenseService {
         return throwError(() => err);
       })
     );
+  }
+
+  /* ──────────────────────────── Tier memory ──────────────────────────── */
+
+  /** Record the tier a track was licensed under, so the Licenses tab can show it. */
+  rememberTier(track: any, tier: string): void {
+    const key = this.trackKey(track);
+    if (!key || !tier) { return; }
+    this.tierByTrackKey.set(key, tier);
+    this.writeTierStorage();
+  }
+
+  getRememberedTier(license: any): string | null {
+    return this.tierByTrackKey.get(this.trackKey(license)) ?? null;
+  }
+
+  private readTierStorage(): [string, string][] {
+    try {
+      const raw = localStorage.getItem(LicenseService.TIER_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return parsed && typeof parsed === 'object' ? Object.entries(parsed) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private writeTierStorage(): void {
+    try {
+      localStorage.setItem(
+        LicenseService.TIER_STORAGE_KEY,
+        JSON.stringify(Object.fromEntries(this.tierByTrackKey))
+      );
+    } catch {
+      // Storage unavailable (private window, quota) — the in-memory map still works.
+    }
   }
 
   /* ──────────────────────────── Helpers ──────────────────────────── */

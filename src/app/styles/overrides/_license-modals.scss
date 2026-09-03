@@ -15,7 +15,7 @@
   --accent: var(--tier-accent, #416C45);
   background: #141414;
   border-radius: 16px;
-  border: 4px solid #416C45;
+  border: 4px solid var(--tier-accent, #416C45);
   color: #FFF;
   padding: 0;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.50);
@@ -151,6 +151,40 @@
 }
 .license-modal__body > .license-modal__section-title:first-child {
   margin-top: 0;
+}
+
+/* ── PreClear price card (Figma "node-id=912-64091") ── */
+.license-modal__price-card {
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--price-card-border, #023185);
+  background: var(--price-card-bg, #12171F);
+}
+
+.license-modal__price-card-label {
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.license-modal__price-card-amount {
+  margin-top: 6px;
+  font-family: 'GlacialIndifferenceNormal', 'Glacial Indifference', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+  color: #FFF;
+}
+
+.license-modal__price-card-note {
+  margin-top: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.60);
 }
 
 /* ── Restrictions ── */
@@ -393,7 +427,7 @@
 }
 
 .license-modal__total-accent {
-  color: #4CAF50;
+  color: var(--total-accent, #4CAF50);
   font-family: 'GlacialIndifferenceNormal', 'Glacial Indifference', sans-serif;
   font-size: 18px;
   font-weight: 700;
@@ -438,9 +472,9 @@
   height: 40px;
   padding: 0 22px;
   border-radius: 10px;
-  border: 2px solid #416C45;
-  background: #81C784;
-  color: #000;
+  border: 2px solid var(--btn-primary-border, #416C45);
+  background: var(--btn-primary-bg, #81C784);
+  color: var(--btn-primary-color, #000);
   font-family: 'Glacial IndifferenceNormal', 'Glacial Indifference', sans-serif;
   font-size: 14px;
   font-weight: 700;
@@ -485,8 +519,8 @@
 /* ── Track Details table (Track Licensed) ── */
 .license-modal__details {
   border-radius: 10px;
-  border: 1px solid rgba(76, 175, 80, 0.20);
-  background: rgba(65, 108, 69, 0.20);
+  border: 1px solid var(--details-border, rgba(76, 175, 80, 0.20));
+  background: var(--details-bg, rgba(65, 108, 69, 0.20));
   overflow: hidden;
 }
 
@@ -510,8 +544,17 @@
   font-weight: 500;
 }
 
+/* Grouped variant: one divider between the track rows and the license rows. */
+.license-modal__details--grouped .license-modal__details-row {
+  border-bottom: none;
+}
+
+.license-modal__details--grouped .license-modal__details-row--group-end {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .license-modal__details-value--accent {
-  color: #05DB67;
+  color: var(--details-accent, #05DB67);
   font-weight: 600;
 }
 
@@ -530,7 +573,7 @@
 .license-modal__tagging-icon {
   display: inline-flex;
   align-items: center;
-  color: rgba(255, 255, 255, 0.80);
+  color: var(--icon-accent, #81C784);
   flex-shrink: 0;
 }
 
@@ -560,9 +603,9 @@
   height: 34px;
   padding: 0 16px;
   border-radius: 8px;
-  border: 1px solid #81C784;
-  background: rgba(65, 108, 69, 0.50);
-  color: #C9FDCB;
+  border: 1px solid var(--tag-btn-border, #81C784);
+  background: var(--tag-btn-bg, rgba(65, 108, 69, 0.50));
+  color: var(--tag-btn-color, #C9FDCB);
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
@@ -590,8 +633,8 @@
   margin-top: 24px;
   padding: 20px 20px;
   border-radius: 10px;
-  border: 1px solid rgba(76, 175, 80, 0.60);
-  background: rgba(76, 175, 80, 0.10);
+  border: 1px solid var(--info-card-border, rgba(76, 175, 80, 0.60));
+  background: var(--info-card-bg, rgba(76, 175, 80, 0.10));
 }
 
 .license-modal__license-details-left {
@@ -604,6 +647,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  color: var(--icon-accent, #81C784);
   flex-shrink: 0;
 }
 
