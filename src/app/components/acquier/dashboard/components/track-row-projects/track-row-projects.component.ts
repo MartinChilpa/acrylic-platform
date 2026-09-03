@@ -4,6 +4,7 @@ import { Subscription, retry } from 'rxjs';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { LicenseService } from '../../../../../services/license.service';
 import { AimsDownloadService } from '../../services/aims-download.service';
+import { isPreClearTrack } from '../../../../../utils/license-tier.utils';
 
 /**
  * Self-contained replica of the similarity-search result row, reusable anywhere
@@ -203,6 +204,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   getTierLabel(track: any): string {
+    if (isPreClearTrack(track)) return 'PreClear';
     const id = this.getPriceId(track);
     if (id === 1) return 'ArtistPromo';
     if (id === 2) return 'PreClear';
@@ -211,6 +213,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   getTierClass(track: any): string {
+    if (isPreClearTrack(track)) return 'pt2-icon-tier--preclear';
     const id = this.getPriceId(track);
     if (id === 1) return 'pt2-icon-tier--artistpromo';
     if (id === 3) return 'pt2-icon-tier--bid2clear';
@@ -219,6 +222,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   getResultThemeClass(track: any): string {
+    if (isPreClearTrack(track)) return 'result-theme--preclear';
     const id = this.getPriceId(track);
     if (id === 1) return 'result-theme--artistpromo';
     if (id === 3) return 'result-theme--bid2clear';

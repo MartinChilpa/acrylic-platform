@@ -1,6 +1,7 @@
 import { NgClass } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { PreClearPriceInput, formatTierPrice, isPreClearPrice, resolvePreClearPrice } from '../../../../../utils/license-tier.utils';
 @Component({
   selector: 'acrylic-license',
   standalone: true,
@@ -19,7 +20,26 @@ export class LicenseComponent {
   @Input() descripcion: string | null | undefined;
   @Output() licenseClick = new EventEmitter<void>();
 
+  private get preClearInput(): PreClearPriceInput {
+    return {
+      priceId: this.priceId ?? this.track?.price_id,
+      priceTemp: this.priceTemp ?? this.track?.price_temp,
+      fallbackPrice: this.trackPrice ?? this.track?.price ?? this.track?.license_price ?? this.track?.price_amount
+    };
+  }
+
+  get isPreClear(): boolean {
+    return isPreClearPrice(this.preClearInput);
+  }
+
+  /** The amount shown across the PreClear box: headline, CTA and terms. */
+  private get preClearPrice(): string {
+    const amount = resolvePreClearPrice(this.preClearInput);
+    return amount !== null ? formatTierPrice(amount) : this.displayPrice;
+  }
+
   get theme(): 'preclear' | 'artistpromo' | 'bid2clear' {
+    if (this.isPreClear) return 'preclear';
     const id = Number(this.priceId);
     if (id === 1) return 'artistpromo';
     if (id === 3) return 'bid2clear';
@@ -35,6 +55,9 @@ export class LicenseComponent {
   }
 
   get headline(): string {
+    if (this.isPreClear) {
+      return this.preClearPrice;
+    }
     if (this.priceTemp !== null && this.priceTemp !== undefined && this.priceTemp !== '') {
       const value = String(this.priceTemp).trim();
       if (value) {
@@ -45,6 +68,9 @@ export class LicenseComponent {
   }
 
   get subheadline(): string {
+    if (this.isPreClear) {
+      return this.transloco.translate('license.preClearPrice');
+    }
     const description = this.descripcion ?? this.track?.descripcion;
     if (typeof description === 'string' && description.trim()) {
       return description.trim();
@@ -55,6 +81,9 @@ export class LicenseComponent {
   }
 
   get ctaLabel(): string {
+    if (this.isPreClear) {
+      return this.transloco.translate('license.licenseForPrice', { price: this.preClearPrice });
+    }
     if (this.theme === 'artistpromo') return this.transloco.translate('license.licenseCta');
     return this.transloco.translate('license.licenseForPrice', { price: this.displayPrice });
   }

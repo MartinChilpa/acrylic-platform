@@ -26,7 +26,11 @@ const HOP_BY_HOP_RESPONSE_HEADERS = new Set([
     'te',
     'trailer',
     'transfer-encoding',
-    'upgrade'
+    'upgrade',
+    // The platform API answers 401 with `WWW-Authenticate: Basic`. Since the API is
+    // proxied under the app's own origin, forwarding it makes the browser pop up its
+    // native credentials dialog on top of our own sign-in screen.
+    'www-authenticate'
 ]);
 
 function resolvePlatformOrigin(hostname) {

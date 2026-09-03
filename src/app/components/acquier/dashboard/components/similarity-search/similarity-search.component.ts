@@ -17,6 +17,7 @@ import { TeamPlayersService, TeamPlayerDto } from '../../../../../services/team-
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { LicenseService } from '../../../../../services/license.service';
+import { formatTierPrice, getPreClearTrackPrice, isPreClearTrack } from '../../../../../utils/license-tier.utils';
 interface Suggestion {
   icon: string;
   type: string;
@@ -711,6 +712,10 @@ export class SimilaritySearchComponent implements OnInit {
     const filename = this.getTrackDownloadFilename(this.licensedTrack, url);
     this.downloadingLicensedTrack = true;
 
+    // The backend license row has no price fields, so hand the tier over now,
+    // while we still hold the track that carries price_id / price_temp.
+    this.licenseService.rememberTier(this.licensedTrack, this.getTierLabel(this.licensedTrack));
+
     // Persist the license only now, at download time (nothing is written to the
     // DB when the user merely confirms). Then mark it downloaded so it appears
     // in the Licenses tab / "licensed" tag, and finally download the file.
@@ -909,6 +914,7 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   getTierLabel(track: any): string {
+    if (isPreClearTrack(track)) return 'PreClear';
     const id = this.getPriceId(track);
     if (id === 1) return 'ArtistPromo';
     if (id === 2) return 'PreClear';
@@ -917,6 +923,7 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   getTierClass(track: any): string {
+    if (isPreClearTrack(track)) return 'pt2-icon-tier--preclear';
     const id = this.getPriceId(track);
     if (id === 1) return 'pt2-icon-tier--artistpromo';
     if (id === 3) return 'pt2-icon-tier--bid2clear';
@@ -924,6 +931,7 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   getResultThemeClass(track: any): string {
+    if (isPreClearTrack(track)) return 'result-theme--preclear';
     const id = this.getPriceId(track);
     if (id === 1) return 'result-theme--artistpromo';
     if (id === 3) return 'result-theme--bid2clear';
@@ -1378,6 +1386,43 @@ export class SimilaritySearchComponent implements OnInit {
     }).format(amount);
   }
 
+  /** "Base License" row: PreClear shows its price even when it only lives in price_temp. */
+  getBaseLicensePrice(track: any): string | null {
+    if (isPreClearTrack(track)) {
+      const amount = getPreClearTrackPrice(track);
+      if (amount !== null) return this.formatUsd(amount);
+    }
+    return this.getTrackLicensePrice(track);
+  }
+
+  get isPreClearModalTrack(): boolean {
+    return isPreClearTrack(this.licenseModalTrack);
+  }
+
+  get isPreClearLicensedTrack(): boolean {
+    return isPreClearTrack(this.licensedTrack);
+  }
+
+  /** Amount on the PreClear price card — the tier price plus the optional add-on. */
+  get preClearModalPrice(): string {
+    const amount = getPreClearTrackPrice(this.licenseModalTrack);
+    if (amount === null) return '';
+    return formatTierPrice(amount + (this.extendedCommercialUse ? 300 : 0));
+  }
+
+  getLicensedTrackFee(): string {
+    const amount = getPreClearTrackPrice(this.licensedTrack);
+    return amount !== null ? formatTierPrice(amount) : '-';
+  }
+
+  getLicenseModalCtaLabel(track: any): string {
+    const amount = isPreClearTrack(track) ? getPreClearTrackPrice(track) : null;
+    if (amount !== null) {
+      return this.transloco.translate('license.licenseForPrice', { price: formatTierPrice(amount) });
+    }
+    return this.transloco.translate('similaritySearch.modal.license');
+  }
+
   getTrackLicensePrice(track: any): string | null {
     const raw = Number(track?.price ?? track?.license_price ?? track?.price_amount);
     if (!Number.isFinite(raw) || raw <= 0) return null;
@@ -1420,9 +1465,14 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   getLicenseTotal(): string {
-    const base = Number(this.licenseModalTrack?.price ?? this.licenseModalTrack?.license_price ?? this.licenseModalTrack?.price_amount);
+    const preClearPrice = isPreClearTrack(this.licenseModalTrack)
+      ? getPreClearTrackPrice(this.licenseModalTrack)
+      : null;
+    const base = preClearPrice ?? Number(this.licenseModalTrack?.price ?? this.licenseModalTrack?.license_price ?? this.licenseModalTrack?.price_amount);
     const id = this.getPriceId(this.licenseModalTrack);
-    const isArtistPromo = this.getTierLabel(this.licenseModalTrack) === 'ArtistPromo' || id === 1;
+    // PreClear is paid up front, so it never takes the "included in subscription" path.
+    const isArtistPromo = preClearPrice === null
+      && (this.getTierLabel(this.licenseModalTrack) === 'ArtistPromo' || id === 1);
 
     const addon = this.extendedCommercialUse ? 300 : 0;
 
@@ -1437,6 +1487,7 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   getLicenseModalSubtitle(track: any): string {
+    if (isPreClearTrack(track)) return this.transloco.translate('licenseModal.payListedPrice');
     const id = this.getPriceId(track);
     if (id === 1) return this.transloco.translate('licenseModal.costIncluded');
     const price = this.getTrackLicensePrice(track);

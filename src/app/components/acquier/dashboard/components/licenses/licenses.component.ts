@@ -5,6 +5,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { LicenseService } from '../../../../../services/license.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
+import { isPreClearTrack } from '../../../../../utils/license-tier.utils';
 
 type CampaignPlatform = 'youtube' | 'instagram' | 'tiktok';
 type IconStatus = 'submitted' | 'overdue' | 'pending';
@@ -112,6 +113,9 @@ export class LicensesComponent implements OnInit, OnDestroy {
    *   - project / teamName    -> from backend (campaign/club association)
    *   - usageDue / overdue    -> derived from the backend usage-window dates
    *   - campaignLinks         -> from backend (see confirmAddLink/addCampaignLink TODO)
+   *   - licenseType           -> the tier (PreClear / ArtistPromo / Bid2Clear); until then
+   *                              resolveLicenseType() falls back to LicenseService's
+   *                              remembered tier, since ILicenseResult has no price fields
    */
   private buildEntry(track: any, index: number, teamName: string): LicenseEntry {
     const now = new Date();
@@ -123,7 +127,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
       track,
       licensedAt: now,
       licenseId: `ACR-${year}-${month}-${num}`,
-      licenseType: track.tier_label ?? track.tier ?? 'ArtistPromo',
+      licenseType: this.resolveLicenseType(track),
       whitelistingStatus: 'confirmed',
       project: '—',
       usageDue: usage.label,
@@ -169,6 +173,18 @@ export class LicensesComponent implements OnInit, OnDestroy {
     };
     const key = map[status] ?? status;
     return this.transloco.translate(key);
+  }
+
+  /**
+   * Tier for a license row, most trustworthy source first: a value the backend
+   * sent, then the track's own price fields (optimistic rows still have them),
+   * then what we recorded when the track was licensed.
+   */
+  private resolveLicenseType(track: any): string {
+    if (track?.tier_label) return track.tier_label;
+    if (track?.tier) return track.tier;
+    if (isPreClearTrack(track)) return 'PreClear';
+    return this.licenseService.getRememberedTier(track) ?? 'ArtistPromo';
   }
 
   getTierClass(type: string): string {

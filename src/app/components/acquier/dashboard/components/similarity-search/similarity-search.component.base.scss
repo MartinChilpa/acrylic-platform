@@ -295,6 +295,19 @@
 
 .result-theme--preclear {
   --tier-accent: #023185;
+  --total-accent: #60A5FA;
+  /* Licensed-flow surfaces, sampled from Figma "node-id=912-64091" / "912-64180". */
+  --icon-accent: #C5DAFF;
+  --price-card-bg: #12171F;
+  --price-card-border: #023185;
+  --details-bg: #12171F;
+  --details-border: #2A2E36;
+  --details-accent: #C5DAFF;
+  --tag-btn-bg: #092558;
+  --tag-btn-border: #C5DAFF;
+  --tag-btn-color: #FFFFFF;
+  --info-card-bg: #101A2B;
+  --info-card-border: #072761;
   --tier-bg: rgba(2, 49, 133, 0.30);
   --tier-text: #60A5FA;
   --modal-top-bg: rgba(2, 49, 133, 0.18);
