@@ -15,6 +15,8 @@ export class LicenseComponent {
   @Input() track: any | null = null;
   @Input() priceId: number | string | null | undefined;
   @Input() trackPrice: number | string | null | undefined;
+  @Input() priceTemp: number | string | null | undefined;
+  @Input() descripcion: string | null | undefined;
   @Output() licenseClick = new EventEmitter<void>();
 
   get theme(): 'preclear' | 'artistpromo' | 'bid2clear' {
@@ -33,10 +35,20 @@ export class LicenseComponent {
   }
 
   get headline(): string {
+    if (this.priceTemp !== null && this.priceTemp !== undefined && this.priceTemp !== '') {
+      const value = String(this.priceTemp).trim();
+      if (value) {
+        return value;
+      }
+    }
     return this.theme === 'artistpromo' ? 'Included' : this.displayPrice;
   }
 
   get subheadline(): string {
+    const description = this.descripcion ?? this.track?.descripcion;
+    if (typeof description === 'string' && description.trim()) {
+      return description.trim();
+    }
     if (this.theme === 'artistpromo') return this.transloco.translate('license.artistPromoLicense');
     if (this.theme === 'bid2clear') return this.transloco.translate('license.bid2clearPrice');
     return this.transloco.translate('license.artistPromoLicense');
