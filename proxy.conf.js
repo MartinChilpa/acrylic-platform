@@ -7,6 +7,10 @@
  * API is served under the app's own origin the browser would treat that as its
  * own auth challenge and pop up the native credentials dialog. Auth is handled
  * by our own sign-in screen, so the challenge must never reach the browser.
+ *
+ * The hook has to go through `configure`: this project builds with the esbuild
+ * `application` builder, so `ng serve` runs on Vite, which drives http-proxy
+ * directly and ignores http-proxy-middleware options such as `onProxyRes`.
  */
 const target = process.env.PLATFORM_API_ORIGIN || 'http://127.0.0.1:8000';
 
@@ -15,8 +19,10 @@ module.exports = {
         target,
         secure: false,
         changeOrigin: true,
-        onProxyRes: (proxyRes) => {
-            delete proxyRes.headers['www-authenticate'];
+        configure: (proxy) => {
+            proxy.on('proxyRes', (proxyRes) => {
+                delete proxyRes.headers['www-authenticate'];
+            });
         },
     },
 };
