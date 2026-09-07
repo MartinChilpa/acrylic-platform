@@ -1017,6 +1017,22 @@ export class SimilaritySearchComponent implements OnInit {
     this.sortResetKey++;
   }
 
+  /** Clear the search and its results, back to the state the page loads in. */
+  resetSearch(): void {
+    this.removeVideoSearch();
+    this.searchQuery = '';
+    this.searchControl.setValue('', { emitEvent: false });
+    this.showDropdown = false;
+    this.showSpotifyHint = false;
+    this.showSearchInfo = false;
+    this.existsInDb = null;
+    this.aimsStatusCode = null;
+    this.seedInCatalog = null;
+    this.pageNumber = 1;
+    // Let the same track be searched again right after coming back home.
+    this.lastQuery = '';
+  }
+
   onVideoMeta(event: Event): void {
     const video = event.target as HTMLVideoElement | null;
     if (!video) { return; }
@@ -2146,6 +2162,23 @@ onTrackAudioPause(track: any, index: number): void {
     const module = await import('peaks.js');
     this.peaksLib = module.default ?? module;
     return this.peaksLib;
+  }
+
+  /**
+   * Seed and run a search from outside the component — used by the featured
+   * cards on the dashboard, which hand over a Spotify track URL.
+   */
+  searchFromUrl(url: string): void {
+    const query = (url ?? '').trim();
+    if (!query) {
+      return;
+    }
+    this.clearSelectedVideo();
+    this.setQuery(query);
+    // Clicking a card is a deliberate one-off action, so it should not be
+    // rejected by the cooldown that stops the search button being hammered.
+    this.lastQuery = '';
+    this.search();
   }
 
   setQuery(query: string) {

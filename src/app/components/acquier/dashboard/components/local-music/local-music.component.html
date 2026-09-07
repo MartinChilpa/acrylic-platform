@@ -11,7 +11,14 @@
   <!-- Cards row + See all centrado verticalmente -->
   <div class="local-music__cards">
     @for (track of tracks; track track.id) {
-      <div class="lm-card">
+      <div
+        class="lm-card"
+        [class.lm-card--searchable]="isSearchable(track)"
+        [attr.role]="isSearchable(track) ? 'button' : null"
+        [attr.tabindex]="isSearchable(track) ? 0 : null"
+        (click)="onTrackClick(track)"
+        (keydown.enter)="onTrackClick(track)"
+        (keydown.space)="onTrackClick(track); $event.preventDefault()">
 
         <!-- Imagen grande + flag -->
         <div class="lm-card__img-wrap">
