@@ -77,6 +77,8 @@
 // ── Individual card (vertical) ────────────────────────────────────
 .lm-card {
   display: flex;
+  text-decoration: none;
+  color: inherit;
   flex: 1;
   flex-direction: column;
   gap: 8px;

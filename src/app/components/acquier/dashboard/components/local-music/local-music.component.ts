@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
 
 export interface LocalTrack {
@@ -11,9 +12,9 @@ export interface LocalTrack {
   duration?: string;
   tier: 'bid2clear' | 'preclear' | 'artistpromo';
   /**
-   * Spotify track URL (https://open.spotify.com/track/{id}) used to seed the
-   * similarity search when the card is clicked. An empty value leaves the card
-   * inert rather than firing a search that cannot work.
+   * Spotify track URL (https://open.spotify.com/track/{id}) the card links to,
+   * as the seed of a similarity search. An empty value leaves the card inert
+   * rather than linking to a search that cannot work.
    */
   spotifyUrl: string;
 }
@@ -21,14 +22,14 @@ export interface LocalTrack {
 @Component({
   selector: 'acrylic-local-music',
   standalone: true,
-  imports: [CommonModule, TranslocoModule],
+  imports: [CommonModule, RouterModule, TranslocoModule],
   templateUrl: './local-music.component.html',
   styleUrl: './local-music.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
 export class LocalMusicComponent {
-  /** Emits the Spotify URL of the clicked card so the dashboard can search it. */
-  @Output() trackSelected = new EventEmitter<string>();
+  /** Where a card points: the dashboard, seeded with the track's Spotify URL. */
+  readonly searchRoute = ['/brand/dashboard'];
 
   // Heights (px) for the static waveform bars
   waveBars = [4, 8, 12, 6, 10, 14, 8, 5, 12, 9, 6, 14, 10, 7, 4, 11, 8, 13, 6, 9, 12, 5, 10, 8, 14, 6, 9, 11, 4, 7];
@@ -85,11 +86,7 @@ export class LocalMusicComponent {
     return !!(track.spotifyUrl ?? '').trim();
   }
 
-  onTrackClick(track: LocalTrack): void {
-    const url = (track.spotifyUrl ?? '').trim();
-    if (!url) {
-      return;
-    }
-    this.trackSelected.emit(url);
+  searchParams(track: LocalTrack): Record<string, string> {
+    return { q: (track.spotifyUrl ?? '').trim() };
   }
 }

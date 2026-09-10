@@ -11,14 +11,13 @@
   <!-- Cards row + See all centrado verticalmente -->
   <div class="local-music__cards">
     @for (track of tracks; track track.id) {
-      <div
+      <a
         class="lm-card"
         [class.lm-card--searchable]="isSearchable(track)"
-        [attr.role]="isSearchable(track) ? 'button' : null"
-        [attr.tabindex]="isSearchable(track) ? 0 : null"
-        (click)="onTrackClick(track)"
-        (keydown.enter)="onTrackClick(track)"
-        (keydown.space)="onTrackClick(track); $event.preventDefault()">
+        [routerLink]="isSearchable(track) ? searchRoute : null"
+        [queryParams]="searchParams(track)"
+        target="_blank"
+        rel="noopener noreferrer">
 
         <!-- Imagen grande + flag -->
         <div class="lm-card__img-wrap">
@@ -52,11 +51,15 @@
         </div>
         -->
 
-      </div>
+      </a>
     }
 
     <!-- See all centrado verticalmente -->
-    <a class="local-music__see-all" href="https://linktr.ee/acrylicplaylist">{{ 'localMusic.seeAll' | transloco }} →</a>
+    <a
+      class="local-music__see-all"
+      href="https://linktr.ee/acrylicplaylist"
+      target="_blank"
+      rel="noopener noreferrer">{{ 'localMusic.seeAll' | transloco }} →</a>
   </div>
 
 </section>
