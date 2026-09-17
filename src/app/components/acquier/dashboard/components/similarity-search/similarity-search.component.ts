@@ -1802,7 +1802,7 @@ export class SimilaritySearchComponent implements OnInit {
   getSportFitIconPath(track: any): string {
     const percentage = this.getAudienceSportFitPercentage(track);
     if (percentage === null) {
-      return 'assets/images/icons/volleyball.svg';
+      return 'assets/images/icons/range/volleyball-m.svg';
     }
     if (percentage <= 33) {
       return 'assets/images/icons/range/volleyball-l.svg';

@@ -2,7 +2,11 @@
   <div class="track-grid">
     <div>
       <div class="header-artist">
-        <img class="thumb-image" [src]="getTrackImage(track)" [alt]="track.track_name || 'Track thumbnail'" />
+        <img
+          class="thumb-image"
+          [src]="getTrackImage(track)"
+          [alt]="track.track_name || 'Track thumbnail'"
+          (error)="onThumbError($event)" />
 
         <div class="pte1">
           <div class="title-line">
@@ -27,7 +31,7 @@
 
           <div class="pt2-item">
             <img class="pt2-icon" [src]="getAudienceSizeIconPath(track)" alt="Audience size" />
-            <span class="pt2-label" *ngIf="getAudienceSize(track) as audience">{{ audience }}</span>
+            <span class="pt2-label">{{ getAudienceSize(track) ?? '--' }}</span>
           </div>
 
           <div class="pt2-item">

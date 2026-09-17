@@ -6,6 +6,8 @@ import { AuthUtils } from '../utils/auth.utils';
 import { NavigationService } from './navigation.service';
 import { AmplitudeService } from './amplitude.service';
 import { TeamBrandingService } from './team-branding.service';
+import { ProjectsService } from './projects.service';
+import { LicenseService } from './license.service';
 import { ISignInResponse } from '../interfaces/response/sign-in.response';
 import { TranslocoService } from '@jsverse/transloco';
 import { normalizeLanguage } from '../transloco.config';
@@ -22,6 +24,8 @@ export class AuthService {
   private _navigationService = inject(NavigationService);
   private _amplitudeService = inject(AmplitudeService);
   private _teamBrandingService = inject(TeamBrandingService);
+  private _projectsService = inject(ProjectsService);
+  private _licenseService = inject(LicenseService);
   private _transloco = inject(TranslocoService);
   public IsLoggedIn: WritableSignal<boolean> = signal(false);
 
@@ -66,6 +70,9 @@ export class AuthService {
   signIn(credentials: { username: string; password: string }): Observable<ISignInResponse> {
     return this._http.post<ISignInResponse>(this.AUTH_API_URL + '/token/', credentials).pipe(
       switchMap((response: ISignInResponse) => {
+        // A previous account may still be held in memory if its session ended
+        // without signOut(); do not let the incoming one inherit it.
+        this.clearSessionScopedState();
         this.setSignInResponse(response);
         return this.getAccountProfile().pipe(
           map((profile: any) => {
@@ -140,6 +147,19 @@ export class AuthService {
     );
   }
 
+  /**
+   * Saved tracks and licenses belong to one club. Both services are root
+   * singletons, so their state outlives a session unless it is dropped here,
+   * and the next account to sign in on this browser inherits it.
+   */
+  private clearSessionScopedState(): void {
+    this._projectsService.clear();
+    this._licenseService.clear();
+    // Cache written by an earlier build; remove it so browsers that still hold
+    // one stop showing another account's saved tracks.
+    localStorage.removeItem('acrylic_favorites_cache');
+  }
+
   private setSignInResponse(response: ISignInResponse) {
     // Store the access token in the local storage
     this.accessToken = response.access;
@@ -154,6 +174,8 @@ export class AuthService {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userType');
+
+    this.clearSessionScopedState();
 
     // Set the logged in to false
     this.IsLoggedIn.set(false);
