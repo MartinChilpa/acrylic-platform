@@ -50,6 +50,11 @@ export class LicenseService {
     });
   }
 
+  /** Drop everything held in memory. Called when the session ends. */
+  clear(): void {
+    this.licensedTracksSubject.next([]);
+  }
+
   /** Add a license to the list (only called after backend confirms). */
   addLicensedTrack(license: any): void {
     const current = this.licensedTracksSubject.getValue();

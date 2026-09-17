@@ -167,12 +167,23 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
 
   /* ---------- imagery / metadata ---------- */
 
+  /** Shown when the cover art fails to load (backend sends relative paths). */
+  static readonly FALLBACK_IMAGE = 'assets/images/others/default.jpg';
+
+  onThumbError(event: Event): void {
+    const img = event.target as HTMLImageElement | null;
+    if (!img) { return; }
+    // Guard against a loop if the placeholder itself ever goes missing.
+    if (img.getAttribute('src') === TrackRowProjectsComponent.FALLBACK_IMAGE) { return; }
+    img.setAttribute('src', TrackRowProjectsComponent.FALLBACK_IMAGE);
+  }
+
   getTrackImage(track: any): string {
     const coverImage = track?.cover_image ?? track?.image_url;
     if (typeof coverImage === 'string' && coverImage.trim().length > 0) {
       return coverImage;
     }
-    return this.getThumbnailPath(track) ?? 'assets/images/others/default.jpg';
+    return this.getThumbnailPath(track) ?? TrackRowProjectsComponent.FALLBACK_IMAGE;
   }
 
   private getThumbnailPath(track: any): string | null {
@@ -294,7 +305,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
 
   getSportFitIconPath(track: any): string {
     const percentage = this.getAudienceSportFitPercentage(track);
-    if (percentage === null) { return 'assets/images/icons/volleyball.svg'; }
+    if (percentage === null) { return 'assets/images/icons/range/volleyball-m.svg'; }
     if (percentage <= 33) { return 'assets/images/icons/range/volleyball-l.svg'; }
     if (percentage <= 66) { return 'assets/images/icons/range/volleyball-m.svg'; }
     return 'assets/images/icons/range/volleyball-h.svg';

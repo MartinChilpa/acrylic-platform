@@ -19,7 +19,7 @@ import { ShareProfileComponent } from '../share-profile/share-profile.component'
   styleUrl: './my-profile-details.component.scss'
 })
 export class MyProfileDetailsComponent {
-  plusCircleImage = 'assets/images/others/plus-circle.png';
+  plusCircleImage = 'assets/images/icons/plus-circle.svg';
 
   myArtist: IMyArtist | undefined | null;
   artistSynclist!: IMyArtistSynclistResult[]

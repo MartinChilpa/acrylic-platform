@@ -10,14 +10,10 @@ export class ProjectsService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.API_URL}/${environment.VERSION}/my-club`;
   private readonly keepOnError = !environment.production;
-  private readonly favoritesStorageKey = 'acrylic_favorites_cache';
 
   private favoritesSubject = new BehaviorSubject<IFavoriteResult[]>([]);
   favorites$ = this.favoritesSubject.asObservable();
 
-  constructor() {
-    this.restoreFavoritesFromStorage();
-  }
 
   loadFavorites(): void {
     this.http.get<ICommonSuccessResponse<IFavoriteResult[]>>(`${this.base}/favorites/`).pipe(
@@ -28,7 +24,7 @@ export class ProjectsService {
     ).subscribe((res) => {
       if (!res) { return; }
       const backend: IFavoriteResult[] = Array.isArray(res) ? (res as any) : ((res as any).results ?? []);
-      this.setFavorites(this.mergeFavorites(backend, this.favoritesSubject.getValue()));
+      this.setFavorites(this.adoptTrackSnapshots(backend));
     });
   }
 
@@ -123,33 +119,34 @@ export class ProjectsService {
     return order.map(k => byKey.get(k)!);
   }
 
-  private restoreFavoritesFromStorage(): void {
-    try {
-      const raw = localStorage.getItem(this.favoritesStorageKey);
-      if (!raw) { return; }
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) { return; }
-      this.favoritesSubject.next(parsed as IFavoriteResult[]);
-    } catch {
-      // ignore invalid or inaccessible storage
+  /**
+   * Backend rows carry `track` as a UUID string; the full object only exists on
+   * optimistic entries made this session. Carry those objects onto the matching
+   * backend rows so the rich row keeps rendering — without ever keeping a local
+   * row the backend did not return, which is how another club's saved tracks
+   * used to survive into the next session.
+   */
+  private adoptTrackSnapshots(backend: IFavoriteResult[]): IFavoriteResult[] {
+    const inMemory = new Map<string, any>();
+    for (const fav of this.favoritesSubject.getValue()) {
+      const key = this.trackKey(fav);
+      if (key && fav.track && typeof fav.track === 'object') {
+        inMemory.set(key, fav.track);
+      }
     }
+    return backend.map((fav) => {
+      if (fav.track && typeof fav.track === 'object') { return fav; }
+      const snapshot = inMemory.get(this.trackKey(fav));
+      return snapshot ? { ...fav, track: snapshot } : fav;
+    });
   }
 
-  private saveFavoritesToStorage(favs: IFavoriteResult[]): void {
-    try {
-      if (!favs || !favs.length) {
-        localStorage.removeItem(this.favoritesStorageKey);
-      } else {
-        localStorage.setItem(this.favoritesStorageKey, JSON.stringify(favs));
-      }
-    } catch {
-      // ignore storage write errors
-    }
+  /** Drop everything held in memory. Called when the session ends. */
+  clear(): void {
+    this.favoritesSubject.next([]);
   }
 
   private setFavorites(favs: IFavoriteResult[]): void {
-    const merged = this.mergeFavorites(favs, []);
-    this.favoritesSubject.next(merged);
-    this.saveFavoritesToStorage(merged);
+    this.favoritesSubject.next(this.mergeFavorites(favs, []));
   }
 }
