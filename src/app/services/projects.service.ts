@@ -10,6 +10,7 @@ export class ProjectsService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.API_URL}/${environment.VERSION}/my-club`;
   private readonly keepOnError = !environment.production;
+  private readonly favoriteSnapshotsStorageKey = 'acrylic.favoriteTrackSnapshots';
 
   private favoritesSubject = new BehaviorSubject<IFavoriteResult[]>([]);
   favorites$ = this.favoritesSubject.asObservable();
@@ -32,9 +33,11 @@ export class ProjectsService {
     const previous = this.favoritesSubject.getValue();
     const key = (trackSnapshot ? this.trackKey(trackSnapshot) : '') || String(trackId);
     const existingIdx = previous.findIndex(f => this.trackKey(f) === key);
+    const previousSnapshot = this.readTrackSnapshots().get(key);
 
     if (existingIdx >= 0) {
       this.setFavorites(previous.filter((_, i) => i !== existingIdx));
+      this.forgetTrackSnapshot(key);
     } else {
       const snap = trackSnapshot ?? {};
       const numericId = Number(snap.track_id ?? snap.id);
@@ -50,6 +53,9 @@ export class ProjectsService {
         track: trackSnapshot ?? undefined,
       };
       this.setFavorites([tempFav, ...previous]);
+      if (trackSnapshot && typeof trackSnapshot === 'object') {
+        this.rememberTrackSnapshot(key, trackSnapshot);
+      }
     }
 
     return this.http.post<any>(`${this.base}/favorites/toggle/`, { track_uuid: key }).pipe(
@@ -60,6 +66,11 @@ export class ProjectsService {
           return of(null);
         }
         this.setFavorites(previous);
+        if (previousSnapshot) {
+          this.rememberTrackSnapshot(key, previousSnapshot);
+        } else {
+          this.forgetTrackSnapshot(key);
+        }
         return throwError(() => err);
       })
     );
@@ -120,30 +131,89 @@ export class ProjectsService {
   }
 
   /**
-   * Backend rows carry `track` as a UUID string; the full object only exists on
-   * optimistic entries made this session. Carry those objects onto the matching
-   * backend rows so the rich row keeps rendering — without ever keeping a local
-   * row the backend did not return, which is how another club's saved tracks
-   * used to survive into the next session.
+   * Backend rows carry `track` as a UUID string, so keep the rich search-result
+   * snapshot separately and attach it only to favorites confirmed by the
+   * backend. This preserves metrics such as audience size after a refresh while
+   * preventing cached rows from becoming favorites by themselves.
    */
   private adoptTrackSnapshots(backend: IFavoriteResult[]): IFavoriteResult[] {
-    const inMemory = new Map<string, any>();
+    const snapshots = this.readTrackSnapshots();
     for (const fav of this.favoritesSubject.getValue()) {
       const key = this.trackKey(fav);
       if (key && fav.track && typeof fav.track === 'object') {
-        inMemory.set(key, fav.track);
+        snapshots.set(key, fav.track);
       }
     }
-    return backend.map((fav) => {
-      if (fav.track && typeof fav.track === 'object') { return fav; }
-      const snapshot = inMemory.get(this.trackKey(fav));
+
+    const backendKeys = new Set<string>();
+    const hydrated = backend.map((fav) => {
+      const key = this.trackKey(fav);
+      if (key) { backendKeys.add(key); }
+      if (fav.track && typeof fav.track === 'object') {
+        if (key) { snapshots.set(key, fav.track); }
+        return fav;
+      }
+      const snapshot = snapshots.get(key);
       return snapshot ? { ...fav, track: snapshot } : fav;
     });
+
+    for (const key of snapshots.keys()) {
+      if (!backendKeys.has(key)) { snapshots.delete(key); }
+    }
+    this.writeTrackSnapshots(snapshots);
+    return hydrated;
   }
 
-  /** Drop everything held in memory. Called when the session ends. */
+  private readTrackSnapshots(): Map<string, any> {
+    try {
+      const raw = localStorage.getItem(this.favoriteSnapshotsStorageKey);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return new Map<string, any>();
+      }
+      return new Map<string, any>(Object.entries(parsed));
+    } catch {
+      return new Map<string, any>();
+    }
+  }
+
+  private writeTrackSnapshots(snapshots: Map<string, any>): void {
+    try {
+      if (!snapshots.size) {
+        localStorage.removeItem(this.favoriteSnapshotsStorageKey);
+        return;
+      }
+      localStorage.setItem(
+        this.favoriteSnapshotsStorageKey,
+        JSON.stringify(Object.fromEntries(snapshots))
+      );
+    } catch {
+      // Storage may be unavailable or full; the in-memory favorite still works.
+    }
+  }
+
+  private rememberTrackSnapshot(key: string, snapshot: any): void {
+    if (!key || !snapshot || typeof snapshot !== 'object') { return; }
+    const snapshots = this.readTrackSnapshots();
+    snapshots.set(key, snapshot);
+    this.writeTrackSnapshots(snapshots);
+  }
+
+  private forgetTrackSnapshot(key: string): void {
+    if (!key) { return; }
+    const snapshots = this.readTrackSnapshots();
+    snapshots.delete(key);
+    this.writeTrackSnapshots(snapshots);
+  }
+
+  /** Drop all session-scoped state. Called when the session ends. */
   clear(): void {
     this.favoritesSubject.next([]);
+    try {
+      localStorage.removeItem(this.favoriteSnapshotsStorageKey);
+    } catch {
+      // Storage may be unavailable; the in-memory state was still cleared.
+    }
   }
 
   private setFavorites(favs: IFavoriteResult[]): void {
