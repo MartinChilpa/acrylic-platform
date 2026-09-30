@@ -678,9 +678,14 @@
   font-weight: 400;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s;
+  transition: background 0.15s, opacity 0.15s;
 
-  &:hover {
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.06);
   }
 }
