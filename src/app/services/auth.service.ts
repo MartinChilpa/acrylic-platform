@@ -76,6 +76,7 @@ export class AuthService {
         this.setSignInResponse(response);
         return this.getAccountProfile().pipe(
           map((profile: any) => {
+            this.syncAccountContext(profile);
             this.userType = (profile?.user_type ?? '').toString();
             // Apply the account's language (account_account.language) so the UI
             // matches the account, not whatever stale value is in localStorage.
@@ -158,6 +159,12 @@ export class AuthService {
     // Cache written by an earlier build; remove it so browsers that still hold
     // one stop showing another account's saved tracks.
     localStorage.removeItem('acrylic_favorites_cache');
+  }
+
+  /** Keep browser-persisted project metadata isolated to this account. */
+  syncAccountContext(profile: any): void {
+    const scope = profile?.uuid ?? profile?.club?.uuid;
+    this._projectsService.setSnapshotScope(scope?.toString());
   }
 
   private setSignInResponse(response: ISignInResponse) {

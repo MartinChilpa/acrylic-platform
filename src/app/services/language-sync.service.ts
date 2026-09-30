@@ -45,6 +45,7 @@ export class LanguageSyncService {
     if (this.authService.IsLoggedIn()) {
       this.authService.getAccountProfile().subscribe({
         next: (profile: any) => {
+          this.authService.syncAccountContext(profile);
           this.applyLanguage(profile?.language);
         },
         error: (err) => {

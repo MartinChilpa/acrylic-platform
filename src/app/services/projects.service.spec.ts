@@ -5,7 +5,10 @@ import { TestBed } from '@angular/core/testing';
 import { ProjectsService } from './projects.service';
 
 describe('ProjectsService', () => {
-  const snapshotsStorageKey = 'acrylic.favoriteTrackSnapshots';
+  const snapshotsStoragePrefix = 'acrylic.favoriteTrackSnapshots';
+  const snapshotsScopeKey = 'acrylic.favoriteTrackSnapshots.scope';
+  const accountScope = 'account-1';
+  const accountStorageKey = `${snapshotsStoragePrefix}.${accountScope}`;
   const track = {
     uuid: 'track-1',
     track_name: 'Saved track',
@@ -29,7 +32,10 @@ describe('ProjectsService', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
-    localStorage.removeItem(snapshotsStorageKey);
+    localStorage.removeItem(snapshotsStoragePrefix);
+    localStorage.removeItem(snapshotsScopeKey);
+    localStorage.removeItem(accountStorageKey);
+    localStorage.removeItem(`${snapshotsStoragePrefix}.account-2`);
     TestBed.configureTestingModule({
       providers: [
         ProjectsService,
@@ -43,17 +49,21 @@ describe('ProjectsService', () => {
 
   afterEach(() => {
     http.verify();
-    localStorage.removeItem(snapshotsStorageKey);
+    localStorage.removeItem(snapshotsStoragePrefix);
+    localStorage.removeItem(snapshotsScopeKey);
+    localStorage.removeItem(accountStorageKey);
+    localStorage.removeItem(`${snapshotsStoragePrefix}.account-2`);
   });
 
-  it('restores rich track metrics for backend-confirmed favorites after memory is lost', () => {
+  it('restores rich track metrics after signing out and back into the same account', () => {
+    service.setSnapshotScope(accountScope);
     service.toggleFavorite(track.uuid, track).subscribe();
 
     http.expectOne('/api/v1/my-club/favorites/toggle/').flush({});
     http.expectOne('/api/v1/my-club/favorites/').flush({ results: [favorite] });
 
-    // Simulate the in-memory state being lost during a browser refresh.
-    (service as any).favoritesSubject.next([]);
+    service.clear();
+    service.setSnapshotScope(accountScope);
 
     let favorites: any[] = [];
     service.favorites$.subscribe((value) => { favorites = value; });
@@ -66,7 +76,8 @@ describe('ProjectsService', () => {
   });
 
   it('does not turn a cached snapshot into a favorite when the backend returns none', () => {
-    localStorage.setItem(snapshotsStorageKey, JSON.stringify({ [track.uuid]: track }));
+    service.setSnapshotScope(accountScope);
+    localStorage.setItem(accountStorageKey, JSON.stringify({ [track.uuid]: track }));
 
     let favorites: any[] = [];
     service.favorites$.subscribe((value) => { favorites = value; });
@@ -74,14 +85,31 @@ describe('ProjectsService', () => {
     http.expectOne('/api/v1/my-club/favorites/').flush({ results: [] });
 
     expect(favorites).toEqual([]);
-    expect(localStorage.getItem(snapshotsStorageKey)).toBeNull();
+    expect(localStorage.getItem(accountStorageKey)).toBeNull();
   });
 
-  it('clears persisted snapshots with the session state', () => {
-    localStorage.setItem(snapshotsStorageKey, JSON.stringify({ [track.uuid]: track }));
+  it('keeps persisted snapshots when clearing the live session', () => {
+    service.setSnapshotScope(accountScope);
+    localStorage.setItem(accountStorageKey, JSON.stringify({ [track.uuid]: track }));
 
     service.clear();
 
-    expect(localStorage.getItem(snapshotsStorageKey)).toBeNull();
+    expect(localStorage.getItem(accountStorageKey)).not.toBeNull();
+  });
+
+  it('does not expose one account snapshot to another account', () => {
+    service.setSnapshotScope(accountScope);
+    localStorage.setItem(accountStorageKey, JSON.stringify({ [track.uuid]: track }));
+
+    service.clear();
+    service.setSnapshotScope('account-2');
+
+    let favorites: any[] = [];
+    service.favorites$.subscribe((value) => { favorites = value; });
+    service.loadFavorites();
+    http.expectOne('/api/v1/my-club/favorites/').flush({ results: [favorite] });
+
+    expect(favorites).toHaveSize(1);
+    expect(favorites[0].track).toBe('track-1');
   });
 });

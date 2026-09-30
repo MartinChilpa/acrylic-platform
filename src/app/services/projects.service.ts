@@ -10,10 +10,53 @@ export class ProjectsService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.API_URL}/${environment.VERSION}/my-club`;
   private readonly keepOnError = !environment.production;
-  private readonly favoriteSnapshotsStorageKey = 'acrylic.favoriteTrackSnapshots';
+  private readonly favoriteSnapshotsStoragePrefix = 'acrylic.favoriteTrackSnapshots';
+  private readonly favoriteSnapshotsScopeKey = 'acrylic.favoriteTrackSnapshots.scope';
+  private snapshotScope = this.readStoredSnapshotScope();
 
   private favoritesSubject = new BehaviorSubject<IFavoriteResult[]>([]);
   favorites$ = this.favoritesSubject.asObservable();
+
+  /**
+   * Select the account-owned snapshot cache after /account/profile/ resolves.
+   * A scoped key lets snapshots survive logout without leaking them into the
+   * next account that signs in on the same browser.
+   */
+  setSnapshotScope(scope: string | null | undefined): void {
+    const normalized = (scope ?? '').toString().trim();
+    if (!normalized || normalized === this.snapshotScope) { return; }
+
+    const previousScope = this.snapshotScope;
+    const previousKey = this.favoriteSnapshotsStorageKey;
+    this.snapshotScope = normalized;
+
+    if (previousScope && previousScope !== normalized) {
+      this.favoritesSubject.next([]);
+    }
+
+    try {
+      localStorage.setItem(this.favoriteSnapshotsScopeKey, normalized);
+
+      // One-time migration from the unscoped cache created by the previous
+      // release. Never copy data when moving between two known accounts.
+      if (!previousScope) {
+        const legacy = localStorage.getItem(previousKey);
+        if (legacy && !localStorage.getItem(this.favoriteSnapshotsStorageKey)) {
+          localStorage.setItem(this.favoriteSnapshotsStorageKey, legacy);
+        }
+        localStorage.removeItem(previousKey);
+      }
+    } catch {
+      // Storage may be unavailable; in-memory favorites continue to work.
+    }
+
+    // The profile request can finish after /favorites/. Rehydrate rows that
+    // are already loaded once the correct account cache becomes available.
+    const current = this.favoritesSubject.getValue();
+    if (current.length) {
+      this.setFavorites(this.adoptTrackSnapshots(current));
+    }
+  }
 
 
   loadFavorites(): void {
@@ -177,6 +220,20 @@ export class ProjectsService {
     }
   }
 
+  private get favoriteSnapshotsStorageKey(): string {
+    return this.snapshotScope
+      ? `${this.favoriteSnapshotsStoragePrefix}.${encodeURIComponent(this.snapshotScope)}`
+      : this.favoriteSnapshotsStoragePrefix;
+  }
+
+  private readStoredSnapshotScope(): string | null {
+    try {
+      return localStorage.getItem(this.favoriteSnapshotsScopeKey)?.trim() || null;
+    } catch {
+      return null;
+    }
+  }
+
   private writeTrackSnapshots(snapshots: Map<string, any>): void {
     try {
       if (!snapshots.size) {
@@ -206,14 +263,12 @@ export class ProjectsService {
     this.writeTrackSnapshots(snapshots);
   }
 
-  /** Drop all session-scoped state. Called when the session ends. */
+  /**
+   * Drop only live session state. Account-scoped snapshots intentionally stay
+   * in storage so rich track metadata can be restored after the next sign-in.
+   */
   clear(): void {
     this.favoritesSubject.next([]);
-    try {
-      localStorage.removeItem(this.favoriteSnapshotsStorageKey);
-    } catch {
-      // Storage may be unavailable; the in-memory state was still cleared.
-    }
   }
 
   private setFavorites(favs: IFavoriteResult[]): void {
