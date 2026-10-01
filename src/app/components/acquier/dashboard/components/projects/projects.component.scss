@@ -303,6 +303,19 @@ $radius-sm:     8px;
   }
 }
 
+/* Same type as the page title, so the two headings read as one hierarchy. */
+.favorites__header {
+  margin-bottom: 12px;
+}
+
+.favorites__title {
+  font-family: 'Glacial Indifference', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  margin: 0;
+}
+
 .favorites__list {
   display: flex;
   flex-direction: column;

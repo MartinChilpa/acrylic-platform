@@ -1,3 +1,11 @@
+<acrylic-header
+  [teamName]="teamName"
+  [teamLogo]="teamLogo"
+  [tagline]="tagline"
+  [primaryColor]="primaryColor"
+  [secondaryColor]="secondaryColor">
+</acrylic-header>
+
 <div class="projects">
 
   <div class="projects__header">
@@ -74,7 +82,6 @@
   <div class="favorites" *ngIf="favorites.length > 0">
     <div class="favorites__header">
       <h3 class="favorites__title">{{ 'projects.savedTracks' | transloco }}</h3>
-      <span class="favorites__count">{{ favorites.length }}</span>
     </div>
     <div class="favorites__list">
       <div class="favorite-item" *ngFor="let fav of favorites">
