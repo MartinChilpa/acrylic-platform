@@ -1,3 +1,11 @@
+<acrylic-header
+  [teamName]="teamName"
+  [teamLogo]="teamLogo"
+  [tagline]="tagline"
+  [primaryColor]="primaryColor"
+  [secondaryColor]="secondaryColor">
+</acrylic-header>
+
 <div class="lic-page">
 
   <!-- Header -->
@@ -6,27 +14,27 @@
     <p class="lic-subtitle">{{ 'licenses.subtitle' | transloco }}</p>
   </div>
 
-  <!-- Stats -->
+  <!-- Summary cards -->
   <div class="lic-stats">
-    <div class="stat-card">
+    <div class="stat-card stat-card--active">
       <span class="stat-card__label">{{ 'licenses.stats.activeLicenses' | transloco }}</span>
       <span class="stat-card__value">{{ activeLicensesCount }}</span>
-      <span class="stat-card__sub">{{ 'licenses.stats.acrossAllProjects' | transloco }}</span>
+      <span class="stat-card__sub">{{ 'licenses.stats.acrossYourProjects' | transloco }}</span>
     </div>
-    <div class="stat-card">
-      <span class="stat-card__label">{{ 'licenses.stats.whitelistingInProgress' | transloco }}</span>
+    <div class="stat-card stat-card--whitelisting">
+      <span class="stat-card__label">{{ 'licenses.stats.whitelisting' | transloco }}</span>
       <span class="stat-card__value">{{ whitelistingInProgressCount }}</span>
-      <span class="stat-card__sub">{{ 'licenses.stats.awaitingDistributor' | transloco }}</span>
+      <span class="stat-card__sub">{{ 'licenses.stats.requestsSubmitted' | transloco }}</span>
     </div>
-    <div class="stat-card">
-      <span class="stat-card__label stat-card__label--dim">{{ 'licenses.stats.usageLinksDue' | transloco }}</span>
-      <span class="stat-card__value">{{ usageLinksDueCount }}</span>
-      <span class="stat-card__sub">{{ 'licenses.stats.awaitingLinks' | transloco }}</span>
+    <div class="stat-card stat-card--links">
+      <span class="stat-card__label">{{ 'licenses.stats.linksToAdd' | transloco }}</span>
+      <span class="stat-card__value stat-card__value--alert">{{ linksToAddCount }}</span>
+      <span class="stat-card__sub">{{ 'licenses.stats.forPublishedContent' | transloco }}</span>
     </div>
-    <div class="stat-card">
-      <span class="stat-card__label stat-card__label--dim">{{ 'licenses.stats.needsAttention' | transloco }}</span>
-      <span class="stat-card__value stat-card__value--alert">{{ needsAttentionCount }}</span>
-      <span class="stat-card__sub">{{ 'licenses.stats.followUpRequired' | transloco }}</span>
+    <div class="stat-card stat-card--expiring">
+      <span class="stat-card__label">{{ 'licenses.stats.expiringSoon' | transloco }}</span>
+      <span class="stat-card__value">{{ expiringSoonCount }}</span>
+      <span class="stat-card__sub">{{ 'licenses.stats.expiringWindow' | transloco }}</span>
     </div>
   </div>
 
@@ -43,7 +51,22 @@
       [placeholder]="'licenses.search.placeholder' | transloco" />
   </div>
 
-  <!-- Main content: rows (detail opens as an overlay drawer, list stays put) -->
+  <!-- Filters -->
+  <div class="lic-filters">
+    <button type="button" class="lic-chip" [class.lic-chip--on]="activeFilter === 'all'" (click)="setFilter('all')">
+      {{ 'licenses.filters.all' | transloco }} <span class="lic-chip__count">{{ activeLicensesCount }}</span>
+    </button>
+    <button type="button" class="lic-chip" [class.lic-chip--on]="activeFilter === 'links'" (click)="setFilter('links')">
+      {{ 'licenses.filters.linksToAdd' | transloco }} <span class="lic-chip__count">{{ linksToAddCount }}</span>
+    </button>
+    <button type="button" class="lic-chip" [class.lic-chip--on]="activeFilter === 'expiring'" (click)="setFilter('expiring')">
+      {{ 'licenses.filters.expiringSoon' | transloco }}
+    </button>
+  </div>
+
+  <p class="lic-count">{{ filteredLicenses.length }} {{ (filteredLicenses.length === 1 ? 'licenses.countOne' : 'licenses.countMany') | transloco }}</p>
+
+  <!-- Main content: cards (detail opens as an overlay drawer, list stays put) -->
   <div class="lic-body">
 
     <!-- Table -->
@@ -58,115 +81,80 @@
         <p class="lic-empty__sub">{{ 'licenses.empty.subtitle' | transloco }}</p>
       </div>
 
-      <!-- Column headings -->
-      <div class="lic-row-head" *ngIf="licenses.length > 0">
-        <span class="lic-row-head__col lic-row-head__col--track">{{ 'licenses.table.headers.track' | transloco }}</span>
-        <span class="lic-row-head__col lic-row-head__col--preview">{{ 'licenses.table.headers.preview' | transloco }}</span>
-        <span class="lic-row-head__col lic-row-head__col--date">{{ 'licenses.table.headers.licensed' | transloco }}</span>
-        <span class="lic-row-head__col lic-row-head__col--due">{{ 'licenses.table.headers.usageDue' | transloco }}</span>
-        <span class="lic-row-head__col lic-row-head__col--type">{{ 'licenses.table.headers.type' | transloco }}</span>
-        <span class="lic-row-head__col lic-row-head__col--status">{{ 'licenses.table.headers.whitelisting' | transloco }}</span>
-        <span class="lic-row-head__col lic-row-head__col--links">{{ 'licenses.table.headers.campaignLinks' | transloco }}</span>
-      </div>
+      <div class="lic-cards">
+        <article class="lic-card"
+                 *ngFor="let lic of filteredLicenses"
+                 [class.lic-card--active]="selectedLicense?.licenseId === lic.licenseId">
 
-      <div class="lic-rows">
-        <div class="lic-row"
-             *ngFor="let lic of filteredLicenses"
-             [class.lic-row--active]="selectedLicense?.licenseId === lic.licenseId"
-             (click)="selectLicense(lic)">
+          <!-- Identity row -->
+          <div class="lic-card__identity">
+            <img class="lic-card__cover" [src]="getTrackImage(lic.track)" [alt]="lic.track.track_name" (error)="onImgError($event)" />
 
-          <div class="lic-col-track">
-            <div class="lic-col-track__cover-wrap">
-              <img class="lic-col-track__cover" [src]="getTrackImage(lic.track)" [alt]="lic.track.track_name" (error)="onImgError($event)" />
+            <button type="button"
+                    class="lic-card__play"
+                    [ngClass]="getPlayButtonClass(lic.licenseType)"
+                    [disabled]="!canPlay(lic)"
+                    (click)="togglePlay(lic, $event)"
+                    [attr.aria-label]="isPlaying(lic) ? 'Pause' : 'Play'">
+              <svg *ngIf="!isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/>
+              </svg>
+              <svg *ngIf="isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/>
+                <rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/>
+              </svg>
+            </button>
+
+            <div class="lic-card__title-group">
+              <span class="lic-card__track">{{ lic.track.track_name || lic.track.name || '—' }}</span>
+              <span class="lic-card__artist">{{ lic.track.artist_canonical || lic.track.artist_name || '—' }}</span>
             </div>
-            <div class="lic-col-track__info">
-              <span class="lic-col-track__name">{{ lic.track.track_name || lic.track.name || '—' }}</span>
-              <span class="lic-col-track__artist">
-                <ng-container *ngIf="toFlagEmoji(getArtistCountryCode2(lic.track)) as flag">{{ flag }}&nbsp;</ng-container>
-                {{ lic.track.artist_canonical || lic.track.artist_name || '—' }}
-                <ng-container *ngIf="lic.track.track_name_track"> · {{ lic.track.track_name_track }}</ng-container>
-              </span>
+
+            <button type="button" class="lic-card__details" (click)="selectLicense(lic)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="1.8"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+              {{ 'licenses.table.details' | transloco }}
+            </button>
+          </div>
+
+          <!-- Metadata -->
+          <dl class="lic-card__meta">
+            <div class="lic-card__meta-item">
+              <dt>{{ 'licenses.meta.license' | transloco }}</dt>
+              <dd><span class="tier-badge" [class]="getTierClass(lic.licenseType)">{{ lic.licenseType }}</span></dd>
             </div>
-          </div>
-
-          <div class="lic-col-preview">
-            <div class="lic-waveform" (click)="$event.stopPropagation()">
-              <div class="lic-waveform__bars">
-                <span class="lic-waveform__bar"
-                      *ngFor="let h of getWaveformBars(lic); let i = index"
-                      [class.lic-waveform__bar--active]="isBarActive(lic, i, 32)"
-                      [style.height.px]="h"></span>
-              </div>
-              <span class="lic-waveform__time">{{ getDurationLabel(lic) }}</span>
-              <button type="button"
-                      class="lic-play-btn"
-                      [class]="getPlayButtonClass(lic.licenseType)"
-                      [disabled]="!canPlay(lic)"
-                      (click)="togglePlay(lic, $event)"
-                      [attr.aria-label]="isPlaying(lic) ? 'Pause' : 'Play'">
-                <svg *ngIf="!isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="white"/>
-                </svg>
-                <svg *ngIf="isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="white"/>
-                  <rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="white"/>
-                </svg>
-              </button>
+            <div class="lic-card__meta-item">
+              <dt>{{ 'licenses.meta.whitelisting' | transloco }}</dt>
+              <dd class="lic-card__wl" [class]="'lic-card__wl--' + lic.whitelistingStatus">{{ getStatusLabel(lic.whitelistingStatus) }}</dd>
             </div>
-          </div>
-
-          <div class="lic-col-text lic-col-date">{{ lic.licensedAt | date:'MMM d, yyyy' }}</div>
-
-          <div class="lic-col-due" [class.lic-col-due--overdue]="lic.isUsageOverdue">
-            {{ lic.isUsageOverdue ? ('licenses.table.usageOverdue' | transloco) : (lic.usageDue ?? '—') }}
-          </div>
-
-          <div class="lic-col-type">
-            <span class="tier-badge" [class]="getTierClass(lic.licenseType)">{{ lic.licenseType }}</span>
-          </div>
-
-          <div class="lic-col-status">
-            <span class="wl-status" [class]="'wl-status--' + lic.whitelistingStatus">
-              <span class="wl-dot"></span>
-              {{ getStatusLabel(lic.whitelistingStatus) }}
-            </span>
-          </div>
-
-          <div class="lic-col-links">
-            <span class="links-cell__label" [class.links-cell__label--submitted]="getCampaignSubmittedCount(lic) > 0">
-              {{ getCampaignStatusLabel(lic) }}
-            </span>
-            <div class="links-cell__icons" (click)="$event.stopPropagation()">
-              <button type="button"
-                      class="platform-icon"
-                      *ngFor="let platform of campaignPlatforms"
-                      [class]="'platform-icon--' + getIconStatus(lic, platform.key)"
-                      [attr.aria-label]="(hasLink(lic, platform.key) ? 'Open ' : 'Add ') + platform.label + ' link'"
-                      (click)="onCampaignIconClick(lic, platform.key)">
-
-                <svg *ngIf="platform.key === 'tiktok'" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.01a8.16 8.16 0 0 0 4.77 1.52V7.08a4.85 4.85 0 0 1-1-.39z" fill="currentColor"/>
-                </svg>
-                <svg *ngIf="platform.key === 'instagram'" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M3 11C3 7.229 3 5.343 4.172 4.172C5.344 3.001 7.229 3 11 3H13C16.771 3 18.657 3 19.828 4.172C20.999 5.344 21 7.229 21 11V13C21 16.771 21 18.657 19.828 19.828C18.656 20.999 16.771 21 13 21H11C7.229 21 5.343 21 4.172 19.828C3.001 18.656 3 16.771 3 13V11Z" stroke="currentColor" stroke-width="2"/>
-                  <path d="M16.5 9C17.3284 9 18 8.32843 18 7.5C18 6.67157 17.3284 6 16.5 6C15.6716 6 15 6.67157 15 7.5C15 8.32843 15.6716 9 16.5 9Z" fill="currentColor"/>
-                  <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2"/>
-                </svg>
-                <svg *ngIf="platform.key === 'youtube'" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M2 12C2 8.7 2 7.05 3.464 6.025C4.93 5 7.286 5 12 5C16.714 5 19.071 5 20.535 6.025C21.999 7.05 22 8.7 22 12C22 15.3 22 16.95 20.535 17.975C19.072 19 16.714 19 12 19C7.286 19 4.929 19 3.464 17.975C1.999 16.95 2 15.3 2 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M10.5 9.90814V14.0921C10.5003 14.146 10.5111 14.1992 10.532 14.2489C10.5528 14.2985 10.5832 14.3436 10.6215 14.3815C10.6598 14.4194 10.7051 14.4493 10.755 14.4697C10.8048 14.4901 10.8582 14.5004 10.912 14.5001C10.9931 14.5011 11.0727 14.4774 11.14 14.4321L14.315 12.3581C14.3715 12.3216 14.418 12.2715 14.4503 12.2125C14.4826 12.1534 14.4996 12.0872 14.4999 12.0199C14.5002 11.9527 14.4837 11.8863 14.452 11.827C14.4202 11.7677 14.3742 11.7172 14.318 11.6801L11.143 9.57014C11.0522 9.50938 10.9412 9.48685 10.8339 9.50744C10.7266 9.52804 10.6318 9.59009 10.57 9.68014C10.524 9.74725 10.4996 9.82679 10.5 9.90814Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
+            <div class="lic-card__meta-item">
+              <dt>{{ 'licenses.meta.licensed' | transloco }}</dt>
+              <dd>{{ lic.licensedAt | date:'d MMM yyyy' }}</dd>
             </div>
-          </div>
+            <div class="lic-card__meta-item">
+              <dt>{{ 'licenses.meta.expires' | transloco }}</dt>
+              <dd>{{ (getLicenseExpiry(lic) | date:'d MMM yyyy') ?? ('licenses.doesNotExpire' | transloco) }}</dd>
+            </div>
+          </dl>
 
-          <div class="lic-col-action">
-            <button class="lic-view-btn" (click)="selectLicense(lic); $event.stopPropagation()">{{ 'licenses.table.details' | transloco }}</button>
+          <!-- Posting links -->
+          <div class="lic-card__links" *ngIf="needsLinks(lic)">
+            <div class="lic-card__links-copy">
+              <span class="lic-card__links-title">{{ 'licenses.links.addYours' | transloco }}</span>
+              <span class="lic-card__links-sub">{{ 'licenses.links.deadline' | transloco }}</span>
+            </div>
+            <button type="button" class="lic-card__add-link" (click)="openAddLink(lic)">
+              {{ 'licenses.campaign.addLink' | transloco }}
+            </button>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   </div>
+
+  <p class="lic-footnote">{{ 'licenses.footnote' | transloco }}</p>
 
   <!-- Detail drawer (overlay) -->
   <div class="lic-drawer-backdrop" *ngIf="selectedLicense" (click)="selectedLicense = null"></div>
@@ -189,11 +177,7 @@
         </button>
       </div>
 
-      <div class="lic-panel__wl-status" [class]="'lic-panel__wl-status--' + lic.whitelistingStatus">
-        <span class="lic-panel__wl-left">
-          <span class="wl-dot" [class]="'wl-dot--' + lic.whitelistingStatus"></span>
-          <span>{{ 'licenses.panel.whitelisting' | transloco }} {{ getStatusLabel(lic.whitelistingStatus) }}</span>
-        </span>
+      <div class="lic-panel__wl-status lic-panel__wl-status--plain">
         <span class="lic-panel__wl-id">{{ lic.licenseId }}</span>
       </div>
 
@@ -230,10 +214,6 @@
       <div class="lic-panel__section">
         <div class="lic-panel__section-title">{{ 'licenses.panel.licenseDetails' | transloco }}</div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">{{ 'licenses.panel.licenseID' | transloco }}</span>
-          <span class="lic-panel__val">{{ lic.licenseId }}</span>
-        </div>
-        <div class="lic-panel__row">
           <span class="lic-panel__key">{{ 'licenses.panel.licenseType' | transloco }}</span>
           <span class="tier-badge" [class]="getTierClass(lic.licenseType)">{{ lic.licenseType }}</span>
         </div>
@@ -242,12 +222,12 @@
           <span class="lic-panel__val">{{ lic.teamName }}</span>
         </div>
         <div class="lic-panel__row">
-          <span class="lic-panel__key">{{ 'licenses.panel.projectCampaign' | transloco }}</span>
-          <span class="lic-panel__val">{{ lic.project }}</span>
-        </div>
-        <div class="lic-panel__row">
           <span class="lic-panel__key">{{ 'licenses.panel.dateLicensed' | transloco }}</span>
           <span class="lic-panel__val">{{ formatDate(lic.licensedAt) }}</span>
+        </div>
+        <div class="lic-panel__row">
+          <span class="lic-panel__key">{{ 'licenses.panel.licenseExpires' | transloco }}</span>
+          <span class="lic-panel__val">{{ (getLicenseExpiry(lic) | date:'d MMM yyyy') ?? ('licenses.doesNotExpire' | transloco) }}</span>
         </div>
       </div>
 
@@ -280,114 +260,34 @@
 
       <div class="lic-panel__divider"></div>
 
-      <!-- Whitelisting Request -->
+      <div class="lic-panel__divider"></div>
+
+      <!-- Published links -->
       <div class="lic-panel__section">
-        <div class="lic-panel__section-title">{{ 'licenses.panel.whitelistingRequest' | transloco }}</div>
-        <div class="lic-panel__row">
-          <span class="lic-panel__key">{{ 'licenses.panel.dateRequested' | transloco }}</span>
-          <span class="lic-panel__val">—</span>
+        <div class="lic-panel__section-title">{{ 'licenses.panel.publishedLinks' | transloco }}</div>
+
+        <div class="lic-panel__deadline">
+          <span class="lic-panel__deadline-title">{{ 'licenses.links.daysLeft' | transloco }}</span>
+          <span class="lic-panel__deadline-sub">{{ 'licenses.links.deadlineNote' | transloco }}</span>
         </div>
-        <div class="lic-panel__row">
-          <span class="lic-panel__key">{{ 'licenses.panel.processingWindow' | transloco }}</span>
-          <span class="lic-panel__val">{{ 'licenses.panel.processingWindowValue' | transloco }}</span>
-        </div>
-      </div>
+
+        <p class="lic-panel__links-empty" *ngIf="getCampaignSubmittedCount(lic) === 0">
+          {{ 'licenses.links.noneYet' | transloco }}
+        </p>
+
+        <button type="button"
+                class="lic-panel__add-link"
+                (click)="openAddLink(lic)">
+          {{ 'licenses.campaign.addLink' | transloco }}
+        </button>
 
       <div class="lic-panel__divider"></div>
 
-      <!-- Campaign Links and Properties -->
+      <!-- Whitelisting request -->
       <div class="lic-panel__section">
-        <div class="lic-panel__section-title">{{ 'licenses.panel.campaignLinksProperties' | transloco }}</div>
-        <div class="lic-panel__campaign-card">
-        <div class="campaign-link-row" *ngFor="let platform of campaignPlatforms">
-          <span class="campaign-link-row__icon" [class]="'platform-icon--' + getIconStatus(lic, platform.key)">
-            <svg *ngIf="platform.key === 'tiktok'" width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.01a8.16 8.16 0 0 0 4.77 1.52V7.08a4.85 4.85 0 0 1-1-.39z" fill="currentColor"/>
-            </svg>
-            <svg *ngIf="platform.key === 'instagram'" width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M3 11C3 7.229 3 5.343 4.172 4.172C5.344 3.001 7.229 3 11 3H13C16.771 3 18.657 3 19.828 4.172C20.999 5.344 21 7.229 21 11V13C21 16.771 21 18.657 19.828 19.828C18.656 20.999 16.771 21 13 21H11C7.229 21 5.343 21 4.172 19.828C3.001 18.656 3 16.771 3 13V11Z" stroke="currentColor" stroke-width="2"/>
-              <path d="M16.5 9C17.3284 9 18 8.32843 18 7.5C18 6.67157 17.3284 6 16.5 6C15.6716 6 15 6.67157 15 7.5C15 8.32843 15.6716 9 16.5 9Z" fill="currentColor"/>
-              <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            <svg *ngIf="platform.key === 'youtube'" width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M2 12C2 8.7 2 7.05 3.464 6.025C4.93 5 7.286 5 12 5C16.714 5 19.071 5 20.535 6.025C21.999 7.05 22 8.7 22 12C22 15.3 22 16.95 20.535 17.975C19.072 19 16.714 19 12 19C7.286 19 4.929 19 3.464 17.975C1.999 16.95 2 15.3 2 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M10.5 9.90814V14.0921C10.5003 14.146 10.5111 14.1992 10.532 14.2489C10.5528 14.2985 10.5832 14.3436 10.6215 14.3815C10.6598 14.4194 10.7051 14.4493 10.755 14.4697C10.8048 14.4901 10.8582 14.5004 10.912 14.5001C10.9931 14.5011 11.0727 14.4774 11.14 14.4321L14.315 12.3581C14.3715 12.3216 14.418 12.2715 14.4503 12.2125C14.4826 12.1534 14.4996 12.0872 14.4999 12.0199C14.5002 11.9527 14.4837 11.8863 14.452 11.827C14.4202 11.7677 14.3742 11.7172 14.318 11.6801L11.143 9.57014C11.0522 9.50938 10.9412 9.48685 10.8339 9.50744C10.7266 9.52804 10.6318 9.59009 10.57 9.68014C10.524 9.74725 10.4996 9.82679 10.5 9.90814Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span class="campaign-link-row__label">{{ platform.label }}</span>
-
-          <!-- Link present: green confirmation pill (opens the link) -->
-          <a *ngIf="hasLink(lic, platform.key)"
-             class="campaign-link-row__added"
-             [href]="getLinkValue(lic, platform.key)" target="_blank" rel="noopener"
-             [title]="getLinkValue(lic, platform.key)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
-              <path d="M8.5 12.5L11 15L15.5 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            {{ 'licenses.campaign.linkAdded' | transloco }}
-          </a>
-
-          <!-- Default: Add link button -->
-          <button *ngIf="!hasLink(lic, platform.key) && !isEditingLink(lic, platform.key)"
-                  type="button" class="campaign-link-row__add" (click)="startAddLink(lic, platform.key)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M9 15L15 9M11 5L12.5 3.5C14.5 1.5 17.5 1.5 19.5 3.5C21.5 5.5 21.5 8.5 19.5 10.5L18 12M13 19L11.5 20.5C9.5 22.5 6.5 22.5 4.5 20.5C2.5 18.5 2.5 15.5 4.5 13.5L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            {{ 'licenses.campaign.addLink' | transloco }}
-          </button>
-
-          <!-- Editing: inline input (no browser prompt) -->
-          <div class="campaign-link-edit" *ngIf="!hasLink(lic, platform.key) && isEditingLink(lic, platform.key)">
-            <div class="campaign-link-edit__field" [class.campaign-link-edit__field--error]="linkError">
-              <input #linkBox
-                     class="campaign-link-edit__input"
-                     type="text"
-                     [(ngModel)]="linkInput"
-                     [placeholder]="'Paste ' + platform.label + ' link'"
-                     (keyup.enter)="confirmAddLink(lic, platform.key)"
-                     (keyup.escape)="cancelAddLink()" />
-              <button type="button" class="campaign-link-edit__save" (click)="confirmAddLink(lic, platform.key)">Save</button>
-              <button type="button" class="campaign-link-edit__cancel" (click)="cancelAddLink()" aria-label="Cancel">
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-                  <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
-            <span class="campaign-link-edit__error" *ngIf="linkError">{{ linkError }}</span>
-          </div>
-        </div>
-        </div>
-      </div>
-
-      <div class="lic-panel__divider"></div>
-
-      <!-- Timeline -->
-      <div class="lic-panel__section">
-        <div class="lic-panel__section-title">{{ 'licenses.panel.timeline' | transloco }}</div>
-        <div class="lic-timeline">
-          <div class="lic-timeline__item">
-            <span class="lic-timeline__dot lic-timeline__dot--done"></span>
-            <div class="lic-timeline__content">
-              <span class="lic-timeline__label">{{ 'licenses.timeline.licenseGenerated' | transloco }}</span>
-              <span class="lic-timeline__date">{{ lic.licensedAt | date:'MMM d, yyyy · h:mm a' }}</span>
-            </div>
-          </div>
-          <div class="lic-timeline__item lic-timeline__item--muted">
-            <span class="lic-timeline__dot"></span>
-            <div class="lic-timeline__content">
-              <span class="lic-timeline__label">{{ 'licenses.timeline.whitelistingRequestSent' | transloco }}</span>
-              <span class="lic-timeline__date">—</span>
-            </div>
-          </div>
-          <div class="lic-timeline__item lic-timeline__item--muted">
-            <span class="lic-timeline__dot"></span>
-            <div class="lic-timeline__content">
-              <span class="lic-timeline__label">{{ 'licenses.timeline.distributorAcknowledged' | transloco }}</span>
-              <span class="lic-timeline__date">—</span>
-            </div>
-          </div>
-        </div>
+        <a class="lic-panel__whitelist" [href]="getWhitelistMailto(lic)">
+          {{ 'licenses.actions.requestWhitelist' | transloco }}
+        </a>
       </div>
 
       <div class="lic-panel__divider"></div>
@@ -406,3 +306,127 @@
 
   </div>
 </div>
+
+<!-- Add a published link -->
+<div class="lic-drawer-backdrop" *ngIf="addLinkLicense" (click)="closeAddLink()"></div>
+<aside class="lic-panel lic-drawer lic-addlink" *ngIf="addLinkLicense as lic">
+
+  <div class="lic-addlink__head">
+    <img class="lic-addlink__cover" [src]="getTrackImage(lic.track)" [alt]="lic.track.track_name" (error)="onImgError($event)" />
+    <button type="button"
+            class="lic-card__play"
+            [ngClass]="getPlayButtonClass(lic.licenseType)"
+            [disabled]="!canPlay(lic)"
+            (click)="togglePlay(lic, $event)"
+            [attr.aria-label]="isPlaying(lic) ? 'Pause' : 'Play'">
+      <svg *ngIf="!isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/>
+      </svg>
+      <svg *ngIf="isPlaying(lic)" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/>
+        <rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/>
+      </svg>
+    </button>
+    <div class="lic-addlink__titles">
+      <span class="lic-addlink__track">{{ lic.track.track_name || lic.track.name || '-' }}</span>
+      <span class="lic-addlink__artist">{{ lic.track.artist_canonical || lic.track.artist_name || '-' }}</span>
+    </div>
+    <button type="button" class="lic-addlink__close" (click)="closeAddLink()" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <ng-container *ngIf="addLinkPhase === 'saved'; else addLinkForm">
+    <h3 class="lic-addlink__title">{{ 'licenses.addLink.publishedLink' | transloco }}</h3>
+    <div class="lic-addlink__saved">
+      <span class="lic-addlink__saved-platform">{{ savedLinkPlatform }}</span>
+      <span class="lic-addlink__saved-url">{{ savedLinkUrl }}</span>
+    </div>
+
+    <div class="lic-addlink__flag" *ngIf="savedLinkRestricted">
+      <span class="lic-addlink__flag-title">{{ 'licenses.addLink.platformRestricted' | transloco }}</span>
+      <span class="lic-addlink__flag-body">{{ 'licenses.addLink.recordedNeedsAttention' | transloco: { platform: savedLinkPlatform } }}</span>
+    </div>
+
+    <button type="button" class="lic-addlink__ghost" *ngIf="savedLinkRestricted">
+      {{ 'licenses.actions.contactTeam' | transloco }}
+    </button>
+    <button type="button" class="lic-addlink__ghost" (click)="closeAddLink()">
+      {{ 'licenses.addLink.done' | transloco }}
+    </button>
+  </ng-container>
+
+  <ng-template #addLinkForm>
+    <h3 class="lic-addlink__title">{{ 'licenses.addLink.title' | transloco }}</h3>
+    <p class="lic-addlink__lede">{{ 'licenses.addLink.lede' | transloco }}</p>
+
+    <label class="lic-addlink__label" for="lic-post-link">{{ 'licenses.addLink.postLink' | transloco }}</label>
+    <input id="lic-post-link"
+           class="lic-addlink__input"
+           [class.lic-addlink__input--error]="addLinkIssue === 'invalid' || addLinkIssue === 'duplicate'"
+           type="text"
+           autocomplete="off"
+           [(ngModel)]="addLinkUrl"
+           (ngModelChange)="onAddLinkInput()"
+           placeholder="https://youtube.com/shorts/AbCd1234xyz" />
+
+    <p class="lic-addlink__error" *ngIf="addLinkIssue === 'invalid'">{{ 'licenses.addLink.invalid' | transloco }}</p>
+    <p class="lic-addlink__error" *ngIf="addLinkIssue === 'duplicate'">{{ 'licenses.addLink.duplicate' | transloco }}</p>
+    <p class="lic-addlink__hint" *ngIf="!addLinkIssue && addLinkPhase !== 'checking' && addLinkPhase !== 'saving'">
+      {{ 'licenses.addLink.hint' | transloco }}
+    </p>
+    <p class="lic-addlink__hint" *ngIf="addLinkPhase === 'checking'">{{ 'licenses.addLink.checkingHint' | transloco }}</p>
+    <p class="lic-addlink__hint" *ngIf="addLinkPhase === 'saving'">{{ 'licenses.addLink.savingHint' | transloco }}</p>
+
+    <button type="button" class="lic-addlink__ghost" *ngIf="addLinkIssue === 'duplicate'" (click)="viewExistingLink()">
+      {{ 'licenses.addLink.viewExisting' | transloco }}
+    </button>
+
+    <ng-container *ngIf="addLinkIssue !== 'duplicate'">
+      <div class="lic-addlink__detected" *ngIf="detectedPlatform && addLinkPhase !== 'checking'">
+        <span class="lic-addlink__detected-label">{{ 'licenses.addLink.platformDetected' | transloco }}</span>
+        <span class="lic-addlink__detected-value">{{ detectedPlatform }}</span>
+      </div>
+
+      <ng-container *ngIf="addLinkIssue === 'unknown-platform'">
+        <p class="lic-addlink__hint">{{ 'licenses.addLink.notIdentified' | transloco }}</p>
+        <label class="lic-addlink__label" for="lic-platform-name">{{ 'licenses.addLink.platformName' | transloco }}</label>
+        <input id="lic-platform-name"
+               class="lic-addlink__input"
+               type="text"
+               autocomplete="off"
+               [(ngModel)]="addLinkPlatformName"
+               placeholder="LinkedIn" />
+        <p class="lic-addlink__hint">{{ 'licenses.addLink.noPermission' | transloco }}</p>
+      </ng-container>
+
+      <div class="lic-addlink__flag" *ngIf="addLinkIssue === 'restricted'">
+        <span class="lic-addlink__flag-title">{{ 'licenses.addLink.platformRestricted' | transloco }}</span>
+        <span class="lic-addlink__flag-body">{{ 'licenses.addLink.restrictedBody' | transloco: { platform: detectedPlatform } }}</span>
+      </div>
+
+      <p class="lic-addlink__note" *ngIf="addLinkPhase === 'ready' && !addLinkIssue">
+        {{ 'licenses.addLink.noPermissionChange' | transloco }}
+      </p>
+
+      <button type="button"
+              class="lic-addlink__save"
+              [disabled]="!canSaveAddLink || addLinkPhase === 'checking' || addLinkPhase === 'saving'"
+              (click)="saveAddLink()">
+        <ng-container [ngSwitch]="addLinkPhase">
+          <ng-container *ngSwitchCase="'checking'">{{ 'licenses.addLink.checking' | transloco }}</ng-container>
+          <ng-container *ngSwitchCase="'saving'">{{ 'licenses.addLink.saving' | transloco }}</ng-container>
+          <ng-container *ngSwitchDefault>
+            {{ (addLinkIssue === 'restricted' ? 'licenses.addLink.saveAndFlag' : 'licenses.addLink.save') | transloco }}
+          </ng-container>
+        </ng-container>
+      </button>
+    </ng-container>
+
+    <button type="button" class="lic-addlink__ghost" (click)="closeAddLink()">
+      {{ 'licenses.addLink.cancel' | transloco }}
+    </button>
+  </ng-template>
+</aside>

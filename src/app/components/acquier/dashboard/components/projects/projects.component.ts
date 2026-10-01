@@ -5,16 +5,27 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { IFavoriteResult, IProjectResult } from '../../../../../interfaces/response/projects.response';
 import { TrackRowProjectsComponent } from '../track-row-projects/track-row-projects.component';
+import { TeamBrandingService } from '../../../../../services/team-branding.service';
+import { HeaderComponent } from '../../../../shared/acquier/header/header.component';
 
 @Component({
   selector: 'acrylic-projects',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoModule, TrackRowProjectsComponent],
+  imports: [CommonModule, FormsModule, TranslocoModule, TrackRowProjectsComponent, HeaderComponent],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss',
 })
 export class ProjectsComponent implements OnInit {
   private projectsService = inject(ProjectsService);
+  private brandingService = inject(TeamBrandingService);
+
+  /** Club branding for the page header, same source the dashboard uses. */
+  private initialBranding = this.brandingService.getActiveBranding();
+  teamName = this.initialBranding.teamName;
+  teamLogo = this.initialBranding.teamLogo;
+  tagline = this.initialBranding.tagline;
+  primaryColor = this.initialBranding.primaryColor;
+  secondaryColor = this.initialBranding.secondaryColor;
 
   projects: IProjectResult[] = [];
   favorites: IFavoriteResult[] = [];
@@ -25,6 +36,14 @@ export class ProjectsComponent implements OnInit {
   newProjectDesc = '';
 
   ngOnInit(): void {
+    const branding = this.brandingService.getActiveBranding();
+    this.teamName = branding.teamName;
+    this.teamLogo = branding.teamLogo;
+    this.tagline = branding.tagline;
+    this.primaryColor = branding.primaryColor;
+    this.secondaryColor = branding.secondaryColor;
+    this.brandingService.applyCssVars(branding);
+
     this.loadAll();
     this.projectsService.favorites$.subscribe((favs) => {
       this.favorites = favs;

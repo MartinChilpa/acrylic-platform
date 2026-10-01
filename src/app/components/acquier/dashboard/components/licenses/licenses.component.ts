@@ -5,9 +5,13 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ProjectsService } from '../../../../../services/projects.service';
 import { LicenseService } from '../../../../../services/license.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
+import { HeaderComponent } from '../../../../shared/acquier/header/header.component';
 import { isPreClearTrack } from '../../../../../utils/license-tier.utils';
 
 type CampaignPlatform = 'youtube' | 'instagram' | 'tiktok';
+type LicenseFilter = 'all' | 'links' | 'expiring';
+type AddLinkPhase = 'idle' | 'checking' | 'ready' | 'saving' | 'saved';
+type AddLinkIssue = null | 'invalid' | 'duplicate' | 'unknown-platform' | 'restricted';
 type IconStatus = 'submitted' | 'overdue' | 'pending';
 
 interface CampaignLink {
@@ -36,7 +40,7 @@ interface CampaignPlatformMeta {
 @Component({
   selector: 'acrylic-licenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoModule],
+  imports: [CommonModule, FormsModule, TranslocoModule, HeaderComponent],
   templateUrl: './licenses.component.html',
   styleUrl: './licenses.component.scss',
 })
@@ -50,13 +54,47 @@ export class LicensesComponent implements OnInit, OnDestroy {
   selectedLicense: LicenseEntry | null = null;
   searchQuery = '';
 
+  /** Chips above the list. */
+  activeFilter: LicenseFilter = 'all';
+
+  /** Club branding for the page header, same source the dashboard uses. */
+  private initialBranding = this.brandingService.getActiveBranding();
+  teamName = this.initialBranding.teamName;
+  teamLogo = this.initialBranding.teamLogo;
+  tagline = this.initialBranding.tagline;
+  primaryColor = this.initialBranding.primaryColor;
+  secondaryColor = this.initialBranding.secondaryColor;
+
   /** Usage window: links are due within this many days of the licensed date. */
   private readonly usageWindowDays = 30;
 
-  /** Inline "Add link" editor state (drawer). */
-  editingPlatform: { licenseId: string; platform: CampaignPlatform } | null = null;
-  linkInput = '';
-  linkError = '';
+  /** A license counts as expiring once it is this close to its archival date. */
+  private readonly expiringSoonWindowDays = 30;
+
+  /**
+   * "Add a published link" panel. One paste box identifies the platform and
+   * surfaces any license restriction before the link is recorded.
+   */
+  addLinkLicense: LicenseEntry | null = null;
+  addLinkUrl = '';
+  addLinkPlatformName = '';
+  addLinkPhase: AddLinkPhase = 'idle';
+  addLinkIssue: AddLinkIssue = null;
+  detectedPlatform: string | null = null;
+  savedLinkPlatform = '';
+  savedLinkUrl = '';
+  savedLinkRestricted = false;
+  private detectTimerId: number | null = null;
+
+  /**
+   * Platforms this license does not clear. A link to one can still be recorded,
+   * but it is flagged rather than approved.
+   * TODO(backend): read the restriction list off the license instead.
+   */
+  private static readonly RESTRICTED_PLATFORMS = new Set(['Facebook']);
+
+  /** Where whitelisting requests are sent. */
+  private static readonly WHITELIST_INBOX = 'juan@acrylic.la';
 
   readonly campaignPlatforms: CampaignPlatformMeta[] = [
     { key: 'youtube', label: 'YouTube', domains: ['youtube.com', 'youtu.be'] },
@@ -69,9 +107,10 @@ export class LicensesComponent implements OnInit, OnDestroy {
   private trackTimes = new Map<string, { current: number; duration: number }>();
 
   get filteredLicenses(): LicenseEntry[] {
+    const byChip = this.licenses.filter(l => this.matchesFilter(l));
     const q = this.searchQuery.toLowerCase();
-    if (!q) return this.licenses;
-    return this.licenses.filter(l =>
+    if (!q) return byChip;
+    return byChip.filter(l =>
       (l.track.track_name ?? '').toLowerCase().includes(q) ||
       (l.track.artist_canonical ?? l.track.artist_name ?? '').toLowerCase().includes(q) ||
       l.licenseId.toLowerCase().includes(q) ||
@@ -79,12 +118,71 @@ export class LicensesComponent implements OnInit, OnDestroy {
     );
   }
 
+  private matchesFilter(lic: LicenseEntry): boolean {
+    if (this.activeFilter === 'links') { return this.needsLinks(lic); }
+    if (this.activeFilter === 'expiring') { return this.isExpiringSoon(lic); }
+    return true;
+  }
+
+  setFilter(filter: LicenseFilter): void {
+    this.activeFilter = filter;
+  }
+
+  /** A license still waiting for the club to post its published links. */
+  needsLinks(lic: LicenseEntry): boolean {
+    return this.getCampaignSubmittedCount(lic) === 0;
+  }
+
+  isExpiringSoon(lic: LicenseEntry): boolean {
+    const expiry = this.getLicenseExpiry(lic);
+    if (!expiry) { return false; }
+    const days = (expiry.getTime() - Date.now()) / 86_400_000;
+    return days >= 0 && days <= this.expiringSoonWindowDays;
+  }
+
+  /**
+   * How long the license runs is whatever the rightsholder set as the archival
+   * window on the track (catalog_track.archival), counted from the licensed
+   * date. No archival value means the license does not expire.
+   */
+  getLicenseExpiry(lic: LicenseEntry): Date | null {
+    const months = this.readArchivalMonths(lic.track);
+    if (months === null) { return null; }
+    const expiry = new Date(lic.licensedAt);
+    expiry.setMonth(expiry.getMonth() + months);
+    return expiry;
+  }
+
+  /** Archival arrives as a month count, or a "None"/empty value for no limit. */
+  private readArchivalMonths(track: any): number | null {
+    for (const key of ['archival', 'archival_restriction', 'archive_restriction']) {
+      const raw = track?.[key];
+      if (raw === null || raw === undefined || raw === '') { continue; }
+      const text = String(raw).trim();
+      if (/none/i.test(text)) { return null; }
+      const months = Number(text.replace(/\s*months?$/i, '').trim());
+      if (Number.isFinite(months) && months > 0) { return months; }
+    }
+    return null;
+  }
+
+  get linksToAddCount(): number { return this.licenses.filter(l => this.needsLinks(l)).length; }
+  get expiringSoonCount(): number { return this.licenses.filter(l => this.isExpiringSoon(l)).length; }
+
   get activeLicensesCount(): number { return this.licenses.length; }
   get whitelistingInProgressCount(): number { return this.licenses.filter(l => l.whitelistingStatus === 'requested').length; }
   get usageLinksDueCount(): number { return this.licenses.filter(l => !l.isUsageOverdue && this.getCampaignSubmittedCount(l) === 0).length; }
   get needsAttentionCount(): number { return this.licenses.filter(l => l.whitelistingStatus === 'needs-attention' || l.isUsageOverdue).length; }
 
   ngOnInit(): void {
+    const branding = this.brandingService.getActiveBranding();
+    this.teamName = branding.teamName;
+    this.teamLogo = branding.teamLogo;
+    this.tagline = branding.tagline;
+    this.primaryColor = branding.primaryColor;
+    this.secondaryColor = branding.secondaryColor;
+    this.brandingService.applyCssVars(branding);
+
     this.licenseService.licensedTracks$.subscribe((tracks) => {
       const teamName = this.brandingService.getActiveBranding().teamName;
       this.licenses = tracks.map((track, i) => this.buildEntry(track, i, teamName));
@@ -98,6 +196,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearDetectTimer();
     this.audioEls.forEach((audio) => audio.pause());
     this.audioEls.clear();
   }
@@ -346,53 +445,184 @@ export class LicensesComponent implements OnInit, OnDestroy {
     this.selectedLicense = lic;
   }
 
-  isEditingLink(lic: LicenseEntry, platform: CampaignPlatform): boolean {
-    return this.editingPlatform?.licenseId === lic.licenseId
-      && this.editingPlatform?.platform === platform;
+  /**
+   * Whitelisting is requested by email for now: there is no endpoint for it.
+   * The message is prefilled so the licensing team can act without a reply.
+   * TODO(backend): POST the request once /my-club/licenses/<id>/whitelist/ exists.
+   */
+  getWhitelistMailto(lic: LicenseEntry): string {
+    const track = lic.track?.track_name || lic.track?.name || '-';
+    const artist = lic.track?.artist_canonical || lic.track?.artist_name || '-';
+    const subject = `Whitelist request: ${track} - ${artist}`;
+    const body = [
+      'Please request whitelisting for the track below.',
+      '',
+      `Track: ${track}`,
+      `Artist: ${artist}`,
+      `ISRC: ${lic.track?.isrc || '-'}`,
+      `License ID: ${lic.licenseId}`,
+      `License type: ${lic.licenseType}`,
+      `Club / Team: ${lic.teamName}`,
+      `Date licensed: ${this.formatDate(lic.licensedAt)}`,
+    ].join('\r\n');
+
+    return `mailto:${LicensesComponent.WHITELIST_INBOX}`
+      + `?subject=${encodeURIComponent(subject)}`
+      + `&body=${encodeURIComponent(body)}`;
   }
 
-  startAddLink(lic: LicenseEntry, platform: CampaignPlatform): void {
-    this.editingPlatform = { licenseId: lic.licenseId, platform };
-    this.linkInput = '';
-    this.linkError = '';
+  /* ─────────── Add a published link ─────────── */
+
+  openAddLink(lic: LicenseEntry): void {
+    this.addLinkLicense = lic;
+    this.addLinkUrl = '';
+    this.addLinkPlatformName = '';
+    this.addLinkPhase = 'idle';
+    this.addLinkIssue = null;
+    this.detectedPlatform = null;
   }
 
-  cancelAddLink(): void {
-    this.editingPlatform = null;
-    this.linkInput = '';
-    this.linkError = '';
+  closeAddLink(): void {
+    this.clearDetectTimer();
+    this.addLinkLicense = null;
+    this.addLinkUrl = '';
+    this.addLinkPlatformName = '';
+    this.addLinkPhase = 'idle';
+    this.addLinkIssue = null;
+    this.detectedPlatform = null;
   }
 
-  confirmAddLink(lic: LicenseEntry, platform: CampaignPlatform): void {
-    const meta = this.campaignPlatforms.find(p => p.key === platform);
-    if (!meta) { return; }
+  /** Typing restarts identification; nothing is decided until it settles. */
+  onAddLinkInput(): void {
+    this.clearDetectTimer();
+    this.addLinkIssue = null;
+    this.detectedPlatform = null;
 
-    const url = this.linkInput.trim();
+    const url = this.addLinkUrl.trim();
     if (!url) {
-      this.linkError = 'Paste a link first.';
+      this.addLinkPhase = 'idle';
       return;
     }
 
-    const isValidDomain = meta.domains.some((domain) => {
-      try {
-        const normalized = /^https?:\/\//i.test(url) ? url : `https://${url}`;
-        const host = new URL(normalized).hostname.toLowerCase();
-        return host === domain || host.endsWith(`.${domain}`);
-      } catch {
-        return false;
-      }
-    });
+    this.addLinkPhase = 'checking';
+    // TODO(backend): a real check would ask the API to identify the platform and
+    // read the license restrictions. Until that endpoint exists this resolves
+    // locally, with the short delay standing in for the round trip.
+    this.detectTimerId = window.setTimeout(() => this.resolveAddLink(), 400);
+  }
 
-    if (!isValidDomain) {
-      this.linkError = `Enter a valid ${meta.domains[0]} URL.`;
+  private resolveAddLink(): void {
+    const url = this.addLinkUrl.trim();
+    const host = this.readHost(url);
+
+    if (!host) {
+      this.addLinkPhase = 'idle';
+      this.addLinkIssue = 'invalid';
       return;
     }
 
-    lic.campaignLinks = { ...lic.campaignLinks, [platform]: { url } };
-    this.editingPlatform = null;
-    this.linkInput = '';
-    this.linkError = '';
-    // TODO(backend): persist campaign links once the usage-links endpoint is available.
+    if (this.addLinkLicense && this.isDuplicateLink(this.addLinkLicense, url)) {
+      this.addLinkPhase = 'idle';
+      this.addLinkIssue = 'duplicate';
+      return;
+    }
+
+    this.detectedPlatform = this.identifyPlatform(host, url);
+    this.addLinkPhase = 'ready';
+
+    if (!this.detectedPlatform) {
+      this.addLinkIssue = 'unknown-platform';
+      return;
+    }
+    if (LicensesComponent.RESTRICTED_PLATFORMS.has(this.detectedPlatform)) {
+      this.addLinkIssue = 'restricted';
+    }
+  }
+
+  /** Only an absolute http(s) link to a post counts. */
+  private readHost(url: string): string | null {
+    if (!/^https?:\/\//i.test(url)) { return null; }
+    try {
+      const parsed = new URL(url);
+      return parsed.pathname && parsed.pathname !== '/' ? parsed.hostname.toLowerCase() : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private identifyPlatform(host: string, url: string): string | null {
+    if (host.includes('youtube.com') || host === 'youtu.be') {
+      return url.includes('/shorts/') ? 'YouTube Shorts' : 'YouTube';
+    }
+    if (host.includes('instagram.com')) { return 'Instagram'; }
+    if (host.includes('tiktok.com')) { return 'TikTok'; }
+    if (host.includes('facebook.com') || host === 'fb.watch') { return 'Facebook'; }
+    return null;
+  }
+
+  private isDuplicateLink(lic: LicenseEntry, url: string): boolean {
+    return Object.values(lic.campaignLinks ?? {})
+      .some((link) => (link?.url ?? '').trim().toLowerCase() === url.toLowerCase());
+  }
+
+  get addLinkPlatformLabel(): string {
+    return this.detectedPlatform ?? this.addLinkPlatformName.trim();
+  }
+
+  get canSaveAddLink(): boolean {
+    if (this.addLinkPhase !== 'ready') { return false; }
+    if (this.addLinkIssue === 'unknown-platform') { return !!this.addLinkPlatformName.trim(); }
+    return true;
+  }
+
+  saveAddLink(): void {
+    const lic = this.addLinkLicense;
+    if (!lic || !this.canSaveAddLink) { return; }
+
+    const url = this.addLinkUrl.trim();
+    const label = this.addLinkPlatformLabel;
+    const wasRestricted = this.addLinkIssue === 'restricted';
+    this.addLinkPhase = 'saving';
+
+    // TODO(backend): persist published links once the usage-links endpoint exists.
+    window.setTimeout(() => {
+      const key = this.storageKeyFor(label);
+      lic.campaignLinks = { ...lic.campaignLinks, [key]: { url } };
+      this.savedLinkPlatform = label;
+      this.savedLinkUrl = url;
+      this.savedLinkRestricted = wasRestricted;
+      this.addLinkPhase = 'saved';
+    }, 400);
+  }
+
+  retryAddLink(): void {
+    this.addLinkPhase = 'ready';
+    this.addLinkIssue = null;
+    this.onAddLinkInput();
+  }
+
+  /** Keep the known three on their own keys so existing icons still light up. */
+  private storageKeyFor(label: string): CampaignPlatform {
+    const lower = label.toLowerCase();
+    if (lower.includes('youtube')) { return 'youtube'; }
+    if (lower.includes('instagram')) { return 'instagram'; }
+    return 'tiktok';
+  }
+
+  viewExistingLink(): void {
+    const lic = this.addLinkLicense;
+    if (!lic) { return; }
+    const url = this.addLinkUrl.trim().toLowerCase();
+    const match = Object.values(lic.campaignLinks ?? {})
+      .find((link) => (link?.url ?? '').trim().toLowerCase() === url);
+    if (match?.url) { window.open(match.url, '_blank', 'noopener'); }
+  }
+
+  private clearDetectTimer(): void {
+    if (this.detectTimerId !== null) {
+      clearTimeout(this.detectTimerId);
+      this.detectTimerId = null;
+    }
   }
 
   /** Solid download button colored by license tier. */

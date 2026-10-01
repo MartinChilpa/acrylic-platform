@@ -142,6 +142,9 @@ export class SimilaritySearchComponent implements OnInit {
   extendedCommercialUse = false;
   generalTermsOpen = false;
   downloadingLicensedTrack = false;
+  /** True once the file has actually been handed to the browser. Gates both
+   *  the "Go to Licenses" button and the license reaching the Licenses tab. */
+  licensedTrackDownloaded = false;
   tagsCopied = false;
   private tagsCopiedTimerId: number | null = null;
 
@@ -669,6 +672,7 @@ export class SimilaritySearchComponent implements OnInit {
     // Download button commits the license (createLicense + mark-downloaded).
     this.trackResultInteraction(this.licenseModalTrack, 'license');
     this.licensedTrack = this.licenseModalTrack;
+    this.licensedTrackDownloaded = false;
     this.modalService.hideModal('license-track-modal');
     setTimeout(() => {
       this.modalService.showModal('track-licensed-modal');
@@ -684,6 +688,7 @@ export class SimilaritySearchComponent implements OnInit {
   resetLicenseFlow(): void {
     this.licenseModalTrack = null;
     this.licensedTrack = null;
+    this.licensedTrackDownloaded = false;
     this.licenseModalSubtitle = null;
     this.extendedCommercialUse = false;
     this.generalTermsOpen = false;
@@ -716,9 +721,36 @@ export class SimilaritySearchComponent implements OnInit {
     // while we still hold the track that carries price_id / price_temp.
     this.licenseService.rememberTier(this.licensedTrack, this.getTierLabel(this.licensedTrack));
 
-    // Persist the license only now, at download time (nothing is written to the
-    // DB when the user merely confirms). Then mark it downloaded so it appears
-    // in the Licenses tab / "licensed" tag, and finally download the file.
+    // Nothing is written to the DB until the file is actually on its way: the
+    // license must not show up in the Licenses tab before the download happens.
+    this.performLicensedDownload(url, filename, trackUuid);
+  }
+
+  private performLicensedDownload(url: string, filename: string, trackUuid: string): void {
+    this.aimsDownloadService.getPresignedDownloadUrl({ url, filename }).subscribe({
+      next: (presignedUrl) => {
+        if (!presignedUrl) {
+          this.errorMsg = 'No se pudo descargar el track.';
+          return;
+        }
+        this.triggerDownloadViaIframe(presignedUrl);
+        // The modal stays open so the user can follow the invitation to the
+        // Licenses tab; closing it is left to Done, the X, or that button.
+        this.licensedTrackDownloaded = true;
+        this.persistLicenseAfterDownload(trackUuid);
+      },
+      error: () => {
+        this.errorMsg = 'No se pudo descargar el track.';
+        this.downloadingLicensedTrack = false;
+      },
+      complete: () => {
+        this.downloadingLicensedTrack = false;
+      }
+    });
+  }
+
+  /** Create the license and mark it downloaded, now that the file has gone out. */
+  private persistLicenseAfterDownload(trackUuid: string): void {
     this.licenseService.createLicense(trackUuid, this.extendedCommercialUse).subscribe({
       next: (license) => {
         this.licenseService.markDownloaded(license.uuid).pipe(retry(1)).subscribe({
@@ -728,35 +760,11 @@ export class SimilaritySearchComponent implements OnInit {
             this.licenseService.loadLicenses();
           },
         });
-        this.performLicensedDownload(url, filename);
       },
       error: (err) => {
-        // e.g. a license already exists for this track — still let the user
-        // download and refresh the list so it shows.
-        console.error('[SimilaritySearch] createLicense at download failed', err);
+        // e.g. a license already exists for this track — refresh so it shows.
+        console.error('[SimilaritySearch] createLicense after download failed', err);
         this.licenseService.loadLicenses();
-        this.performLicensedDownload(url, filename);
-      }
-    });
-  }
-
-  private performLicensedDownload(url: string, filename: string): void {
-    this.aimsDownloadService.getPresignedDownloadUrl({ url, filename }).subscribe({
-      next: (presignedUrl) => {
-        if (!presignedUrl) {
-          this.errorMsg = 'No se pudo descargar el track.';
-          return;
-        }
-        this.triggerDownloadViaIframe(presignedUrl);
-        this.modalService.hideModal('track-licensed-modal');
-        this.resetLicenseFlow();
-      },
-      error: () => {
-        this.errorMsg = 'No se pudo descargar el track.';
-        this.downloadingLicensedTrack = false;
-      },
-      complete: () => {
-        this.downloadingLicensedTrack = false;
       }
     });
   }

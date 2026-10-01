@@ -978,7 +978,7 @@
           [ngClass]="getResultThemeClass(licensedTrack)">
           <div class="license-modal__top">
             <div class="license-modal__header">
-              <div class="license-modal__title">{{ 'similaritySearch.modal.trackLicensed' | transloco }}</div>
+              <div class="license-modal__title">{{ 'similaritySearch.modal.downloadToLicense' | transloco }}</div>
               <button
                 type="button"
                 class="license-modal__close"
@@ -996,7 +996,11 @@
               <span class="license-modal__tier-text">{{ getTierLabel(licensedTrack) }}</span>
             </div>
 
-            <div class="license-modal__subtitle">Your license for this track is confirmed</div>
+            <div class="license-modal__subtitle">
+              {{ (licensedTrackDownloaded
+                    ? 'similaritySearch.modal.licenseConfirmed'
+                    : 'similaritySearch.modal.downloadToConfirm') | transloco }}
+            </div>
           </div>
 
           <div class="license-modal__divider"></div>
@@ -1059,10 +1063,18 @@
                 </span>
                 <div>
                   <div class="license-modal__license-details-title">{{ 'similaritySearch.modal.licenseDetails' | transloco }}</div>
-                  <div class="license-modal__license-details-subtitle">{{ 'similaritySearch.modal.viewLicenseDetails' | transloco }}</div>
+                  <div class="license-modal__license-details-subtitle">
+                    {{ (licensedTrackDownloaded
+                          ? 'similaritySearch.modal.licenseReadyInTab'
+                          : 'similaritySearch.modal.viewLicenseDetails') | transloco }}
+                  </div>
                 </div>
               </div>
-              <button type="button" class="license-modal__outline-btn" (click)="goToLicenses()">{{ 'similaritySearch.buttons.goToLicenses' | transloco }}</button>
+              <button
+                type="button"
+                class="license-modal__outline-btn"
+                [disabled]="!licensedTrackDownloaded"
+                (click)="goToLicenses()">{{ 'similaritySearch.buttons.goToLicenses' | transloco }}</button>
             </div>
 
             <div class="license-modal__contact">

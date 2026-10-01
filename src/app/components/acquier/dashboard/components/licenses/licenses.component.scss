@@ -42,14 +42,15 @@ $overdue-icon: rgba(255, 255, 255, 0.8);
 
 /* Stats */
 .lic-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
 }
 
 .stat-card {
   display: flex;
-  min-width: 155px;
+  min-width: 0;
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
@@ -536,6 +537,13 @@ $overdue-icon: rgba(255, 255, 255, 0.8);
   &--requested { color: $orange; background: rgba(251, 146, 60, 0.1); }
   &--needs-attention { color: $red; background: rgba(248, 113, 113, 0.1); }
   &--pending { color: rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.05); }
+
+  /* Without the status label the strip only carries the license ID. */
+  &--plain {
+    justify-content: flex-start;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.05);
+  }
 }
 
 .lic-panel__wl-left {
@@ -852,4 +860,617 @@ $overdue-icon: rgba(255, 255, 255, 0.8);
   text-decoration: none;
 
   &:hover { color: #fff; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   Licenses · card list  (Figma node-id=2217-47200)
+   Replaces the column table: each license is a self-contained
+   card that reflows to a single column on narrow screens.
+   ───────────────────────────────────────────────────────────── */
+
+.lic-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.lic-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover { background: rgba(255, 255, 255, 0.08); }
+
+  &--on {
+    background: #E9EBEE;
+    border-color: #E9EBEE;
+    color: #15181D;
+  }
+
+  &__count { opacity: 0.65; font-variant-numeric: tabular-nums; }
+}
+
+.lic-count {
+  margin: 0 0 12px;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+}
+
+.lic-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lic-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 0.15s;
+
+  &--active { border-color: rgba(255, 255, 255, 0.24); }
+}
+
+.lic-card__identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lic-card__cover {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.lic-card__play {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.10);
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+
+  &:hover:not(:disabled) { background: rgba(255, 255, 255, 0.16); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.lic-card__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.lic-card__track {
+  font-family: 'Glacial IndifferenceNormal', 'Glacial Indifference', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+  overflow-wrap: anywhere;
+}
+
+.lic-card__artist {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.60);
+  overflow-wrap: anywhere;
+}
+
+.lic-card__details {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: transparent;
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(255, 255, 255, 0.07); }
+}
+
+.lic-card__meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+
+.lic-card__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+
+  dt {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.50);
+  }
+
+  dd {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #FFFFFF;
+    overflow-wrap: anywhere;
+  }
+}
+
+.lic-card__wl {
+  &--confirmed { color: #7ACCA2; }
+  &--requested { color: #7ACCA2; }
+  &--pending { color: rgba(255, 255, 255, 0.70); }
+  &--needs-attention { color: #F0A35E; }
+}
+
+.lic-card__links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(219, 164, 63, 0.35);
+  background: rgba(219, 164, 63, 0.08);
+}
+
+.lic-card__links-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.lic-card__links-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #E8B45F;
+}
+
+.lic-card__links-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.lic-card__add-link {
+  flex: 0 0 auto;
+  height: 38px;
+  padding: 0 24px;
+  border-radius: 8px;
+  border: none;
+  background: #9BDCA6;
+  color: #10231A;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.9; }
+}
+
+.lic-footnote {
+  margin: 24px 0 0;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+}
+
+/* ── Tablet: the four metadata columns stop fitting ── */
+@media (max-width: 900px) {
+  .lic-card__meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ── Mobile: identity stacks, actions go full width ── */
+@media (max-width: 640px) {
+  .lic-card { padding: 16px; gap: 16px; }
+
+  .lic-card__identity { flex-wrap: wrap; }
+
+  .lic-card__title-group { flex: 1 1 140px; }
+
+  .lic-card__details {
+    order: 5;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .lic-card__links {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lic-card__add-link { width: 100%; }
+
+  .lic-filters { gap: 8px; }
+  .lic-chip { height: 34px; padding: 0 14px; font-size: 12px; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   Licenses · review pass (Figma node-id=2217-47560)
+   ───────────────────────────────────────────────────────────── */
+
+/* Summary cards collapse in two steps rather than wrapping raggedly. */
+@media (max-width: 900px) {
+  .lic-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Search field: white surface, dark placeholder. */
+.lic-search-wrap .lic-search-icon { color: #262626; }
+
+.lic-search {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #FFFFFF;
+  color: #262626;
+
+  &::placeholder { color: #262626; opacity: 1; }
+
+  &:focus {
+    outline: none;
+    border-color: #C5DAFF;
+    box-shadow: 0 0 0 3px rgba(197, 218, 255, 0.35);
+  }
+}
+
+/* Play button on the card follows the tier, like the row button already did. */
+.lic-card__play {
+  &.play-btn--artist { background: #416C45; }
+  &.play-btn--preclear { background: #023185; }
+  &.play-btn--bid2clear { background: #55216D; }
+
+  &.play-btn--artist:hover:not(:disabled) { background: #4C7C51; }
+  &.play-btn--preclear:hover:not(:disabled) { background: #063C9E; }
+  &.play-btn--bid2clear:hover:not(:disabled) { background: #662982; }
+}
+
+/* Drawer · Published links */
+.lic-panel__deadline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(219, 164, 63, 0.35);
+  background: rgba(219, 164, 63, 0.10);
+}
+
+.lic-panel__deadline-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #E8B45F;
+}
+
+.lic-panel__deadline-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.lic-panel__links-empty {
+  margin: 0 0 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.lic-panel__add-link {
+  width: 100%;
+  height: 44px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: none;
+  background: #9BDCA6;
+  color: #10231A;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.9; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Add a published link · one paste box
+   (Figma "Add a post", "Review platform", "Field states")
+   ───────────────────────────────────────────────────────────── */
+
+.lic-addlink {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.lic-addlink__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.lic-addlink__cover {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.lic-addlink__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lic-addlink__track {
+  font-family: 'Glacial IndifferenceNormal', 'Glacial Indifference', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+  overflow-wrap: anywhere;
+}
+
+.lic-addlink__artist {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.60);
+  overflow-wrap: anywhere;
+}
+
+.lic-addlink__close {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  border-radius: 6px;
+
+  &:hover { background: rgba(255, 255, 255, 0.08); }
+}
+
+.lic-addlink__title {
+  margin: 0;
+  font-family: 'Glacial IndifferenceNormal', 'Glacial Indifference', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.lic-addlink__lede {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.lic-addlink__label {
+  margin-top: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.lic-addlink__input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid #FFFFFF;
+  background: #FFFFFF;
+  color: #262626;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+
+  &::placeholder { color: #8A8A8A; }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(197, 218, 255, 0.35);
+  }
+
+  &--error {
+    border-color: #E5484D;
+    box-shadow: 0 0 0 2px rgba(229, 72, 77, 0.25);
+  }
+}
+
+.lic-addlink__hint {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.lic-addlink__error {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #FF6B6E;
+}
+
+.lic-addlink__note {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.lic-addlink__detected {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.lic-addlink__detected-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.lic-addlink__detected-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.lic-addlink__flag {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(219, 164, 63, 0.35);
+  background: rgba(219, 164, 63, 0.10);
+}
+
+.lic-addlink__flag-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #E8B45F;
+}
+
+.lic-addlink__flag-body {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.lic-addlink__saved {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lic-addlink__saved-platform {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.lic-addlink__saved-url {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  overflow-wrap: anywhere;
+}
+
+.lic-addlink__save {
+  width: 100%;
+  height: 44px;
+  margin-top: 4px;
+  border-radius: 8px;
+  border: none;
+  background: #9BDCA6;
+  color: #10231A;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s;
+
+  &:hover:not(:disabled) { opacity: 0.9; }
+
+  &:disabled {
+    background: #2E4A35;
+    color: rgba(255, 255, 255, 0.45);
+    cursor: not-allowed;
+  }
+}
+
+.lic-addlink__ghost {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(255, 255, 255, 0.06); }
+}
+
+
+/* Whitelisting request replaces the timeline in the drawer. */
+.lic-panel__whitelist {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  border: none;
+  background: #9BDCA6;
+  color: #10231A;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.9; }
 }
