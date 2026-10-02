@@ -33,6 +33,16 @@
     #000000;
 }
 
+/* Federation mark at the foot of the sign-in panel. The source is a 557px
+   square, so it has to be constrained or it dominates the panel. */
+.auth-club-layout__federation {
+  display: block;
+  width: 72px;
+  height: auto;
+  margin: 24px auto 32px;
+  opacity: 0.9;
+}
+
 .auth-club-layout__promo {
   width: 100%;
   height: 100%;
