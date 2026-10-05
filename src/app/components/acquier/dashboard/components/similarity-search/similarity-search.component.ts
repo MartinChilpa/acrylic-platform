@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ModalService } from '../../../../../services/modal.service';
 
-import { SimilarityUrlService } from '../../services/similarity-url.service';
+import { SimilarityUrlService, normalizeSpotifyTrackUrl } from '../../services/similarity-url.service';
 import { AimsDownloadService } from '../../services/aims-download.service';
 import { AmplitudeService } from '../../../../../services/amplitude.service';
 import { LicenseComponent } from '../license/license.component';
@@ -499,7 +499,12 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   search() {
-    const query = (this.searchControl.value ?? '').trim();
+    const rawQuery = (this.searchControl.value ?? '').trim();
+    const query = normalizeSpotifyTrackUrl(rawQuery);
+    if (query !== rawQuery) {
+      this.searchQuery = query;
+      this.searchControl.setValue(query, { emitEvent: false });
+    }
     const now = Date.now();
     this.currentSearchId = crypto.randomUUID();
     this.currentSearchSubmittedAt = now;

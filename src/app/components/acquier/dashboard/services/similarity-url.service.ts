@@ -17,6 +17,35 @@ interface UploadedPart {
   etag: string;
 }
 
+/**
+ * Spotify inserts a locale segment in links copied from some regional pages
+ * (for example, /intl-es/track/...). AIMS expects the canonical /track/ URL.
+ */
+export function normalizeSpotifyTrackUrl(sourceUrl: string): string {
+  const value = (sourceUrl ?? '').trim();
+  if (!value) { return value; }
+
+  try {
+    const parsed = new URL(value);
+    if (parsed.hostname.toLowerCase() !== 'open.spotify.com') {
+      return value;
+    }
+
+    const canonicalPath = parsed.pathname.replace(
+      /^\/intl-[a-z]{2}(?:-[a-z0-9]+)*(?=\/(?:track|embed\/track)\/)/i,
+      ''
+    );
+    if (canonicalPath === parsed.pathname) {
+      return value;
+    }
+
+    parsed.pathname = canonicalPath;
+    return parsed.toString();
+  } catch {
+    return value;
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,9 +55,10 @@ export class SimilarityUrlService {
   API_URL = `${environment.API_URL}/${environment.VERSION}/aims`;
 
   searchSimilarityByUrl(sourceUrl: string, page: number = 1, pageSize: number = 10) {
+    const normalizedUrl = normalizeSpotifyTrackUrl(sourceUrl);
     return this.http.post<any[]>(`${this.API_URL}/similarity/`, {
-      youtube_url: sourceUrl,
-      link: sourceUrl,
+      youtube_url: normalizedUrl,
+      link: normalizedUrl,
       page,
       page_size: pageSize
     });
