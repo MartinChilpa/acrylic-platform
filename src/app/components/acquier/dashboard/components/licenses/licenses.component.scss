@@ -1399,6 +1399,63 @@ $overdue-icon: rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(155, 220, 166, 0.30);
+  background: rgba(155, 220, 166, 0.10);
+}
+
+.lic-addlink__saved-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #9BDCA6;
+}
+
+/* "Links by platform": how many posts are recorded per network. */
+.lic-addlink__tracker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.lic-addlink__tracker-title {
+  margin-bottom: 2px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.lic-addlink__tracker-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+
+  &--added {
+    color: #FFFFFF;
+
+    .lic-addlink__tracker-count { color: #9BDCA6; }
+  }
+}
+
+.lic-addlink__tracker-count {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.lic-addlink__tracker-note {
+  margin-top: 2px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .lic-addlink__saved-platform {
