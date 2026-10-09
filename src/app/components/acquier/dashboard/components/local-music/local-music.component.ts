@@ -1,7 +1,9 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
+
+import { TeamBrandingService } from '../../../../../services/team-branding.service';
 
 export interface LocalTrack {
   id: string;
@@ -19,6 +21,9 @@ export interface LocalTrack {
   spotifyUrl: string;
 }
 
+/** FMF's club_club.slug in production (club id 232). */
+const FMF_TEAM_SLUG = 'fmf';
+
 @Component({
   selector: 'acrylic-local-music',
   standalone: true,
@@ -34,7 +39,10 @@ export class LocalMusicComponent {
   // Heights (px) for the static waveform bars
   waveBars = [4, 8, 12, 6, 10, 14, 8, 5, 12, 9, 6, 14, 10, 7, 4, 11, 8, 13, 6, 9, 12, 5, 10, 8, 14, 6, 9, 11, 4, 7];
 
-  tracks: LocalTrack[] = [
+  private readonly brandingService = inject(TeamBrandingService);
+
+  /** Tracks every club sees unless it has its own list below. */
+  private readonly defaultTracks: LocalTrack[] = [
     {
       id: '1',
       title: 'Adriano',
@@ -81,6 +89,64 @@ export class LocalMusicComponent {
       spotifyUrl: 'https://open.spotify.com/track/7ac7FoJJ4sKB9b02lBq5wG',
     },
   ];
+
+  /**
+   * Club-specific lists, keyed by club slug (club_club.slug). The slug comes
+   * from the club sign-in URL (/auth/:teamSlug/sign-in), so a club member who
+   * signs in through the generic page sees the default list.
+   */
+  private readonly tracksByClub: Record<string, LocalTrack[]> = {
+    [FMF_TEAM_SLUG]: [
+      {
+        id: 'fmf-1',
+        title: 'San Lucas',
+        artist: 'Kevin Kaarl',
+        image: 'https://es.rollingstone.com/wp-content/uploads/2023/05/Kevin-Kaarl-y-el-valor-de-la-vulnerabilidad-4.jpg',
+        countryCode: 'mx',
+        tier: 'artistpromo',
+        spotifyUrl: 'https://open.spotify.com/track/3aZxnqYFM8UI2jLgUD3B2a',
+      },
+      {
+        id: 'fmf-2',
+        title: 'Siempre me cuesta regresar',
+        artist: 'La Texana',
+        image: 'https://gritaradio.com/wp-content/uploads/2025/04/La-Casa-Que-Cae-el-LP-debut-de-La-Texana-scaled.jpg',
+        countryCode: 'mx',
+        tier: 'artistpromo',
+        spotifyUrl: 'https://open.spotify.com/track/1YcHOSxfZmFrpIhl32GdQH',
+      },
+      {
+        id: 'fmf-3',
+        title: 'MUÑEKITAS',
+        artist: 'LA VIRGENCITA',
+        image: 'https://i0.wp.com/dcocote.com/wp-content/uploads/2026/02/la-virgencita-pegameeeeento-foto-prensa-1.jpg?resize=1767%2C1180&ssl=1',
+        countryCode: 'mx',
+        tier: 'artistpromo',
+        spotifyUrl: 'https://open.spotify.com/track/01nlB0VAo2vxgj21J5V2eK',
+      },
+      {
+        id: 'fmf-4',
+        title: 'ella llora',
+        artist: 'sobresdylan',
+        image: 'https://tercerparlante.com/wp-content/uploads/2026/10/sobresdylan-2026-73599.webp',
+        countryCode: 'mx',
+        tier: 'artistpromo',
+        spotifyUrl: 'https://open.spotify.com/track/7AEgJUtqE0TH4S4rdu3Nsd',
+      },
+      {
+        id: 'fmf-5',
+        title: 'Me haces bien',
+        artist: 'Palmasur',
+        image: 'https://revistakuadro.com/wp-content/uploads/2022/02/271994877_1656645158021699_1257988327789570717_n.jpeg',
+        countryCode: 'mx',
+        tier: 'artistpromo',
+        spotifyUrl: 'https://open.spotify.com/track/0GlC70q5XuY6h9IYeqxxtt',
+      },
+    ],
+  };
+
+  readonly tracks: LocalTrack[] =
+    this.tracksByClub[this.brandingService.getStoredTeamSlugOrNull() ?? ''] ?? this.defaultTracks;
 
   isSearchable(track: LocalTrack): boolean {
     return !!(track.spotifyUrl ?? '').trim();

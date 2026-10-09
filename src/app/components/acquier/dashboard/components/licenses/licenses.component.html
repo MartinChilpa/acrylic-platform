@@ -126,16 +126,12 @@
               <dd><span class="tier-badge" [class]="getTierClass(lic.licenseType)">{{ lic.licenseType }}</span></dd>
             </div>
             <div class="lic-card__meta-item">
-              <dt>{{ 'licenses.meta.whitelisting' | transloco }}</dt>
-              <dd class="lic-card__wl" [class]="'lic-card__wl--' + lic.whitelistingStatus">{{ getStatusLabel(lic.whitelistingStatus) }}</dd>
-            </div>
-            <div class="lic-card__meta-item">
               <dt>{{ 'licenses.meta.licensed' | transloco }}</dt>
               <dd>{{ lic.licensedAt | date:'d MMM yyyy' }}</dd>
             </div>
             <div class="lic-card__meta-item">
               <dt>{{ 'licenses.meta.expires' | transloco }}</dt>
-              <dd>{{ (getLicenseExpiry(lic) | date:'d MMM yyyy') ?? ('licenses.doesNotExpire' | transloco) }}</dd>
+              <dd>{{ getExpiryLabel(lic) }}</dd>
             </div>
           </dl>
 
@@ -227,7 +223,7 @@
         </div>
         <div class="lic-panel__row">
           <span class="lic-panel__key">{{ 'licenses.panel.licenseExpires' | transloco }}</span>
-          <span class="lic-panel__val">{{ (getLicenseExpiry(lic) | date:'d MMM yyyy') ?? ('licenses.doesNotExpire' | transloco) }}</span>
+          <span class="lic-panel__val">{{ getExpiryLabel(lic) }}</span>
         </div>
       </div>
 
@@ -339,8 +335,11 @@
   </div>
 
   <ng-container *ngIf="addLinkPhase === 'saved'; else addLinkForm">
-    <h3 class="lic-addlink__title">{{ 'licenses.addLink.publishedLink' | transloco }}</h3>
+    <h3 class="lic-addlink__title">{{ 'licenses.addLink.linkAdded' | transloco }}</h3>
+    <p class="lic-addlink__lede">{{ 'licenses.addLink.recorded' | transloco }}</p>
+
     <div class="lic-addlink__saved">
+      <span class="lic-addlink__saved-label">{{ 'licenses.addLink.linkSaved' | transloco }}</span>
       <span class="lic-addlink__saved-platform">{{ savedLinkPlatform }}</span>
       <span class="lic-addlink__saved-url">{{ savedLinkUrl }}</span>
     </div>
@@ -350,17 +349,44 @@
       <span class="lic-addlink__flag-body">{{ 'licenses.addLink.recordedNeedsAttention' | transloco: { platform: savedLinkPlatform } }}</span>
     </div>
 
+    <div class="lic-addlink__tracker">
+      <span class="lic-addlink__tracker-title">{{ 'licenses.addLink.linksByPlatform' | transloco }}</span>
+      <div class="lic-addlink__tracker-row"
+           *ngFor="let platform of trackedPlatforms"
+           [class.lic-addlink__tracker-row--added]="getPlatformLinkCount(lic, platform) > 0">
+        <span>{{ platform }}</span>
+        <span class="lic-addlink__tracker-count">{{ getPlatformLinkLabel(lic, platform) }}</span>
+      </div>
+      <span class="lic-addlink__tracker-note">{{ 'licenses.addLink.onlyWherePublished' | transloco }}</span>
+    </div>
+
+    <p class="lic-addlink__lede">{{ 'licenses.addLink.postedElsewhere' | transloco }}</p>
+
     <button type="button" class="lic-addlink__ghost" *ngIf="savedLinkRestricted">
       {{ 'licenses.actions.contactTeam' | transloco }}
     </button>
-    <button type="button" class="lic-addlink__ghost" (click)="closeAddLink()">
+    <button type="button" class="lic-addlink__save" (click)="closeAddLink()">
       {{ 'licenses.addLink.done' | transloco }}
+    </button>
+    <button type="button" class="lic-addlink__ghost" (click)="addAnotherLink()">
+      {{ 'licenses.addLink.addAnother' | transloco }}
     </button>
   </ng-container>
 
   <ng-template #addLinkForm>
     <h3 class="lic-addlink__title">{{ 'licenses.addLink.title' | transloco }}</h3>
     <p class="lic-addlink__lede">{{ 'licenses.addLink.lede' | transloco }}</p>
+
+    <div class="lic-addlink__tracker">
+      <span class="lic-addlink__tracker-title">{{ 'licenses.addLink.linksByPlatform' | transloco }}</span>
+      <div class="lic-addlink__tracker-row"
+           *ngFor="let platform of trackedPlatforms"
+           [class.lic-addlink__tracker-row--added]="getPlatformLinkCount(lic, platform) > 0">
+        <span>{{ platform }}</span>
+        <span class="lic-addlink__tracker-count">{{ getPlatformLinkLabel(lic, platform) }}</span>
+      </div>
+      <span class="lic-addlink__tracker-note">{{ 'licenses.addLink.onlyWherePublished' | transloco }}</span>
+    </div>
 
     <label class="lic-addlink__label" for="lic-post-link">{{ 'licenses.addLink.postLink' | transloco }}</label>
     <input id="lic-post-link"

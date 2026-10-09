@@ -8,13 +8,13 @@ import { TeamBrandingService } from '../../../../../services/team-branding.servi
 import { HeaderComponent } from '../../../../shared/acquier/header/header.component';
 import { isPreClearTrack } from '../../../../../utils/license-tier.utils';
 
-type CampaignPlatform = 'youtube' | 'instagram' | 'tiktok';
 type LicenseFilter = 'all' | 'links' | 'expiring';
 type AddLinkPhase = 'idle' | 'checking' | 'ready' | 'saving' | 'saved';
 type AddLinkIssue = null | 'invalid' | 'duplicate' | 'unknown-platform' | 'restricted';
-type IconStatus = 'submitted' | 'overdue' | 'pending';
 
-interface CampaignLink {
+interface PublishedLink {
+  /** Detected platform label, or the name typed in for an unknown one. */
+  platform: string;
   url: string;
 }
 
@@ -28,13 +28,7 @@ interface LicenseEntry {
   usageDue: string | null;
   isUsageOverdue: boolean;
   teamName: string;
-  campaignLinks: Partial<Record<CampaignPlatform, CampaignLink>>;
-}
-
-interface CampaignPlatformMeta {
-  key: CampaignPlatform;
-  label: string;
-  domains: string[];
+  publishedLinks: PublishedLink[];
 }
 
 @Component({
@@ -96,11 +90,8 @@ export class LicensesComponent implements OnInit, OnDestroy {
   /** Where whitelisting requests are sent. */
   private static readonly WHITELIST_INBOX = 'juan@acrylic.la';
 
-  readonly campaignPlatforms: CampaignPlatformMeta[] = [
-    { key: 'youtube', label: 'YouTube', domains: ['youtube.com', 'youtu.be'] },
-    { key: 'instagram', label: 'Instagram', domains: ['instagram.com'] },
-    { key: 'tiktok', label: 'TikTok', domains: ['tiktok.com'] },
-  ];
+  /** Rows of the "Links by platform" tracker in the add-link panel. */
+  readonly trackedPlatforms = ['Instagram', 'TikTok', 'YouTube', 'YouTube Shorts', 'Facebook'];
 
   private audioEls = new Map<string, HTMLAudioElement>();
   playingIds = new Set<string>();
@@ -151,6 +142,14 @@ export class LicensesComponent implements OnInit, OnDestroy {
     const expiry = new Date(lic.licensedAt);
     expiry.setMonth(expiry.getMonth() + months);
     return expiry;
+  }
+
+  /** "12 months" / "12 meses" / "12 mois", or "Does not expire" without archival. */
+  getExpiryLabel(lic: LicenseEntry): string {
+    const months = this.readArchivalMonths(lic.track);
+    if (months === null) { return this.transloco.translate('licenses.doesNotExpire'); }
+    const key = months === 1 ? 'licenses.expires.oneMonth' : 'licenses.expires.months';
+    return this.transloco.translate(key, { count: months });
   }
 
   /** Archival arrives as a month count, or a "None"/empty value for no limit. */
@@ -211,7 +210,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
    *   - whitelistingStatus   -> from backend ('confirmed' | 'requested' | 'needs-attention' | 'pending')
    *   - project / teamName    -> from backend (campaign/club association)
    *   - usageDue / overdue    -> derived from the backend usage-window dates
-   *   - campaignLinks         -> from backend (see confirmAddLink/addCampaignLink TODO)
+   *   - publishedLinks        -> from backend (see saveAddLink TODO)
    *   - licenseType           -> the tier (PreClear / ArtistPromo / Bid2Clear); until then
    *                              resolveLicenseType() falls back to LicenseService's
    *                              remembered tier, since ILicenseResult has no price fields
@@ -232,7 +231,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
       usageDue: usage.label,
       isUsageOverdue: usage.overdue,
       teamName,
-      campaignLinks: {},
+      publishedLinks: [],
     };
   }
 
@@ -408,41 +407,21 @@ export class LicensesComponent implements OnInit, OnDestroy {
     return index / total <= this.getPlaybackProgress(lic);
   }
 
-  /* ---------- Campaign links ---------- */
-
-  hasLink(lic: LicenseEntry, platform: CampaignPlatform): boolean {
-    return !!lic.campaignLinks[platform]?.url;
-  }
-
-  getLinkValue(lic: LicenseEntry, platform: CampaignPlatform): string | null {
-    return lic.campaignLinks[platform]?.url ?? null;
-  }
+  /* ---------- Published links ---------- */
 
   getCampaignSubmittedCount(lic: LicenseEntry): number {
-    return this.campaignPlatforms.filter(p => this.hasLink(lic, p.key)).length;
+    return lic.publishedLinks.length;
   }
 
-  getCampaignStatusLabel(lic: LicenseEntry): string {
-    const count = this.getCampaignSubmittedCount(lic);
-    if (count > 0) {
-      return `${count}+ ${this.transloco.translate('licenses.campaign.submitted')}`;
-    }
-    return this.transloco.translate('licenses.campaign.pending');
+  getPlatformLinkCount(lic: LicenseEntry, platform: string): number {
+    return lic.publishedLinks.filter(link => link.platform === platform).length;
   }
 
-  getIconStatus(lic: LicenseEntry, platform: CampaignPlatform): IconStatus {
-    // 'overdue' will be derivable once the backend exposes usage-link due dates.
-    return this.hasLink(lic, platform) ? 'submitted' : 'pending';
-  }
-
-  onCampaignIconClick(lic: LicenseEntry, platform: CampaignPlatform): void {
-    const url = this.getLinkValue(lic, platform);
-    if (url) {
-      window.open(url, '_blank', 'noopener');
-      return;
-    }
-    // Open the drawer so the link can be added with the inline editor.
-    this.selectedLicense = lic;
+  getPlatformLinkLabel(lic: LicenseEntry, platform: string): string {
+    const count = this.getPlatformLinkCount(lic, platform);
+    if (count === 0) { return this.transloco.translate('licenses.addLink.noLinks'); }
+    if (count === 1) { return this.transloco.translate('licenses.addLink.oneLink'); }
+    return this.transloco.translate('licenses.addLink.manyLinks', { count });
   }
 
   /**
@@ -474,6 +453,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
   /* ─────────── Add a published link ─────────── */
 
   openAddLink(lic: LicenseEntry): void {
+    this.clearDetectTimer();
     this.addLinkLicense = lic;
     this.addLinkUrl = '';
     this.addLinkPlatformName = '';
@@ -561,8 +541,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
   }
 
   private isDuplicateLink(lic: LicenseEntry, url: string): boolean {
-    return Object.values(lic.campaignLinks ?? {})
-      .some((link) => (link?.url ?? '').trim().toLowerCase() === url.toLowerCase());
+    return lic.publishedLinks.some((link) => link.url.trim().toLowerCase() === url.toLowerCase());
   }
 
   get addLinkPlatformLabel(): string {
@@ -586,8 +565,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
 
     // TODO(backend): persist published links once the usage-links endpoint exists.
     window.setTimeout(() => {
-      const key = this.storageKeyFor(label);
-      lic.campaignLinks = { ...lic.campaignLinks, [key]: { url } };
+      lic.publishedLinks = [...lic.publishedLinks, { platform: label, url }];
       this.savedLinkPlatform = label;
       this.savedLinkUrl = url;
       this.savedLinkRestricted = wasRestricted;
@@ -601,21 +579,18 @@ export class LicensesComponent implements OnInit, OnDestroy {
     this.onAddLinkInput();
   }
 
-  /** Keep the known three on their own keys so existing icons still light up. */
-  private storageKeyFor(label: string): CampaignPlatform {
-    const lower = label.toLowerCase();
-    if (lower.includes('youtube')) { return 'youtube'; }
-    if (lower.includes('instagram')) { return 'instagram'; }
-    return 'tiktok';
+  /** Back to an empty form for the same license, keeping what was saved. */
+  addAnotherLink(): void {
+    const lic = this.addLinkLicense;
+    if (lic) { this.openAddLink(lic); }
   }
 
   viewExistingLink(): void {
     const lic = this.addLinkLicense;
     if (!lic) { return; }
     const url = this.addLinkUrl.trim().toLowerCase();
-    const match = Object.values(lic.campaignLinks ?? {})
-      .find((link) => (link?.url ?? '').trim().toLowerCase() === url);
-    if (match?.url) { window.open(match.url, '_blank', 'noopener'); }
+    const match = lic.publishedLinks.find((link) => link.url.trim().toLowerCase() === url);
+    if (match) { window.open(match.url, '_blank', 'noopener'); }
   }
 
   private clearDetectTimer(): void {
