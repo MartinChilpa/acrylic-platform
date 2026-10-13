@@ -1,6 +1,6 @@
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { IsActiveMatchOptions, RouterModule } from '@angular/router';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { acquierSidenavItems } from '../../../../utils/sidenav-item.utils';
 import { AuthService } from '../../../../services/auth.service';
@@ -19,6 +19,14 @@ export class SidenavComponent {
   private transloco = inject(TranslocoService);
   isExpanded = signal(false);
   navItems = acquierSidenavItems;
+
+  /** Child routes (/brand/performance/track/…) keep their tab lit; query params never matter. */
+  readonly activeOptions: IsActiveMatchOptions = {
+    paths: 'subset',
+    queryParams: 'ignored',
+    matrixParams: 'ignored',
+    fragment: 'ignored',
+  };
 
   get teamName(): string {
     return this.brandingService.getActiveBranding().teamName;

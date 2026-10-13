@@ -1,0 +1,274 @@
+@use '../performance.shared' as *;
+
+.ptd-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1184px;
+  margin: 0 auto;
+  padding: 32px;
+  box-sizing: border-box;
+  font-family: $perf-font;
+  color: $perf-text;
+  line-height: 1.4;
+
+  @media (max-width: $perf-bp-phone) {
+    gap: 20px;
+    padding: 20px 16px 96px;
+  }
+}
+
+.ptd-back {
+  align-self: flex-start;
+  width: 160px;
+}
+
+.ptd-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__crumb { color: $perf-muted; font-size: 14px; }
+
+  &__title {
+    margin: 0;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+
+    @media (max-width: $perf-bp-phone) { font-size: 28px; }
+  }
+
+  &__sub { color: $perf-muted; font-size: 18px; }
+}
+
+.ptd-preview {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 80px;
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: $perf-surface;
+
+  &__label { font-size: 16px; white-space: nowrap; }
+
+  &__time,
+  &__status {
+    color: $perf-muted;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: $perf-bp-phone) {
+    gap: 12px;
+    padding: 16px;
+
+    &__time,
+    &__status { display: none; }
+  }
+}
+
+.ptd-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 680fr) minmax(0, 416fr);
+  align-items: start;
+  gap: 24px;
+
+  @media (max-width: $perf-bp-tablet) { grid-template-columns: 1fr; }
+}
+
+.ptd-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.ptd-card {
+  padding: 24px;
+  border-radius: 8px;
+  background: $perf-surface;
+
+  &__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+  }
+}
+
+.ptd-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: $perf-bp-phone) { gap: 12px; }
+}
+
+.ptd-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+
+  &__label { color: $perf-muted; font-size: 14px; }
+  &__value { font-size: 28px; font-weight: 700; }
+
+  @media (max-width: $perf-bp-phone) {
+    padding: 14px;
+
+    &__value { font-size: 22px; }
+  }
+}
+
+.ptd-platforms {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ptd-platform {
+  display: grid;
+  grid-template-columns: 108px minmax(80px, 300px) 72px auto;
+  align-items: center;
+  gap: 20px;
+  min-height: 36px;
+
+  &__name { color: $perf-muted; font-size: 16px; }
+  &__value { font-size: 16px; }
+
+  &__link {
+    color: $perf-muted;
+    font-size: 14px;
+    text-decoration: none;
+
+    &:hover { color: $perf-text; text-decoration: underline; }
+
+    &--none { visibility: hidden; }
+  }
+
+  @media (max-width: $perf-bp-phone) {
+    grid-template-columns: 76px minmax(40px, 1fr) 64px;
+    gap: 12px;
+
+    &__link { display: none; }
+  }
+}
+
+.ptd-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: $perf-chip;
+  overflow: hidden;
+
+  &__value { height: 100%; }
+}
+
+.ptd-geo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+.ptd-note {
+  margin: 0;
+  color: $perf-muted;
+  font-size: 14px;
+}
+
+.ptd-more {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 16px;
+  background: $perf-surface;
+
+  &__title {
+    flex: 0 0 240px;
+    margin: 0;
+    padding-top: 8px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__name {
+    flex: 0 1 240px;
+    min-width: 0;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+  }
+
+  &__streams {
+    flex: 1 1 auto;
+    color: $perf-muted;
+    font-size: 14px;
+  }
+
+  @media (max-width: $perf-bp-tablet) {
+    flex-direction: column;
+    gap: 12px;
+
+    &__title { flex-basis: auto; padding-top: 0; }
+    &__list { width: 100%; }
+  }
+
+  @media (max-width: $perf-bp-phone) {
+    &__row { gap: 12px; }
+    &__streams { display: none; }
+    &__name { flex: 1 1 auto; }
+
+    .perf-btn--view { width: auto; }
+  }
+}
+
+.ptd-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 240px;
+  border-radius: 8px;
+  background: $perf-surface;
+  color: $perf-muted;
+  font-size: 16px;
+  text-align: center;
+
+  &--error { color: #FFB4B4; }
+
+  &__spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    border-top-color: #AD46FF;
+    border-radius: 50%;
+    animation: ptd-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes ptd-spin {
+  to { transform: rotate(360deg); }
+}

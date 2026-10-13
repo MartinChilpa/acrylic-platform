@@ -1,0 +1,178 @@
+// Shared by the Performance list and track details (Figma: Acrylic Design System / Performance).
+
+$perf-font: 'Glacial Indifference', sans-serif;
+$perf-text: #FFFFFF;
+$perf-muted: #D4D4D4;
+$perf-subtle: #A5A5A5;
+$perf-control-bg: #202020;
+$perf-control-border: #666666;
+$perf-surface: #171717;
+$perf-surface-alt: #101010;
+$perf-chip: #262626;
+$perf-artist: #81C784;
+$perf-artist-dark: #416C45;
+$perf-preclear: #C5DAFF;
+
+$perf-bp-tablet: 900px;
+$perf-bp-phone: 640px;
+
+// Outline button: "View track", "Back to results", pager actions.
+.perf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid $perf-control-border;
+  border-radius: 6px;
+  background: $perf-control-bg;
+  color: $perf-text;
+  font-family: $perf-font;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover { background: #2A2A2A; border-color: #8A8A8A; }
+
+  &--view { width: 136px; }
+}
+
+// Tier-colored play button.
+.perf-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #6EB675;
+  border-radius: 10px;
+  background: $perf-artist-dark;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: filter 0.15s;
+
+  &:hover:not(:disabled) { filter: brightness(1.15); }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &--preclear { background: #023185; border-color: #3D6FC2; }
+
+  &--lg { width: 44px; height: 44px; }
+}
+
+// Use option label: Artist Promo green, PreClear blue.
+.perf-tier {
+  font-family: $perf-font;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+
+  &--artist { color: $perf-artist; }
+  &--preclear { color: $perf-preclear; }
+  &--lg { font-size: 18px; }
+}
+
+.perf-timeline {
+  flex: 1 1 auto;
+  min-width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: $perf-control-border;
+  overflow: hidden;
+
+  &__value {
+    height: 100%;
+    background: $perf-artist;
+    transition: width 0.2s linear;
+  }
+}
+
+.perf-metric__value--na {
+  color: $perf-subtle !important;
+  font-weight: 400 !important;
+}
+
+// "Use this track" card.
+.perf-use {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid $perf-artist-dark;
+  border-radius: 8px;
+  background: rgba(65, 108, 69, 0.2);
+  font-family: $perf-font;
+
+  &__title {
+    margin: 0;
+    color: $perf-text;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  &__lede {
+    margin: 0;
+    color: $perf-muted;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  &__ecu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border-radius: 6px;
+    background: $perf-chip;
+    color: $perf-muted;
+    font-size: 14px;
+    line-height: 1.4;
+
+    strong { color: $perf-text; font-size: 16px; }
+  }
+
+  &__ecu-sub { font-weight: 700; }
+
+  &__note {
+    margin: 0;
+    color: $perf-muted;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  &__error {
+    margin: -8px 0 0;
+    color: #FF8A8A;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
+
+.perf-license {
+  width: 100%;
+  height: 44px;
+  border: 2px solid $perf-artist-dark;
+  border-radius: 10px;
+  background: $perf-artist;
+  color: #000000;
+  font-family: $perf-font;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 2px rgba(0, 0, 0, 0.25));
+  transition: filter 0.15s;
+
+  &:hover:not(:disabled) { filter: drop-shadow(0 4px 2px rgba(0, 0, 0, 0.25)) brightness(1.08); }
+
+  &:disabled { opacity: 0.6; cursor: wait; }
+}

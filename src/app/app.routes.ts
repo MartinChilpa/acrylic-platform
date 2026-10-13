@@ -9,6 +9,8 @@ export const routesNames = {
   DASHBOARD: 'dashboard',
   PROJECTS: 'projects',
   LICENSES: 'licenses',
+  PERFORMANCE: 'performance',
+  PERFORMANCE_TRACK: 'performance/track/:uuid',
   AUTH: 'auth',
   BRAND: 'brand',
   LABEL: 'label',
@@ -74,6 +76,14 @@ export const routes: Routes = [
       {
         path: routesNames.LICENSES,
         loadComponent: () => import('./components/acquier/dashboard/components/licenses/licenses.component').then((c)=>c.LicensesComponent),
+      },
+      {
+        path: routesNames.PERFORMANCE,
+        loadComponent: () => import('./components/acquier/dashboard/components/performance/performance.component').then((c)=>c.PerformanceComponent),
+      },
+      {
+        path: routesNames.PERFORMANCE_TRACK,
+        loadComponent: () => import('./components/acquier/dashboard/components/performance/performance-track/performance-track.component').then((c)=>c.PerformanceTrackComponent),
       }
     ]
   },
