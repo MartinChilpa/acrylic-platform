@@ -29,6 +29,10 @@ export class ProjectsComponent implements OnInit {
 
   projects: IProjectResult[] = [];
   favorites: IFavoriteResult[] = [];
+  visibleFavorites: IFavoriteResult[] = [];
+  readonly favoritesPageSize = 10;
+  favoritesPageNumber = 1;
+  favoritesTotalPages = 1;
   loading = false;
   expandedUuid: string | null = null;
   isCreating = false;
@@ -44,10 +48,36 @@ export class ProjectsComponent implements OnInit {
     this.secondaryColor = branding.secondaryColor;
     this.brandingService.applyCssVars(branding);
 
-    this.loadAll();
     this.projectsService.favorites$.subscribe((favs) => {
       this.favorites = favs;
+      this.updateFavoritesPage();
     });
+    this.loadAll();
+  }
+
+  goToPreviousFavoritesPage(): void {
+    if (this.favoritesPageNumber <= 1) { return; }
+    this.favoritesPageNumber--;
+    this.updateFavoritesPage();
+  }
+
+  goToNextFavoritesPage(): void {
+    if (this.favoritesPageNumber >= this.favoritesTotalPages) { return; }
+    this.favoritesPageNumber++;
+    this.updateFavoritesPage();
+  }
+
+  private updateFavoritesPage(): void {
+    this.favoritesTotalPages = Math.max(
+      1,
+      Math.ceil(this.favorites.length / this.favoritesPageSize)
+    );
+    this.favoritesPageNumber = Math.min(
+      Math.max(1, this.favoritesPageNumber),
+      this.favoritesTotalPages
+    );
+    const start = (this.favoritesPageNumber - 1) * this.favoritesPageSize;
+    this.visibleFavorites = this.favorites.slice(start, start + this.favoritesPageSize);
   }
 
   private loadAll(): void {
