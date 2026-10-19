@@ -1,0 +1,736 @@
+@use './performance.shared' as *;
+
+.perf-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1184px;
+  margin: 0 auto;
+  padding: 32px;
+  box-sizing: border-box;
+  font-family: $perf-font;
+  color: $perf-text;
+
+  // Phones: room at the bottom for the fixed tab bar.
+  @media (max-width: $perf-bp-phone) {
+    padding: 20px 16px 96px;
+    gap: 20px;
+  }
+}
+
+/* ─────────── Header ─────────── */
+
+.perf-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  line-height: 1.4;
+
+  &__context {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 14px;
+  }
+
+  &__eyebrow { color: #AD46FF; font-weight: 700; }
+  &__team { color: $perf-muted; }
+
+  &__title {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.4;
+
+    @media (max-width: $perf-bp-phone) { font-size: 26px; line-height: 1.25; }
+  }
+
+  &__lede {
+    margin: 0;
+    color: $perf-muted;
+    font-size: 16px;
+  }
+
+  &__updated {
+    margin: 0;
+    align-self: flex-end;
+    color: $perf-muted;
+    font-size: 14px;
+
+    @media (max-width: $perf-bp-phone) { align-self: flex-start; }
+  }
+}
+
+/* ─────────── Search and filters ─────────── */
+
+.perf-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+.perf-search {
+  position: relative;
+
+  &__input {
+    width: 100%;
+    height: 52px;
+    padding: 0 48px 0 16px;
+    border: 0;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #262626;
+    font-family: $perf-font;
+    font-size: 16px;
+    box-sizing: border-box;
+
+    &::placeholder { color: #262626; }
+    &::-webkit-search-cancel-button { display: none; }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(173, 70, 255, 0.45);
+    }
+  }
+
+  &__clear {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #555555;
+    cursor: pointer;
+
+    &:hover { background: #EFEFEF; }
+  }
+}
+
+// Dropdown styled as the design's filter control, native select underneath.
+.perf-select {
+  position: relative;
+  display: inline-flex;
+  width: 180px;
+  height: 40px;
+
+  &--platform { width: 160px; }
+  &--size { width: 188px; }
+  &--ecu { width: 240px; }
+  &--sort { width: 208px; }
+
+  select {
+    width: 100%;
+    height: 100%;
+    padding: 0 36px 0 12px;
+    border: 1px solid $perf-control-border;
+    border-radius: 6px;
+    background: $perf-control-bg;
+    color: $perf-text;
+    font-family: $perf-font;
+    font-size: 14px;
+    appearance: none;
+    cursor: pointer;
+
+    &:focus-visible { outline: 2px solid #AD46FF; outline-offset: 1px; }
+
+    option { background: $perf-control-bg; color: $perf-text; }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid #FFFFFF;
+    border-bottom: 1.5px solid #FFFFFF;
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  &__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  @media (max-width: $perf-bp-phone) {
+    flex: 1 1 calc(50% - 6px);
+    width: auto;
+
+    &--ecu { flex-basis: 100%; }
+  }
+}
+
+.perf-note {
+  margin: 0;
+  color: $perf-muted;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ─────────── Results ─────────── */
+
+.perf-results {
+  display: flex;
+  flex-direction: column;
+}
+
+.perf-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  margin-bottom: 8px;
+
+  @media (max-width: $perf-bp-phone) {
+    flex-wrap: wrap;
+
+    .perf-select--sort { flex-basis: 100%; }
+  }
+}
+
+.perf-tabs {
+  display: flex;
+  gap: 8px;
+
+  @media (max-width: $perf-bp-phone) { flex: 1 1 100%; }
+}
+
+.perf-tab {
+  width: 164px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid $perf-control-border;
+  border-radius: 6px;
+  background: $perf-control-bg;
+  color: $perf-text;
+  font-family: $perf-font;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+
+  &--active {
+    border-color: #C1C5C8;
+    background: #C1C5C8;
+    color: #262626;
+    font-weight: 700;
+  }
+
+  @media (max-width: $perf-bp-phone) { flex: 1 1 0; width: auto; }
+}
+
+// Shared column grid for the header row and each data row.
+.perf-table {
+  display: flex;
+  flex-direction: column;
+
+  &--tracks {
+    --perf-cols: 36px minmax(160px, 2fr) minmax(96px, 1fr) minmax(96px, 1fr) minmax(96px, 0.9fr) 136px 140px;
+  }
+
+  &--artists {
+    --perf-cols: minmax(160px, 2fr) minmax(96px, 1fr) minmax(96px, 1fr) minmax(110px, 1fr) minmax(96px, 1fr) 140px;
+  }
+
+  &__head {
+    display: grid;
+    grid-template-columns: var(--perf-cols);
+    align-items: center;
+    gap: 16px;
+    height: 40px;
+    padding: 0 12px;
+    background: $perf-surface;
+    color: $perf-muted;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  @media (max-width: $perf-bp-tablet) {
+    gap: 8px;
+
+    &__head { display: none; }
+  }
+}
+
+.perf-row {
+  display: grid;
+  grid-template-columns: var(--perf-cols);
+  align-items: center;
+  gap: 16px;
+  min-height: 80px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: $perf-surface-alt;
+  font-size: 14px;
+  line-height: 1.4;
+
+  &:nth-child(odd) { background: $perf-surface; }
+
+  .perf-table--tracks & {
+    cursor: pointer;
+
+    &:hover { background: #1E1E1E; }
+    &:focus-visible { outline: 2px solid #AD46FF; outline-offset: -2px; }
+  }
+
+  &--selected { box-shadow: inset 3px 0 0 #AD46FF; }
+
+  &__identity {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  &__title {
+    color: $perf-text;
+    font-size: 16px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  &__sub {
+    color: $perf-muted;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+
+  &__muted {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: $perf-muted;
+  }
+
+  &__streams { font-size: 16px; }
+  &__unavailable { color: $perf-subtle; font-size: 14px; }
+
+  &__strong {
+    color: $perf-text;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  &__use {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  // Column names inside cards on narrow screens.
+  &__label { display: none; }
+
+  @media (max-width: $perf-bp-tablet) {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+    border-radius: 8px;
+
+    .perf-table--tracks & {
+      grid-template-columns: 36px repeat(3, minmax(0, 1fr));
+      grid-template-areas:
+        'play identity identity identity'
+        '. origin audience streams'
+        '. use use use'
+        'action action action action';
+
+      .perf-row__play { grid-area: play; }
+      .perf-row__identity { grid-area: identity; }
+      .perf-row__origin { grid-area: origin; }
+      .perf-row__audience { grid-area: audience; }
+      .perf-row__streams { grid-area: streams; }
+      .perf-row__use { grid-area: use; }
+      .perf-row__action { grid-area: action; }
+    }
+
+    &__identity { grid-column: 1 / -1; }
+
+    &__muted,
+    &__strong {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+
+    &__label {
+      display: block;
+      color: $perf-subtle;
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    &__action {
+      grid-column: 1 / -1;
+
+      .perf-btn--view { width: 100%; }
+    }
+  }
+}
+
+.perf-ecu-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid #777777;
+  border-radius: 4px;
+  background: $perf-chip;
+  color: $perf-text;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.perf-ecu-muted {
+  color: $perf-muted;
+  font-size: 13px;
+}
+
+.perf-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+
+  @media (max-width: $perf-bp-tablet) { display: none; }
+}
+
+/* ─────────── States ─────────── */
+
+.perf-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 200px;
+  padding: 32px 16px;
+  border-radius: 8px;
+  background: $perf-surface;
+  color: $perf-muted;
+  font-size: 16px;
+  text-align: center;
+
+  &--error { color: #FFB4B4; }
+
+  &__spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    border-top-color: #AD46FF;
+    border-radius: 50%;
+    animation: perf-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes perf-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─────────── Footer and pager ─────────── */
+
+.perf-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+  color: $perf-muted;
+  font-size: 14px;
+  line-height: 1.4;
+
+  &__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 80px;
+  }
+}
+
+.perf-pager {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+
+  &__link {
+    min-width: 28px;
+    padding: 2px 6px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: $perf-muted;
+    font-family: $perf-font;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { color: $perf-text; background: $perf-control-bg; }
+    &:disabled { opacity: 0.4; cursor: default; }
+
+    &--active { color: $perf-text; font-weight: 700; }
+  }
+
+  &__gap { padding: 0 4px; }
+}
+
+/* ─────────── Persistent player ─────────── */
+
+.perf-player {
+  position: sticky;
+  bottom: 16px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 72px;
+  margin-top: auto;
+  padding: 16px;
+  box-sizing: border-box;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  background: $perf-surface;
+
+  &__track {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 220px;
+    min-width: 0;
+
+    .perf-row__title,
+    .perf-row__sub {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__time,
+  &__status {
+    color: $perf-muted;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: $perf-bp-tablet) {
+    gap: 12px;
+
+    .perf-timeline,
+    &__time,
+    &__status { display: none; }
+
+    &__track { flex: 1 1 auto; width: auto; }
+  }
+
+  // On phones a pinned player would cover the cards; it sits after the list.
+  @media (max-width: $perf-bp-phone) {
+    position: static;
+
+    .perf-btn--view { width: auto; }
+  }
+}
+
+/* ─────────── Track panel ─────────── */
+
+.perf-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.perf-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  width: min(400px, 100%);
+  background: #0B0B0B;
+  border-left: 1px solid #2A2A2A;
+  font-family: $perf-font;
+  color: $perf-text;
+  overflow-y: auto;
+  animation: perf-drawer-in 0.2s ease-out;
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 24px 24px 0;
+  }
+
+  // Phone-only "< Performance" back link.
+  &__back {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: $perf-text;
+    font-family: $perf-font;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  &__titles {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  &__sub {
+    color: $perf-muted;
+    font-size: 13px;
+  }
+
+  &__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: $perf-text;
+    cursor: pointer;
+
+    &:hover { background: rgba(255, 255, 255, 0.08); }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
+  }
+
+  &__preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__preview-label {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  &__note {
+    margin: 0;
+    color: $perf-subtle;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  &__overline {
+    color: $perf-subtle;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &__platform {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: #C1C5C8;
+    font-size: 14px;
+    line-height: 1.4;
+
+    strong { color: $perf-text; }
+  }
+
+  &__origin { font-size: 14px; }
+
+  @media (max-width: $perf-bp-phone) {
+    width: 100%;
+    border-left: 0;
+
+    &__head {
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px 16px 0;
+    }
+
+    &__back { display: inline-flex; }
+    &__close { display: none; }
+    &__title { font-size: 20px; }
+    &__body { padding: 20px 16px 96px; }
+  }
+}
+
+@keyframes perf-drawer-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.perf-divider {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.perf-metrics {
+  display: flex;
+  gap: 12px;
+}
+
+.perf-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 6px;
+  background: $perf-surface;
+  line-height: 1.4;
+
+  &__label {
+    color: #C1C5C8;
+    font-size: 12px;
+  }
+
+  &__value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+}

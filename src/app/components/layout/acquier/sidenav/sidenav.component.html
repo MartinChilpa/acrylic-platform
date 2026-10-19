@@ -14,7 +14,7 @@
         [class.disabled]="item.disabled"
         [routerLink]="item.disabled ? null : item.routerLink"
         routerLinkActive="sidenav__item--active"
-        [routerLinkActiveOptions]="{ exact: true }"
+        [routerLinkActiveOptions]="activeOptions"
       >
         <img
           class="sidenav__icon"

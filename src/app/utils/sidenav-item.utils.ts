@@ -33,9 +33,17 @@ export const publicSidenavItems = [
   },
 ]
 
-export const acquierSidenavItems = [
+export interface AcquierSidenavItem {
+  icon: string;
+  label: string;
+  routerLink: string;
+  disabled?: boolean;
+  badge?: string;
+}
+
+export const acquierSidenavItems: AcquierSidenavItem[] = [
   { icon: 'home', label: 'Home', routerLink: '/brand/dashboard' },
   { icon: 'projects', label: 'Projects', routerLink: '/brand/projects' },
   { icon: 'licenses', label: 'Licenses', routerLink: '/brand/licenses' },
-  { icon: 'performance', label: 'Performance', routerLink: '/brand/performance', disabled: true, badge: 'Coming Soon' },
+  { icon: 'performance', label: 'Performance', routerLink: '/brand/performance' },
 ];

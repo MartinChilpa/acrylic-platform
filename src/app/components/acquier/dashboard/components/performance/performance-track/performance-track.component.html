@@ -1,0 +1,156 @@
+<acrylic-header
+  [teamName]="teamName"
+  [teamLogo]="teamLogo"
+  [tagline]="tagline"
+  [primaryColor]="primaryColor"
+  [secondaryColor]="secondaryColor">
+</acrylic-header>
+
+<div class="ptd-page">
+  <button type="button" class="perf-btn ptd-back" (click)="backToResults()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    {{ 'performance.details.back' | transloco }}
+  </button>
+
+  @switch (loadState) {
+    @case ('loading') {
+      <div class="ptd-state" role="status">
+        <span class="ptd-state__spinner" aria-hidden="true"></span>
+        {{ 'performance.loading' | transloco }}
+      </div>
+    }
+    @case ('error') {
+      <div class="ptd-state ptd-state--error" role="alert">
+        {{ 'performance.details.notFound' | transloco }}
+      </div>
+    }
+    @default {
+      @if (track; as t) {
+        <!-- Identity -->
+        <header class="ptd-identity">
+          <span class="ptd-identity__crumb">{{ 'performance.details.crumb' | transloco }}</span>
+          <h2 class="ptd-identity__title">{{ t.name }}</h2>
+          <span class="ptd-identity__sub">{{ artistName }}&nbsp;&nbsp;·&nbsp;&nbsp;{{ origin }}</span>
+        </header>
+
+        <!-- Preview -->
+        <div class="ptd-preview">
+          <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(t)"
+                  [disabled]="!t.previewUrl"
+                  [attr.aria-label]="(isPlaying(t) ? 'performance.pause' : 'performance.play') | transloco"
+                  (click)="togglePreview(t)">
+            @if (isPlaying(t)) {
+              <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+            } @else {
+              <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+            }
+          </button>
+          <strong class="ptd-preview__label">{{ 'performance.previewTrack' | transloco }}</strong>
+          <span class="ptd-preview__time">{{ formatTime(isPlaying(t) ? currentTime() : 0) }}</span>
+          <div class="perf-timeline"><div class="perf-timeline__value" [style.width.%]="isPlaying(t) ? progress : 0"></div></div>
+          <span class="ptd-preview__status">{{ (t.previewUrl ? 'performance.details.readyToPlay' : 'performance.previewUnavailable') | transloco }}</span>
+        </div>
+
+        <div class="ptd-columns">
+          <div class="ptd-main">
+            <!-- Primary metrics -->
+            <div class="ptd-metrics">
+              <div class="ptd-card ptd-metric">
+                <span class="ptd-metric__label">{{ 'performance.columns.totalAudience' | transloco }}</span>
+                <span class="ptd-metric__value" [class.perf-metric__value--na]="t.artist?.totalAudience == null">{{ audience(t.artist?.totalAudience) }}</span>
+                <span class="ptd-metric__label">{{ 'performance.details.combinedCounts' | transloco }}</span>
+              </div>
+              <div class="ptd-card ptd-metric">
+                <span class="ptd-metric__label">{{ 'performance.columns.spotifyStreams' | transloco }}</span>
+                <span class="ptd-metric__value" [class.perf-metric__value--na]="t.spotifyStreams === null">{{ audience(t.spotifyStreams) }}</span>
+                <span class="ptd-metric__label">{{ 'performance.details.forThisTrack' | transloco }}</span>
+              </div>
+            </div>
+
+            <!-- Audience by platform -->
+            <section class="ptd-card ptd-platforms">
+              <h3 class="ptd-card__title">{{ 'performance.details.audienceByPlatform' | transloco: { artist: artistName } }}</h3>
+              @for (platform of platforms; track platform.key) {
+                <div class="ptd-platform">
+                  <span class="ptd-platform__name">{{ platform.label }}</span>
+                  <div class="ptd-bar" aria-hidden="true">
+                    <div class="ptd-bar__value" [style.width.%]="barWidth(platform.key)" [style.background]="platform.color"></div>
+                  </div>
+                  <strong class="ptd-platform__value" [class.perf-metric__value--na]="t.artist?.audience?.[platform.key] == null">{{ audience(t.artist?.audience?.[platform.key], 2) }}</strong>
+                  @if (t.artist?.profileUrls?.[platform.key]; as url) {
+                    <a class="ptd-platform__link" [href]="url" target="_blank" rel="noopener noreferrer">{{ 'performance.details.profile' | transloco }}</a>
+                  } @else {
+                    <span class="ptd-platform__link ptd-platform__link--none">{{ 'performance.details.profile' | transloco }}</span>
+                  }
+                </div>
+              }
+              <p class="ptd-note">{{ 'performance.details.platformNote' | transloco }}</p>
+            </section>
+
+            <!-- Geography -->
+            <section class="ptd-card ptd-geo">
+              <h3 class="ptd-geo__title">{{ 'performance.details.artistOrigin' | transloco: { origin: origin } }}</h3>
+              <p class="ptd-note">{{ 'performance.details.originNote' | transloco }}</p>
+            </section>
+          </div>
+
+          <!-- Use and license -->
+          <aside class="perf-use ptd-use">
+            <h3 class="perf-use__title">{{ 'performance.use.title' | transloco }}</h3>
+            <span class="perf-tier perf-tier--lg" [ngClass]="'perf-tier--' + tierClass(t)">{{ t.tier }}</span>
+            <p class="perf-use__lede">{{ 'performance.use.lede' | transloco }}</p>
+            <div class="perf-use__ecu">
+              @if (t.extendedCommercialUse) {
+                <strong>{{ 'performance.ecuAvailable' | transloco }}</strong>
+                <span class="perf-use__ecu-sub">{{ 'performance.use.ecuName' | transloco }}</span>
+                <span>{{ 'performance.use.ecuBody' | transloco }}</span>
+              } @else {
+                <strong>{{ 'performance.use.checkAdUse' | transloco }}</strong>
+                <span class="perf-use__ecu-sub">{{ 'performance.use.paidAds' | transloco }}</span>
+                <span>{{ 'performance.use.checkAdUseBody' | transloco }}</span>
+              }
+            </div>
+            <button type="button" class="perf-license" [disabled]="licensing || !t.isrc" (click)="licenseTrack(t)">
+              {{ (licensing ? 'performance.use.opening' : 'performance.use.license') | transloco }}
+            </button>
+            @if (licenseError) {
+              <p class="perf-use__error" role="alert">{{ 'performance.use.licenseError' | transloco }}</p>
+            }
+            <p class="perf-use__note">{{ 'performance.use.detailsNote' | transloco }}</p>
+          </aside>
+        </div>
+
+        <!-- More from the artist -->
+        @if (moreFromArtist.length) {
+          <section class="ptd-more">
+            <h3 class="ptd-more__title">{{ 'performance.details.moreFrom' | transloco: { artist: artistName } }}</h3>
+            <div class="ptd-more__list">
+              @for (other of moreFromArtist; track other.uuid) {
+                <div class="ptd-more__row">
+                  <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(other)"
+                          [disabled]="!other.previewUrl"
+                          [attr.aria-label]="(isPlaying(other) ? 'performance.pause' : 'performance.play') | transloco"
+                          (click)="togglePreview(other)">
+                    @if (isPlaying(other)) {
+                      <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+                    } @else {
+                      <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+                    }
+                  </button>
+                  <strong class="ptd-more__name">{{ other.name }}</strong>
+                  <span class="ptd-more__streams">{{ 'performance.details.streamsLabel' | transloco: { value: audience(other.spotifyStreams) } }}</span>
+                  <button type="button" class="perf-btn perf-btn--view" (click)="viewTrack(other)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                    {{ 'performance.viewTrack' | transloco }}
+                  </button>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <p class="ptd-note">{{ 'performance.missingNote' | transloco }}</p>
+      }
+    }
+  }
+</div>

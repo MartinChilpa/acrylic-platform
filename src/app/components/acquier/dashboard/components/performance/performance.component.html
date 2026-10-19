@@ -1,0 +1,407 @@
+<acrylic-header
+  [teamName]="teamName"
+  [teamLogo]="teamLogo"
+  [tagline]="tagline"
+  [primaryColor]="primaryColor"
+  [secondaryColor]="secondaryColor">
+</acrylic-header>
+
+<div class="perf-page">
+
+  <!-- Header -->
+  <header class="perf-head">
+    <div class="perf-head__context">
+      <span class="perf-head__eyebrow">{{ 'performance.eyebrow' | transloco }}</span>
+      <span class="perf-head__team">{{ teamName }}</span>
+    </div>
+    <h2 class="perf-head__title">
+      @if (focusArtist) {
+        {{ 'performance.exploreArtist' | transloco: { artist: focusArtist } }}
+      } @else {
+        {{ 'performance.title' | transloco }}
+      }
+    </h2>
+    <p class="perf-head__lede">
+      {{ (focusArtist ? 'performance.exploreLede' : 'performance.lede') | transloco }}
+    </p>
+    @if (updated) {
+      <p class="perf-head__updated">{{ 'performance.dataUpdated' | transloco: { date: (updated | date:'d MMM y') } }}</p>
+    }
+  </header>
+
+  <!-- Search and filters -->
+  <section class="perf-filters">
+    <div class="perf-search">
+      <input class="perf-search__input"
+             type="search"
+             autocomplete="off"
+             [attr.aria-label]="'performance.searchPlaceholder' | transloco"
+             [placeholder]="'performance.searchPlaceholder' | transloco"
+             [(ngModel)]="search"
+             (ngModelChange)="onSearchInput($event)" />
+      @if (search) {
+        <button type="button" class="perf-search__clear" (click)="clearSearch()" [attr.aria-label]="'performance.clearSearch' | transloco">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </button>
+      }
+    </div>
+
+    <div class="perf-filters__row">
+      <label class="perf-select perf-select--origin">
+        <span class="perf-select__sr">{{ 'performance.filters.origin' | transloco }}</span>
+        <select [ngModel]="filters.origin" (ngModelChange)="setFilter('origin', $event)">
+          <option value="">{{ 'performance.filters.originAll' | transloco }}</option>
+          @for (option of originOptions; track option.code) {
+            <option [value]="option.code">{{ 'performance.filters.originValue' | transloco: { origin: option.name } }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="perf-select perf-select--platform">
+        <span class="perf-select__sr">{{ 'performance.filters.platform' | transloco }}</span>
+        <select [ngModel]="filters.platform" (ngModelChange)="setFilter('platform', $event)">
+          <option value="">{{ 'performance.filters.platformAll' | transloco }}</option>
+          @for (platform of platforms; track platform.key) {
+            <option [value]="platform.key">{{ 'performance.filters.platformValue' | transloco: { platform: platform.label } }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="perf-select perf-select--size">
+        <span class="perf-select__sr">{{ 'performance.filters.size' | transloco }}</span>
+        <select [ngModel]="filters.size" (ngModelChange)="setFilter('size', $event)">
+          <option value="any">{{ 'performance.filters.sizeAny' | transloco }}</option>
+          <option value="under1m">{{ 'performance.filters.sizeUnder1m' | transloco }}</option>
+          <option value="1to10m">{{ 'performance.filters.size1to10m' | transloco }}</option>
+          <option value="over10m">{{ 'performance.filters.sizeOver10m' | transloco }}</option>
+        </select>
+      </label>
+
+      <label class="perf-select perf-select--ecu">
+        <span class="perf-select__sr">{{ 'performance.filters.ecu' | transloco }}</span>
+        <select [ngModel]="filters.ecu" (ngModelChange)="setFilter('ecu', $event)">
+          <option value="any">{{ 'performance.filters.ecuAny' | transloco }}</option>
+          <option value="available">{{ 'performance.filters.ecuAvailable' | transloco }}</option>
+          <option value="notListed">{{ 'performance.filters.ecuNotListed' | transloco }}</option>
+        </select>
+      </label>
+    </div>
+
+    <p class="perf-note">{{ 'performance.originNote' | transloco }}</p>
+  </section>
+
+  <!-- Results -->
+  <section class="perf-results">
+    <div class="perf-toolbar">
+      <div class="perf-tabs" role="tablist">
+        <button type="button" role="tab" class="perf-tab"
+                [class.perf-tab--active]="tab === 'tracks'"
+                [attr.aria-selected]="tab === 'tracks'"
+                (click)="setTab('tracks')">
+          {{ 'performance.tabs.tracks' | transloco }}&nbsp;&nbsp;{{ loadState === 'ready' ? filteredTracks.length : '–' }}
+        </button>
+        <button type="button" role="tab" class="perf-tab"
+                [class.perf-tab--active]="tab === 'artists'"
+                [attr.aria-selected]="tab === 'artists'"
+                (click)="setTab('artists')">
+          {{ 'performance.tabs.artists' | transloco }}&nbsp;&nbsp;{{ loadState === 'ready' ? artistRows.length : '–' }}
+        </button>
+      </div>
+
+      <label class="perf-select perf-select--sort">
+        <span class="perf-select__sr">{{ 'performance.sort.label' | transloco }}</span>
+        <select [ngModel]="sort" (ngModelChange)="setSort($event)">
+          <option value="audience">{{ 'performance.sort.audience' | transloco }}</option>
+          <option value="name">{{ 'performance.sort.name' | transloco }}</option>
+        </select>
+      </label>
+    </div>
+
+    @switch (loadState) {
+      @case ('loading') {
+        <div class="perf-state" role="status">
+          <span class="perf-state__spinner" aria-hidden="true"></span>
+          {{ 'performance.loading' | transloco }}
+        </div>
+      }
+      @case ('error') {
+        <div class="perf-state perf-state--error" role="alert">
+          <span>{{ 'performance.error' | transloco }}</span>
+          <button type="button" class="perf-btn" (click)="retry()">{{ 'performance.retry' | transloco }}</button>
+        </div>
+      }
+      @default {
+        @if (resultCount === 0) {
+          <div class="perf-state">
+            <span>{{ (search ? 'performance.emptySearch' : 'performance.empty') | transloco: { query: search } }}</span>
+            @if (hasActiveFilters) {
+              <button type="button" class="perf-btn" (click)="resetFilters()">{{ 'performance.resetFilters' | transloco }}</button>
+            }
+          </div>
+        } @else if (tab === 'tracks') {
+          <!-- Tracks table -->
+          <div class="perf-table perf-table--tracks" role="table">
+            <div class="perf-table__head" role="row">
+              <span role="columnheader"></span>
+              <span role="columnheader">{{ 'performance.columns.trackArtist' | transloco }}</span>
+              <span role="columnheader">{{ 'performance.columns.origin' | transloco }}</span>
+              <span role="columnheader">{{ 'performance.columns.totalAudience' | transloco }}</span>
+              <span role="columnheader">{{ 'performance.columns.spotifyStreams' | transloco }}</span>
+              <span role="columnheader">{{ 'performance.columns.useOptions' | transloco }}</span>
+              <span role="columnheader"></span>
+            </div>
+
+            @for (track of pagedTracks; track track.uuid) {
+              <div class="perf-row" role="row" tabindex="0"
+                   [class.perf-row--selected]="selectedTrack?.uuid === track.uuid"
+                   (click)="openTrack(track)"
+                   (keydown.enter)="openTrack(track)">
+                <span class="perf-row__play" role="cell">
+                  <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(track)"
+                          [disabled]="!track.previewUrl"
+                          [attr.aria-label]="(isPlaying(track) ? 'performance.pause' : 'performance.play') | transloco"
+                          [title]="track.previewUrl ? '' : ('performance.previewUnavailable' | transloco)"
+                          (click)="togglePreview(track, $event)">
+                    @if (isPlaying(track)) {
+                      <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+                    } @else {
+                      <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+                    }
+                  </button>
+                </span>
+                <span class="perf-row__identity" role="cell">
+                  <span class="perf-row__title">{{ track.name || '–' }}</span>
+                  <span class="perf-row__sub">{{ track.artist?.name || ('performance.unknownArtist' | transloco) }}</span>
+                </span>
+                <span class="perf-row__muted perf-row__origin" role="cell">
+                  <span class="perf-row__label">{{ 'performance.columns.origin' | transloco }}</span>
+                  {{ origin(track) }}
+                </span>
+                <span class="perf-row__strong perf-row__audience" role="cell">
+                  <span class="perf-row__label">{{ 'performance.columns.totalAudience' | transloco }}</span>
+                  {{ audience(track.artist?.totalAudience) }}
+                </span>
+                <span class="perf-row__muted perf-row__streams" role="cell"
+                      [class.perf-row__unavailable]="track.spotifyStreams === null">
+                  <span class="perf-row__label">{{ 'performance.columns.spotifyStreams' | transloco }}</span>
+                  {{ audience(track.spotifyStreams) }}
+                </span>
+                <span class="perf-row__use" role="cell">
+                  <span class="perf-tier" [ngClass]="'perf-tier--' + tierClass(track)">{{ track.tier }}</span>
+                  @if (track.extendedCommercialUse) {
+                    <span class="perf-ecu-badge">{{ 'performance.ecuAvailable' | transloco }}</span>
+                  } @else {
+                    <span class="perf-ecu-muted">{{ 'performance.ecuNotListed' | transloco }}</span>
+                  }
+                </span>
+                <span class="perf-row__action" role="cell">
+                  <button type="button" class="perf-btn perf-btn--view" (click)="viewTrack(track, $event)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                    {{ 'performance.viewTrack' | transloco }}
+                  </button>
+                </span>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Artists table -->
+          <div class="perf-table perf-table--artists" role="table">
+            <div class="perf-table__head" role="row">
+              <span role="columnheader">{{ 'performance.columns.artistCatalogue' | transloco }}</span>
+              <span role="columnheader">{{ 'performance.columns.origin' | transloco }}</span>
+              <span role="columnheader">{{ 'performance.columns.totalAudience' | transloco }}</span>
+              <span role="columnheader">{{ 'performance.columns.largestPlatform' | transloco }}</span>
+              <span role="columnheader">{{ 'performance.columns.availableTracks' | transloco }}</span>
+              <span role="columnheader"></span>
+            </div>
+
+            @for (row of pagedArtists; track row.artist.uuid) {
+              <div class="perf-row" role="row">
+                <span class="perf-row__identity" role="cell">
+                  <span class="perf-row__title">{{ row.artist.name }}</span>
+                  <span class="perf-row__sub">{{ plural('performance.tracksInCatalogue', row.tracks.length) }}</span>
+                </span>
+                <span class="perf-row__muted" role="cell">
+                  <span class="perf-row__label">{{ 'performance.columns.origin' | transloco }}</span>
+                  {{ originName(row.artist.countryCode) }}
+                </span>
+                <span class="perf-row__strong" role="cell">
+                  <span class="perf-row__label">{{ 'performance.columns.totalAudience' | transloco }}</span>
+                  {{ audience(row.artist.totalAudience) }}
+                </span>
+                <span class="perf-row__muted" role="cell">
+                  <span class="perf-row__label">{{ 'performance.columns.largestPlatform' | transloco }}</span>
+                  @if (row.artist.largestPlatform) {
+                    <span class="perf-dot" [style.background]="platformColor(row.artist.largestPlatform)" aria-hidden="true"></span>
+                  }
+                  {{ platformLabel(row.artist.largestPlatform) }}
+                </span>
+                <span class="perf-row__muted" role="cell">
+                  <span class="perf-row__label">{{ 'performance.columns.availableTracks' | transloco }}</span>
+                  {{ plural('performance.trackCount', row.tracks.length) }}
+                </span>
+                <span class="perf-row__action" role="cell">
+                  <button type="button" class="perf-btn perf-btn--view" (click)="viewArtistTracks(row)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                    {{ 'performance.viewTracks' | transloco }}
+                  </button>
+                </span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (resultCount > 0) {
+          <div class="perf-footer">
+            <div class="perf-footer__summary">
+              @if (focusArtist && tab === 'tracks') {
+                <span>{{ plural('performance.tracksByArtist', filteredTracks.length, { artist: focusArtist }) }}</span>
+              } @else {
+                <span>{{ (tab === 'tracks' ? 'performance.showingTracks' : 'performance.showingArtists') | transloco: { from: pageStart + 1, to: pageEnd, total: resultCount } }}</span>
+              }
+              @if (pageCount > 1) {
+                <nav class="perf-pager" [attr.aria-label]="'performance.pagination' | transloco">
+                  <button type="button" class="perf-pager__link" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">{{ 'performance.previous' | transloco }}</button>
+                  @for (p of pages; track $index) {
+                    @if (p === null) {
+                      <span class="perf-pager__gap">…</span>
+                    } @else {
+                      <button type="button" class="perf-pager__link"
+                              [class.perf-pager__link--active]="p === currentPage"
+                              [attr.aria-current]="p === currentPage ? 'page' : null"
+                              (click)="goToPage(p)">{{ p }}</button>
+                    }
+                  }
+                  <button type="button" class="perf-pager__link" [disabled]="currentPage === pageCount" (click)="goToPage(currentPage + 1)">{{ 'performance.next' | transloco }}</button>
+                </nav>
+              }
+            </div>
+            <p class="perf-note">{{ (tab === 'tracks' ? 'performance.tracksNote' : 'performance.artistsNote') | transloco }}</p>
+          </div>
+        }
+      }
+    }
+  </section>
+
+  <!-- Persistent player -->
+  @if (playerTrack) {
+    <div class="perf-player">
+      <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(playerTrack)"
+              [disabled]="!playerTrack.previewUrl"
+              [attr.aria-label]="(isPlaying(playerTrack) ? 'performance.pause' : 'performance.play') | transloco"
+              (click)="togglePreview(playerTrack)">
+        @if (isPlaying(playerTrack)) {
+          <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+        } @else {
+          <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+        }
+      </button>
+      <div class="perf-player__track">
+        <span class="perf-row__title">{{ playerTrack.name }}</span>
+        <span class="perf-row__sub">{{ playerTrack.artist?.name || ('performance.unknownArtist' | transloco) }}</span>
+      </div>
+      <span class="perf-player__time">{{ formatTime(isPlaying(playerTrack) ? currentTime() : 0) }}</span>
+      <div class="perf-timeline"><div class="perf-timeline__value" [style.width.%]="isPlaying(playerTrack) ? playerProgress : 0"></div></div>
+      <span class="perf-player__status">{{ (playerTrack.previewUrl ? 'performance.preview' : 'performance.previewUnavailable') | transloco }}</span>
+      <button type="button" class="perf-btn perf-btn--view" (click)="viewTrack(playerTrack)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+        {{ 'performance.viewTrack' | transloco }}
+      </button>
+    </div>
+  }
+</div>
+
+<!-- Track panel: side drawer on desktop, full screen on phones -->
+@if (selectedTrack; as track) {
+  <div class="perf-drawer-backdrop" (click)="closeTrack()"></div>
+  <aside class="perf-drawer" role="dialog" aria-modal="true" [attr.aria-label]="track.name">
+    <div class="perf-drawer__head">
+      <button type="button" class="perf-drawer__back" (click)="closeTrack()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {{ 'acquerSidenav.performance' | transloco }}
+      </button>
+      <div class="perf-drawer__titles">
+        <span class="perf-drawer__title">{{ track.name }}</span>
+        <span class="perf-drawer__sub">{{ track.artist?.name || ('performance.unknownArtist' | transloco) }} · {{ origin(track) }}</span>
+      </div>
+      <button type="button" class="perf-drawer__close" (click)="closeTrack()" [attr.aria-label]="'performance.close' | transloco">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="perf-drawer__body">
+      <div class="perf-drawer__preview">
+        <button type="button" class="perf-play perf-play--lg" [ngClass]="'perf-play--' + tierClass(track)"
+                [disabled]="!track.previewUrl"
+                [attr.aria-label]="(isPlaying(track) ? 'performance.pause' : 'performance.play') | transloco"
+                (click)="togglePreview(track)">
+          @if (isPlaying(track)) {
+            <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+          } @else {
+            <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+          }
+        </button>
+        <span class="perf-drawer__preview-label">{{ (track.previewUrl ? 'performance.previewTrack' : 'performance.previewUnavailable') | transloco }}</span>
+      </div>
+
+      <hr class="perf-divider" />
+
+      <div class="perf-metrics">
+        <div class="perf-metric">
+          <span class="perf-metric__label">{{ 'performance.columns.totalAudience' | transloco }}</span>
+          <span class="perf-metric__value" [class.perf-metric__value--na]="track.artist?.totalAudience == null">{{ audience(track.artist?.totalAudience) }}</span>
+        </div>
+        <div class="perf-metric">
+          <span class="perf-metric__label">{{ 'performance.columns.spotifyStreams' | transloco }}</span>
+          <span class="perf-metric__value" [class.perf-metric__value--na]="track.spotifyStreams === null">{{ audience(track.spotifyStreams) }}</span>
+        </div>
+      </div>
+      <p class="perf-drawer__note">{{ 'performance.panel.metricsNote' | transloco }}</p>
+
+      <span class="perf-drawer__overline">{{ 'performance.panel.audienceByPlatform' | transloco: { artist: track.artist?.name || '' } }}</span>
+      @for (platform of platforms; track platform.key) {
+        <div class="perf-drawer__platform">
+          <span>{{ platform.label }}</span>
+          <strong [class.perf-metric__value--na]="track.artist?.audience?.[platform.key] == null">{{ audience(track.artist?.audience?.[platform.key], 2) }}</strong>
+        </div>
+      }
+      <p class="perf-drawer__note">{{ 'performance.spotifyNote' | transloco }}</p>
+
+      <hr class="perf-divider" />
+
+      <span class="perf-drawer__overline">{{ 'performance.panel.artistOrigin' | transloco }}</span>
+      <strong class="perf-drawer__origin">{{ origin(track) }}</strong>
+      <p class="perf-drawer__note">{{ 'performance.panel.originNote' | transloco }}</p>
+
+      <hr class="perf-divider" />
+
+      <div class="perf-use">
+        <h3 class="perf-use__title">{{ 'performance.use.title' | transloco }}</h3>
+        <span class="perf-tier perf-tier--lg" [ngClass]="'perf-tier--' + tierClass(track)">{{ track.tier }}</span>
+        <p class="perf-use__lede">{{ 'performance.use.lede' | transloco }}</p>
+        <div class="perf-use__ecu">
+          @if (track.extendedCommercialUse) {
+            <strong>{{ 'performance.ecuAvailable' | transloco }}</strong>
+            <span class="perf-use__ecu-sub">{{ 'performance.use.ecuName' | transloco }}</span>
+            <span>{{ 'performance.use.ecuBody' | transloco }}</span>
+          } @else {
+            <strong>{{ 'performance.use.checkAdUse' | transloco }}</strong>
+            <span class="perf-use__ecu-sub">{{ 'performance.use.paidAds' | transloco }}</span>
+            <span>{{ 'performance.use.checkAdUseBody' | transloco }}</span>
+          }
+        </div>
+        <button type="button" class="perf-license" [disabled]="licensingUuid === track.uuid || !track.isrc" (click)="licenseTrack(track)">
+          {{ (licensingUuid === track.uuid ? 'performance.use.opening' : 'performance.use.license') | transloco }}
+        </button>
+        @if (licenseError) {
+          <p class="perf-use__error" role="alert">{{ 'performance.use.licenseError' | transloco }}</p>
+        }
+        <p class="perf-use__note">{{ 'performance.use.panelNote' | transloco }}</p>
+      </div>
+
+      <p class="perf-drawer__note">{{ 'performance.missingNote' | transloco }}</p>
+    </div>
+  </aside>
+}
