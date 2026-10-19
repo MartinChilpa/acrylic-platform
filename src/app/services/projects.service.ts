@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, catchError, of, tap, throwError } from 'rxjs';
+import { BehaviorSubject, EMPTY, Observable, catchError, expand, of, reduce, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ICommonSuccessResponse } from '../interfaces/response/common.response';
 import { IFavoriteResult, IProjectResult } from '../interfaces/response/projects.response';
@@ -60,16 +60,55 @@ export class ProjectsService {
 
 
   loadFavorites(): void {
-    this.http.get<ICommonSuccessResponse<IFavoriteResult[]>>(`${this.base}/favorites/`).pipe(
+    this.http.get<ICommonSuccessResponse<IFavoriteResult[]> | IFavoriteResult[]>(`${this.base}/favorites/`).pipe(
+      expand((response) => {
+        const nextUrl = this.getNextFavoritesPageUrl(response);
+        return nextUrl
+          ? this.http.get<ICommonSuccessResponse<IFavoriteResult[]> | IFavoriteResult[]>(nextUrl).pipe(
+              catchError((err) => {
+                // Keep the pages already received if a later backend page fails.
+                console.warn('[ProjectsService] additional favorites page unavailable', err);
+                return EMPTY;
+              })
+            )
+          : EMPTY;
+      }),
+      reduce(
+        (allFavorites, response) => [...allFavorites, ...this.getFavoritesFromResponse(response)],
+        [] as IFavoriteResult[]
+      ),
       catchError((err) => {
         console.warn('[ProjectsService] loadFavorites unavailable', err);
         return of(null);
       })
-    ).subscribe((res) => {
-      if (!res) { return; }
-      const backend: IFavoriteResult[] = Array.isArray(res) ? (res as any) : ((res as any).results ?? []);
+    ).subscribe((backend) => {
+      if (!backend) { return; }
       this.setFavorites(this.adoptTrackSnapshots(backend));
     });
+  }
+
+  private getFavoritesFromResponse(
+    response: ICommonSuccessResponse<IFavoriteResult[]> | IFavoriteResult[]
+  ): IFavoriteResult[] {
+    return Array.isArray(response) ? response : (response?.results ?? []);
+  }
+
+  private getNextFavoritesPageUrl(
+    response: ICommonSuccessResponse<IFavoriteResult[]> | IFavoriteResult[]
+  ): string | null {
+    if (Array.isArray(response) || typeof response?.next !== 'string' || !response.next.trim()) {
+      return null;
+    }
+
+    const next = response.next.trim();
+    try {
+      const parsed = new URL(next, window.location.origin);
+      // Keep API pagination on the app's same-origin proxy even when DRF emits
+      // an absolute platform URL.
+      return `${parsed.pathname}${parsed.search}`;
+    } catch {
+      return next.startsWith('/') ? next : null;
+    }
   }
 
   toggleFavorite(trackId: string | number, trackSnapshot?: any): Observable<any> {

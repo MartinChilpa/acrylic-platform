@@ -88,6 +88,35 @@ describe('ProjectsService', () => {
     expect(localStorage.getItem(accountStorageKey)).toBeNull();
   });
 
+  it('loads every backend page before publishing the favorites list', () => {
+    const secondFavorite = {
+      ...favorite,
+      uuid: 'favorite-2',
+      track_uuid: 'track-2',
+      track: 'track-2',
+      isrc: 'ISRC2',
+      track_name: 'Second track',
+    };
+    let favorites: any[] = [];
+    service.favorites$.subscribe((value) => { favorites = value; });
+
+    service.loadFavorites();
+    http.expectOne('/api/v1/my-club/favorites/').flush({
+      count: 2,
+      previous: null,
+      next: 'https://platform.acrylic.la/api/v1/my-club/favorites/?page=2',
+      results: [favorite],
+    });
+    http.expectOne('/api/v1/my-club/favorites/?page=2').flush({
+      count: 2,
+      previous: '/api/v1/my-club/favorites/?page=1',
+      next: null,
+      results: [secondFavorite],
+    });
+
+    expect(favorites.map((item) => item.track_uuid)).toEqual(['track-1', 'track-2']);
+  });
+
   it('keeps persisted snapshots when clearing the live session', () => {
     service.setSnapshotScope(accountScope);
     localStorage.setItem(accountStorageKey, JSON.stringify({ [track.uuid]: track }));

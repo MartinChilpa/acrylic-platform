@@ -45,6 +45,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   private peaksInstance: any | null = null;
   private peaksLib: any | null = null;
   private rafId: number | null = null;
+  private destroyed = false;
 
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
@@ -68,6 +69,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.subs.unsubscribe();
     this.stopTimer();
     this.destroyPeaks();
@@ -399,6 +401,7 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
     if (!audioUrl || !waveformUrl || !audioEl || !overviewEl) { return; }
 
     const Peaks = await this.getPeaksLib();
+    if (this.destroyed) { return; }
     this.waveformLoading = true;
     Peaks.init({
       overview: {
@@ -413,6 +416,10 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
       showPlayheadTime: false,
       keyboard: false
     }, (err: unknown, instance: any) => {
+      if (this.destroyed) {
+        instance?.destroy?.();
+        return;
+      }
       this.waveformLoading = false;
       if (err || !instance) {
         this.waveformError = 'Failed to load waveform';

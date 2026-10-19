@@ -306,6 +306,9 @@ $radius-sm:     8px;
 /* Same type as the page title, so the two headings read as one hierarchy. */
 .favorites__header {
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .favorites__title {
@@ -314,6 +317,19 @@ $radius-sm:     8px;
   font-weight: 700;
   line-height: 32px;
   margin: 0;
+}
+
+.favorites__count {
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: $text-muted;
+  font-size: 12px;
+  line-height: 24px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .favorites__list {
@@ -328,6 +344,55 @@ $radius-sm:     8px;
   flex-direction: column;
   gap: 6px;
   width: 100%;
+}
+
+.favorites__pagination {
+  width: 100%;
+  margin-top: 16px;
+  padding: 0 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.favorites__pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.favorites__pagination-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid $border;
+  background: rgba(255, 255, 255, 0.08);
+  color: $text-primary;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+
+  &:hover:not(:disabled) { background: rgba(255, 255, 255, 0.14); }
+  &:disabled { opacity: 0.35; cursor: not-allowed; }
+}
+
+.favorites__pagination-status,
+.favorites__pagination-size {
+  color: $text-muted;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .projects {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .favorites__pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 .favorite-item__assign {
