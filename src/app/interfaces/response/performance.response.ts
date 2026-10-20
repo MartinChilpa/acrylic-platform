@@ -13,6 +13,23 @@ export interface IPerformanceTrackResult {
   /** Not on the public serializer yet; read when the backend adds them. */
   spotify_streams?: number | null;
   audio_url?: string | null;
+  cover_image?: string | null;
+}
+
+/** One entry of artist_artist.chartmetric_instagram_top_countries. */
+export interface IChartmetricCountry {
+  code2: string;
+  name?: string;
+  rank: number;
+  weights?: number;
+}
+
+/** One entry of artist_artist.chartmetric_instagram_top_cities. */
+export interface IChartmetricCity {
+  city_name: string;
+  code2?: string;
+  rank: number;
+  weights?: number;
 }
 
 export interface IPerformanceArtistResult {
@@ -20,7 +37,10 @@ export interface IPerformanceArtistResult {
   name: string;
   /** ISO 3166-1 alpha-2 code. */
   country: string | null;
+  hometown: string | null;
   updated: string;
+  chartmetric_instagram_top_countries: IChartmetricCountry[] | null;
+  chartmetric_instagram_top_cities: IChartmetricCity[] | null;
   tiktok_followers: number | null;
   instagram_followers: number | null;
   youtube_followers: number | null;
@@ -46,6 +66,14 @@ export interface PerformanceArtist {
   uuid: string;
   name: string;
   countryCode: string | null;
+  /** City the artist is from, as stored in artist_artist.hometown. */
+  hometown: string | null;
+  /**
+   * Where the artist's Instagram audience is, per Chartmetric. Ranks only:
+   * these are the artist's top locations, not audience sizes.
+   */
+  instagramTopCountries: { code: string; rank: number; weight: number | null }[];
+  instagramTopCities: { name: string; code: string | null; rank: number; weight: number | null }[];
   /** Follower count per platform; null where the source has no number. */
   audience: Record<PerformancePlatform, number | null>;
   /** Sum of the platform counts, null when none is known. Not unique reach. */
@@ -67,6 +95,8 @@ export interface PerformanceTrack {
   /** Per-track streams are not stored yet, so this is usually null. */
   spotifyStreams: number | null;
   previewUrl: string | null;
+  /** catalog_track.cover_image, once the tracks endpoint returns it. */
+  coverUrl: string | null;
 }
 
 export interface PerformanceCatalog {

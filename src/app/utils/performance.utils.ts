@@ -11,6 +11,99 @@ export const PERFORMANCE_PLATFORMS: { key: PerformancePlatform; label: string; c
   { key: 'spotify', label: 'Spotify', color: '#1ED760' },
 ];
 
+/* ─────────── Audience composition (Figma: Performance / Audience composition / V1) ─────────── */
+
+/** Pie order (clockwise from 12 o'clock) and slice colors from the design. */
+const COMPOSITION_SLICES: { key: PerformancePlatform; label: string; color: string }[] = [
+  { key: 'spotify', label: 'Spotify', color: '#E79888' },
+  { key: 'instagram', label: 'Instagram', color: '#8DC4C2' },
+  { key: 'youtube', label: 'YouTube', color: '#FFCC8F' },
+  { key: 'tiktok', label: 'TikTok', color: '#4B6095' },
+];
+
+export interface CompositionSlice {
+  key: PerformancePlatform;
+  label: string;
+  color: string;
+  /** Null when the platform has no count. */
+  value: number | null;
+  /** Share of the total in percent, one decimal; null when unavailable. */
+  share: number | null;
+  /** SVG path for the slice in a 148×148 box; null when not drawn. */
+  path: string | null;
+}
+
+export interface AudienceComposition {
+  total: number | null;
+  slices: CompositionSlice[];
+  /**
+   * All four platforms have a count. Only then is the pie drawn: a pie of the
+   * known platforms alone would read as the whole audience.
+   */
+  complete: boolean;
+}
+
+/**
+ * The artist's audience split across the four platform counts. Shares use
+ * largest-remainder rounding so they add up to exactly 100%. These are
+ * follower counts, not track streams or unique people.
+ */
+export function audienceComposition(artist: PerformanceArtist | null | undefined): AudienceComposition {
+  const values = COMPOSITION_SLICES.map(s => artist?.audience[s.key] ?? null);
+  const known = values.filter((v): v is number => v !== null && v > 0);
+  const total = known.length ? known.reduce((a, b) => a + b, 0) : null;
+  const complete = values.every(v => v !== null && v > 0);
+
+  // Shares of a partial total would overstate the known platforms, so none then.
+  const shares = complete && total ? largestRemainder(values.map(v => v ?? 0), total) : values.map(() => null);
+  const paths = complete && total ? piePaths(values as number[], total) : values.map(() => null);
+
+  return {
+    total,
+    complete,
+    slices: COMPOSITION_SLICES.map((s, i) => ({
+      ...s,
+      value: values[i],
+      share: values[i] !== null ? shares[i] : null,
+      path: paths[i],
+    })),
+  };
+}
+
+/** Tenths of a percent that sum to 100.0, by largest remainder. */
+function largestRemainder(values: number[], total: number): number[] {
+  const exact = values.map(v => (v / total) * 1000);
+  const floors = exact.map(Math.floor);
+  let left = 1000 - floors.reduce((a, b) => a + b, 0);
+  exact
+    .map((v, i) => ({ i, rest: v - floors[i] }))
+    .sort((a, b) => b.rest - a.rest)
+    .forEach(({ i }) => { if (left > 0 && values[i] > 0) { floors[i]++; left--; } });
+  return floors.map(f => f / 10);
+}
+
+/** Slice paths, angle = count / total × 360°, starting at 12 o'clock, clockwise. */
+function piePaths(values: number[], total: number): (string | null)[] {
+  const c = 74;
+  const r = 73.5;
+  const point = (angle: number) => {
+    const rad = (angle - 90) * (Math.PI / 180);
+    return `${(c + r * Math.cos(rad)).toFixed(3)} ${(c + r * Math.sin(rad)).toFixed(3)}`;
+  };
+  let start = 0;
+  return values.map(value => {
+    const sweep = (value / total) * 360;
+    if (sweep <= 0) { return null; }
+    const end = start + sweep;
+    // A single platform holding everything is a full circle, not an arc.
+    const path = sweep >= 359.999
+      ? `M ${c - r} ${c} a ${r} ${r} 0 1 0 ${2 * r} 0 a ${r} ${r} 0 1 0 ${-2 * r} 0 Z`
+      : `M ${c} ${c} L ${point(start)} A ${r} ${r} 0 ${sweep > 180 ? 1 : 0} 1 ${point(end)} Z`;
+    start = end;
+    return path;
+  });
+}
+
 export type AudienceSize = 'any' | 'under1m' | '1to10m' | 'over10m';
 export type EcuFilter = 'any' | 'available' | 'notListed';
 export type PerformanceSort = 'audience' | 'name';
@@ -91,7 +184,8 @@ export function sortPerformanceTracks(tracks: PerformanceTrack[], sort: Performa
     (b.artist?.totalAudience ?? -1) - (a.artist?.totalAudience ?? -1) || a.name.localeCompare(b.name));
 }
 
-export function groupTracksByArtist(tracks: PerformanceTrack[], sort: PerformanceSort): PerformanceArtistRow[] {
+/** `keepOrder` keeps artists in the order their tracks arrive (a search ranking). */
+export function groupTracksByArtist(tracks: PerformanceTrack[], sort: PerformanceSort, keepOrder = false): PerformanceArtistRow[] {
   const rows = new Map<string, PerformanceArtistRow>();
   for (const track of tracks) {
     if (!track.artist) { continue; }
@@ -100,6 +194,7 @@ export function groupTracksByArtist(tracks: PerformanceTrack[], sort: Performanc
     rows.set(track.artist.uuid, row);
   }
   const list = [...rows.values()];
+  if (keepOrder) { return list; }
   if (sort === 'name') {
     return list.sort((a, b) => a.artist.name.localeCompare(b.artist.name));
   }

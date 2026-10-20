@@ -5,13 +5,15 @@ import { ActivatedRoute, ParamMap, Router, RouterModule } from '@angular/router'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { Subject, of } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { HeaderComponent } from '../../../../shared/acquier/header/header.component';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
 import { PerformanceService } from '../../../../../services/performance.service';
 import { PerformancePlatform, PerformanceTrack } from '../../../../../interfaces/response/performance.response';
 import {
+  AudienceComposition,
   AudienceSize,
+  audienceComposition,
   DEFAULT_PERFORMANCE_FILTERS,
   EcuFilter,
   PERFORMANCE_PLATFORMS,
@@ -25,6 +27,7 @@ import {
   pageWindow,
   sortPerformanceTracks,
 } from '../../../../../utils/performance.utils';
+import { SearchOutcome, searchCatalog } from '../../../../../utils/performance-search.utils';
 
 type ResultTab = 'tracks' | 'artists';
 type LoadState = 'loading' | 'ready' | 'error';
@@ -61,11 +64,16 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   sort: PerformanceSort = 'audience';
   page = 1;
 
+  /** Set when the URL carries an explicit sort, which overrides a search ranking. */
+  private sortChosen = false;
+
   loadState: LoadState = 'loading';
   updated: Date | null = null;
   private catalog: PerformanceTrack[] = [];
-  private loadedSearch: string | null = null;
   private searchInput$ = new Subject<string>();
+
+  /** How the current search was read; drives the hint under the search bar. */
+  outcome: SearchOutcome = searchCatalog([], '');
 
   /* Derived from catalog + filters on every change. */
   filteredTracks: PerformanceTrack[] = [];
@@ -93,33 +101,32 @@ export class PerformanceComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(q => this.updateQuery({ q: q || null, page: null }));
 
-    // Every URL change re-derives the view; only a new search term hits the DB.
-    this.route.queryParamMap.pipe(
-      tap(params => this.readQuery(params)),
-      map(params => (params.get('q') ?? '').trim()),
-      switchMap(q => {
-        if (q === this.loadedSearch && this.loadState === 'ready') { return of(null); }
-        this.loadState = 'loading';
-        return this.performanceService.searchCatalog(q).pipe(
-          tap(catalog => {
-            this.catalog = catalog.tracks;
-            this.updated = catalog.updated;
-            this.loadedSearch = q;
-            this.loadState = 'ready';
-          }),
-          catchError(err => {
-            console.error('[Performance] catalog load failed', err);
-            this.catalog = [];
-            this.loadedSearch = null;
-            this.loadState = 'error';
-            return of(null);
-          })
-        );
-      }),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(() => this.derive());
+    // Every URL change re-derives the view from the catalog loaded once below.
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      this.readQuery(params);
+      this.derive();
+    });
 
+    this.loadCatalog();
     this.transloco.langChanges$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.derive());
+  }
+
+  private loadCatalog(): void {
+    this.loadState = 'loading';
+    this.performanceService.loadCatalog().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: catalog => {
+        this.catalog = catalog.tracks;
+        this.updated = catalog.updated;
+        this.loadState = 'ready';
+        this.derive();
+      },
+      error: err => {
+        console.error('[Performance] catalog load failed', err);
+        this.catalog = [];
+        this.loadState = 'error';
+        this.derive();
+      },
+    });
   }
 
   ngOnDestroy(): void {
@@ -138,6 +145,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
       size: (['under1m', '1to10m', 'over10m'].includes(params.get('size') ?? '') ? params.get('size') : 'any') as AudienceSize,
       ecu: (['available', 'notListed'].includes(params.get('ecu') ?? '') ? params.get('ecu') : 'any') as EcuFilter,
     };
+    this.sortChosen = params.has('sort');
     this.sort = params.get('sort') === 'name' ? 'name' : 'audience';
     this.page = Math.max(1, Number(params.get('page')) || 1);
   }
@@ -169,8 +177,9 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     this.updateQuery({ [key]: isDefault ? null : value, page: null });
   }
 
+  /** Always written to the URL: an explicit pick overrides a search ranking. */
   setSort(sort: PerformanceSort): void {
-    this.updateQuery({ sort: sort === 'audience' ? null : sort, page: null });
+    this.updateQuery({ sort, page: null });
   }
 
   goToPage(page: number): void {
@@ -193,9 +202,13 @@ export class PerformanceComponent implements OnInit, OnDestroy {
       .map(code => ({ code, name: countryName(code, lang) ?? code }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    const matching = this.catalog.filter(t => matchesPerformanceFilters(t, this.filters));
-    this.filteredTracks = sortPerformanceTracks(matching, this.sort);
-    this.artistRows = groupTracksByArtist(this.filteredTracks, this.sort);
+    this.outcome = searchCatalog(this.catalog, this.search);
+    const matching = this.outcome.tracks.filter(t => matchesPerformanceFilters(t, this.filters));
+    // A search ranking (relevance, platform, audience) keeps its order unless
+    // the user picked another sort.
+    const keepOrder = this.outcome.ranked && !this.sortChosen;
+    this.filteredTracks = keepOrder ? matching : sortPerformanceTracks(matching, this.sort);
+    this.artistRows = groupTracksByArtist(this.filteredTracks, this.sort, keepOrder);
 
     if (this.selectedTrack && !this.catalog.some(t => t.uuid === this.selectedTrack!.uuid)) {
       this.selectedTrack = null;
@@ -239,7 +252,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
 
   /** Every result belongs to one artist: the "Explore X's tracks" view. */
   get focusArtist(): string | null {
-    if (!this.search.trim() || this.artistRows.length !== 1) { return null; }
+    if (this.outcome.mode !== 'text' || this.artistRows.length !== 1) { return null; }
     return this.artistRows[0].artist.name;
   }
 
@@ -266,6 +279,17 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   originName(code: string | null | undefined): string {
     return countryName(code, this.transloco.getActiveLang()) ?? this.transloco.translate('performance.unavailable');
   }
+
+  /** Pie data for the panel; cached per track so change detection reuses it. */
+  composition(track: PerformanceTrack): AudienceComposition {
+    if (this.compositionFor !== track) {
+      this.compositionFor = track;
+      this.compositionCache = audienceComposition(track.artist);
+    }
+    return this.compositionCache!;
+  }
+  private compositionFor: PerformanceTrack | null = null;
+  private compositionCache: AudienceComposition | null = null;
 
   platformLabel(key: PerformancePlatform | null): string {
     return this.platforms.find(p => p.key === key)?.label ?? this.transloco.translate('performance.unavailable');
@@ -341,19 +365,36 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Same URL, so the query stream will not fire again; load directly. */
   retry(): void {
-    this.loadState = 'loading';
-    this.performanceService.searchCatalog(this.search).pipe(
-      catchError(() => of(null)),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(catalog => {
-      if (!catalog) { this.loadState = 'error'; return; }
-      this.catalog = catalog.tracks;
-      this.updated = catalog.updated;
-      this.loadedSearch = this.search.trim();
-      this.loadState = 'ready';
-      this.derive();
-    });
+    this.loadCatalog();
   }
+
+  /** Runs the suggested spelling ("Did you mean …?"). */
+  applySuggestion(name: string): void {
+    this.search = name;
+    this.updateQuery({ q: name, page: null });
+  }
+
+  /** The place a search was read as: country names in the active language, or the city as typed. */
+  get placeLabel(): string {
+    const place = this.outcome.place;
+    if (!place) { return ''; }
+    if (place.kind === 'country') {
+      const lang = this.transloco.getActiveLang();
+      return place.key.split(',').map(code => countryName(code, lang) ?? code).join(' / ');
+    }
+    return place.label.replace(/\b\p{L}/gu, ch => ch.toUpperCase());
+  }
+
+  platformName(key: PerformancePlatform | null): string {
+    return this.platforms.find(p => p.key === key)?.label ?? '';
+  }
+
+  onCoverError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (!img.src.endsWith(PerformanceComponent.COVER_FALLBACK)) { img.src = PerformanceComponent.COVER_FALLBACK; }
+  }
+
+  static readonly COVER_FALLBACK = 'assets/images/others/default.jpg';
+  readonly coverFallback = PerformanceComponent.COVER_FALLBACK;
 }

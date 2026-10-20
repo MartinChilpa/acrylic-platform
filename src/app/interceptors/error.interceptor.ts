@@ -1,11 +1,20 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { AlertService } from '../services/alert.service';
 
+/**
+ * Set on requests whose failure the caller handles quietly (optional data),
+ * so no global error alert is shown for them.
+ */
+export const SKIP_ERROR_ALERT = new HttpContextToken<boolean>(() => false);
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const alertService = inject(AlertService);
   return next(req).pipe(catchError((error: HttpErrorResponse) => {
+    if (req.context.get(SKIP_ERROR_ALERT)) {
+      return throwError(() => error);
+    }
     let errorTitle = "";
     let errorMessage = 'An error occurred';
     if (error.error instanceof ErrorEvent) {

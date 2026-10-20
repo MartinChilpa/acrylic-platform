@@ -180,6 +180,44 @@
   }
 }
 
+.perf-cover {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: $perf-chip;
+}
+
+// Reading of the search under the input: place, ranking, spelling hint.
+.perf-search-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: -4px;
+  color: $perf-muted;
+  font-size: 14px;
+  line-height: 1.4;
+
+  &__rank { color: #C9A2FF; }
+  &__warn { color: #F2C46D; }
+
+  &__suggest {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #C9A2FF;
+    font-family: $perf-font;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover { color: #FFFFFF; }
+  }
+}
+
 .perf-note {
   margin: 0;
   color: $perf-muted;
@@ -245,7 +283,7 @@
   flex-direction: column;
 
   &--tracks {
-    --perf-cols: 36px minmax(160px, 2fr) minmax(96px, 1fr) minmax(96px, 1fr) minmax(96px, 0.9fr) 136px 140px;
+    --perf-cols: 36px minmax(200px, 2.4fr) minmax(110px, 1fr) minmax(110px, 1fr) 136px 140px;
   }
 
   &--artists {
@@ -300,6 +338,20 @@
     flex-direction: column;
     gap: 4px;
     min-width: 0;
+
+    // Cover art beside the track name.
+    &--cover {
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+  }
+
+  &__names {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
   }
 
   &__title {
@@ -321,9 +373,6 @@
     gap: 6px;
     color: $perf-muted;
   }
-
-  &__streams { font-size: 16px; }
-  &__unavailable { color: $perf-subtle; font-size: 14px; }
 
   &__strong {
     color: $perf-text;
@@ -347,18 +396,17 @@
     border-radius: 8px;
 
     .perf-table--tracks & {
-      grid-template-columns: 36px repeat(3, minmax(0, 1fr));
+      grid-template-columns: 36px repeat(2, minmax(0, 1fr));
       grid-template-areas:
-        'play identity identity identity'
-        '. origin audience streams'
-        '. use use use'
-        'action action action action';
+        'play identity identity'
+        '. origin audience'
+        '. use use'
+        'action action action';
 
       .perf-row__play { grid-area: play; }
       .perf-row__identity { grid-area: identity; }
       .perf-row__origin { grid-area: origin; }
       .perf-row__audience { grid-area: audience; }
-      .perf-row__streams { grid-area: streams; }
       .perf-row__use { grid-area: use; }
       .perf-row__action { grid-area: action; }
     }
@@ -713,6 +761,86 @@
   gap: 12px;
 }
 
+// Figma: Performance / Audience composition / V1.
+.perf-composition {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(126, 210, 134, 0.1) 0%, rgba(65, 108, 69, 0.1) 100%);
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+  }
+
+  &__total {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    strong { font-size: 32px; font-weight: 700; line-height: normal; }
+    span { color: $perf-muted; font-size: 14px; line-height: 20px; }
+  }
+
+  &__body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__pie {
+    flex: 0 0 148px;
+    width: 148px;
+    height: 148px;
+  }
+
+  &__legend {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    &--na { box-shadow: inset 0 0 0 1px $perf-subtle; }
+  }
+
+  &__label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    white-space: nowrap;
+
+    strong { font-size: 14px; line-height: 20px; }
+    span { color: $perf-muted; font-size: 12px; line-height: 16px; }
+  }
+
+  &__note {
+    margin: 0;
+    color: $perf-muted;
+    font-size: 12px;
+    line-height: 16px;
+  }
+}
+
 .perf-metric {
   display: flex;
   flex-direction: column;
@@ -733,4 +861,6 @@
     font-size: 22px;
     font-weight: 700;
   }
+
+  &--wide { flex: none; width: 100%; box-sizing: border-box; }
 }
