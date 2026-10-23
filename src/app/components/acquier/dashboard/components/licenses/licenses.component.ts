@@ -2,21 +2,20 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { ProjectsService } from '../../../../../services/projects.service';
+import { Subscription } from 'rxjs';
 import { LicenseService } from '../../../../../services/license.service';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
 import { HeaderComponent } from '../../../../shared/acquier/header/header.component';
 import { isPreClearTrack } from '../../../../../utils/license-tier.utils';
+import {
+  PublishedLinkDetectionError,
+  TrackPublishedLink,
+  TrackPublishedLinksService,
+} from '../../../../../services/track-published-links.service';
 
 type LicenseFilter = 'all' | 'links' | 'expiring';
 type AddLinkPhase = 'idle' | 'checking' | 'ready' | 'saving' | 'saved';
 type AddLinkIssue = null | 'invalid' | 'duplicate' | 'unknown-platform' | 'restricted';
-
-interface PublishedLink {
-  /** Detected platform label, or the name typed in for an unknown one. */
-  platform: string;
-  url: string;
-}
 
 interface LicenseEntry {
   track: any;
@@ -28,7 +27,7 @@ interface LicenseEntry {
   usageDue: string | null;
   isUsageOverdue: boolean;
   teamName: string;
-  publishedLinks: PublishedLink[];
+  publishedLinks: TrackPublishedLink[];
 }
 
 @Component({
@@ -39,10 +38,12 @@ interface LicenseEntry {
   styleUrl: './licenses.component.scss',
 })
 export class LicensesComponent implements OnInit, OnDestroy {
-  private projectsService = inject(ProjectsService);
   private licenseService = inject(LicenseService);
+  private publishedLinksService = inject(TrackPublishedLinksService);
   private brandingService = inject(TeamBrandingService);
   private transloco = inject(TranslocoService);
+  private subscriptions = new Subscription();
+  private allPublishedLinks: TrackPublishedLink[] = [];
 
   licenses: LicenseEntry[] = [];
   selectedLicense: LicenseEntry | null = null;
@@ -182,19 +183,24 @@ export class LicensesComponent implements OnInit, OnDestroy {
     this.secondaryColor = branding.secondaryColor;
     this.brandingService.applyCssVars(branding);
 
-    this.licenseService.licensedTracks$.subscribe((tracks) => {
+    this.subscriptions.add(this.licenseService.licensedTracks$.subscribe((tracks) => {
       const teamName = this.brandingService.getActiveBranding().teamName;
       this.licenses = tracks.map((track, i) => this.buildEntry(track, i, teamName));
       if (this.selectedLicense) {
         const stillExists = this.licenses.find(l => l.licenseId === this.selectedLicense!.licenseId);
         this.selectedLicense = stillExists ?? null;
       }
-    });
+    }));
     // Hydrate from backend on mount (merges with any in-memory optimistic entries)
     this.licenseService.loadLicenses();
+    this.subscriptions.add(this.publishedLinksService.list().subscribe({
+      next: (response) => this.setPublishedLinks(response.results),
+      error: (error) => console.error('[LicensesComponent] Failed to load published links', error),
+    }));
   }
 
   ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
     this.clearDetectTimer();
     this.audioEls.forEach((audio) => audio.pause());
     this.audioEls.clear();
@@ -210,7 +216,6 @@ export class LicensesComponent implements OnInit, OnDestroy {
    *   - whitelistingStatus   -> from backend ('confirmed' | 'requested' | 'needs-attention' | 'pending')
    *   - project / teamName    -> from backend (campaign/club association)
    *   - usageDue / overdue    -> derived from the backend usage-window dates
-   *   - publishedLinks        -> from backend (see saveAddLink TODO)
    *   - licenseType           -> the tier (PreClear / ArtistPromo / Bid2Clear); until then
    *                              resolveLicenseType() falls back to LicenseService's
    *                              remembered tier, since ILicenseResult has no price fields
@@ -231,7 +236,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
       usageDue: usage.label,
       isUsageOverdue: usage.overdue,
       teamName,
-      publishedLinks: [],
+      publishedLinks: this.getPublishedLinksForTrack(track),
     };
   }
 
@@ -414,7 +419,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
   }
 
   getPlatformLinkCount(lic: LicenseEntry, platform: string): number {
-    return lic.publishedLinks.filter(link => link.platform === platform).length;
+    return lic.publishedLinks.filter(link => link.platform_display === platform).length;
   }
 
   getPlatformLinkLabel(lic: LicenseEntry, platform: string): string {
@@ -485,17 +490,15 @@ export class LicensesComponent implements OnInit, OnDestroy {
     }
 
     this.addLinkPhase = 'checking';
-    // TODO(backend): a real check would ask the API to identify the platform and
-    // read the license restrictions. Until that endpoint exists this resolves
-    // locally, with the short delay standing in for the round trip.
+    // Debounce detection so pasting or typing a URL does not flicker the form.
     this.detectTimerId = window.setTimeout(() => this.resolveAddLink(), 400);
   }
 
   private resolveAddLink(): void {
     const url = this.addLinkUrl.trim();
-    const host = this.readHost(url);
+    const detection = this.publishedLinksService.detect(url);
 
-    if (!host) {
+    if (!detection.valid) {
       this.addLinkPhase = 'idle';
       this.addLinkIssue = 'invalid';
       return;
@@ -507,7 +510,7 @@ export class LicensesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.detectedPlatform = this.identifyPlatform(host, url);
+    this.detectedPlatform = detection.platformDisplay;
     this.addLinkPhase = 'ready';
 
     if (!this.detectedPlatform) {
@@ -519,38 +522,13 @@ export class LicensesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Only an absolute http(s) link to a post counts. */
-  private readHost(url: string): string | null {
-    if (!/^https?:\/\//i.test(url)) { return null; }
-    try {
-      const parsed = new URL(url);
-      return parsed.pathname && parsed.pathname !== '/' ? parsed.hostname.toLowerCase() : null;
-    } catch {
-      return null;
-    }
-  }
-
-  private identifyPlatform(host: string, url: string): string | null {
-    if (host.includes('youtube.com') || host === 'youtu.be') {
-      return url.includes('/shorts/') ? 'YouTube Shorts' : 'YouTube';
-    }
-    if (host.includes('instagram.com')) { return 'Instagram'; }
-    if (host.includes('tiktok.com')) { return 'TikTok'; }
-    if (host.includes('facebook.com') || host === 'fb.watch') { return 'Facebook'; }
-    return null;
-  }
-
   private isDuplicateLink(lic: LicenseEntry, url: string): boolean {
     return lic.publishedLinks.some((link) => link.url.trim().toLowerCase() === url.toLowerCase());
   }
 
-  get addLinkPlatformLabel(): string {
-    return this.detectedPlatform ?? this.addLinkPlatformName.trim();
-  }
-
   get canSaveAddLink(): boolean {
     if (this.addLinkPhase !== 'ready') { return false; }
-    if (this.addLinkIssue === 'unknown-platform') { return !!this.addLinkPlatformName.trim(); }
+    if (this.addLinkIssue === 'unknown-platform') { return false; }
     return true;
   }
 
@@ -559,18 +537,32 @@ export class LicensesComponent implements OnInit, OnDestroy {
     if (!lic || !this.canSaveAddLink) { return; }
 
     const url = this.addLinkUrl.trim();
-    const label = this.addLinkPlatformLabel;
     const wasRestricted = this.addLinkIssue === 'restricted';
+    const trackUuid = this.getTrackUuid(lic.track);
+    if (!trackUuid) {
+      this.addLinkIssue = 'invalid';
+      return;
+    }
     this.addLinkPhase = 'saving';
 
-    // TODO(backend): persist published links once the usage-links endpoint exists.
-    window.setTimeout(() => {
-      lic.publishedLinks = [...lic.publishedLinks, { platform: label, url }];
-      this.savedLinkPlatform = label;
-      this.savedLinkUrl = url;
-      this.savedLinkRestricted = wasRestricted;
-      this.addLinkPhase = 'saved';
-    }, 400);
+    this.subscriptions.add(this.publishedLinksService.createForTrack(trackUuid, url).subscribe({
+      next: (savedLink) => {
+        this.allPublishedLinks = [savedLink, ...this.allPublishedLinks];
+        lic.publishedLinks = [...lic.publishedLinks, savedLink];
+        this.savedLinkPlatform = savedLink.platform_display;
+        this.savedLinkUrl = savedLink.url;
+        this.savedLinkRestricted = wasRestricted;
+        this.addLinkPhase = 'saved';
+      },
+      error: (error) => {
+        this.addLinkPhase = 'ready';
+        if (error instanceof PublishedLinkDetectionError) {
+          this.addLinkIssue = error.code === 'invalid-url' ? 'invalid' : 'unknown-platform';
+          return;
+        }
+        this.addLinkIssue = error?.status === 400 && error?.error?.url ? 'duplicate' : 'invalid';
+      },
+    }));
   }
 
   retryAddLink(): void {
@@ -598,6 +590,25 @@ export class LicensesComponent implements OnInit, OnDestroy {
       clearTimeout(this.detectTimerId);
       this.detectTimerId = null;
     }
+  }
+
+  private getTrackUuid(track: any): string {
+    const value = track?.track_uuid ?? track?.track?.uuid ?? track?.uuid;
+    return value === null || value === undefined ? '' : String(value).trim();
+  }
+
+  private getPublishedLinksForTrack(track: any): TrackPublishedLink[] {
+    const trackUuid = this.getTrackUuid(track);
+    return trackUuid
+      ? this.allPublishedLinks.filter((link) => link.track_uuid === trackUuid)
+      : [];
+  }
+
+  private setPublishedLinks(links: TrackPublishedLink[]): void {
+    this.allPublishedLinks = links;
+    this.licenses.forEach((license) => {
+      license.publishedLinks = this.getPublishedLinksForTrack(license.track);
+    });
   }
 
   /** Solid download button colored by license tier. */
