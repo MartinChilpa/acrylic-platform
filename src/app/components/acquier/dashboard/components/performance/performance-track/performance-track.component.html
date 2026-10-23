@@ -36,7 +36,7 @@
         <!-- Preview -->
         <div class="ptd-preview">
           <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(t)"
-                  [disabled]="!t.previewUrl"
+                  [disabled]="!canPreview(t)"
                   [attr.aria-label]="(isPlaying(t) ? 'performance.pause' : 'performance.play') | transloco"
                   (click)="togglePreview(t)">
             @if (isPlaying(t)) {
@@ -48,7 +48,7 @@
           <strong class="ptd-preview__label">{{ 'performance.previewTrack' | transloco }}</strong>
           <span class="ptd-preview__time">{{ formatTime(isPlaying(t) ? currentTime() : 0) }}</span>
           <div class="perf-timeline"><div class="perf-timeline__value" [style.width.%]="isPlaying(t) ? progress : 0"></div></div>
-          <span class="ptd-preview__status">{{ (t.previewUrl ? 'performance.details.readyToPlay' : 'performance.previewUnavailable') | transloco }}</span>
+          <span class="ptd-preview__status">{{ (canPreview(t) ? 'performance.details.readyToPlay' : 'performance.previewUnavailable') | transloco }}</span>
         </div>
 
         <div class="ptd-columns">
@@ -130,7 +130,7 @@
               @for (other of moreFromArtist; track other.uuid) {
                 <div class="ptd-more__row">
                   <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(other)"
-                          [disabled]="!other.previewUrl"
+                          [disabled]="!canPreview(other)"
                           [attr.aria-label]="(isPlaying(other) ? 'performance.pause' : 'performance.play') | transloco"
                           (click)="togglePreview(other)">
                     @if (isPlaying(other)) {

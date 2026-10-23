@@ -12,6 +12,9 @@ export interface IPerformanceTrackResult {
   extended_commercial_use: boolean;
   /** Not on the public serializer yet; read when the backend adds them. */
   spotify_streams?: number | null;
+  /** Signed, expiring URL for catalog_track.file_wav (backend: TrackSerializer.preview_url). */
+  preview_url?: string | null;
+  /** Older name for the same thing; read as a fallback. */
   audio_url?: string | null;
   cover_image?: string | null;
 }

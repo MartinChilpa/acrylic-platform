@@ -100,6 +100,11 @@ export class PerformanceTrackComponent implements OnInit, OnDestroy {
     this.performanceService.togglePreview(track);
   }
 
+  /** A preview link exists and has not failed to play. */
+  canPreview(track: PerformanceTrack | null): boolean {
+    return this.performanceService.canPreview(track);
+  }
+
   isPlaying(track: PerformanceTrack | null): boolean {
     return !!track && this.playingUuid() === track.uuid;
   }

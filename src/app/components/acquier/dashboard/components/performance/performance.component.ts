@@ -20,6 +20,9 @@ import {
   PerformanceArtistRow,
   PerformanceFilters,
   PerformanceSort,
+  SOCIAL_PLATFORMS,
+  SocialFilter,
+  sortBySocial,
   countryName,
   formatAudience,
   groupTracksByArtist,
@@ -143,7 +146,8 @@ export class PerformanceComponent implements OnInit, OnDestroy {
       origin: (params.get('origin') ?? '').toUpperCase(),
       platform: platform && this.platforms.some(p => p.key === platform) ? platform : '',
       size: (['under1m', '1to10m', 'over10m'].includes(params.get('size') ?? '') ? params.get('size') : 'any') as AudienceSize,
-      ecu: (['available', 'notListed'].includes(params.get('ecu') ?? '') ? params.get('ecu') : 'any') as EcuFilter,
+      ecu: (params.get('ecu') === 'available' ? 'available' : 'any') as EcuFilter,
+      social: (SOCIAL_PLATFORMS as string[]).includes(params.get('social') ?? '') ? params.get('social') as SocialFilter : '',
     };
     this.sortChosen = params.has('sort');
     this.sort = params.get('sort') === 'name' ? 'name' : 'audience';
@@ -206,8 +210,12 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     const matching = this.outcome.tracks.filter(t => matchesPerformanceFilters(t, this.filters));
     // A search ranking (relevance, platform, audience) keeps its order unless
     // the user picked another sort.
-    const keepOrder = this.outcome.ranked && !this.sortChosen;
-    this.filteredTracks = keepOrder ? matching : sortPerformanceTracks(matching, this.sort);
+    // A social filter ranks by that platform's followers, on top of any search.
+    const social = this.filters.social;
+    const keepOrder = (this.outcome.ranked || !!social) && !this.sortChosen;
+    this.filteredTracks = social && !this.sortChosen
+      ? sortBySocial(matching, social)
+      : keepOrder ? matching : sortPerformanceTracks(matching, this.sort);
     this.artistRows = groupTracksByArtist(this.filteredTracks, this.sort, keepOrder);
 
     if (this.selectedTrack && !this.catalog.some(t => t.uuid === this.selectedTrack!.uuid)) {
@@ -258,11 +266,11 @@ export class PerformanceComponent implements OnInit, OnDestroy {
 
   get hasActiveFilters(): boolean {
     const f = this.filters;
-    return !!(f.origin || f.platform || f.size !== 'any' || f.ecu !== 'any');
+    return !!(f.origin || f.platform || f.size !== 'any' || f.ecu !== 'any' || f.social);
   }
 
   resetFilters(): void {
-    this.updateQuery({ origin: null, platform: null, size: null, ecu: null, page: null });
+    this.updateQuery({ origin: null, platform: null, size: null, ecu: null, social: null, page: null });
   }
 
   /* ─────────── Formatting ─────────── */
@@ -334,6 +342,11 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     event?.stopPropagation();
     this.playerTrack = track;
     this.performanceService.togglePreview(track);
+  }
+
+  /** A preview link exists and has not failed to play. */
+  canPreview(track: PerformanceTrack | null): boolean {
+    return this.performanceService.canPreview(track);
   }
 
   isPlaying(track: PerformanceTrack | null): boolean {

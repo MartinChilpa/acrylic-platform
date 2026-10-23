@@ -105,7 +105,15 @@ function piePaths(values: number[], total: number): (string | null)[] {
 }
 
 export type AudienceSize = 'any' | 'under1m' | '1to10m' | 'over10m';
-export type EcuFilter = 'any' | 'available' | 'notListed';
+export type EcuFilter = 'any' | 'available';
+
+/**
+ * Social ranking: artists with a follower count on the platform, most
+ * followers first. Followers are the only Instagram/TikTok metric stored
+ * (tiktok_likes is empty and there is no engagement or growth data).
+ */
+export type SocialFilter = '' | 'instagram' | 'tiktok';
+export const SOCIAL_PLATFORMS: Exclude<SocialFilter, ''>[] = ['instagram', 'tiktok'];
 export type PerformanceSort = 'audience' | 'name';
 
 export interface PerformanceFilters {
@@ -113,6 +121,7 @@ export interface PerformanceFilters {
   platform: PerformancePlatform | '';
   size: AudienceSize;
   ecu: EcuFilter;
+  social: SocialFilter;
 }
 
 export const DEFAULT_PERFORMANCE_FILTERS: PerformanceFilters = {
@@ -120,7 +129,16 @@ export const DEFAULT_PERFORMANCE_FILTERS: PerformanceFilters = {
   platform: '',
   size: 'any',
   ecu: 'any',
+  social: '',
 };
+
+/** Most followers on the platform first; artists without the count are filtered out before. */
+export function sortBySocial(tracks: PerformanceTrack[], platform: Exclude<SocialFilter, ''>): PerformanceTrack[] {
+  return [...tracks].sort((a, b) =>
+    (b.artist?.audience[platform] ?? -1) - (a.artist?.audience[platform] ?? -1)
+    || (a.artist?.name ?? '').localeCompare(b.artist?.name ?? '')
+    || a.name.localeCompare(b.name));
+}
 
 /** One artist with the tracks of theirs that survived the filters. */
 export interface PerformanceArtistRow {
@@ -162,8 +180,8 @@ export function matchesPerformanceFilters(track: PerformanceTrack, filters: Perf
   const artist = track.artist;
   if (filters.origin && artist?.countryCode !== filters.origin) { return false; }
   if (filters.platform && !(artist?.audience[filters.platform])) { return false; }
+  if (filters.social && !(artist?.audience[filters.social])) { return false; }
   if (filters.ecu === 'available' && !track.extendedCommercialUse) { return false; }
-  if (filters.ecu === 'notListed' && track.extendedCommercialUse) { return false; }
   if (filters.size !== 'any') {
     const total = artist?.totalAudience;
     if (total === null || total === undefined) { return false; }

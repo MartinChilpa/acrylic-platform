@@ -119,12 +119,13 @@
         </select>
       </label>
 
-      <label class="perf-select perf-select--ecu">
-        <span class="perf-select__sr">{{ 'performance.filters.ecu' | transloco }}</span>
-        <select [ngModel]="filters.ecu" (ngModelChange)="setFilter('ecu', $event)">
-          <option value="any">{{ 'performance.filters.ecuAny' | transloco }}</option>
-          <option value="available">{{ 'performance.filters.ecuAvailable' | transloco }}</option>
-          <option value="notListed">{{ 'performance.filters.ecuNotListed' | transloco }}</option>
+      <!-- Ranks by follower count, the only Instagram/TikTok metric with data. -->
+      <label class="perf-select perf-select--social">
+        <span class="perf-select__sr">{{ 'performance.filters.social' | transloco }}</span>
+        <select [ngModel]="filters.social" (ngModelChange)="setFilter('social', $event)">
+          <option value="">{{ 'performance.filters.socialAny' | transloco }}</option>
+          <option value="instagram">{{ 'performance.filters.socialInstagram' | transloco }}</option>
+          <option value="tiktok">{{ 'performance.filters.socialTiktok' | transloco }}</option>
         </select>
       </label>
     </div>
@@ -208,9 +209,9 @@
                    (keydown.enter)="openTrack(track)">
                 <span class="perf-row__play" role="cell">
                   <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(track)"
-                          [disabled]="!track.previewUrl"
+                          [disabled]="!canPreview(track)"
                           [attr.aria-label]="(isPlaying(track) ? 'performance.pause' : 'performance.play') | transloco"
-                          [title]="track.previewUrl ? '' : ('performance.previewUnavailable' | transloco)"
+                          [title]="canPreview(track) ? '' : ('performance.previewUnavailable' | transloco)"
                           (click)="togglePreview(track, $event)">
                     @if (isPlaying(track)) {
                       <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
@@ -238,8 +239,6 @@
                   <span class="perf-tier" [ngClass]="'perf-tier--' + tierClass(track)">{{ track.tier }}</span>
                   @if (track.extendedCommercialUse) {
                     <span class="perf-ecu-badge">{{ 'performance.ecuAvailable' | transloco }}</span>
-                  } @else {
-                    <span class="perf-ecu-muted">{{ 'performance.ecuNotListed' | transloco }}</span>
                   }
                 </span>
                 <span class="perf-row__action" role="cell">
@@ -335,7 +334,7 @@
   @if (playerTrack) {
     <div class="perf-player">
       <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(playerTrack)"
-              [disabled]="!playerTrack.previewUrl"
+              [disabled]="!canPreview(playerTrack)"
               [attr.aria-label]="(isPlaying(playerTrack) ? 'performance.pause' : 'performance.play') | transloco"
               (click)="togglePreview(playerTrack)">
         @if (isPlaying(playerTrack)) {
@@ -350,7 +349,7 @@
       </div>
       <span class="perf-player__time">{{ formatTime(isPlaying(playerTrack) ? currentTime() : 0) }}</span>
       <div class="perf-timeline"><div class="perf-timeline__value" [style.width.%]="isPlaying(playerTrack) ? playerProgress : 0"></div></div>
-      <span class="perf-player__status">{{ (playerTrack.previewUrl ? 'performance.preview' : 'performance.previewUnavailable') | transloco }}</span>
+      <span class="perf-player__status">{{ (canPreview(playerTrack) ? 'performance.preview' : 'performance.previewUnavailable') | transloco }}</span>
       <button type="button" class="perf-btn perf-btn--view" (click)="viewTrack(playerTrack)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
         {{ 'performance.viewTrack' | transloco }}
@@ -380,7 +379,7 @@
     <div class="perf-drawer__body">
       <div class="perf-drawer__preview">
         <button type="button" class="perf-play perf-play--lg" [ngClass]="'perf-play--' + tierClass(track)"
-                [disabled]="!track.previewUrl"
+                [disabled]="!canPreview(track)"
                 [attr.aria-label]="(isPlaying(track) ? 'performance.pause' : 'performance.play') | transloco"
                 (click)="togglePreview(track)">
           @if (isPlaying(track)) {
@@ -389,7 +388,7 @@
             <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
           }
         </button>
-        <span class="perf-drawer__preview-label">{{ (track.previewUrl ? 'performance.previewTrack' : 'performance.previewUnavailable') | transloco }}</span>
+        <span class="perf-drawer__preview-label">{{ (canPreview(track) ? 'performance.previewTrack' : 'performance.previewUnavailable') | transloco }}</span>
       </div>
 
       <hr class="perf-divider" />
