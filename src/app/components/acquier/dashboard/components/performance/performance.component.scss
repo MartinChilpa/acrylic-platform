@@ -129,7 +129,7 @@
 
   &--platform { width: 160px; }
   &--size { width: 188px; }
-  &--ecu { width: 240px; }
+  &--social { width: 248px; }
   &--sort { width: 208px; }
 
   select {
@@ -176,7 +176,7 @@
     flex: 1 1 calc(50% - 6px);
     width: auto;
 
-    &--ecu { flex-basis: 100%; }
+    &--social { flex-basis: 100%; }
   }
 }
 
@@ -449,10 +449,6 @@
   white-space: nowrap;
 }
 
-.perf-ecu-muted {
-  color: $perf-muted;
-  font-size: 13px;
-}
 
 .perf-dot {
   width: 8px;

@@ -196,7 +196,7 @@ export class PerformanceService {
       tier: /preclear/i.test(tierName) ? 'PreClear' : 'Artist Promo',
       extendedCommercialUse: !!row.extended_commercial_use,
       spotifyStreams: row.spotify_streams ?? null,
-      previewUrl: row.audio_url || null,
+      previewUrl: this.toMediaUrl(row.preview_url ?? row.audio_url),
       coverUrl: this.toImageUrl(row.cover_image),
     };
   }
@@ -220,6 +220,15 @@ export class PerformanceService {
     return value === null || value === undefined || !Number.isFinite(n) ? null : n;
   }
 
+  /**
+   * Audio must come as a full http(s) URL (a signed media link). A bare storage
+   * key such as "tracks/…/x.wav" is ignored, never turned into a request.
+   */
+  private toMediaUrl(value: string | null | undefined): string | null {
+    const url = (value ?? '').trim();
+    return /^https?:\/\//i.test(url) ? url : null;
+  }
+
   /** Only absolute http(s) or site-relative image URLs are used. */
   private toImageUrl(value: string | null | undefined): string | null {
     const url = (value ?? '').trim();
@@ -239,24 +248,23 @@ export class PerformanceService {
   readonly playingUuid = signal<string | null>(null);
   readonly currentTime = signal(0);
   readonly duration = signal(0);
+  /** Tracks whose preview could not be played, even after refreshing the link. */
+  readonly failedPreviews = signal<ReadonlySet<string>>(new Set());
   private audio: HTMLAudioElement | null = null;
   private audioUuid: string | null = null;
 
+  canPreview(track: PerformanceTrack | null): boolean {
+    return !!track?.previewUrl && !this.failedPreviews().has(track.uuid);
+  }
+
+  /** Play/pause; one preview at a time. Audio only, nothing else is drawn. */
   togglePreview(track: PerformanceTrack): void {
-    if (!track.previewUrl) { return; }
-    if (this.audioUuid !== track.uuid) {
-      this.stopPreview();
-      this.audio = new Audio(track.previewUrl);
-      this.audioUuid = track.uuid;
-      this.audio.addEventListener('timeupdate', () => {
-        this.currentTime.set(this.audio?.currentTime ?? 0);
-        this.duration.set(this.audio?.duration || 0);
-      });
-      this.audio.addEventListener('play', () => this.playingUuid.set(track.uuid));
-      this.audio.addEventListener('pause', () => this.playingUuid.set(null));
-      this.audio.addEventListener('ended', () => this.playingUuid.set(null));
+    if (!this.canPreview(track)) { return; }
+    if (this.audioUuid !== track.uuid || !this.audio) {
+      this.startPreview(track, track.previewUrl!, true);
+      return;
     }
-    if (this.audio!.paused) { this.audio!.play(); } else { this.audio!.pause(); }
+    if (this.audio.paused) { this.play(this.audio); } else { this.audio.pause(); }
   }
 
   stopPreview(): void {
@@ -266,5 +274,53 @@ export class PerformanceService {
     this.playingUuid.set(null);
     this.currentTime.set(0);
     this.duration.set(0);
+  }
+
+  private startPreview(track: PerformanceTrack, url: string, mayRefresh: boolean): void {
+    this.stopPreview();
+    const audio = new Audio(url);
+    this.audio = audio;
+    this.audioUuid = track.uuid;
+    // Listeners ignore an element that has since been replaced.
+    const current = () => this.audio === audio;
+    audio.addEventListener('timeupdate', () => {
+      if (!current()) { return; }
+      this.currentTime.set(audio.currentTime);
+      this.duration.set(audio.duration || 0);
+    });
+    audio.addEventListener('play', () => { if (current()) { this.playingUuid.set(track.uuid); } });
+    audio.addEventListener('pause', () => { if (current()) { this.playingUuid.set(null); } });
+    audio.addEventListener('ended', () => { if (current()) { this.playingUuid.set(null); } });
+    audio.addEventListener('error', () => {
+      if (!current()) { return; }
+      this.stopPreview();
+      // Signed links expire; fetch the track once for a fresh one before giving up.
+      if (mayRefresh) { this.refreshPreview(track); } else { this.markFailed(track); }
+    });
+    this.play(audio);
+  }
+
+  /** play() rejects on autoplay blocks and bad sources; the 'error' event covers the latter. */
+  private play(audio: HTMLAudioElement): void {
+    audio.play().catch(err => {
+      if (err?.name === 'NotAllowedError' && this.audio === audio) { this.playingUuid.set(null); }
+    });
+  }
+
+  private refreshPreview(track: PerformanceTrack): void {
+    this.http.get<IPerformanceTrackResult>(`${this.base}/tracks/${track.uuid}/`).pipe(
+      map(row => this.toMediaUrl(row.preview_url ?? row.audio_url)),
+      catchError(() => of(null))
+    ).subscribe(url => {
+      if (!url || url === track.previewUrl) { this.markFailed(track); return; }
+      track.previewUrl = url;
+      this.startPreview(track, url, false);
+    });
+  }
+
+  private markFailed(track: PerformanceTrack): void {
+    const next = new Set(this.failedPreviews());
+    next.add(track.uuid);
+    this.failedPreviews.set(next);
   }
 }

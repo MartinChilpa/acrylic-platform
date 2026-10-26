@@ -370,6 +370,14 @@ export function searchCatalog(tracks: PerformanceTrack[], raw: string): SearchOu
     return byName.tracks.length ? byName : { ...base, mode: 'geo', place, tracks: [], ranked: true, platform: query.platform };
   }
 
+  // 2b. A city in the artists' Chartmetric Instagram top cities ("Lyon").
+  // Countries are handled above by artist origin; cities have no origin field
+  // with data, so a city name is matched against where the audience is.
+  if (placeText && !resolveCountries(placeText).length) {
+    const byCity = audienceSearch(base, tracks, placeText, 'city');
+    if (byCity.tracks.length) { return byCity; }
+  }
+
   // 3. Platform ranking over the whole catalog ("best artists on TikTok").
   if (query.platform && !query.remainder) {
     return rankByPlatform({ ...base, mode: 'all', tracks, ranked: true }, query);
@@ -412,8 +420,23 @@ function rankByPlatform(outcome: SearchOutcome, query: ParsedQuery): SearchOutco
   };
 }
 
-function audienceSearch(base: SearchOutcome, tracks: PerformanceTrack[], placeText: string): SearchOutcome {
-  const codes = resolveCountries(placeText);
+/**
+ * A Chartmetric city name answers to the query when it is the same city,
+ * contains it as whole words ("City of London" for "London"), or is a close
+ * spelling. Both sides are normalized, so case and accents never matter
+ * ("montreal" finds "Montréal").
+ */
+export function cityMatches(cityName: string, query: string): boolean {
+  const name = normalize(cityName);
+  const q = normalize(query);
+  if (!name || !q) { return false; }
+  if (name === q) { return true; }
+  if (q.length < 4) { return false; }
+  return ` ${name} `.includes(` ${q} `) || similarity(name, q) >= 0.85;
+}
+
+function audienceSearch(base: SearchOutcome, tracks: PerformanceTrack[], placeText: string, only?: 'city'): SearchOutcome {
+  const codes = only === 'city' ? [] : resolveCountries(placeText);
   const city = normalize(placeText);
   const kind: SearchPlace['kind'] = codes.length ? 'country' : 'city';
   const place: SearchPlace = { kind, label: placeText, key: codes.length ? codes.join(',') : city };
@@ -422,10 +445,7 @@ function audienceSearch(base: SearchOutcome, tracks: PerformanceTrack[], placeTe
   const rankFor = (artist: PerformanceArtist): { rank: number; weight: number } | null => {
     const entries = kind === 'country'
       ? artist.instagramTopCountries.filter(c => codes.includes(c.code))
-      : artist.instagramTopCities.filter(c => {
-          const name = normalize(c.name);
-          return name === city || (city.length >= 4 && similarity(name, city) >= 0.85);
-        });
+      : artist.instagramTopCities.filter(c => cityMatches(c.name, city));
     if (!entries.length) { return null; }
     const top = entries.reduce((a, b) => (a.rank <= b.rank ? a : b));
     return { rank: top.rank, weight: top.weight ?? 0 };
