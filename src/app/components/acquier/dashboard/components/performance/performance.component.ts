@@ -1,11 +1,11 @@
-import { Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { Subject, of } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { HeaderComponent } from '../../../../shared/acquier/header/header.component';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
 import { PerformanceService } from '../../../../../services/performance.service';
@@ -30,7 +30,7 @@ import {
   pageWindow,
   sortPerformanceTracks,
 } from '../../../../../utils/performance.utils';
-import { SearchOutcome, searchCatalog } from '../../../../../utils/performance-search.utils';
+import { CountrySuggestion, SearchOutcome, searchCatalog, suggestCountries } from '../../../../../utils/performance-search.utils';
 
 type ResultTab = 'tracks' | 'artists';
 type LoadState = 'loading' | 'ready' | 'error';
@@ -49,6 +49,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private host: ElementRef<HTMLElement> = inject(ElementRef);
 
   private branding = this.brandingService.getActiveBranding();
   teamName = this.branding.teamName;
@@ -73,7 +74,13 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   loadState: LoadState = 'loading';
   updated: Date | null = null;
   private catalog: PerformanceTrack[] = [];
-  private searchInput$ = new Subject<string>();
+  /** Pending write of the typed text to the URL. */
+  private searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** Country autocomplete under the search box. */
+  suggestions: CountrySuggestion[] = [];
+  activeSuggestion = -1;
+  suggestionsOpen = false;
 
   /** How the current search was read; drives the hint under the search bar. */
   outcome: SearchOutcome = searchCatalog([], '');
@@ -97,16 +104,20 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.brandingService.applyCssVars(this.branding);
 
-    this.searchInput$.pipe(
-      debounceTime(300),
-      map(value => value.trim()),
-      distinctUntilChanged(),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(q => this.updateQuery({ q: q || null, page: null }));
+    // Coming back to the tab (sidenav, another page) with a bare URL: put the
+    // last search, filters, sort and page back instead of starting over.
+    const saved = this.performanceService.listState;
+    let restoring = !this.route.snapshot.queryParamMap.keys.length && !!saved && Object.keys(saved).length > 0;
+    if (restoring) {
+      this.router.navigate([], { relativeTo: this.route, queryParams: saved, replaceUrl: true });
+    }
 
     // Every URL change re-derives the view from the catalog loaded once below.
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      if (restoring && !params.keys.length) { return; }
+      restoring = false;
       this.readQuery(params);
+      this.performanceService.listState = { ...this.route.snapshot.queryParams };
       this.derive();
     });
 
@@ -122,6 +133,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
         this.updated = catalog.updated;
         this.loadState = 'ready';
         this.derive();
+        this.scrollToLastOpened();
       },
       error: err => {
         console.error('[Performance] catalog load failed', err);
@@ -133,7 +145,19 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearSearchTimer();
     this.performanceService.stopPreview();
+  }
+
+  /** Back from a track: bring the row that was opened into view. */
+  private scrollToLastOpened(): void {
+    const uuid = this.performanceService.lastOpenedUuid;
+    if (!uuid) { return; }
+    this.performanceService.lastOpenedUuid = null;
+    setTimeout(() => {
+      const row = this.host.nativeElement.querySelector(`[data-track-uuid="${CSS.escape(uuid)}"]`);
+      row?.scrollIntoView({ block: 'center' });
+    });
   }
 
   /* ─────────── URL state ─────────── */
@@ -163,13 +187,104 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Typing: refresh the country suggestions now, run the search once typing settles. */
   onSearchInput(value: string): void {
-    this.searchInput$.next(value);
+    this.updateSuggestions(value);
+    this.clearSearchTimer();
+    this.searchTimer = setTimeout(() => this.commitSearch(), 300);
+  }
+
+  /** Writes the typed text to the URL, once, if it differs from what is there. */
+  private commitSearch(): void {
+    this.clearSearchTimer();
+    const q = this.search.replace(/\s+/g, ' ').trim();
+    if (q !== (this.route.snapshot.queryParamMap.get('q') ?? '')) {
+      this.updateQuery({ q: q || null, page: null });
+    }
+  }
+
+  private clearSearchTimer(): void {
+    if (this.searchTimer !== null) {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = null;
+    }
   }
 
   clearSearch(): void {
+    this.clearSearchTimer();
     this.search = '';
+    this.closeSuggestions();
     this.updateQuery({ q: null, page: null });
+  }
+
+  /* ─────────── Country autocomplete ─────────── */
+
+  private updateSuggestions(value: string): void {
+    this.suggestions = this.loadState === 'ready'
+      ? suggestCountries(value, this.catalog, this.transloco.getActiveLang())
+      : [];
+    this.activeSuggestion = -1;
+    this.suggestionsOpen = this.suggestions.length > 0;
+  }
+
+  onSearchFocus(): void {
+    this.updateSuggestions(this.search);
+  }
+
+  onSearchBlur(): void {
+    this.closeSuggestions();
+  }
+
+  closeSuggestions(): void {
+    this.suggestionsOpen = false;
+    this.activeSuggestion = -1;
+  }
+
+  /** Arrow keys move through the list, Enter picks (or searches), Escape closes. */
+  onSearchKeydown(event: KeyboardEvent): void {
+    const count = this.suggestions.length;
+    if (!this.suggestionsOpen || !count) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        this.commitSearch();
+      }
+      return;
+    }
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.activeSuggestion = (this.activeSuggestion + 1) % count;
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.activeSuggestion = this.activeSuggestion <= 0 ? count - 1 : this.activeSuggestion - 1;
+        break;
+      case 'Enter':
+        event.preventDefault();
+        if (this.activeSuggestion >= 0) {
+          this.selectCountry(this.suggestions[this.activeSuggestion]);
+        } else {
+          this.closeSuggestions();
+          this.commitSearch();
+        }
+        break;
+      case 'Escape':
+        event.preventDefault();
+        this.closeSuggestions();
+        break;
+      case 'Tab':
+        this.closeSuggestions();
+        break;
+    }
+  }
+
+  /** A picked country becomes the Artist origin filter, replacing the typed text. */
+  selectCountry(suggestion: CountrySuggestion): void {
+    this.clearSearchTimer();
+    this.search = '';
+    this.suggestions = [];
+    this.closeSuggestions();
+    this.updateQuery({ origin: suggestion.code, q: null, page: null });
   }
 
   setTab(tab: ResultTab): void {
@@ -349,15 +464,29 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     return this.performanceService.canPreview(track);
   }
 
+  /** The preview is fetching or buffering. */
+  isLoading(track: PerformanceTrack | null): boolean {
+    return !!track && this.performanceService.loadingUuid() === track.uuid;
+  }
+
+  /** The preview is loaded (playing or paused), so its position is shown. */
+  isLoaded(track: PerformanceTrack | null): boolean {
+    return !!track && this.performanceService.loadedUuid() === track.uuid;
+  }
+
   isPlaying(track: PerformanceTrack | null): boolean {
     return !!track && this.playingUuid() === track.uuid;
   }
 
   viewTrack(track: PerformanceTrack, event?: Event): void {
     event?.stopPropagation();
-    this.router.navigate(['/brand/performance/track', track.uuid], {
-      queryParams: this.route.snapshot.queryParams,
-    });
+    // Text typed in the last moment has not reached the URL yet; carry it along.
+    this.clearSearchTimer();
+    const q = this.search.replace(/\s+/g, ' ').trim();
+    const queryParams = { ...this.route.snapshot.queryParams, q: q || undefined };
+    this.performanceService.listState = queryParams;
+    this.performanceService.lastOpenedUuid = track.uuid;
+    this.router.navigate(['/brand/performance/track', track.uuid], { queryParams });
   }
 
   /** Hands the track to the dashboard search, where the license flow lives. */

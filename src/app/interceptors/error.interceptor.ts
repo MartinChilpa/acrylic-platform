@@ -2,6 +2,7 @@ import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { AlertService } from '../services/alert.service';
+import { AuthService } from '../services/auth.service';
 
 /**
  * Set on requests whose failure the caller handles quietly (optional data),
@@ -9,10 +10,28 @@ import { AlertService } from '../services/alert.service';
  */
 export const SKIP_ERROR_ALERT = new HttpContextToken<boolean>(() => false);
 
+/**
+ * A stale or rejected session token: SimpleJWT's `token_not_valid`, or a
+ * failed refresh. Not something the user can act on from an alert.
+ */
+function isInvalidSessionError(url: string, error: HttpErrorResponse): boolean {
+  return error.status === 401
+    && (error.error?.code === 'token_not_valid' || url.includes('/auth/token/refresh'));
+}
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const alertService = inject(AlertService);
+  const authService = inject(AuthService);
   return next(req).pipe(catchError((error: HttpErrorResponse) => {
     if (req.context.get(SKIP_ERROR_ALERT)) {
+      return throwError(() => error);
+    }
+    if (isInvalidSessionError(req.url, error)) {
+      // No alert: the session is cleared and protected pages go to sign-in.
+      // A failed refresh is already handled by AuthService.check().
+      if (!req.url.includes('/auth/token/refresh')) {
+        authService.handleInvalidToken();
+      }
       return throwError(() => error);
     }
     let errorTitle = "";

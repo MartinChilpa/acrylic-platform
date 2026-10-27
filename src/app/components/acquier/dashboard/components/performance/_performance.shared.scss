@@ -66,6 +66,20 @@ $perf-bp-phone: 640px;
   &--preclear { background: #023185; border-color: #3D6FC2; }
 
   &--lg { width: 44px; height: 44px; }
+
+  // Shown while the preview is fetching or buffering.
+  &__spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #FFFFFF;
+    border-radius: 50%;
+    animation: perf-play-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes perf-play-spin {
+  to { transform: rotate(360deg); }
 }
 
 // Use option label: Artist Promo green, PreClear blue.

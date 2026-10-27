@@ -1,6 +1,7 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap, throwError } from 'rxjs';
 import { AuthUtils } from '../utils/auth.utils';
 import { NavigationService } from './navigation.service';
@@ -27,6 +28,7 @@ export class AuthService {
   private _projectsService = inject(ProjectsService);
   private _licenseService = inject(LicenseService);
   private _transloco = inject(TranslocoService);
+  private _router = inject(Router);
   public IsLoggedIn: WritableSignal<boolean> = signal(false);
 
   constructor() {
@@ -117,6 +119,32 @@ export class AuthService {
     const teamSlug = this._teamBrandingService.getStoredTeamSlugOrNull();
     this.endSession();
     this._navigationService.navigateToSignIn(teamSlug);
+  }
+
+  /**
+   * The API rejected the stored token (expired, revoked, or from another
+   * environment). Treat it as a signed-out session: clear it quietly and send
+   * the user to sign in only when the current page needs a session.
+   */
+  handleInvalidToken(): void {
+    if (!this.accessToken && !this.refreshToken) { return; }
+    const teamSlug = this._teamBrandingService.getStoredTeamSlugOrNull();
+    this.endSession();
+    // The rejection can arrive mid-navigation (resolvers, first data loads), when
+    // router.url still shows the previous page; check where the user is going.
+    const target = this._router.getCurrentNavigation()?.finalUrl?.toString()
+      ?? this._router.getCurrentNavigation()?.extractedUrl.toString()
+      ?? this._router.url;
+    if (AuthService.isProtectedUrl(target) || AuthService.isProtectedUrl(this._router.url)) {
+      this._navigationService.navigateToSignIn(teamSlug);
+    }
+  }
+
+  /** Pages behind authGuard; public pages (landing, auth, public profiles, support) are not. */
+  private static isProtectedUrl(url: string): boolean {
+    const path = url.split(/[?#]/)[0];
+    if (/^\/artist\/(profile|my-support)(\/|$)/.test(path)) { return false; }
+    return /^\/(brand|label|artist)(\/|$)/.test(path);
   }
 
   check(): Observable<boolean> {

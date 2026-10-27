@@ -8,8 +8,17 @@ export class AuthUtils
             return true;
         }
 
-        // Get the expiration date
-        const date = this._getTokenExpirationDate(token);
+        // Get the expiration date. A stored value that is not a readable JWT
+        // counts as expired, so the session is renewed or ended instead of throwing.
+        let date: Date | null;
+        try
+        {
+            date = this._getTokenExpirationDate(token);
+        }
+        catch
+        {
+            return true;
+        }
 
         offsetSeconds = offsetSeconds || 0;
 
