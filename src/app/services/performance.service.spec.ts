@@ -5,18 +5,27 @@ import { PerformanceCatalog, PerformanceTrack } from '../interfaces/response/per
 
 /** Stand-in for HTMLAudioElement so playback can be driven from the test. */
 class FakeAudio extends EventTarget {
+  src = '';
+  preload = '';
   paused = true;
+  readyState = 0;
   currentTime = 0;
   duration = 0;
-  constructor(public src: string) { super(); }
+  loads = 0;
+  /** Starts playback; the test fires 'playing' when the "audio" is ready. */
   play(): Promise<void> {
     this.paused = false;
-    this.dispatchEvent(new Event('play'));
     return Promise.resolve();
   }
   pause(): void {
     this.paused = true;
     this.dispatchEvent(new Event('pause'));
+  }
+  removeAttribute(name: string): void {
+    if (name === 'src') { this.src = ''; }
+  }
+  load(): void {
+    this.loads++;
   }
 }
 
@@ -97,9 +106,9 @@ describe('PerformanceService', () => {
 
     beforeEach(() => {
       created = [];
-      // A plain function, since the service calls `new Audio(url)`.
-      spyOn(window as any, 'Audio').and.callFake(function (src: string) {
-        const audio = new FakeAudio(src);
+      // A plain function, since the service calls `new Audio()`.
+      spyOn(window as any, 'Audio').and.callFake(function () {
+        const audio = new FakeAudio();
         created.push(audio);
         return audio;
       });
@@ -107,18 +116,49 @@ describe('PerformanceService', () => {
 
     afterEach(() => service.stopPreview());
 
-    it('plays and pauses the preview', () => {
+    it('shows loading until the audio plays, then keeps its position on pause', () => {
       const t = track();
       service.togglePreview(t);
+      expect(created[0].src).toBe('https://media.example/old.wav');
+      expect(service.loadingUuid()).toBe('t1');
+      expect(service.playingUuid()).toBeNull();
+
+      created[0].dispatchEvent(new Event('playing'));
+      expect(service.loadingUuid()).toBeNull();
       expect(service.playingUuid()).toBe('t1');
+
       service.togglePreview(t);
       expect(service.playingUuid()).toBeNull();
+      expect(service.loadedUuid()).toBe('t1');   // still loaded, so the time is kept
+    });
+
+    it('cancels a preview that is still loading on a second click and releases it', () => {
+      const t = track();
+      service.togglePreview(t);
+      service.togglePreview(t);
+
+      expect(service.loadedUuid()).toBeNull();
+      expect(service.loadingUuid()).toBeNull();
+      expect(created[0].src).toBe('');
+      expect(created[0].loads).toBe(1);
+      // Its listeners are gone: a late event changes nothing.
+      created[0].dispatchEvent(new Event('playing'));
+      expect(service.playingUuid()).toBeNull();
+    });
+
+    it('plays one preview at a time', () => {
+      const other = { ...track(), uuid: 't2', previewUrl: 'https://media.example/two.wav' };
+      service.togglePreview(track());
+      service.togglePreview(other);
+      expect(created[0].src).toBe('');
+      expect(service.loadedUuid()).toBe('t2');
     });
 
     it('refreshes an expired link once, then marks the preview unavailable', () => {
       const t = track();
       service.togglePreview(t);
       created[0].dispatchEvent(new Event('error'));
+      expect(service.loadingUuid()).toBe('t1');   // still loading while the new link is fetched
 
       http.expectOne('/api/v1/tracks/t1/').flush({ uuid: 't1', preview_url: 'https://media.example/new.wav' });
       expect(created[1].src).toBe('https://media.example/new.wav');
@@ -127,6 +167,16 @@ describe('PerformanceService', () => {
       created[1].dispatchEvent(new Event('error'));
       expect(service.canPreview(t)).toBeFalse();
       expect(service.playingUuid()).toBeNull();
+      expect(service.loadingUuid()).toBeNull();
+    });
+
+    it('does not apply a refreshed link after the user moved on', () => {
+      const t = track();
+      service.togglePreview(t);
+      created[0].dispatchEvent(new Event('error'));
+      service.stopPreview();
+      expect(http.expectOne('/api/v1/tracks/t1/').cancelled).toBeTrue();
+      expect(created.length).toBe(1);
     });
   });
 });

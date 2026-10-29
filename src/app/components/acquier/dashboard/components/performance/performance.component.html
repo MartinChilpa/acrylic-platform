@@ -35,16 +35,44 @@
       <input class="perf-search__input"
              type="search"
              autocomplete="off"
+             role="combobox"
+             aria-autocomplete="list"
+             aria-controls="perf-country-suggestions"
+             [attr.aria-expanded]="suggestionsOpen"
+             [attr.aria-activedescendant]="activeSuggestion >= 0 ? 'perf-country-' + activeSuggestion : null"
              [attr.aria-label]="'performance.searchPlaceholder' | transloco"
              [placeholder]="'performance.searchPlaceholder' | transloco"
              [(ngModel)]="search"
-             (ngModelChange)="onSearchInput($event)" />
+             (ngModelChange)="onSearchInput($event)"
+             (keydown)="onSearchKeydown($event)"
+             (focus)="onSearchFocus()"
+             (blur)="onSearchBlur()" />
       @if (search) {
         <button type="button" class="perf-search__clear" (click)="clearSearch()" [attr.aria-label]="'performance.clearSearch' | transloco">
           <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
           </svg>
         </button>
+      }
+
+      <!-- Country suggestions; mousedown keeps focus in the input so the pick lands. -->
+      @if (suggestionsOpen) {
+        <ul class="perf-suggest" id="perf-country-suggestions" role="listbox"
+            [attr.aria-label]="'performance.suggest.label' | transloco">
+          @for (suggestion of suggestions; track suggestion.code; let i = $index) {
+            <li class="perf-suggest__item" role="option"
+                [id]="'perf-country-' + i"
+                [class.perf-suggest__item--active]="i === activeSuggestion"
+                [attr.aria-selected]="i === activeSuggestion"
+                (mousedown)="$event.preventDefault()"
+                (mouseenter)="activeSuggestion = i"
+                (click)="selectCountry(suggestion)">
+              <span class="perf-suggest__kind">{{ 'performance.suggest.country' | transloco }}</span>
+              <span class="perf-suggest__name">{{ suggestion.name }}</span>
+              <span class="perf-suggest__count">{{ plural('performance.suggest.artists', suggestion.artistCount) }}</span>
+            </li>
+          }
+        </ul>
       }
     </div>
 
@@ -203,17 +231,17 @@
             </div>
 
             @for (track of pagedTracks; track track.uuid) {
-              <div class="perf-row" role="row" tabindex="0"
+              <div class="perf-row" role="row" tabindex="0" [attr.data-track-uuid]="track.uuid"
                    [class.perf-row--selected]="selectedTrack?.uuid === track.uuid"
                    (click)="openTrack(track)"
                    (keydown.enter)="openTrack(track)">
                 <span class="perf-row__play" role="cell">
                   <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(track)"
-                          [disabled]="!canPreview(track)"
+                          [disabled]="!canPreview(track)" [attr.aria-busy]="isLoading(track)"
                           [attr.aria-label]="(isPlaying(track) ? 'performance.pause' : 'performance.play') | transloco"
                           [title]="canPreview(track) ? '' : ('performance.previewUnavailable' | transloco)"
                           (click)="togglePreview(track, $event)">
-                    @if (isPlaying(track)) {
+                    @if (isLoading(track)) {<span class="perf-play__spinner" aria-hidden="true"></span>} @else if (isPlaying(track)) {
                       <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
                     } @else {
                       <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
@@ -334,10 +362,10 @@
   @if (playerTrack) {
     <div class="perf-player">
       <button type="button" class="perf-play" [ngClass]="'perf-play--' + tierClass(playerTrack)"
-              [disabled]="!canPreview(playerTrack)"
+              [disabled]="!canPreview(playerTrack)" [attr.aria-busy]="isLoading(playerTrack)"
               [attr.aria-label]="(isPlaying(playerTrack) ? 'performance.pause' : 'performance.play') | transloco"
               (click)="togglePreview(playerTrack)">
-        @if (isPlaying(playerTrack)) {
+        @if (isLoading(playerTrack)) {<span class="perf-play__spinner" aria-hidden="true"></span>} @else if (isPlaying(playerTrack)) {
           <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
         } @else {
           <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
@@ -347,9 +375,9 @@
         <span class="perf-row__title">{{ playerTrack.name }}</span>
         <span class="perf-row__sub">{{ playerTrack.artist?.name || ('performance.unknownArtist' | transloco) }}</span>
       </div>
-      <span class="perf-player__time">{{ formatTime(isPlaying(playerTrack) ? currentTime() : 0) }}</span>
-      <div class="perf-timeline"><div class="perf-timeline__value" [style.width.%]="isPlaying(playerTrack) ? playerProgress : 0"></div></div>
-      <span class="perf-player__status">{{ (canPreview(playerTrack) ? 'performance.preview' : 'performance.previewUnavailable') | transloco }}</span>
+      <span class="perf-player__time">{{ formatTime(isLoaded(playerTrack) ? currentTime() : 0) }}</span>
+      <div class="perf-timeline"><div class="perf-timeline__value" [style.width.%]="isLoaded(playerTrack) ? playerProgress : 0"></div></div>
+      <span class="perf-player__status">{{ (isLoading(playerTrack) ? 'performance.loadingPreview' : canPreview(playerTrack) ? 'performance.preview' : 'performance.previewUnavailable') | transloco }}</span>
       <button type="button" class="perf-btn perf-btn--view" (click)="viewTrack(playerTrack)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
         {{ 'performance.viewTrack' | transloco }}
@@ -379,16 +407,16 @@
     <div class="perf-drawer__body">
       <div class="perf-drawer__preview">
         <button type="button" class="perf-play perf-play--lg" [ngClass]="'perf-play--' + tierClass(track)"
-                [disabled]="!canPreview(track)"
+                [disabled]="!canPreview(track)" [attr.aria-busy]="isLoading(track)"
                 [attr.aria-label]="(isPlaying(track) ? 'performance.pause' : 'performance.play') | transloco"
                 (click)="togglePreview(track)">
-          @if (isPlaying(track)) {
+          @if (isLoading(track)) {<span class="perf-play__spinner" aria-hidden="true"></span>} @else if (isPlaying(track)) {
             <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
           } @else {
             <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
           }
         </button>
-        <span class="perf-drawer__preview-label">{{ (canPreview(track) ? 'performance.previewTrack' : 'performance.previewUnavailable') | transloco }}</span>
+        <span class="perf-drawer__preview-label">{{ (isLoading(track) ? 'performance.loadingPreview' : canPreview(track) ? 'performance.previewTrack' : 'performance.previewUnavailable') | transloco }}</span>
       </div>
 
       <hr class="perf-divider" />

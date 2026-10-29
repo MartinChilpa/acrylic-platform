@@ -105,6 +105,16 @@ export class PerformanceTrackComponent implements OnInit, OnDestroy {
     return this.performanceService.canPreview(track);
   }
 
+  /** The preview is fetching or buffering. */
+  isLoading(track: PerformanceTrack | null): boolean {
+    return !!track && this.performanceService.loadingUuid() === track.uuid;
+  }
+
+  /** The preview is loaded (playing or paused), so its position is shown. */
+  isLoaded(track: PerformanceTrack | null): boolean {
+    return !!track && this.performanceService.loadedUuid() === track.uuid;
+  }
+
   isPlaying(track: PerformanceTrack | null): boolean {
     return !!track && this.playingUuid() === track.uuid;
   }

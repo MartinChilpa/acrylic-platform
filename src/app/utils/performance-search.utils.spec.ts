@@ -1,5 +1,5 @@
 import { PerformanceArtist, PerformanceTrack } from '../interfaces/response/performance.response';
-import { cityMatches, matchScore, resolveCountries, searchCatalog } from './performance-search.utils';
+import { cityMatches, matchScore, resolveCountries, searchCatalog, suggestCountries } from './performance-search.utils';
 
 function artist(uuid: string, name: string, country: string | null, extra: Partial<PerformanceArtist> = {}): PerformanceArtist {
   return {
@@ -88,6 +88,66 @@ describe('performance search', () => {
       const out = searchCatalog(catalog, 'Rolls Royce');
       expect(out.mode).toBe('text');
       expect(names(out.tracks)).toEqual(['Rolls Royce']);
+    });
+  });
+
+  describe('audience context words', () => {
+    it('reads engagement and trending as audience searches in en, es and fr', () => {
+      for (const q of ['engagement in Dakar', 'trending in Lyon', 'tendencia en Dakar', 'interacción en Lyon',
+                       'tendances à Lyon', 'engagement à Dakar']) {
+        const out = searchCatalog(catalog, q);
+        expect(out.mode).withContext(q).toBe('audience');
+        expect(out.place?.kind).withContext(q).toBe('city');
+        expect(out.tracks.length).withContext(q).toBeGreaterThan(0);
+      }
+    });
+
+    it('uses top countries for a country with a context word', () => {
+      const out = searchCatalog(catalog, 'trending in Senegal');
+      expect(out.mode).toBe('audience');
+      expect(out.place?.kind).toBe('country');
+      expect(names(out.tracks)).toEqual(['Lou Yakou Yawa']);   // only Samba Peuzzi lists SN
+    });
+  });
+
+  describe('country autocomplete', () => {
+    const mexican = artist('a6', 'Carín León', 'MX');
+    const spanish = artist('a7', 'Rosalía', 'ES');
+    const withLatin = [...catalog, track('t7', 'Casi oficial', mexican), track('t8', 'Malamente', spanish)];
+    const codes = (raw: string, lang = 'en') => suggestCountries(raw, withLatin, lang).map(s => s.code);
+
+    it('suggests a country from the start of its name', () => {
+      expect(codes('mex')).toEqual(['MX']);
+      expect(codes('SEN')).toEqual(['SN']);
+    });
+
+    it('ignores accents, case and extra spaces', () => {
+      expect(codes('espana')).toEqual(['ES']);
+      expect(codes('  ESPAÑA  ')).toEqual(['ES']);
+      expect(codes('mexico', 'es')).toEqual(['MX']);
+    });
+
+    it('labels suggestions in the active language and counts catalog artists', () => {
+      const [es] = suggestCountries('espa', withLatin, 'es');
+      expect(es.name).toBe('España');
+      expect(suggestCountries('sene', withLatin, 'en')[0].artistCount).toBe(2);
+    });
+
+    it('only suggests countries that have artists in the catalog', () => {
+      expect(codes('fran')).toEqual([]);   // France has no catalog artist here
+    });
+
+    it('puts names that start with the text before names that only contain it', () => {
+      // "ivo" starts a word of "Côte d’Ivoire"; nothing starts with it outright.
+      expect(codes('ivo')).toEqual(['CI']);
+      expect(codes('d')).toEqual([]);      // too short to suggest
+    });
+
+    it('reads the start of a country name as a country search when no name matches', () => {
+      const out = searchCatalog(withLatin, 'mex');
+      expect(out.mode).toBe('geo');
+      expect(out.place?.key).toBe('MX');
+      expect(names(out.tracks)).toEqual(['Casi oficial']);
     });
   });
 

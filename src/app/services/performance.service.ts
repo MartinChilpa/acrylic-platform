@@ -1,7 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
+import { Params } from '@angular/router';
 import { SKIP_ERROR_ALERT } from '../interceptors/error.interceptor';
-import { Observable, forkJoin, of, throwError } from 'rxjs';
+import { Observable, Subscription, forkJoin, of, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { ICommonSuccessResponse } from '../interfaces/response/common.response';
@@ -41,6 +42,14 @@ export class PerformanceService {
   /* ─────────── Catalog ─────────── */
 
   private catalog$?: Observable<PerformanceCatalog>;
+
+  /**
+   * Last search, filters, sort and page of the list, so returning to the tab
+   * from elsewhere restores them. In memory only, like the catalog cache.
+   */
+  listState: Params | null = null;
+  /** Track last opened from the list, scrolled back into view on return. */
+  lastOpenedUuid: string | null = null;
 
   /**
    * Every track in catalog_track with its artist, loaded once per session.
@@ -250,8 +259,13 @@ export class PerformanceService {
   readonly duration = signal(0);
   /** Tracks whose preview could not be played, even after refreshing the link. */
   readonly failedPreviews = signal<ReadonlySet<string>>(new Set());
+  /** Track whose audio is loaded (playing or paused); keeps its position on pause. */
+  readonly loadedUuid = signal<string | null>(null);
+  /** Track whose audio is fetching or buffering. */
+  readonly loadingUuid = signal<string | null>(null);
   private audio: HTMLAudioElement | null = null;
-  private audioUuid: string | null = null;
+  private listeners: AbortController | null = null;
+  private refreshSub: Subscription | null = null;
 
   canPreview(track: PerformanceTrack | null): boolean {
     return !!track?.previewUrl && !this.failedPreviews().has(track.uuid);
@@ -260,17 +274,30 @@ export class PerformanceService {
   /** Play/pause; one preview at a time. Audio only, nothing else is drawn. */
   togglePreview(track: PerformanceTrack): void {
     if (!this.canPreview(track)) { return; }
-    if (this.audioUuid !== track.uuid || !this.audio) {
+    if (this.loadedUuid() !== track.uuid) {
       this.startPreview(track, track.previewUrl!, true);
       return;
     }
-    if (this.audio.paused) { this.play(this.audio); } else { this.audio.pause(); }
+    // A second click while it is still loading cancels it.
+    if (this.loadingUuid() === track.uuid || !this.audio) { this.stopPreview(); return; }
+    if (this.audio.paused) { this.play(this.audio, track.uuid); } else { this.audio.pause(); }
   }
 
+  /** Stops playback and releases the element, its listeners and any pending link refresh. */
   stopPreview(): void {
-    this.audio?.pause();
+    this.refreshSub?.unsubscribe();
+    this.refreshSub = null;
+    this.listeners?.abort();
+    this.listeners = null;
+    if (this.audio) {
+      this.audio.pause();
+      // Dropping the source stops the browser from buffering the rest of the file.
+      this.audio.removeAttribute('src');
+      this.audio.load();
+    }
     this.audio = null;
-    this.audioUuid = null;
+    this.loadedUuid.set(null);
+    this.loadingUuid.set(null);
     this.playingUuid.set(null);
     this.currentTime.set(0);
     this.duration.set(0);
@@ -278,41 +305,70 @@ export class PerformanceService {
 
   private startPreview(track: PerformanceTrack, url: string, mayRefresh: boolean): void {
     this.stopPreview();
-    const audio = new Audio(url);
+    const audio = new Audio();
+    audio.preload = 'auto';
+    const listeners = new AbortController();
+    const opts = { signal: listeners.signal };
     this.audio = audio;
-    this.audioUuid = track.uuid;
-    // Listeners ignore an element that has since been replaced.
-    const current = () => this.audio === audio;
+    this.listeners = listeners;
+    this.loadedUuid.set(track.uuid);
+    this.loadingUuid.set(track.uuid);
+
     audio.addEventListener('timeupdate', () => {
-      if (!current()) { return; }
       this.currentTime.set(audio.currentTime);
       this.duration.set(audio.duration || 0);
-    });
-    audio.addEventListener('play', () => { if (current()) { this.playingUuid.set(track.uuid); } });
-    audio.addEventListener('pause', () => { if (current()) { this.playingUuid.set(null); } });
-    audio.addEventListener('ended', () => { if (current()) { this.playingUuid.set(null); } });
+    }, opts);
+    audio.addEventListener('loadedmetadata', () => this.duration.set(audio.duration || 0), opts);
+    audio.addEventListener('playing', () => {
+      this.loadingUuid.set(null);
+      this.playingUuid.set(track.uuid);
+    }, opts);
+    // Buffering mid-track shows the loading state again.
+    audio.addEventListener('waiting', () => this.loadingUuid.set(track.uuid), opts);
+    audio.addEventListener('pause', () => {
+      this.loadingUuid.set(null);
+      this.playingUuid.set(null);
+    }, opts);
+    audio.addEventListener('ended', () => {
+      this.playingUuid.set(null);
+      this.currentTime.set(0);
+    }, opts);
     audio.addEventListener('error', () => {
-      if (!current()) { return; }
       this.stopPreview();
       // Signed links expire; fetch the track once for a fresh one before giving up.
       if (mayRefresh) { this.refreshPreview(track); } else { this.markFailed(track); }
-    });
-    this.play(audio);
+    }, opts);
+
+    audio.src = url;
+    this.play(audio, track.uuid);
   }
 
   /** play() rejects on autoplay blocks and bad sources; the 'error' event covers the latter. */
-  private play(audio: HTMLAudioElement): void {
+  private play(audio: HTMLAudioElement, uuid: string): void {
+    if (audio.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) { this.loadingUuid.set(uuid); }
     audio.play().catch(err => {
-      if (err?.name === 'NotAllowedError' && this.audio === audio) { this.playingUuid.set(null); }
+      if (err?.name === 'NotAllowedError' && this.audio === audio) {
+        this.loadingUuid.set(null);
+        this.playingUuid.set(null);
+      }
     });
   }
 
   private refreshPreview(track: PerformanceTrack): void {
-    this.http.get<IPerformanceTrackResult>(`${this.base}/tracks/${track.uuid}/`).pipe(
+    // Stays in the loading state while the new link is fetched.
+    this.loadedUuid.set(track.uuid);
+    this.loadingUuid.set(track.uuid);
+    this.refreshSub = this.http.get<IPerformanceTrackResult>(`${this.base}/tracks/${track.uuid}/`).pipe(
       map(row => this.toMediaUrl(row.preview_url ?? row.audio_url)),
       catchError(() => of(null))
     ).subscribe(url => {
-      if (!url || url === track.previewUrl) { this.markFailed(track); return; }
+      this.refreshSub = null;
+      if (!url || url === track.previewUrl) {
+        this.loadedUuid.set(null);
+        this.loadingUuid.set(null);
+        this.markFailed(track);
+        return;
+      }
       track.previewUrl = url;
       this.startPreview(track, url, false);
     });

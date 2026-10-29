@@ -52,13 +52,22 @@ const PLATFORM_WORDS: Record<string, PerformancePlatform> = {
 };
 
 const RANKING_WORDS = new Set([
-  'best', 'top', 'popular', 'most', 'biggest', 'largest', 'leading', 'followed', 'famous', 'trending',
+  'best', 'top', 'popular', 'most', 'biggest', 'largest', 'leading', 'followed', 'famous',
   'mejores', 'mejor', 'populares', 'popular', 'principales', 'meilleurs', 'meilleur', 'populaires', 'plus',
 ]);
 
+/**
+ * Words that ask where an artist's audience is, which switches the search to
+ * Chartmetric's Instagram top countries / top cities. Normalized (no accents),
+ * in English, Spanish and French.
+ */
 const AUDIENCE_WORDS = new Set([
-  'fanbase', 'fanbases', 'fans', 'audience', 'audiences',
-  'fanaticada', 'audiencia', 'publico', 'seguidores', 'public',
+  // en
+  'fanbase', 'fanbases', 'fans', 'audience', 'audiences', 'engagement', 'trending',
+  // es
+  'fanaticada', 'audiencia', 'publico', 'seguidores', 'interaccion', 'tendencia', 'tendencias',
+  // fr ("engagement", "audience" and "fans" are shared with en)
+  'public', 'tendance', 'tendances',
 ]);
 
 /** Connective words that never name a place, artist or platform. */
@@ -213,6 +222,69 @@ function countryIndex(): Map<string, string> {
   }
   countryIndexCache = index;
   return index;
+}
+
+let countryNamesCache: Map<string, string[]> | null = null;
+
+/** ISO code -> its normalized names in English, Spanish and French. */
+function countryNames(): Map<string, string[]> {
+  if (countryNamesCache) { return countryNamesCache; }
+  const names = new Map<string, string[]>();
+  countryIndex().forEach((code, name) => names.set(code, [...(names.get(code) ?? []), name]));
+  countryNamesCache = names;
+  return names;
+}
+
+/** 0 exact, 1 starts with, 2 a later word starts with, 3 contains; null when no match. */
+function countryMatchRank(query: string, code: string): number | null {
+  let best: number | null = null;
+  for (const name of countryNames().get(code) ?? []) {
+    const rank = name === query ? 0
+      : name.startsWith(query) ? 1
+      : ` ${name}`.includes(` ${query}`) ? 2
+      : query.length >= 3 && name.includes(query) ? 3
+      : null;
+    if (rank !== null && (best === null || rank < best)) { best = rank; }
+  }
+  return best;
+}
+
+export interface CountrySuggestion {
+  code: string;
+  /** Display name in the active language. */
+  name: string;
+  /** Catalog artists from this country. */
+  artistCount: number;
+}
+
+/**
+ * Countries for the search box as the user types: partial, case- and
+ * accent-insensitive ("mex" -> Mexico, "espana" -> España), limited to
+ * countries that have artists in the catalog so no suggestion is empty.
+ * Exact names rank first, then names starting with the text, then names with
+ * a later word starting with it, then names containing it.
+ */
+export function suggestCountries(raw: string, tracks: PerformanceTrack[], lang: string, limit = 6): CountrySuggestion[] {
+  const query = normalize(raw);
+  if (query.length < 2) { return []; }
+
+  const artistsByCode = new Map<string, Set<string>>();
+  for (const track of tracks) {
+    const code = track.artist?.countryCode?.toUpperCase();
+    if (!code || !track.artist) { continue; }
+    artistsByCode.set(code, (artistsByCode.get(code) ?? new Set()).add(track.artist.uuid));
+  }
+
+  let display: Intl.DisplayNames | null = null;
+  try { display = new Intl.DisplayNames([lang || 'en'], { type: 'region' }); } catch { display = null; }
+
+  return [...artistsByCode.entries()]
+    .map(([code, artistSet]) => ({ code, rank: countryMatchRank(query, code), artistCount: artistSet.size }))
+    .filter((row): row is { code: string; rank: number; artistCount: number } => row.rank !== null)
+    .map(row => ({ ...row, name: display?.of(row.code) ?? row.code }))
+    .sort((a, b) => a.rank - b.rank || b.artistCount - a.artistCount || a.name.localeCompare(b.name))
+    .slice(0, limit)
+    .map(({ code, name, artistCount }) => ({ code, name, artistCount }));
 }
 
 /**
@@ -384,7 +456,30 @@ export function searchCatalog(tracks: PerformanceTrack[], raw: string): SearchOu
   }
 
   // 4. Track and artist names.
-  return textSearch(base, tracks, artists, query.normalized);
+  const byName = textSearch(base, tracks, artists, query.normalized);
+  if (byName.tracks.length && !byName.approximate) { return byName; }
+
+  // 5. The start of a country name ("mex" -> Mexico), when no name matches
+  // directly. Only countries with catalog artists count.
+  const partial = countryPrefixCodes(query.normalized, artists);
+  if (partial.length) {
+    const place: SearchPlace = { kind: 'country', label: raw.trim(), key: partial.join(',') };
+    const local = tracks.filter(t => t.artist && placeMatches(t.artist, place));
+    return rankByPlatform({ ...base, mode: 'geo', place, tracks: local, ranked: true }, query);
+  }
+  return byName;
+}
+
+/** Codes of catalog countries whose name starts with the query (or a word in it does). */
+function countryPrefixCodes(query: string, artists: PerformanceArtist[]): string[] {
+  if (query.length < 3) { return []; }
+  const codes = new Set(artists.map(a => a.countryCode?.toUpperCase()).filter((c): c is string => !!c));
+  const ranked = [...codes]
+    .map(code => ({ code, rank: countryMatchRank(query, code) }))
+    .filter((row): row is { code: string; rank: number } => row.rank !== null && row.rank <= 2);
+  if (!ranked.length) { return []; }
+  const best = Math.min(...ranked.map(r => r.rank));
+  return ranked.filter(r => r.rank === best).map(r => r.code);
 }
 
 function resolvePlace(text: string, artists: PerformanceArtist[]): SearchPlace | null {

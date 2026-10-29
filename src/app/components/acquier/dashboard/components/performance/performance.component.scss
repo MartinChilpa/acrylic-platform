@@ -120,6 +120,50 @@
   }
 }
 
+// Country autocomplete under the search field.
+.perf-suggest {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid $perf-control-border;
+  border-radius: 8px;
+  background: $perf-control-bg;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: $perf-text;
+    font-size: 15px;
+    cursor: pointer;
+
+    &--active { background: #2E2E2E; }
+  }
+
+  &__kind {
+    color: $perf-subtle;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__name { flex: 1 1 auto; font-weight: 700; }
+
+  &__count {
+    color: $perf-muted;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
+
 // Dropdown styled as the design's filter control, native select underneath.
 .perf-select {
   position: relative;
