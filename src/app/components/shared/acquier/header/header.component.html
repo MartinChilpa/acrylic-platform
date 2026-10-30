@@ -1,15 +1,30 @@
 <div class="team-header" [style.--primary-color]="primaryColor">
-  <div class="team-header__bar">
-    <div class="team-header__inner">
-      <div class="team-header__logo-wrapper">
-        <img *ngIf="teamLogo" [src]="teamLogo" [alt]="teamName" class="team-header__logo" />
-      </div>
-      <div class="team-header__content">
-        <h1 class="team-header__title">{{ teamName }}</h1>
-        <div class="team-header__tagline-wrapper" *ngIf="tagline">
-          <span class="team-header__tagline">{{ tagline | uppercase }}</span>
+  <ng-container *ngIf="variant === 'compact'; else hero">
+    <header class="workspace-header">
+      <span class="workspace-header__crest">
+        <img *ngIf="teamLogo" [src]="teamLogo" [alt]="teamName" />
+      </span>
+      <span class="workspace-header__team">{{ teamName }}</span>
+      <span class="workspace-header__label">{{ 'teamHeader.workspace' | transloco }}</span>
+      <span class="workspace-header__spacer"></span>
+      <span class="workspace-header__page" *ngIf="pageTitle">{{ pageTitle }}</span>
+      <span class="workspace-header__description" *ngIf="pageDescription">{{ pageDescription }}</span>
+    </header>
+  </ng-container>
+
+  <ng-template #hero>
+    <div class="team-header__bar">
+      <div class="team-header__inner">
+        <div class="team-header__logo-wrapper">
+          <img *ngIf="teamLogo" [src]="teamLogo" [alt]="teamName" class="team-header__logo" />
+        </div>
+        <div class="team-header__content">
+          <h1 class="team-header__title">{{ teamName }}</h1>
+          <div class="team-header__tagline-wrapper" *ngIf="tagline">
+            <span class="team-header__tagline">{{ tagline | uppercase }}</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </ng-template>
 </div>

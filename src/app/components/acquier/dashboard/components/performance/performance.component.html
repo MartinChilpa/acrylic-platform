@@ -3,7 +3,10 @@
   [teamLogo]="teamLogo"
   [tagline]="tagline"
   [primaryColor]="primaryColor"
-  [secondaryColor]="secondaryColor">
+  [secondaryColor]="secondaryColor"
+  variant="compact"
+  [pageTitle]="'acquerSidenav.performance' | transloco"
+  [pageDescription]="'performance.lede' | transloco">
 </acrylic-header>
 
 <div class="perf-page">
@@ -11,7 +14,6 @@
   <!-- Header -->
   <header class="perf-head">
     <div class="perf-head__context">
-      <span class="perf-head__eyebrow">{{ 'performance.eyebrow' | transloco }}</span>
       <span class="perf-head__team">{{ teamName }}</span>
     </div>
     <h2 class="perf-head__title">
@@ -24,9 +26,6 @@
     <p class="perf-head__lede">
       {{ (focusArtist ? 'performance.exploreLede' : 'performance.lede') | transloco }}
     </p>
-    @if (updated) {
-      <p class="perf-head__updated">{{ 'performance.dataUpdated' | transloco: { date: (updated | date:'d MMM y') } }}</p>
-    }
   </header>
 
   <!-- Search and filters -->

@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, Output, EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, Output, EventEmitter, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { EMPTY, Subject, defer, of, throwError, timer } from 'rxjs';
-import { catchError, exhaustMap, expand, last, map, retry, tap } from 'rxjs/operators';
+import { catchError, debounceTime, exhaustMap, expand, last, map, retry, switchMap, tap } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ModalService } from '../../../../../services/modal.service';
@@ -18,6 +19,13 @@ import { TeamBrandingService } from '../../../../../services/team-branding.servi
 import { ProjectsService } from '../../../../../services/projects.service';
 import { LicenseService } from '../../../../../services/license.service';
 import { formatTierPrice, getPreClearTrackPrice, isPreClearTrack } from '../../../../../utils/license-tier.utils';
+import { SpotifyService } from '../../../../../services/spotify.service';
+import { ISpotifySearchResult } from '../../../../../interfaces/response/spotify.response';
+
+type SpotifySuggestState = 'idle' | 'loading' | 'ready' | 'error';
+
+/** Spotify search needs at least this many non-space characters. */
+const SPOTIFY_SUGGEST_MIN_CHARS = 2;
 interface Suggestion {
   icon: string;
   type: string;
@@ -58,6 +66,8 @@ export class SimilaritySearchComponent implements OnInit {
   private projectsService = inject(ProjectsService);
   private licenseService = inject(LicenseService);
   private transloco = inject(TranslocoService);
+  private spotifyService = inject(SpotifyService);
+  private destroyRef = inject(DestroyRef);
 
   favoriteTrackIds = new Set<string>();
   licensedTrackIds = new Set<string>();
@@ -80,6 +90,15 @@ export class SimilaritySearchComponent implements OnInit {
   private lastQueryAt = 0;
   searchControl = new FormControl('');
   private manualSearch$ = new Subject<{ type: 'url' | 'prompt' | 'video'; query?: string; file?: File }>();
+
+  // Spotify track suggestions while typing. Picking one searches by its URL
+  // while the input shows "Track – Artist".
+  spotifySuggestions: ISpotifySearchResult[] = [];
+  spotifySuggestState: SpotifySuggestState = 'idle';
+  showSpotifySuggestions = false;
+  spotifyActiveIndex = -1;
+  private spotifyQuery$ = new Subject<string>();
+  private pickedSpotifyTrack: { label: string; url: string } | null = null;
   private peaksLib: any | null = null;
   private peaksInstances = new Map<string, any>();
   private waveformErrors = new Map<string, string>();
@@ -158,6 +177,7 @@ export class SimilaritySearchComponent implements OnInit {
   @ViewChildren('waveOverviewRef') private waveOverviewRefs!: QueryList<ElementRef<HTMLDivElement>>;
 
   ngOnInit() {
+    this.listenForSpotifySuggestions();
     this.loadClubPlayers();
     this.projectsService.loadFavorites();
     this.projectsService.favorites$.subscribe((favs) => {
@@ -499,9 +519,13 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   search() {
-    const rawQuery = (this.searchControl.value ?? '').trim();
+    const typed = (this.searchControl.value ?? '').trim();
+    // A picked suggestion shows "Track – Artist" but searches by its Spotify URL.
+    const picked = this.pickedSpotifyTrack?.label === typed ? this.pickedSpotifyTrack : null;
+    const rawQuery = picked?.url ?? typed;
     const query = normalizeSpotifyTrackUrl(rawQuery);
-    if (query !== rawQuery) {
+    this.closeSpotifySuggestions();
+    if (!picked && query !== rawQuery) {
       this.searchQuery = query;
       this.searchControl.setValue(query, { emitEvent: false });
     }
@@ -541,7 +565,7 @@ export class SimilaritySearchComponent implements OnInit {
 
     this.lastQuery = query;
     this.lastQueryAt = now;
-    this.lastSearchLabel = query;
+    this.lastSearchLabel = picked?.label ?? query;
     this.searchInput.emit(query);
     if (this.isSupportedMediaUrl(query)) {
       this.searched.emit();
@@ -1113,6 +1137,101 @@ export class SimilaritySearchComponent implements OnInit {
     // Surface the Spotify → YouTube hint as soon as a Spotify link is detected.
     this.showSpotifyHint = this.isSpotifyUrl(query);
     this.showSearchInfo = query.length === 0 && !this.selectedVideoFile;
+    if (this.pickedSpotifyTrack && this.pickedSpotifyTrack.label !== query) {
+      this.pickedSpotifyTrack = null;
+    }
+    this.requestSpotifySuggestions(query);
+  }
+
+  /** Arrow keys move through the Spotify suggestions, Enter picks or searches, Escape closes. */
+  onSearchKeydown(event: KeyboardEvent): void {
+    const open = this.showSpotifySuggestions && this.spotifySuggestions.length > 0;
+    switch (event.key) {
+      case 'ArrowDown':
+      case 'ArrowUp': {
+        if (!open) { return; }
+        event.preventDefault();
+        const count = this.spotifySuggestions.length;
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        this.spotifyActiveIndex = this.spotifyActiveIndex < 0 && step < 0
+          ? count - 1
+          : (this.spotifyActiveIndex + step + count) % count;
+        return;
+      }
+      case 'Enter': {
+        event.preventDefault();
+        const active = open ? this.spotifySuggestions[this.spotifyActiveIndex] : undefined;
+        if (active) {
+          this.selectSpotifySuggestion(active);
+        } else if (this.canSearch) {
+          this.search();
+        }
+        return;
+      }
+      case 'Escape':
+        if (this.showSpotifySuggestions) {
+          event.preventDefault();
+          this.closeSpotifySuggestions();
+        }
+        return;
+    }
+  }
+
+  selectSpotifySuggestion(track: ISpotifySearchResult): void {
+    const label = [track.name, track.artist].filter(Boolean).join(' – ');
+    this.pickedSpotifyTrack = { label, url: track.spotify_url };
+    this.searchQuery = label;
+    this.searchControl.setValue(label, { emitEvent: false });
+    this.showDropdown = false;
+    this.showSpotifyHint = false;
+    this.search();
+  }
+
+  formatSpotifyDuration(ms: number): string {
+    return this.formatVideoTime((ms ?? 0) / 1000);
+  }
+
+  private listenForSpotifySuggestions(): void {
+    this.spotifyQuery$.pipe(
+      debounceTime(300),
+      // switchMap drops a slower earlier response once a newer query starts.
+      switchMap(q => q
+        ? this.spotifyService.searchTracks(q, 5).pipe(
+            map(res => ({ ok: true, results: res?.results ?? [] })),
+            catchError(() => of({ ok: false, results: [] as ISpotifySearchResult[] })),
+          )
+        : of(null)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(res => {
+      if (!res) { return; }
+      this.spotifySuggestions = res.results.slice(0, 5);
+      this.spotifySuggestState = res.ok ? 'ready' : 'error';
+      this.spotifyActiveIndex = -1;
+    });
+  }
+
+  private requestSpotifySuggestions(query: string): void {
+    const wantsSuggestions = query.replace(/\s/g, '').length >= SPOTIFY_SUGGEST_MIN_CHARS
+      && !/^https?:\/\//i.test(query)
+      && !this.isSupportedMediaUrl(query)
+      && !this.isSpotifyUrl(query)
+      && !this.pickedSpotifyTrack;
+    if (!wantsSuggestions) {
+      this.closeSpotifySuggestions();
+      return;
+    }
+    this.showSpotifySuggestions = true;
+    this.spotifySuggestState = 'loading';
+    this.spotifyQuery$.next(query);
+  }
+
+  private closeSpotifySuggestions(): void {
+    this.showSpotifySuggestions = false;
+    this.spotifySuggestState = 'idle';
+    this.spotifySuggestions = [];
+    this.spotifyActiveIndex = -1;
+    // Ends any request in flight so a late answer cannot reopen the list.
+    this.spotifyQuery$.next('');
   }
 
   private isSpotifyUrl(query: string): boolean {
@@ -1129,6 +1248,7 @@ export class SimilaritySearchComponent implements OnInit {
     setTimeout(() => {
       this.showDropdown = false;
       this.showSearchInfo = false;
+      this.closeSpotifySuggestions();
     }, 120);
   }
 

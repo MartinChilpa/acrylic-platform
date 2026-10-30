@@ -72,7 +72,6 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   private sortChosen = false;
 
   loadState: LoadState = 'loading';
-  updated: Date | null = null;
   private catalog: PerformanceTrack[] = [];
   /** Pending write of the typed text to the URL. */
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
@@ -130,7 +129,6 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     this.performanceService.loadCatalog().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: catalog => {
         this.catalog = catalog.tracks;
-        this.updated = catalog.updated;
         this.loadState = 'ready';
         this.derive();
         this.scrollToLastOpened();

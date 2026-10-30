@@ -29,12 +29,11 @@
 
   &__context {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 16px;
     font-size: 14px;
   }
 
-  &__eyebrow { color: #AD46FF; font-weight: 700; }
   &__team { color: $perf-muted; }
 
   &__title {
@@ -50,15 +49,6 @@
     margin: 0;
     color: $perf-muted;
     font-size: 16px;
-  }
-
-  &__updated {
-    margin: 0;
-    align-self: flex-end;
-    color: $perf-muted;
-    font-size: 14px;
-
-    @media (max-width: $perf-bp-phone) { align-self: flex-start; }
   }
 }
 
