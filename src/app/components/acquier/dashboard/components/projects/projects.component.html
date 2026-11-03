@@ -82,12 +82,41 @@
   <div class="favorites" *ngIf="favorites.length > 0">
     <div class="favorites__header">
       <h3 class="favorites__title">{{ 'projects.savedTracks' | transloco }}</h3>
+      <span class="favorites__count">{{ favorites.length }}</span>
     </div>
     <div class="favorites__list">
-      <div class="favorite-item" *ngFor="let fav of favorites">
+      <div class="favorite-item" *ngFor="let fav of visibleFavorites">
         <acrylic-track-row-projects [track]="rowTrack(fav)"></acrylic-track-row-projects>
       </div>
     </div>
+
+    <nav
+      class="favorites__pagination"
+      *ngIf="favoritesTotalPages > 1"
+      [attr.aria-label]="'projects.pagination.label' | transloco">
+      <div class="favorites__pagination-controls">
+        <button
+          type="button"
+          class="favorites__pagination-button"
+          (click)="goToPreviousFavoritesPage()"
+          [disabled]="favoritesPageNumber === 1"
+          [attr.aria-label]="'projects.pagination.previous' | transloco">
+          &lt;
+        </button>
+        <span class="favorites__pagination-status" aria-live="polite">
+          {{ favoritesPageNumber }} {{ 'projects.pagination.of' | transloco }} {{ favoritesTotalPages }}
+        </span>
+        <button
+          type="button"
+          class="favorites__pagination-button"
+          (click)="goToNextFavoritesPage()"
+          [disabled]="favoritesPageNumber === favoritesTotalPages"
+          [attr.aria-label]="'projects.pagination.next' | transloco">
+          &gt;
+        </button>
+      </div>
+      <span class="favorites__pagination-size">{{ 'projects.pagination.perPage' | transloco }}</span>
+    </nav>
   </div>
 
   <div class="favorites favorites--empty" *ngIf="!loading && favorites.length === 0">

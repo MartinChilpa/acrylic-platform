@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, inject } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
 import { Subscription, retry } from 'rxjs';
 import { ProjectsService } from '../../../../../services/projects.service';
@@ -18,7 +18,7 @@ import { isPreClearTrack } from '../../../../../utils/license-tier.utils';
   templateUrl: './track-row-projects.component.html',
   styleUrls: ['./track-row-projects.component.scss'],
 })
-export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class TrackRowProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() track: any;
 
   @ViewChild('audioRef') private audioRef?: ElementRef<HTMLAudioElement>;
@@ -45,6 +45,10 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   private peaksInstance: any | null = null;
   private peaksLib: any | null = null;
   private rafId: number | null = null;
+  private peaksInitTimerId: number | null = null;
+  private waveformGeneration = 0;
+  private viewReady = false;
+  private destroyed = false;
 
   private readonly dummyHighlights = [
     { offset: 25.088, duration: 45.72 },
@@ -64,12 +68,21 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngAfterViewInit(): void {
-    void this.initPeaks();
+    this.viewReady = true;
+    this.scheduleWaveformInit();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['track'] || changes['track'].firstChange || !this.viewReady) { return; }
+    this.resetPlaybackState();
+    this.scheduleWaveformInit();
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.subs.unsubscribe();
     this.stopTimer();
+    this.clearPeaksInitTimer();
     this.destroyPeaks();
   }
 
@@ -391,15 +404,55 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
-  private async initPeaks(): Promise<void> {
+  private scheduleWaveformInit(): void {
+    this.clearPeaksInitTimer();
+    this.destroyPeaks();
+    this.waveformLoading = false;
+    this.waveformError = null;
+    const generation = ++this.waveformGeneration;
+
+    // The audio and waveform elements are controlled by *ngIf. Waiting one
+    // tick lets Angular update both ViewChild references after a page/reload.
+    this.peaksInitTimerId = window.setTimeout(() => {
+      this.peaksInitTimerId = null;
+      void this.initPeaks(generation);
+    });
+  }
+
+  private clearPeaksInitTimer(): void {
+    if (this.peaksInitTimerId !== null) {
+      window.clearTimeout(this.peaksInitTimerId);
+      this.peaksInitTimerId = null;
+    }
+  }
+
+  private resetPlaybackState(): void {
+    const audio = this.audioRef?.nativeElement;
+    audio?.pause();
+    this.isPlaying = false;
+    this.timerLabel = '0:00';
+    this.stopTimer();
+  }
+
+  private async initPeaks(generation: number): Promise<void> {
     const audioUrl = this.getTrackAudioUrl(this.track);
     const waveformUrl = this.getTrackWaveformUrl(this.track);
     const audioEl = this.audioRef?.nativeElement;
     const overviewEl = this.waveOverviewRef?.nativeElement;
     if (!audioUrl || !waveformUrl || !audioEl || !overviewEl) { return; }
 
-    const Peaks = await this.getPeaksLib();
     this.waveformLoading = true;
+    let Peaks: any;
+    try {
+      Peaks = await this.getPeaksLib();
+    } catch {
+      if (!this.destroyed && generation === this.waveformGeneration) {
+        this.waveformLoading = false;
+        this.waveformError = 'Failed to load waveform';
+      }
+      return;
+    }
+    if (this.destroyed || generation !== this.waveformGeneration) { return; }
     Peaks.init({
       overview: {
         container: overviewEl,
@@ -413,6 +466,10 @@ export class TrackRowProjectsComponent implements OnInit, AfterViewInit, OnDestr
       showPlayheadTime: false,
       keyboard: false
     }, (err: unknown, instance: any) => {
+      if (this.destroyed || generation !== this.waveformGeneration) {
+        instance?.destroy?.();
+        return;
+      }
       this.waveformLoading = false;
       if (err || !instance) {
         this.waveformError = 'Failed to load waveform';
