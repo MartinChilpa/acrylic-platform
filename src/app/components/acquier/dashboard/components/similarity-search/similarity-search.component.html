@@ -14,7 +14,12 @@
         (focus)="onSearchInputFocus()"
         (input)="onSearchInputChange()"
         (blur)="onSearchInputBlur()"
-        (keyup.enter)="canSearch && search()"
+        (keydown)="onSearchKeydown($event)"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-controls="spotify-suggestions"
+        [attr.aria-expanded]="showSpotifySuggestions"
+        [attr.aria-activedescendant]="spotifyActiveIndex >= 0 ? 'spotify-suggestion-' + spotifyActiveIndex : null"
         [placeholder]="'similaritySearch.search.placeholder' | transloco"
       />
 
@@ -505,6 +510,45 @@
     </div>
 
 
+  </div>
+
+  <!-- Spotify track suggestions while typing -->
+  <div class="spotify-suggest" *ngIf="showSpotifySuggestions">
+    <div class="spotify-suggest__status" *ngIf="spotifySuggestState === 'loading' && !spotifySuggestions.length">
+      <span class="spotify-suggest__spinner" aria-hidden="true"></span>
+      {{ 'similaritySearch.spotifySuggest.loading' | transloco }}
+    </div>
+    <div class="spotify-suggest__status" *ngIf="spotifySuggestState === 'ready' && !spotifySuggestions.length">
+      {{ 'similaritySearch.spotifySuggest.empty' | transloco }}
+    </div>
+    <div class="spotify-suggest__status spotify-suggest__status--error" *ngIf="spotifySuggestState === 'error'" role="status">
+      {{ 'similaritySearch.spotifySuggest.unavailable' | transloco }}
+    </div>
+    <ul class="spotify-suggest__list" id="spotify-suggestions" role="listbox"
+        *ngIf="spotifySuggestions.length" [class.spotify-suggest__list--stale]="spotifySuggestState === 'loading'"
+        [attr.aria-label]="'similaritySearch.spotifySuggest.label' | transloco">
+      <li *ngFor="let track of spotifySuggestions; let i = index"
+          class="spotify-suggest__item" role="option"
+          [id]="'spotify-suggestion-' + i"
+          [class.spotify-suggest__item--active]="i === spotifyActiveIndex"
+          [attr.aria-selected]="i === spotifyActiveIndex"
+          (mousedown)="$event.preventDefault()"
+          (mouseenter)="spotifyActiveIndex = i"
+          (click)="selectSpotifySuggestion(track)">
+        <img *ngIf="track.image; else coverPlaceholder" class="spotify-suggest__cover" [src]="track.image" alt="" />
+        <ng-template #coverPlaceholder>
+          <span class="spotify-suggest__cover spotify-suggest__cover--empty" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+          </span>
+        </ng-template>
+        <span class="spotify-suggest__text">
+          <span class="spotify-suggest__name">{{ track.name }}</span>
+          <span class="spotify-suggest__artist">{{ track.artist }}</span>
+        </span>
+        <span class="spotify-suggest__duration" *ngIf="track.duration">{{ formatSpotifyDuration(track.duration) }}</span>
+      </li>
+    </ul>
+    <span class="spotify-suggest__source">{{ 'similaritySearch.spotifySuggest.source' | transloco }}</span>
   </div>
   </div>
 
