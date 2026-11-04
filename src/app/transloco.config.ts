@@ -1,7 +1,7 @@
 import { Translation, TranslocoLoader, provideTransloco, TranslocoService } from '@jsverse/transloco';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, APP_INITIALIZER } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export const SUPPORTED_LANGS = ['en', 'es', 'fr'];
@@ -37,10 +37,18 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 export class TranslocoInitializer {
 	constructor(private transloco: TranslocoService) {}
 
-	init(): void {
+	/**
+	 * Resolves once the active language is loaded, so the first render never
+	 * runs with an empty dictionary. Before, every synchronous translate() in a
+	 * template logged a missing-key warning until the file arrived; Sentry's
+	 * replay turned each warning into another change detection, and the first
+	 * load spun for ~20 s. A failed load still lets the app start.
+	 */
+	init(): Promise<unknown> {
 		const storedLang = normalizeLanguage(localStorage.getItem('activeLanguage'));
 		this.transloco.setDefaultLang('en');
 		this.transloco.setActiveLang(storedLang);
+		return firstValueFrom(this.transloco.load(storedLang)).catch(() => undefined);
 	}
 }
 

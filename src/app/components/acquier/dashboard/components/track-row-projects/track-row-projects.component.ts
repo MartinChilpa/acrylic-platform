@@ -7,6 +7,7 @@ import { AimsDownloadService } from '../../services/aims-download.service';
 import { isPreClearTrack } from '../../../../../utils/license-tier.utils';
 import { SaveTrackRef } from '../../../../../services/save-to.service';
 import { SaveHeartComponent } from '../../../../shared/acquier/save-to/save-heart/save-heart.component';
+import { formatInteger, formatUsd } from '../../../../../utils/number-format.utils';
 
 /**
  * Self-contained replica of the similarity-search result row, reusable anywhere
@@ -188,7 +189,7 @@ export class TrackRowProjectsComponent implements OnInit, OnChanges, AfterViewIn
   getTrackLicensePrice(track: any): string | null {
     const raw = Number(track?.price ?? track?.license_price ?? track?.price_amount);
     if (!Number.isFinite(raw) || raw <= 0) { return null; }
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(raw);
+    return formatUsd(raw);
   }
 
   /* ---------- imagery / metadata ---------- */
@@ -272,7 +273,7 @@ export class TrackRowProjectsComponent implements OnInit, OnChanges, AfterViewIn
   getAudienceSize(track: any): string | null {
     const total = this.getAudienceSizeValue(track);
     if (total === null) { return null; }
-    return new Intl.NumberFormat('en-US').format(total);
+    return formatInteger(total);
   }
 
   private getAudienceSizeValue(track: any): number | null {

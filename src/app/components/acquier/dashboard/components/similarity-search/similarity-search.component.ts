@@ -23,6 +23,7 @@ import { SpotifyService } from '../../../../../services/spotify.service';
 import { ISpotifySearchResult } from '../../../../../interfaces/response/spotify.response';
 import { SaveTrackRef } from '../../../../../services/save-to.service';
 import { SaveHeartComponent } from '../../../../shared/acquier/save-to/save-heart/save-heart.component';
+import { formatInteger, formatUsd, formatUsdCents } from '../../../../../utils/number-format.utils';
 
 type SpotifySuggestState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -1537,16 +1538,11 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   private formatUsd(amount: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
+    return formatUsd(amount);
   }
 
   private formatUsdCents(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+    return formatUsdCents(amount);
   }
 
   /** "Base License" row: PreClear shows its price even when it only lives in price_temp. */
@@ -1583,7 +1579,7 @@ export class SimilaritySearchComponent implements OnInit {
     if (amount !== null) {
       return this.transloco.translate('license.licenseForPrice', { price: formatTierPrice(amount) });
     }
-    return this.transloco.translate('similaritySearch.modal.license');
+    return this.transloco.translate('license.licenseCta');
   }
 
   getTrackLicensePrice(track: any): string | null {
@@ -1728,7 +1724,7 @@ export class SimilaritySearchComponent implements OnInit {
     if (!Number.isFinite(num) || num < 0) {
       return null;
     }
-    return new Intl.NumberFormat('en-US').format(num);
+    return formatInteger(num);
   }
 
   getAudienceSize(track: any): string | null {
@@ -1736,7 +1732,7 @@ export class SimilaritySearchComponent implements OnInit {
     if (total === null) {
       return null;
     }
-    return new Intl.NumberFormat('en-US').format(total);
+    return formatInteger(total);
   }
 
   getAudienceSizeValue(track: any): number | null {

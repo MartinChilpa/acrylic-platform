@@ -1,3 +1,5 @@
+import { formatUsd } from './number-format.utils';
+
 /**
  * PreClear Price rules.
  *
@@ -30,11 +32,7 @@ function toPriceAmount(value: unknown): number | null {
 }
 
 export function formatTierPrice(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
-  }).format(amount);
+  return formatUsd(amount);
 }
 
 export function resolvePreClearPrice(input: PreClearPriceInput): number | null {
