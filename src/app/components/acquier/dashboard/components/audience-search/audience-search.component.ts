@@ -8,42 +8,50 @@ import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HeaderComponent } from '../../../../shared/acquier/header/header.component';
 import { TeamBrandingService } from '../../../../../services/team-branding.service';
-import { PerformanceService } from '../../../../../services/performance.service';
-import { PerformancePlatform, PerformanceTrack } from '../../../../../interfaces/response/performance.response';
+import { AudienceSearchService } from '../../../../../services/audience-search.service';
+import { ProjectsService } from '../../../../../services/projects.service';
+import { SaveToService } from '../../../../../services/save-to.service';
+import { AudienceSearchPlatform, AudienceSearchTrack } from '../../../../../interfaces/response/audience-search.response';
 import {
   AudienceComposition,
   AudienceSize,
   audienceComposition,
-  DEFAULT_PERFORMANCE_FILTERS,
+  DEFAULT_AUDIENCE_SEARCH_FILTERS,
   EcuFilter,
-  PERFORMANCE_PLATFORMS,
-  PerformanceArtistRow,
-  PerformanceFilters,
-  PerformanceSort,
+  AUDIENCE_SEARCH_PLATFORMS,
+  AudienceSearchArtistRow,
+  AudienceSearchFilters,
+  AudienceSearchSort,
   SOCIAL_PLATFORMS,
   SocialFilter,
   sortBySocial,
   countryName,
   formatAudience,
   groupTracksByArtist,
-  matchesPerformanceFilters,
+  matchesAudienceSearchFilters,
   pageWindow,
-  sortPerformanceTracks,
-} from '../../../../../utils/performance.utils';
-import { CountrySuggestion, SearchOutcome, searchCatalog, suggestCountries } from '../../../../../utils/performance-search.utils';
+  sortAudienceSearchTracks,
+} from '../../../../../utils/audience-search.utils';
+import { CountrySuggestion, SearchOutcome, searchCatalog, suggestCountries } from '../../../../../utils/audience-search-query.utils';
 
 type ResultTab = 'tracks' | 'artists';
 type LoadState = 'loading' | 'ready' | 'error';
+/** landing: nothing searched yet (A1). artistTracks: one artist's tracks from "View tracks" (A3a). */
+type ResultView = 'landing' | 'artists' | 'artistTracks' | 'tracks';
+
+const SORTS: AudienceSearchSort[] = ['audience', 'audienceAsc', 'name'];
 
 @Component({
-  selector: 'acrylic-performance',
+  selector: 'acrylic-audience-search',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, TranslocoModule, HeaderComponent],
-  templateUrl: './performance.component.html',
-  styleUrl: './performance.component.scss',
+  templateUrl: './audience-search.component.html',
+  styleUrl: './audience-search.component.scss',
 })
-export class PerformanceComponent implements OnInit, OnDestroy {
-  private performanceService = inject(PerformanceService);
+export class AudienceSearchComponent implements OnInit, OnDestroy {
+  private audienceSearchService = inject(AudienceSearchService);
+  private projectsService = inject(ProjectsService);
+  private saveTo = inject(SaveToService);
   private brandingService = inject(TeamBrandingService);
   private transloco = inject(TranslocoService);
   private route = inject(ActivatedRoute);
@@ -58,23 +66,27 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   primaryColor = this.branding.primaryColor;
   secondaryColor = this.branding.secondaryColor;
 
-  readonly platforms = PERFORMANCE_PLATFORMS;
+  readonly platforms = AUDIENCE_SEARCH_PLATFORMS;
   readonly pageSize = 10;
 
-  /* State mirrored in the URL so "Back to results" lands on the same view. */
+  /** Text in the search box. Only Search or Enter turns it into `query`. */
   search = '';
-  tab: ResultTab = 'tracks';
-  filters: PerformanceFilters = { ...DEFAULT_PERFORMANCE_FILTERS };
-  sort: PerformanceSort = 'audience';
+
+  /* State mirrored in the URL so "Back to results" lands on the same view. */
+  /** The submitted search (?q=). Empty means nothing searched yet. */
+  query = '';
+  tab: ResultTab = 'artists';
+  /** Artist whose tracks "View tracks" opened (?artist=). */
+  artistUuid: string | null = null;
+  filters: AudienceSearchFilters = { ...DEFAULT_AUDIENCE_SEARCH_FILTERS };
+  sort: AudienceSearchSort = 'audience';
   page = 1;
 
   /** Set when the URL carries an explicit sort, which overrides a search ranking. */
   private sortChosen = false;
 
   loadState: LoadState = 'loading';
-  private catalog: PerformanceTrack[] = [];
-  /** Pending write of the typed text to the URL. */
-  private searchTimer: ReturnType<typeof setTimeout> | null = null;
+  private catalog: AudienceSearchTrack[] = [];
 
   /** Country autocomplete under the search box. */
   suggestions: CountrySuggestion[] = [];
@@ -85,27 +97,30 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   outcome: SearchOutcome = searchCatalog([], '');
 
   /* Derived from catalog + filters on every change. */
-  filteredTracks: PerformanceTrack[] = [];
-  artistRows: PerformanceArtistRow[] = [];
+  filteredTracks: AudienceSearchTrack[] = [];
+  artistRows: AudienceSearchArtistRow[] = [];
   originOptions: { code: string; name: string }[] = [];
 
+  /** Catalog uuids of tracks in Saved tracks: drives "✓ Saved to…". */
+  private savedUuids = new Set<string>();
+
   /** Track open in the side panel. */
-  selectedTrack: PerformanceTrack | null = null;
+  selectedTrack: AudienceSearchTrack | null = null;
   /** Track shown in the persistent player. */
-  playerTrack: PerformanceTrack | null = null;
+  playerTrack: AudienceSearchTrack | null = null;
   licensingUuid: string | null = null;
   licenseError = false;
 
-  readonly playingUuid = this.performanceService.playingUuid;
-  readonly currentTime = this.performanceService.currentTime;
-  readonly duration = this.performanceService.duration;
+  readonly playingUuid = this.audienceSearchService.playingUuid;
+  readonly currentTime = this.audienceSearchService.currentTime;
+  readonly duration = this.audienceSearchService.duration;
 
   ngOnInit(): void {
     this.brandingService.applyCssVars(this.branding);
 
     // Coming back to the tab (sidenav, another page) with a bare URL: put the
     // last search, filters, sort and page back instead of starting over.
-    const saved = this.performanceService.listState;
+    const saved = this.audienceSearchService.listState;
     let restoring = !this.route.snapshot.queryParamMap.keys.length && !!saved && Object.keys(saved).length > 0;
     if (restoring) {
       this.router.navigate([], { relativeTo: this.route, queryParams: saved, replaceUrl: true });
@@ -116,8 +131,13 @@ export class PerformanceComponent implements OnInit, OnDestroy {
       if (restoring && !params.keys.length) { return; }
       restoring = false;
       this.readQuery(params);
-      this.performanceService.listState = { ...this.route.snapshot.queryParams };
+      this.audienceSearchService.listState = { ...this.route.snapshot.queryParams };
       this.derive();
+    });
+
+    this.projectsService.loadFavorites();
+    this.projectsService.favorites$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(favorites => {
+      this.savedUuids = new Set(favorites.map(f => this.projectsService.trackKey(f)).filter(Boolean));
     });
 
     this.loadCatalog();
@@ -126,7 +146,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
 
   private loadCatalog(): void {
     this.loadState = 'loading';
-    this.performanceService.loadCatalog().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.audienceSearchService.loadCatalog().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: catalog => {
         this.catalog = catalog.tracks;
         this.loadState = 'ready';
@@ -134,7 +154,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
         this.scrollToLastOpened();
       },
       error: err => {
-        console.error('[Performance] catalog load failed', err);
+        console.error('[AudienceSearch] catalog load failed', err);
         this.catalog = [];
         this.loadState = 'error';
         this.derive();
@@ -143,15 +163,14 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.clearSearchTimer();
-    this.performanceService.stopPreview();
+    this.audienceSearchService.stopPreview();
   }
 
   /** Back from a track: bring the row that was opened into view. */
   private scrollToLastOpened(): void {
-    const uuid = this.performanceService.lastOpenedUuid;
+    const uuid = this.audienceSearchService.lastOpenedUuid;
     if (!uuid) { return; }
-    this.performanceService.lastOpenedUuid = null;
+    this.audienceSearchService.lastOpenedUuid = null;
     setTimeout(() => {
       const row = this.host.nativeElement.querySelector(`[data-track-uuid="${CSS.escape(uuid)}"]`);
       row?.scrollIntoView({ block: 'center' });
@@ -161,18 +180,25 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   /* ─────────── URL state ─────────── */
 
   private readQuery(params: ParamMap): void {
-    this.search = params.get('q') ?? '';
-    this.tab = params.get('tab') === 'artists' ? 'artists' : 'tracks';
-    const platform = params.get('platform') as PerformancePlatform | null;
+    const q = params.get('q') ?? '';
+    // Paging or switching tabs keeps whatever is being typed; a new search shows its query.
+    if (q !== this.query) { this.search = q; }
+    this.query = q;
+    // Results open on Artists; Tracks stays one click away.
+    this.tab = params.get('tab') === 'tracks' ? 'tracks' : 'artists';
+    this.artistUuid = this.tab === 'artists' ? params.get('artist') : null;
+    const platform = params.get('platform') as AudienceSearchPlatform | null;
     this.filters = {
       origin: (params.get('origin') ?? '').toUpperCase(),
       platform: platform && this.platforms.some(p => p.key === platform) ? platform : '',
       size: (['under1m', '1to10m', 'over10m'].includes(params.get('size') ?? '') ? params.get('size') : 'any') as AudienceSize,
       ecu: (params.get('ecu') === 'available' ? 'available' : 'any') as EcuFilter,
       social: (SOCIAL_PLATFORMS as string[]).includes(params.get('social') ?? '') ? params.get('social') as SocialFilter : '',
+      artistPromoOnly: params.get('promo') === '1',
     };
-    this.sortChosen = params.has('sort');
-    this.sort = params.get('sort') === 'name' ? 'name' : 'audience';
+    const sort = params.get('sort') as AudienceSearchSort | null;
+    this.sortChosen = !!sort && SORTS.includes(sort);
+    this.sort = this.sortChosen ? sort! : 'audience';
     this.page = Math.max(1, Number(params.get('page')) || 1);
   }
 
@@ -185,34 +211,27 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Typing: refresh the country suggestions now, run the search once typing settles. */
+  /** Typing only refreshes the country suggestions; nothing is searched yet (A2). */
   onSearchInput(value: string): void {
     this.updateSuggestions(value);
-    this.clearSearchTimer();
-    this.searchTimer = setTimeout(() => this.commitSearch(), 300);
   }
 
-  /** Writes the typed text to the URL, once, if it differs from what is there. */
-  private commitSearch(): void {
-    this.clearSearchTimer();
+  get canSearch(): boolean {
+    return !!this.search.trim();
+  }
+
+  /** Search button or Enter. Every new search starts on the Artists tab. */
+  runSearch(): void {
     const q = this.search.replace(/\s+/g, ' ').trim();
-    if (q !== (this.route.snapshot.queryParamMap.get('q') ?? '')) {
-      this.updateQuery({ q: q || null, page: null });
-    }
-  }
-
-  private clearSearchTimer(): void {
-    if (this.searchTimer !== null) {
-      clearTimeout(this.searchTimer);
-      this.searchTimer = null;
-    }
+    if (!q) { return; }
+    this.closeSuggestions();
+    this.updateQuery({ q, tab: null, artist: null, page: null });
   }
 
   clearSearch(): void {
-    this.clearSearchTimer();
     this.search = '';
     this.closeSuggestions();
-    this.updateQuery({ q: null, page: null });
+    this.updateQuery({ q: null, tab: null, artist: null, page: null });
   }
 
   /* ─────────── Country autocomplete ─────────── */
@@ -244,7 +263,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     if (!this.suggestionsOpen || !count) {
       if (event.key === 'Enter') {
         event.preventDefault();
-        this.commitSearch();
+        this.runSearch();
       }
       return;
     }
@@ -262,8 +281,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
         if (this.activeSuggestion >= 0) {
           this.selectCountry(this.suggestions[this.activeSuggestion]);
         } else {
-          this.closeSuggestions();
-          this.commitSearch();
+          this.runSearch();
         }
         break;
       case 'Escape':
@@ -276,26 +294,29 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** A picked country becomes the Artist origin filter, replacing the typed text. */
+  /** A picked country runs a search for it, with that Artist origin filter. */
   selectCountry(suggestion: CountrySuggestion): void {
-    this.clearSearchTimer();
-    this.search = '';
+    this.search = suggestion.name;
     this.suggestions = [];
     this.closeSuggestions();
-    this.updateQuery({ origin: suggestion.code, q: null, page: null });
+    this.updateQuery({ origin: suggestion.code, q: suggestion.name, tab: null, artist: null, page: null });
   }
 
   setTab(tab: ResultTab): void {
-    this.updateQuery({ tab: tab === 'tracks' ? null : tab, page: null });
+    this.updateQuery({ tab: tab === 'artists' ? null : tab, artist: null, page: null });
   }
 
-  setFilter(key: keyof PerformanceFilters, value: string): void {
+  setFilter(key: keyof AudienceSearchFilters, value: string): void {
     const isDefault = value === '' || value === 'any';
     this.updateQuery({ [key]: isDefault ? null : value, page: null });
   }
 
+  toggleArtistPromoOnly(): void {
+    this.updateQuery({ promo: this.filters.artistPromoOnly ? null : '1', page: null });
+  }
+
   /** Always written to the URL: an explicit pick overrides a search ranking. */
-  setSort(sort: PerformanceSort): void {
+  setSort(sort: AudienceSearchSort): void {
     this.updateQuery({ sort, page: null });
   }
 
@@ -304,10 +325,17 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     this.updateQuery({ page: page === 1 ? null : page });
   }
 
-  /** "View tracks" on an artist: search for them and show their tracks. */
-  viewArtistTracks(row: PerformanceArtistRow): void {
-    this.search = row.artist.name;
-    this.updateQuery({ q: row.artist.name, tab: null, page: null });
+  /** A3a: the artist's tracks, keeping the query in the search box. */
+  viewArtistTracks(row: AudienceSearchArtistRow): void {
+    this.updateQuery({ artist: row.artist.uuid, page: null });
+  }
+
+  backToArtists(): void {
+    this.updateQuery({ artist: null, page: null });
+  }
+
+  goToProjects(): void {
+    this.saveTo.goToProjects();
   }
 
   /* ─────────── Derived view ─────────── */
@@ -319,8 +347,16 @@ export class PerformanceComponent implements OnInit, OnDestroy {
       .map(code => ({ code, name: countryName(code, lang) ?? code }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    this.outcome = searchCatalog(this.catalog, this.search);
-    const matching = this.outcome.tracks.filter(t => matchesPerformanceFilters(t, this.filters));
+    if (!this.query) {
+      // A1: nothing is listed until a search is run.
+      this.outcome = searchCatalog([], '');
+      this.filteredTracks = [];
+      this.artistRows = [];
+      return;
+    }
+
+    this.outcome = searchCatalog(this.catalog, this.query);
+    const matching = this.outcome.tracks.filter(t => matchesAudienceSearchFilters(t, this.filters));
     // A search ranking (relevance, platform, audience) keeps its order unless
     // the user picked another sort.
     // A social filter ranks by that platform's followers, on top of any search.
@@ -328,7 +364,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     const keepOrder = (this.outcome.ranked || !!social) && !this.sortChosen;
     this.filteredTracks = social && !this.sortChosen
       ? sortBySocial(matching, social)
-      : keepOrder ? matching : sortPerformanceTracks(matching, this.sort);
+      : keepOrder ? matching : sortAudienceSearchTracks(matching, this.sort);
     this.artistRows = groupTracksByArtist(this.filteredTracks, this.sort, keepOrder);
 
     if (this.selectedTrack && !this.catalog.some(t => t.uuid === this.selectedTrack!.uuid)) {
@@ -339,8 +375,25 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     }
   }
 
+  get view(): ResultView {
+    if (!this.query) { return 'landing'; }
+    if (this.tab === 'tracks') { return 'tracks'; }
+    return this.focusRow ? 'artistTracks' : 'artists';
+  }
+
+  /** The artist opened with "View tracks", if it is still in the results. */
+  get focusRow(): AudienceSearchArtistRow | null {
+    if (!this.artistUuid) { return null; }
+    return this.artistRows.find(r => r.artist.uuid === this.artistUuid) ?? null;
+  }
+
+  /** Tracks listed in the current view (Tracks tab, or one artist's tracks). */
+  private get listedTracks(): AudienceSearchTrack[] {
+    return this.view === 'artistTracks' ? this.focusRow!.tracks : this.filteredTracks;
+  }
+
   get resultCount(): number {
-    return this.tab === 'tracks' ? this.filteredTracks.length : this.artistRows.length;
+    return this.view === 'artists' ? this.artistRows.length : this.listedTracks.length;
   }
 
   get pageCount(): number {
@@ -359,11 +412,11 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     return Math.min(this.pageStart + this.pageSize, this.resultCount);
   }
 
-  get pagedTracks(): PerformanceTrack[] {
-    return this.filteredTracks.slice(this.pageStart, this.pageEnd);
+  get pagedTracks(): AudienceSearchTrack[] {
+    return this.listedTracks.slice(this.pageStart, this.pageEnd);
   }
 
-  get pagedArtists(): PerformanceArtistRow[] {
+  get pagedArtists(): AudienceSearchArtistRow[] {
     return this.artistRows.slice(this.pageStart, this.pageEnd);
   }
 
@@ -371,52 +424,79 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     return pageWindow(this.currentPage, this.pageCount);
   }
 
-  /** Every result belongs to one artist: the "Explore X's tracks" view. */
-  get focusArtist(): string | null {
-    if (this.outcome.mode !== 'text' || this.artistRows.length !== 1) { return null; }
-    return this.artistRows[0].artist.name;
-  }
-
   get hasActiveFilters(): boolean {
     const f = this.filters;
-    return !!(f.origin || f.platform || f.size !== 'any' || f.ecu !== 'any' || f.social);
+    return !!(f.origin || f.platform || f.size !== 'any' || f.ecu !== 'any' || f.social || f.artistPromoOnly);
+  }
+
+  /** Anything to clear: a search, typed text, a filter, a sort, or a non-default view. */
+  get canClearAll(): boolean {
+    return !!this.query || !!this.search.trim() || this.hasActiveFilters || this.sortChosen
+      || this.tab !== 'artists' || !!this.artistUuid;
+  }
+
+  /** "Clear": back to the first screen (A1) with every filter, sort and view reset. */
+  clearAll(): void {
+    this.search = '';
+    this.closeSuggestions();
+    this.selectedTrack = null;
+    this.playerTrack = null;
+    this.audienceSearchService.stopPreview();
+    this.audienceSearchService.listState = null;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   resetFilters(): void {
-    this.updateQuery({ origin: null, platform: null, size: null, ecu: null, social: null, page: null });
+    this.updateQuery({ origin: null, platform: null, size: null, ecu: null, social: null, promo: null, artist: null, page: null });
+  }
+
+  /* ─────────── Saving ─────────── */
+
+  isSaved(track: AudienceSearchTrack): boolean {
+    return this.savedUuids.has(track.uuid);
+  }
+
+  /** A3a/A3b: the shared picker; a saved track opens on its current destinations (C2). */
+  saveTrack(track: AudienceSearchTrack, event?: Event): void {
+    event?.stopPropagation();
+    this.saveTo.openPicker([{
+      uuid: track.uuid,
+      title: track.name || '–',
+      artist: track.artist?.name || this.transloco.translate('audienceSearch.unknownArtist'),
+    }]);
   }
 
   /* ─────────── Formatting ─────────── */
 
   audience(value: number | null | undefined, digits = 1): string {
-    return formatAudience(value, digits) ?? this.transloco.translate('performance.unavailable');
+    return formatAudience(value, digits) ?? this.transloco.translate('audienceSearch.unavailable');
   }
 
-  origin(track: PerformanceTrack | null): string {
+  origin(track: AudienceSearchTrack | null): string {
     return countryName(track?.artist?.countryCode, this.transloco.getActiveLang())
-      ?? this.transloco.translate('performance.unavailable');
+      ?? this.transloco.translate('audienceSearch.unavailable');
   }
 
   originName(code: string | null | undefined): string {
-    return countryName(code, this.transloco.getActiveLang()) ?? this.transloco.translate('performance.unavailable');
+    return countryName(code, this.transloco.getActiveLang()) ?? this.transloco.translate('audienceSearch.unavailable');
   }
 
   /** Pie data for the panel; cached per track so change detection reuses it. */
-  composition(track: PerformanceTrack): AudienceComposition {
+  composition(track: AudienceSearchTrack): AudienceComposition {
     if (this.compositionFor !== track) {
       this.compositionFor = track;
       this.compositionCache = audienceComposition(track.artist);
     }
     return this.compositionCache!;
   }
-  private compositionFor: PerformanceTrack | null = null;
+  private compositionFor: AudienceSearchTrack | null = null;
   private compositionCache: AudienceComposition | null = null;
 
-  platformLabel(key: PerformancePlatform | null): string {
-    return this.platforms.find(p => p.key === key)?.label ?? this.transloco.translate('performance.unavailable');
+  platformLabel(key: AudienceSearchPlatform | null): string {
+    return this.platforms.find(p => p.key === key)?.label ?? this.transloco.translate('audienceSearch.unavailable');
   }
 
-  platformColor(key: PerformancePlatform | null): string {
+  platformColor(key: AudienceSearchPlatform | null): string {
     return this.platforms.find(p => p.key === key)?.color ?? 'transparent';
   }
 
@@ -425,7 +505,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     return this.transloco.translate(`${key}${count === 1 ? 'One' : 'Other'}`, { count, ...params });
   }
 
-  tierClass(track: PerformanceTrack): string {
+  tierClass(track: AudienceSearchTrack): string {
     return track.tier === 'PreClear' ? 'preclear' : 'artist';
   }
 
@@ -441,7 +521,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
 
   /* ─────────── Interaction ─────────── */
 
-  openTrack(track: PerformanceTrack): void {
+  openTrack(track: AudienceSearchTrack): void {
     this.selectedTrack = track;
     this.playerTrack = track;
     this.licenseError = false;
@@ -451,48 +531,55 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     this.selectedTrack = null;
   }
 
-  togglePreview(track: PerformanceTrack, event?: Event): void {
+  togglePreview(track: AudienceSearchTrack, event?: Event): void {
     event?.stopPropagation();
     this.playerTrack = track;
-    this.performanceService.togglePreview(track);
+    this.audienceSearchService.togglePreview(track);
   }
 
   /** A preview link exists and has not failed to play. */
-  canPreview(track: PerformanceTrack | null): boolean {
-    return this.performanceService.canPreview(track);
+  canPreview(track: AudienceSearchTrack | null): boolean {
+    return this.audienceSearchService.canPreview(track);
+  }
+
+  /** D2: the preview exists but would not load. */
+  previewFailed(track: AudienceSearchTrack | null): boolean {
+    return this.audienceSearchService.previewFailed(track);
+  }
+
+  retryPreview(track: AudienceSearchTrack): void {
+    this.playerTrack = track;
+    this.audienceSearchService.retryPreview(track);
   }
 
   /** The preview is fetching or buffering. */
-  isLoading(track: PerformanceTrack | null): boolean {
-    return !!track && this.performanceService.loadingUuid() === track.uuid;
+  isLoading(track: AudienceSearchTrack | null): boolean {
+    return !!track && this.audienceSearchService.loadingUuid() === track.uuid;
   }
 
   /** The preview is loaded (playing or paused), so its position is shown. */
-  isLoaded(track: PerformanceTrack | null): boolean {
-    return !!track && this.performanceService.loadedUuid() === track.uuid;
+  isLoaded(track: AudienceSearchTrack | null): boolean {
+    return !!track && this.audienceSearchService.loadedUuid() === track.uuid;
   }
 
-  isPlaying(track: PerformanceTrack | null): boolean {
+  isPlaying(track: AudienceSearchTrack | null): boolean {
     return !!track && this.playingUuid() === track.uuid;
   }
 
-  viewTrack(track: PerformanceTrack, event?: Event): void {
+  viewTrack(track: AudienceSearchTrack, event?: Event): void {
     event?.stopPropagation();
-    // Text typed in the last moment has not reached the URL yet; carry it along.
-    this.clearSearchTimer();
-    const q = this.search.replace(/\s+/g, ' ').trim();
-    const queryParams = { ...this.route.snapshot.queryParams, q: q || undefined };
-    this.performanceService.listState = queryParams;
-    this.performanceService.lastOpenedUuid = track.uuid;
-    this.router.navigate(['/brand/performance/track', track.uuid], { queryParams });
+    const queryParams = { ...this.route.snapshot.queryParams };
+    this.audienceSearchService.listState = queryParams;
+    this.audienceSearchService.lastOpenedUuid = track.uuid;
+    this.router.navigate(['/brand/audience-search/track', track.uuid], { queryParams });
   }
 
   /** Hands the track to the dashboard search, where the license flow lives. */
-  licenseTrack(track: PerformanceTrack): void {
+  licenseTrack(track: AudienceSearchTrack): void {
     if (this.licensingUuid) { return; }
     this.licensingUuid = track.uuid;
     this.licenseError = false;
-    this.performanceService.getSpotifyUrl(track).pipe(
+    this.audienceSearchService.getSpotifyUrl(track).pipe(
       catchError(() => of(null)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(url => {
@@ -512,7 +599,7 @@ export class PerformanceComponent implements OnInit, OnDestroy {
   /** Runs the suggested spelling ("Did you mean …?"). */
   applySuggestion(name: string): void {
     this.search = name;
-    this.updateQuery({ q: name, page: null });
+    this.updateQuery({ q: name, tab: null, artist: null, page: null });
   }
 
   /** The place a search was read as: country names in the active language, or the city as typed. */
@@ -526,15 +613,15 @@ export class PerformanceComponent implements OnInit, OnDestroy {
     return place.label.replace(/\b\p{L}/gu, ch => ch.toUpperCase());
   }
 
-  platformName(key: PerformancePlatform | null): string {
+  platformName(key: AudienceSearchPlatform | null): string {
     return this.platforms.find(p => p.key === key)?.label ?? '';
   }
 
   onCoverError(event: Event): void {
     const img = event.target as HTMLImageElement;
-    if (!img.src.endsWith(PerformanceComponent.COVER_FALLBACK)) { img.src = PerformanceComponent.COVER_FALLBACK; }
+    if (!img.src.endsWith(AudienceSearchComponent.COVER_FALLBACK)) { img.src = AudienceSearchComponent.COVER_FALLBACK; }
   }
 
   static readonly COVER_FALLBACK = 'assets/images/others/default.jpg';
-  readonly coverFallback = PerformanceComponent.COVER_FALLBACK;
+  readonly coverFallback = AudienceSearchComponent.COVER_FALLBACK;
 }

@@ -1,0 +1,16 @@
+@use '../../../../../styles/custom/dialog' as *;
+@use '../save-to.shared' as *;
+
+// Opened from inside the picker: sits above it.
+.dlg-backdrop--stacked { z-index: 1010; }
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+
+  &__error { margin-top: 8px; }
+
+  &__textarea { resize: vertical; min-height: 52px; }
+}
+
+.form-note { font-size: 15px; }

@@ -1,0 +1,51 @@
+<div class="dlg-backdrop dlg-backdrop--stacked" (click)="cancel()">
+  <form class="dlg" role="dialog" aria-modal="true" [attr.aria-labelledby]="titleId" novalidate
+        (click)="$event.stopPropagation()" (ngSubmit)="submit()">
+    <button type="button" class="dlg__close" (click)="cancel()" [attr.aria-label]="'saveTo.close' | transloco">
+      <img src="assets/images/icons/audience-search/close-dialog.svg" width="32" height="32" alt="" />
+    </button>
+
+    <h2 class="dlg__title" [id]="titleId">
+      {{ (isEdit ? 'saveTo.form.editTitle' : 'saveTo.form.createTitle') | transloco }}
+    </h2>
+    <p class="dlg__lede">{{ 'saveTo.form.lede' | transloco }}</p>
+
+    <div class="form-field">
+      <label class="dlg-label" [for]="titleId + '-name'">{{ 'saveTo.form.name' | transloco }}</label>
+      <input #nameInput class="dlg-field" [id]="titleId + '-name'" name="name" [(ngModel)]="name"
+             [maxlength]="maxLength" autocomplete="off" required
+             [placeholder]="'saveTo.form.namePlaceholder' | transloco"
+             [attr.aria-invalid]="visibleError ? 'true' : null"
+             [attr.aria-describedby]="visibleError ? titleId + '-name-error' : null"
+             (blur)="touched = true" />
+      @if (visibleError) {
+        <p class="dlg__error form-field__error" [id]="titleId + '-name-error'" role="alert">
+          {{ (visibleError === 'duplicate' ? 'saveTo.form.duplicate' : 'saveTo.form.required') | transloco }}
+        </p>
+      }
+    </div>
+
+    <div class="form-field">
+      <label class="dlg-label" [for]="titleId + '-description'">{{ 'saveTo.form.description' | transloco }}</label>
+      <textarea class="dlg-field form-field__textarea" [id]="titleId + '-description'" name="description" rows="2"
+                [(ngModel)]="description" [placeholder]="'saveTo.form.descriptionPlaceholder' | transloco"></textarea>
+    </div>
+
+    <p class="dlg__lede form-note">{{ 'saveTo.form.note' | transloco }}</p>
+
+    @if (failed) {
+      <p class="dlg__error" role="alert">{{ (isEdit ? 'saveTo.errors.renameFailed' : 'saveTo.errors.createFailed') | transloco }}</p>
+    }
+
+    <div class="dlg__actions">
+      <button type="button" class="dlg-btn" (click)="cancel()" [disabled]="busy">{{ 'saveTo.cancel' | transloco }}</button>
+      <button type="submit" class="dlg-btn-primary" [disabled]="!canSubmit">
+        @if (busy) {
+          {{ 'saveTo.saving' | transloco }}
+        } @else {
+          {{ (isEdit ? 'saveTo.saveChanges' : 'saveTo.form.create') | transloco }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

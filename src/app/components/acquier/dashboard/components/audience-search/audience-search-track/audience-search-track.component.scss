@@ -1,4 +1,4 @@
-@use '../performance.shared' as *;
+@use '../audience-search.shared' as *;
 
 .ptd-page {
   display: flex;
@@ -9,11 +9,11 @@
   margin: 0 auto;
   padding: 32px;
   box-sizing: border-box;
-  font-family: $perf-font;
-  color: $perf-text;
+  font-family: $aud-font;
+  color: $aud-text;
   line-height: 1.4;
 
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     gap: 20px;
     padding: 20px 16px 96px;
   }
@@ -29,7 +29,7 @@
   flex-direction: column;
   gap: 8px;
 
-  &__crumb { color: $perf-muted; font-size: 14px; }
+  &__crumb { color: $aud-muted; font-size: 14px; }
 
   &__title {
     margin: 0;
@@ -38,10 +38,10 @@
     line-height: 1.25;
     overflow-wrap: anywhere;
 
-    @media (max-width: $perf-bp-phone) { font-size: 28px; }
+    @media (max-width: $aud-bp-phone) { font-size: 28px; }
   }
 
-  &__sub { color: $perf-muted; font-size: 18px; }
+  &__sub { color: $aud-muted; font-size: 18px; }
 }
 
 .ptd-preview {
@@ -52,18 +52,18 @@
   padding: 20px;
   box-sizing: border-box;
   border-radius: 8px;
-  background: $perf-surface;
+  background: $aud-surface;
 
   &__label { font-size: 16px; white-space: nowrap; }
 
   &__time,
   &__status {
-    color: $perf-muted;
+    color: $aud-muted;
     font-size: 14px;
     white-space: nowrap;
   }
 
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     gap: 12px;
     padding: 16px;
 
@@ -78,7 +78,7 @@
   align-items: start;
   gap: 24px;
 
-  @media (max-width: $perf-bp-tablet) { grid-template-columns: 1fr; }
+  @media (max-width: $aud-bp-tablet) { grid-template-columns: 1fr; }
 }
 
 .ptd-main {
@@ -91,7 +91,7 @@
 .ptd-card {
   padding: 24px;
   border-radius: 8px;
-  background: $perf-surface;
+  background: $aud-surface;
 
   &__title {
     margin: 0;
@@ -105,7 +105,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 
-  @media (max-width: $perf-bp-phone) { gap: 12px; }
+  @media (max-width: $aud-bp-phone) { gap: 12px; }
 }
 
 .ptd-metric {
@@ -114,10 +114,10 @@
   gap: 6px;
   padding: 20px;
 
-  &__label { color: $perf-muted; font-size: 14px; }
+  &__label { color: $aud-muted; font-size: 14px; }
   &__value { font-size: 28px; font-weight: 700; }
 
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     padding: 14px;
 
     &__value { font-size: 22px; }
@@ -137,20 +137,20 @@
   gap: 20px;
   min-height: 36px;
 
-  &__name { color: $perf-muted; font-size: 16px; }
+  &__name { color: $aud-muted; font-size: 16px; }
   &__value { font-size: 16px; }
 
   &__link {
-    color: $perf-muted;
+    color: $aud-muted;
     font-size: 14px;
     text-decoration: none;
 
-    &:hover { color: $perf-text; text-decoration: underline; }
+    &:hover { color: $aud-text; text-decoration: underline; }
 
     &--none { visibility: hidden; }
   }
 
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     grid-template-columns: 76px minmax(40px, 1fr) 64px;
     gap: 12px;
 
@@ -161,7 +161,7 @@
 .ptd-bar {
   height: 6px;
   border-radius: 3px;
-  background: $perf-chip;
+  background: $aud-chip;
   overflow: hidden;
 
   &__value { height: 100%; }
@@ -181,7 +181,7 @@
 
 .ptd-note {
   margin: 0;
-  color: $perf-muted;
+  color: $aud-muted;
   font-size: 14px;
 }
 
@@ -190,7 +190,7 @@
   align-items: flex-start;
   gap: 20px;
   padding: 16px;
-  background: $perf-surface;
+  background: $aud-surface;
 
   &__title {
     flex: 0 0 240px;
@@ -223,11 +223,11 @@
 
   &__streams {
     flex: 1 1 auto;
-    color: $perf-muted;
+    color: $aud-muted;
     font-size: 14px;
   }
 
-  @media (max-width: $perf-bp-tablet) {
+  @media (max-width: $aud-bp-tablet) {
     flex-direction: column;
     gap: 12px;
 
@@ -235,12 +235,12 @@
     &__list { width: 100%; }
   }
 
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     &__row { gap: 12px; }
     &__streams { display: none; }
     &__name { flex: 1 1 auto; }
 
-    .perf-btn--view { width: auto; }
+    .aud-btn--view { width: auto; }
   }
 }
 
@@ -252,8 +252,8 @@
   gap: 16px;
   min-height: 240px;
   border-radius: 8px;
-  background: $perf-surface;
-  color: $perf-muted;
+  background: $aud-surface;
+  color: $aud-muted;
   font-size: 16px;
   text-align: center;
 

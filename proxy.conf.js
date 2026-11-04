@@ -19,6 +19,10 @@ module.exports = {
         target,
         secure: false,
         changeOrigin: true,
+        // One connection per request: Django's runserver desyncs on reused
+        // sockets and the response comes back unparseable, which surfaced as a
+        // failed DELETE even though the row was removed.
+        agent: false,
         configure: (proxy) => {
             proxy.on('proxyRes', (proxyRes) => {
                 delete proxyRes.headers['www-authenticate'];

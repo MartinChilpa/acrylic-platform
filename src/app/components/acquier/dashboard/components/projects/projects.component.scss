@@ -1,12 +1,13 @@
-$accent:        #416C45;
-$accent-light:  #81C784;
-$border:        rgba(255, 255, 255, 0.08);
-$surface:       rgba(255, 255, 255, 0.04);
-$surface-hover: rgba(255, 255, 255, 0.07);
-$text-primary:  #FFFFFF;
-$text-muted:    rgba(255, 255, 255, 0.55);
-$radius-card:   12px;
-$radius-sm:     8px;
+// Projects workspace (Figma 2429:50110 · "Return to the project")
+$surface:      #141414;
+$surface-alt:  #202020;
+$border:       rgba(255, 255, 255, 0.5);
+$border-soft:  rgba(255, 255, 255, 0.1);
+$text:         #FFFFFF;
+$muted:        #B6B6B6;
+$active-bg:    #C1C5C8;
+$bp-tablet:    1024px;
+$bp-phone:     640px;
 
 :host {
   display: block;
@@ -15,332 +16,448 @@ $radius-sm:     8px;
 }
 
 .projects {
-  width: 100%;
-  min-height: 100%;
-  padding: 64px 40px 48px;
-  box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-  color: $text-primary;
-  font-family: 'Inter', sans-serif;
-}
-
-.projects__header {
-  width: 100%;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.projects__title {
+  min-height: calc(100vh - 88px);
+  color: $text;
   font-family: 'Glacial Indifference', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 32px;
-  margin: 0;
+
+  @media (max-width: $bp-tablet) { flex-direction: column; }
 }
 
-.projects__subtitle {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: $text-muted;
-  line-height: 1.5;
-}
-
-.projects__create-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border-radius: $radius-sm;
-  border: 1px solid $accent-light;
-  background: rgba(65, 108, 69, 0.25);
-  color: $accent-light;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s;
-  flex-shrink: 0;
-
-  &:hover { background: rgba(65, 108, 69, 0.45); }
-}
-
-.projects__new-form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border-radius: $radius-card;
-  border: 1px solid rgba(65, 108, 69, 0.50);
-  background: rgba(65, 108, 69, 0.10);
-}
-
-.projects__input {
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: $radius-sm;
-  border: 1px solid $border;
-  background: rgba(0, 0, 0, 0.30);
-  color: $text-primary;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.15s;
-
-  &::placeholder { color: $text-muted; }
-  &:focus { border-color: rgba(129, 199, 132, 0.50); }
-}
-
-.projects__new-form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.projects__btn {
-  height: 34px;
-  padding: 0 16px;
-  border-radius: $radius-sm;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s, opacity 0.15s;
-
-  &--ghost {
-    border: 1px solid $border;
-    background: transparent;
-    color: $text-muted;
-    &:hover { background: $surface; color: $text-primary; }
-  }
-
-  &--primary {
-    border: none;
-    background: $accent-light;
-    color: #000;
-    &:hover { opacity: 0.88; }
-    &:disabled { opacity: 0.4; cursor: not-allowed; }
-  }
-}
-
-.projects__section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.projects__empty {
-  padding: 40px 0;
-  text-align: center;
-  color: $text-muted;
-  font-size: 13px;
-
-  p { margin: 0; }
-}
-
-.project-card {
-  border-radius: $radius-card;
-  border: 1px solid $border;
-  background: $surface;
-  overflow: hidden;
-  transition: border-color 0.15s;
-
-  &--open { border-color: rgba(65, 108, 69, 0.45); }
-}
-
-.project-card__header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  cursor: pointer;
-  user-select: none;
-
-  &:hover { background: $surface-hover; }
-}
-
-.project-card__covers {
-  display: flex;
-  flex-shrink: 0;
-}
-
-.project-card__thumb {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  object-fit: cover;
-  border: 1.5px solid rgba(0, 0, 0, 0.40);
-  margin-left: -4px;
-
-  &:first-child { margin-left: 0; }
-  &--empty { background: rgba(255, 255, 255, 0.06); }
-}
-
-.project-card__meta {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.project-card__name {
-  font-family: 'Glacial Indifference', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: $text-primary;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.project-card__count {
-  font-size: 12px;
-  color: $text-muted;
-}
-
-.project-card__chevron {
-  color: $text-muted;
-  flex-shrink: 0;
-  font-size: 20px;
-  transition: transform 0.2s ease;
-  line-height: 1;
-
-  &--open { transform: rotate(90deg); }
-}
-
-.project-card__tracks {
-  border-top: 1px solid $border;
-  padding: 8px 0;
-}
-
-.project-card__tracks-empty {
-  padding: 12px 16px;
-  font-size: 12px;
-  color: $text-muted;
-  font-style: italic;
-}
-
-.project-track {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
-  transition: background 0.12s;
-
-  &:hover { background: $surface-hover; }
-}
-
-.project-track__cover {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.project-track__info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.project-track__name {
-  font-size: 13px;
-  font-weight: 500;
-  color: $text-primary;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.project-track__artist {
-  font-size: 11px;
-  color: $text-muted;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.project-track__remove {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
-  color: $text-muted;
+// ─── Shared controls ──────────────────────────────────────────
+.projects-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid $border;
+  border-radius: 8px;
+  background: $surface;
+  box-shadow: 0 4px 2px rgba(0, 0, 0, 0.25);
+  color: $text;
+  font: 700 14px/20px 'Glacial Indifference', sans-serif;
+  white-space: nowrap;
   cursor: pointer;
-  flex-shrink: 0;
-  font-size: 13px;
-  transition: background 0.12s, color 0.12s;
+  transition: background 150ms ease;
 
-  &:hover { background: rgba(255, 80, 80, 0.12); color: #ff6b6b; }
+  &:hover:not(:disabled) { background: #1F1F1F; }
+  &:disabled { opacity: 0.5; cursor: default; }
 }
 
-.favorites {
+.projects-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $muted;
+  font: 400 14px/20px 'Glacial Indifference', sans-serif;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover { color: $text; }
+}
+
+.projects-input {
   width: 100%;
+  height: 48px;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 1px solid $border;
+  border-radius: 8px;
+  background: $surface;
+  color: $text;
+  font: 400 16px/23px 'Glacial Indifference', sans-serif;
 
-  &--empty {
-    padding: 32px 0;
-    text-align: center;
-    color: $text-muted;
-    font-size: 13px;
+  &::placeholder { color: $muted; }
+  &:focus { outline: 2px solid rgba(255, 255, 255, 0.6); outline-offset: 1px; }
+}
 
-    p { margin: 0; }
+.projects-check {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    inset: 0;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  &__box {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    margin: 0 10px;
+    box-sizing: border-box;
+    border: 1.5px solid $border;
+    border-radius: 4px;
+    background: $surface-alt;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  input:checked + &__box {
+    border-color: $text;
+    background: $text;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 6px;
+      height: 12px;
+      border: solid #000;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+
+  input:focus-visible + &__box { outline: 2px solid $text; outline-offset: 2px; }
+  input:disabled + &__box { opacity: 0.4; }
+
+  &__label {
+    font-size: 15px;
+    line-height: 21px;
+    white-space: nowrap;
   }
 }
 
-/* Same type as the page title, so the two headings read as one hierarchy. */
-.favorites__header {
-  margin-bottom: 12px;
-}
-
-.favorites__title {
-  font-family: 'Glacial Indifference', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 32px;
+.projects-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  min-width: 200px;
   margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid $border-soft;
+  border-radius: 10px;
+  background: $surface-alt;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+
+  &--right { left: auto; right: 0; }
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: $text;
+    font: 400 14px/20px 'Glacial Indifference', sans-serif;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover, &.is-current { background: rgba(255, 255, 255, 0.08); }
+    &.is-current { font-weight: 700; }
+  }
 }
 
-.favorites__list {
+// ─── Project navigation ───────────────────────────────────────
+.projects-nav {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: 100%;
+  align-items: flex-start;
+  gap: 20px;
+  width: 240px;
+  flex-shrink: 0;
+  padding: 24px;
+  box-sizing: border-box;
+  background: $surface;
+
+  @media (max-width: $bp-tablet) {
+    width: 100%;
+    gap: 12px;
+  }
+
+  &__label {
+    color: $muted;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 17px;
+    text-transform: uppercase;
+  }
+
+  &__saved {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 192px;
+    height: 48px;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: $text;
+    font: 700 16px/23px 'Glacial Indifference', sans-serif;
+    cursor: pointer;
+
+    img { flex-shrink: 0; }
+    &:hover { background: rgba(255, 255, 255, 0.05); }
+    &--active { background: rgba(255, 255, 255, 0.08); }
+  }
+
+  &__new { width: 136px; padding: 0 8.5px; }
+
+  // Figma B3: "Projects" over the sidebar search.
+  &__heading {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  &__search { width: 192px; }
+
+  &__project {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    width: 192px;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: $text;
+    font-family: 'Glacial Indifference', sans-serif;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: rgba(255, 255, 255, 0.05); }
+
+    &--active,
+    &--active:hover {
+      background: $active-bg;
+      color: #000;
+
+      .projects-nav__project-name { font-weight: 700; }
+      .projects-nav__project-count { color: #000; }
+    }
+  }
+
+  &__project-name {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 16px;
+    line-height: 23px;
+  }
+
+  &__project-count {
+    color: $muted;
+    font-size: 12px;
+    line-height: 17px;
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: 192px;
+    margin: 0;
+    color: $muted;
+    font-size: 13px;
+    line-height: 19px;
+    overflow-wrap: anywhere;
+
+    p { margin: 0; }
+  }
+
+  &__spacer { flex: 1 0 0; }
+
+  &__note {
+    width: 192px;
+    margin: 0;
+    color: $muted;
+    font-size: 13px;
+    line-height: 19px;
+
+    @media (max-width: $bp-tablet) { display: none; }
+  }
 }
 
-.favorite-item {
+// ─── Collection ───────────────────────────────────────────────
+.collection__heading { flex: 1 1 320px; min-width: 0; }
+
+// Edit project, Delete project, + New project (Figma B3).
+.collection__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.collection {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  width: 100%;
+  padding: 40px 32px 32px;
+  box-sizing: border-box;
+
+  @media (max-width: $bp-phone) { padding: 24px 16px; }
+
+  &__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+
+    h2 {
+      margin: 0 0 4px;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 45px;
+      overflow-wrap: anywhere;
+    }
+
+    p {
+      margin: 0;
+      color: $muted;
+      font-size: 16px;
+      line-height: 23px;
+    }
+  }
+
+  &__summary {
+    margin: 12px 0 0;
+    color: $muted;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  &__tools {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  &__search {
+    flex: 1;
+    max-width: 1140px;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  &__sort {
+    position: relative;
+    margin-left: auto;
+
+    .projects-btn { min-width: 160px; }
+    .projects-menu { left: auto; right: 0; }
+  }
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    min-height: 80px;
+    margin-top: 12px;
+    padding: 16px;
+    box-sizing: border-box;
+    border-radius: 10px;
+  }
+
+  &__flex { flex: 1 0 0; }
+
+  &__hint {
+    color: $muted;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  &__selected {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+  }
+
+  // Labels sit over the row component's own grid (4% · 16% · 38% · 40%).
+  &__columns {
+    display: grid;
+    grid-template-columns: 20% 38% 40%;
+    column-gap: 10px;
+    margin: 12px 56px 0;
+    padding: 0 19px;
+    color: $muted;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    text-transform: uppercase;
+
+    @media (max-width: $bp-tablet) { display: none; }
+  }
+
+  &__columns-end {
+    display: flex;
+    justify-content: space-between;
+    padding-right: 30%;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  &__empty {
+    margin: 24px 0;
+    color: $muted;
+    font-size: 15px;
+    text-align: center;
+  }
+
+  &__footer {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    color: $muted;
+    font-size: 13px;
+    line-height: 19px;
+
+    @media (max-width: $bp-phone) { flex-direction: column; }
+  }
 }
 
-.favorite-item__assign {
-  display: flex;
-  justify-content: flex-end;
-}
+.collection-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 12px;
 
-.favorite-card__select {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: #1a1a1a;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 12px;
-  cursor: pointer;
+  &__actions { position: relative; }
+
+  &__more {
+    width: 44px;
+    height: 44px;
+    border: 1px solid $border;
+    border-radius: 6px;
+    background: $surface-alt;
+    color: $text;
+    font: 700 14px/20px 'Glacial Indifference', sans-serif;
+    cursor: pointer;
+
+    &:hover { background: #2A2A2A; }
+  }
+
+  &--selected ::ng-deep .result-row { border-color: rgba(255, 255, 255, 0.35); }
 }

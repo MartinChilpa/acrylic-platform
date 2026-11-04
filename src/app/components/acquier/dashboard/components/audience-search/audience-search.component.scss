@@ -1,6 +1,6 @@
-@use './performance.shared' as *;
+@use './audience-search.shared' as *;
 
-.perf-page {
+.aud-page {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -9,11 +9,11 @@
   margin: 0 auto;
   padding: 32px;
   box-sizing: border-box;
-  font-family: $perf-font;
-  color: $perf-text;
+  font-family: $aud-font;
+  color: $aud-text;
 
   // Phones: room at the bottom for the fixed tab bar.
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     padding: 20px 16px 96px;
     gap: 20px;
   }
@@ -21,20 +21,20 @@
 
 /* ─────────── Header ─────────── */
 
-.perf-head {
+.aud-head {
   display: flex;
   flex-direction: column;
   gap: 8px;
   line-height: 1.4;
 
-  &__context {
+  // Title with the Go to projects shortcut on the right.
+  &__row {
     display: flex;
-    justify-content: flex-end;
-    gap: 16px;
-    font-size: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 16px;
   }
-
-  &__team { color: $perf-muted; }
 
   &__title {
     margin: 0;
@@ -42,19 +42,19 @@
     font-weight: 700;
     line-height: 1.4;
 
-    @media (max-width: $perf-bp-phone) { font-size: 26px; line-height: 1.25; }
+    @media (max-width: $aud-bp-phone) { font-size: 26px; line-height: 1.25; }
   }
 
   &__lede {
     margin: 0;
-    color: $perf-muted;
+    color: $aud-muted;
     font-size: 16px;
   }
 }
 
 /* ─────────── Search and filters ─────────── */
 
-.perf-filters {
+.aud-filters {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -66,36 +66,65 @@
   }
 }
 
-.perf-search {
+// White bar: query field and the Search button (Figma A1/A2).
+.aud-search {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 60px;
+  padding: 6px 8px 6px 16px;
+  border-radius: 8px;
+  background: #FFFFFF;
+  box-sizing: border-box;
+
+  &:focus-within { box-shadow: 0 0 0 3px rgba(173, 70, 255, 0.45); }
 
   &__input {
-    width: 100%;
-    height: 52px;
-    padding: 0 48px 0 16px;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 48px;
+    padding: 0;
     border: 0;
-    border-radius: 8px;
-    background: #FFFFFF;
+    background: transparent;
     color: #262626;
-    font-family: $perf-font;
+    font-family: $aud-font;
     font-size: 16px;
-    box-sizing: border-box;
+    line-height: 1.4;
 
-    &::placeholder { color: #262626; }
+    &::placeholder { color: #6B6B6B; }
     &::-webkit-search-cancel-button { display: none; }
 
-    &:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(173, 70, 255, 0.45);
-    }
+    &:focus { outline: none; }
+  }
+
+  &__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    height: 44px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 8px;
+    background: #141414;
+    color: #FFFFFF;
+    font-family: $aud-font;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: #2A2A2A; }
+    &:focus-visible { outline: 2px solid #AD46FF; outline-offset: 2px; }
+    // Figma: the button is dimmed until there is something to search.
+    &:disabled { opacity: 0.42; cursor: not-allowed; }
   }
 
   &__clear {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
     display: inline-flex;
+    flex: 0 0 auto;
     align-items: center;
     justify-content: center;
     width: 32px;
@@ -111,7 +140,7 @@
 }
 
 // Country autocomplete under the search field.
-.perf-suggest {
+.aud-suggest {
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
@@ -120,9 +149,9 @@
   margin: 0;
   padding: 6px;
   list-style: none;
-  border: 1px solid $perf-control-border;
+  border: 1px solid $aud-control-border;
   border-radius: 8px;
-  background: $perf-control-bg;
+  background: $aud-control-bg;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
 
   &__item {
@@ -131,7 +160,7 @@
     gap: 12px;
     padding: 10px 12px;
     border-radius: 6px;
-    color: $perf-text;
+    color: $aud-text;
     font-size: 15px;
     cursor: pointer;
 
@@ -139,7 +168,7 @@
   }
 
   &__kind {
-    color: $perf-subtle;
+    color: $aud-subtle;
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -148,14 +177,14 @@
   &__name { flex: 1 1 auto; font-weight: 700; }
 
   &__count {
-    color: $perf-muted;
+    color: $aud-muted;
     font-size: 13px;
     white-space: nowrap;
   }
 }
 
 // Dropdown styled as the design's filter control, native select underneath.
-.perf-select {
+.aud-select {
   position: relative;
   display: inline-flex;
   width: 180px;
@@ -170,18 +199,18 @@
     width: 100%;
     height: 100%;
     padding: 0 36px 0 12px;
-    border: 1px solid $perf-control-border;
+    border: 1px solid $aud-control-border;
     border-radius: 6px;
-    background: $perf-control-bg;
-    color: $perf-text;
-    font-family: $perf-font;
+    background: $aud-control-bg;
+    color: $aud-text;
+    font-family: $aud-font;
     font-size: 14px;
     appearance: none;
     cursor: pointer;
 
     &:focus-visible { outline: 2px solid #AD46FF; outline-offset: 1px; }
 
-    option { background: $perf-control-bg; color: $perf-text; }
+    option { background: $aud-control-bg; color: $aud-text; }
   }
 
   &::after {
@@ -206,7 +235,7 @@
     white-space: nowrap;
   }
 
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     flex: 1 1 calc(50% - 6px);
     width: auto;
 
@@ -214,23 +243,23 @@
   }
 }
 
-.perf-cover {
+.aud-cover {
   flex: 0 0 auto;
   width: 44px;
   height: 44px;
   border-radius: 6px;
   object-fit: cover;
-  background: $perf-chip;
+  background: $aud-chip;
 }
 
 // Reading of the search under the input: place, ranking, spelling hint.
-.perf-search-hint {
+.aud-search-hint {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 12px;
   margin-top: -4px;
-  color: $perf-muted;
+  color: $aud-muted;
   font-size: 14px;
   line-height: 1.4;
 
@@ -242,7 +271,7 @@
     border: 0;
     background: transparent;
     color: #C9A2FF;
-    font-family: $perf-font;
+    font-family: $aud-font;
     font-size: 14px;
     font-weight: 700;
     text-decoration: underline;
@@ -252,21 +281,21 @@
   }
 }
 
-.perf-note {
+.aud-note {
   margin: 0;
-  color: $perf-muted;
+  color: $aud-muted;
   font-size: 14px;
   line-height: 1.4;
 }
 
 /* ─────────── Results ─────────── */
 
-.perf-results {
+.aud-results {
   display: flex;
   flex-direction: column;
 }
 
-.perf-toolbar {
+.aud-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -274,29 +303,29 @@
   min-height: 56px;
   margin-bottom: 8px;
 
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     flex-wrap: wrap;
 
-    .perf-select--sort { flex-basis: 100%; }
+    .aud-select--sort { flex-basis: 100%; }
   }
 }
 
-.perf-tabs {
+.aud-tabs {
   display: flex;
   gap: 8px;
 
-  @media (max-width: $perf-bp-phone) { flex: 1 1 100%; }
+  @media (max-width: $aud-bp-phone) { flex: 1 1 100%; }
 }
 
-.perf-tab {
+.aud-tab {
   width: 164px;
   height: 40px;
   padding: 0 12px;
-  border: 1px solid $perf-control-border;
+  border: 1px solid $aud-control-border;
   border-radius: 6px;
-  background: $perf-control-bg;
-  color: $perf-text;
-  font-family: $perf-font;
+  background: $aud-control-bg;
+  color: $aud-text;
+  font-family: $aud-font;
   font-size: 14px;
   text-align: left;
   cursor: pointer;
@@ -308,57 +337,58 @@
     font-weight: 700;
   }
 
-  @media (max-width: $perf-bp-phone) { flex: 1 1 0; width: auto; }
+  @media (max-width: $aud-bp-phone) { flex: 1 1 0; width: auto; }
 }
 
 // Shared column grid for the header row and each data row.
-.perf-table {
+.aud-table {
   display: flex;
   flex-direction: column;
 
+  // Figma A3a/A3b: play, track/artist, origin, total audience, Spotify streams, use/save, actions.
   &--tracks {
-    --perf-cols: 36px minmax(200px, 2.4fr) minmax(110px, 1fr) minmax(110px, 1fr) 136px 140px;
+    --aud-cols: 36px minmax(180px, 2.4fr) minmax(90px, 1fr) minmax(90px, 1fr) minmax(90px, 0.9fr) minmax(110px, 1.1fr) 212px;
   }
 
   &--artists {
-    --perf-cols: minmax(160px, 2fr) minmax(96px, 1fr) minmax(96px, 1fr) minmax(110px, 1fr) minmax(96px, 1fr) 140px;
+    --aud-cols: minmax(160px, 2fr) minmax(96px, 1fr) minmax(96px, 1fr) minmax(110px, 1fr) minmax(96px, 1fr) 140px;
   }
 
   &__head {
     display: grid;
-    grid-template-columns: var(--perf-cols);
+    grid-template-columns: var(--aud-cols);
     align-items: center;
     gap: 16px;
     height: 40px;
     padding: 0 12px;
-    background: $perf-surface;
-    color: $perf-muted;
+    background: $aud-surface;
+    color: $aud-muted;
     font-size: 13px;
     font-weight: 700;
   }
 
-  @media (max-width: $perf-bp-tablet) {
+  @media (max-width: $aud-bp-tablet) {
     gap: 8px;
 
     &__head { display: none; }
   }
 }
 
-.perf-row {
+.aud-row {
   display: grid;
-  grid-template-columns: var(--perf-cols);
+  grid-template-columns: var(--aud-cols);
   align-items: center;
   gap: 16px;
   min-height: 80px;
   padding: 12px;
   box-sizing: border-box;
-  background: $perf-surface-alt;
+  background: $aud-surface-alt;
   font-size: 14px;
   line-height: 1.4;
 
-  &:nth-child(odd) { background: $perf-surface; }
+  &:nth-child(odd) { background: $aud-surface; }
 
-  .perf-table--tracks & {
+  .aud-table--tracks & {
     cursor: pointer;
 
     &:hover { background: #1E1E1E; }
@@ -389,14 +419,14 @@
   }
 
   &__title {
-    color: $perf-text;
+    color: $aud-text;
     font-size: 16px;
     font-weight: 700;
     overflow-wrap: anywhere;
   }
 
   &__sub {
-    color: $perf-muted;
+    color: $aud-muted;
     font-size: 14px;
     overflow-wrap: anywhere;
   }
@@ -405,11 +435,11 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: $perf-muted;
+    color: $aud-muted;
   }
 
   &__strong {
-    color: $perf-text;
+    color: $aud-text;
     font-size: 16px;
     font-weight: 700;
   }
@@ -424,25 +454,26 @@
   // Column names inside cards on narrow screens.
   &__label { display: none; }
 
-  @media (max-width: $perf-bp-tablet) {
+  @media (max-width: $aud-bp-tablet) {
     grid-template-columns: 1fr 1fr;
     gap: 12px 16px;
     border-radius: 8px;
 
-    .perf-table--tracks & {
+    .aud-table--tracks & {
       grid-template-columns: 36px repeat(2, minmax(0, 1fr));
       grid-template-areas:
         'play identity identity'
         '. origin audience'
-        '. use use'
+        '. streams use'
         'action action action';
 
-      .perf-row__play { grid-area: play; }
-      .perf-row__identity { grid-area: identity; }
-      .perf-row__origin { grid-area: origin; }
-      .perf-row__audience { grid-area: audience; }
-      .perf-row__use { grid-area: use; }
-      .perf-row__action { grid-area: action; }
+      .aud-row__play { grid-area: play; }
+      .aud-row__identity { grid-area: identity; }
+      .aud-row__origin { grid-area: origin; }
+      .aud-row__audience { grid-area: audience; }
+      .aud-row__streams { grid-area: streams; }
+      .aud-row__use { grid-area: use; }
+      .aud-row__action { grid-area: action; }
     }
 
     &__identity { grid-column: 1 / -1; }
@@ -456,7 +487,7 @@
 
     &__label {
       display: block;
-      color: $perf-subtle;
+      color: $aud-subtle;
       font-size: 12px;
       font-weight: 400;
     }
@@ -464,38 +495,200 @@
     &__action {
       grid-column: 1 / -1;
 
-      .perf-btn--view { width: 100%; }
+      .aud-btn--view { width: 100%; }
+
+      &--pair > * { flex: 1 1 0; }
     }
+  }
+
+  // View track + Save to… side by side.
+  &__action--pair {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
   }
 }
 
-.perf-ecu-badge {
+// D2: informational ECU tag, shown only when ECU is available.
+.aud-ecu-badge {
   display: inline-flex;
   align-items: center;
-  height: 24px;
-  padding: 0 6px;
-  border: 1px solid #777777;
-  border-radius: 4px;
-  background: $perf-chip;
-  color: $perf-text;
+  padding: 3px 7px;
+  border: 0.75px solid #7A7A7A;
+  border-radius: 11px;
+  color: $aud-muted;
   font-size: 12px;
-  font-weight: 700;
+  line-height: 1.3;
   white-space: nowrap;
 }
 
+// "Save to…" and its saved state "✓ Saved to…" (Figma A3a, B2).
+.aud-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1.5px solid #BFBFBF;
+  border-radius: 8px;
+  background: #3D3D3D;
+  color: $aud-text;
+  font-family: $aud-font;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter 0.15s;
 
-.perf-dot {
+  &:hover { filter: brightness(1.15); }
+  &:focus-visible { outline: 2px solid #AD46FF; outline-offset: 2px; }
+}
+
+// Go to projects (page header).
+.aud-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  border: 1px solid #525252;
+  border-radius: 8px;
+  background: #141414;
+  color: $aud-text;
+  font-family: $aud-font;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  cursor: pointer;
+
+  &:hover { background: #2A2A2A; }
+  &:focus-visible { outline: 2px solid #AD46FF; outline-offset: 2px; }
+}
+
+// ArtistPromo only switch.
+.aud-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: $aud-text;
+  font-family: $aud-font;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+
+  &:focus-visible { outline: 2px solid #AD46FF; }
+
+  &__track {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: #454545;
+    transition: background 0.15s;
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    transition: transform 0.15s;
+  }
+
+  &[aria-checked='true'] &__track { background: $aud-artist-dark; }
+  &[aria-checked='true'] &__thumb { transform: translateX(16px); }
+}
+
+// Small "Clear" at the end of the filter row.
+.aud-clear-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  margin-left: auto;
+  padding: 0 12px;
+  border: 1px solid $aud-control-border;
+  border-radius: 6px;
+  background: transparent;
+  color: $aud-muted;
+  font-family: $aud-font;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+
+  &:hover { background: $aud-control-bg; color: $aud-text; }
+  &:focus-visible { outline: 2px solid #AD46FF; outline-offset: 2px; }
+
+  @media (max-width: $aud-bp-phone) { margin-left: 0; }
+}
+
+// A1: nothing searched yet.
+.aud-landing {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 420px;
+  padding: 64px 32px 56px;
+  border-radius: 24px;
+  background-image: linear-gradient(141deg, rgba(0, 0, 0, 0) 0%, rgba(30, 95, 220, 0.2) 50%, rgba(0, 0, 0, 0) 100%);
+  text-align: center;
+  line-height: 1.4;
+  box-sizing: border-box;
+
+  &__title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  &__body {
+    margin: 0;
+    color: #B8B8B8;
+    font-size: 18px;
+  }
+
+  @media (max-width: $aud-bp-phone) { min-height: 260px; padding: 40px 16px; }
+}
+
+// A3a: Back to artists and "GIMS · 1 track".
+.aud-artist-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  min-height: 64px;
+
+  &__title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+}
+
+
+.aud-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   flex: 0 0 auto;
 
-  @media (max-width: $perf-bp-tablet) { display: none; }
+  @media (max-width: $aud-bp-tablet) { display: none; }
 }
 
 /* ─────────── States ─────────── */
 
-.perf-state {
+.aud-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -504,8 +697,8 @@
   min-height: 200px;
   padding: 32px 16px;
   border-radius: 8px;
-  background: $perf-surface;
-  color: $perf-muted;
+  background: $aud-surface;
+  color: $aud-muted;
   font-size: 16px;
   text-align: center;
 
@@ -517,22 +710,22 @@
     border: 3px solid rgba(255, 255, 255, 0.15);
     border-top-color: #AD46FF;
     border-radius: 50%;
-    animation: perf-spin 0.8s linear infinite;
+    animation: aud-spin 0.8s linear infinite;
   }
 }
 
-@keyframes perf-spin {
+@keyframes aud-spin {
   to { transform: rotate(360deg); }
 }
 
 /* ─────────── Footer and pager ─────────── */
 
-.perf-footer {
+.aud-footer {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-top: 24px;
-  color: $perf-muted;
+  color: $aud-muted;
   font-size: 14px;
   line-height: 1.4;
 
@@ -544,7 +737,7 @@
   }
 }
 
-.perf-pager {
+.aud-pager {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -556,15 +749,15 @@
     border: 0;
     border-radius: 4px;
     background: transparent;
-    color: $perf-muted;
-    font-family: $perf-font;
+    color: $aud-muted;
+    font-family: $aud-font;
     font-size: 14px;
     cursor: pointer;
 
-    &:hover:not(:disabled) { color: $perf-text; background: $perf-control-bg; }
+    &:hover:not(:disabled) { color: $aud-text; background: $aud-control-bg; }
     &:disabled { opacity: 0.4; cursor: default; }
 
-    &--active { color: $perf-text; font-weight: 700; }
+    &--active { color: $aud-text; font-weight: 700; }
   }
 
   &__gap { padding: 0 4px; }
@@ -572,7 +765,7 @@
 
 /* ─────────── Persistent player ─────────── */
 
-.perf-player {
+.aud-player {
   position: sticky;
   bottom: 16px;
   z-index: 5;
@@ -585,7 +778,7 @@
   box-sizing: border-box;
   border: 1px solid #404040;
   border-radius: 8px;
-  background: $perf-surface;
+  background: $aud-surface;
 
   &__track {
     display: flex;
@@ -594,8 +787,8 @@
     width: 220px;
     min-width: 0;
 
-    .perf-row__title,
-    .perf-row__sub {
+    .aud-row__title,
+    .aud-row__sub {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -604,39 +797,42 @@
 
   &__time,
   &__status {
-    color: $perf-muted;
+    color: $aud-muted;
     font-size: 14px;
     white-space: nowrap;
   }
 
-  @media (max-width: $perf-bp-tablet) {
+  // D2: "Preview not loading", next to Retry preview.
+  &__status--error { color: #FF9C91; font-weight: 700; }
+
+  @media (max-width: $aud-bp-tablet) {
     gap: 12px;
 
-    .perf-timeline,
+    .aud-timeline,
     &__time,
-    &__status { display: none; }
+    &__status:not(.aud-player__status--error) { display: none; }
 
     &__track { flex: 1 1 auto; width: auto; }
   }
 
   // On phones a pinned player would cover the cards; it sits after the list.
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     position: static;
 
-    .perf-btn--view { width: auto; }
+    .aud-btn--view { width: auto; }
   }
 }
 
 /* ─────────── Track panel ─────────── */
 
-.perf-drawer-backdrop {
+.aud-drawer-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1000;
   background: rgba(0, 0, 0, 0.55);
 }
 
-.perf-drawer {
+.aud-drawer {
   position: fixed;
   top: 0;
   right: 0;
@@ -647,10 +843,10 @@
   width: min(400px, 100%);
   background: #0B0B0B;
   border-left: 1px solid #2A2A2A;
-  font-family: $perf-font;
-  color: $perf-text;
+  font-family: $aud-font;
+  color: $aud-text;
   overflow-y: auto;
-  animation: perf-drawer-in 0.2s ease-out;
+  animation: aud-drawer-in 0.2s ease-out;
 
   &__head {
     display: flex;
@@ -659,7 +855,7 @@
     padding: 24px 24px 0;
   }
 
-  // Phone-only "< Performance" back link.
+  // Phone-only "< AudienceSearch" back link.
   &__back {
     display: none;
     align-items: center;
@@ -667,8 +863,8 @@
     padding: 0;
     border: 0;
     background: transparent;
-    color: $perf-text;
-    font-family: $perf-font;
+    color: $aud-text;
+    font-family: $aud-font;
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
@@ -690,7 +886,7 @@
   }
 
   &__sub {
-    color: $perf-muted;
+    color: $aud-muted;
     font-size: 13px;
   }
 
@@ -704,7 +900,7 @@
     border: 0;
     border-radius: 6px;
     background: transparent;
-    color: $perf-text;
+    color: $aud-text;
     cursor: pointer;
 
     &:hover { background: rgba(255, 255, 255, 0.08); }
@@ -719,9 +915,12 @@
 
   &__preview {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 12px;
   }
+
+  &__save { margin-left: auto; }
 
   &__preview-label {
     font-size: 14px;
@@ -730,13 +929,13 @@
 
   &__note {
     margin: 0;
-    color: $perf-subtle;
+    color: $aud-subtle;
     font-size: 13px;
     line-height: 1.4;
   }
 
   &__overline {
-    color: $perf-subtle;
+    color: $aud-subtle;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -751,12 +950,12 @@
     font-size: 14px;
     line-height: 1.4;
 
-    strong { color: $perf-text; }
+    strong { color: $aud-text; }
   }
 
   &__origin { font-size: 14px; }
 
-  @media (max-width: $perf-bp-phone) {
+  @media (max-width: $aud-bp-phone) {
     width: 100%;
     border-left: 0;
 
@@ -773,12 +972,12 @@
   }
 }
 
-@keyframes perf-drawer-in {
+@keyframes aud-drawer-in {
   from { transform: translateX(24px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 
-.perf-divider {
+.aud-divider {
   width: 100%;
   height: 1px;
   margin: 0;
@@ -786,13 +985,13 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-.perf-metrics {
+.aud-metrics {
   display: flex;
   gap: 12px;
 }
 
-// Figma: Performance / Audience composition / V1.
-.perf-composition {
+// Figma: AudienceSearch / Audience composition / V1.
+.aud-composition {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -813,7 +1012,7 @@
     gap: 12px;
 
     strong { font-size: 32px; font-weight: 700; line-height: normal; }
-    span { color: $perf-muted; font-size: 14px; line-height: 20px; }
+    span { color: $aud-muted; font-size: 14px; line-height: 20px; }
   }
 
   &__body {
@@ -850,7 +1049,7 @@
     height: 8px;
     border-radius: 50%;
 
-    &--na { box-shadow: inset 0 0 0 1px $perf-subtle; }
+    &--na { box-shadow: inset 0 0 0 1px $aud-subtle; }
   }
 
   &__label {
@@ -860,18 +1059,18 @@
     white-space: nowrap;
 
     strong { font-size: 14px; line-height: 20px; }
-    span { color: $perf-muted; font-size: 12px; line-height: 16px; }
+    span { color: $aud-muted; font-size: 12px; line-height: 16px; }
   }
 
   &__note {
     margin: 0;
-    color: $perf-muted;
+    color: $aud-muted;
     font-size: 12px;
     line-height: 16px;
   }
 }
 
-.perf-metric {
+.aud-metric {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -879,7 +1078,7 @@
   min-width: 0;
   padding: 12px;
   border-radius: 6px;
-  background: $perf-surface;
+  background: $aud-surface;
   line-height: 1.4;
 
   &__label {

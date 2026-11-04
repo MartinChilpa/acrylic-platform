@@ -59,6 +59,12 @@ app.use('/api', (req, res) => {
     const proxyReq = client.request(targetUrl, {
         method: req.method,
         headers: buildProxyRequestHeaders(req.headers, targetUrl.host),
+        // Node's global agent keeps connections alive since v19. Django's
+        // runserver mishandles HTTP/1.1 keep-alive, and a reused socket makes
+        // the next response desync ("Parse Error: Expected HTTP/") even though
+        // the request itself succeeded. Only plain HTTP targets are a local dev
+        // server, so pooling stays on for the real platform over HTTPS.
+        agent: targetUrl.protocol === 'https:' ? undefined : false,
     }, (proxyRes) => {
         Object.entries(proxyRes.headers).forEach(([key, value]) => {
             if (!HOP_BY_HOP_RESPONSE_HEADERS.has(key.toLowerCase()) && value !== undefined) {

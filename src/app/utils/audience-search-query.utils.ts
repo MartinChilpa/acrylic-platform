@@ -1,7 +1,7 @@
-import { PerformanceArtist, PerformancePlatform, PerformanceTrack } from '../interfaces/response/performance.response';
+import { AudienceSearchArtist, AudienceSearchPlatform, AudienceSearchTrack } from '../interfaces/response/audience-search.response';
 
 /**
- * Unified search for the Performance tab. One input, read as one of:
+ * Unified search for the AudienceSearch tab. One input, read as one of:
  *
  *   audience  "artists with a big fanbase in Senegal" -> Chartmetric Instagram
  *             top countries / top cities (only when fanbase/audience is said)
@@ -29,11 +29,11 @@ export interface SearchPlace {
 export interface SearchOutcome {
   mode: SearchMode;
   /** Matching tracks, best first. */
-  tracks: PerformanceTrack[];
+  tracks: AudienceSearchTrack[];
   /** True when the order carries meaning (relevance, platform or audience rank). */
   ranked: boolean;
   place: SearchPlace | null;
-  platform: PerformancePlatform | null;
+  platform: AudienceSearchPlatform | null;
   /** Ranking was requested but none of the matching artists has the metric. */
   missingPlatformData: boolean;
   /** Fanbase/audience was asked for but no Chartmetric entry matches the place. */
@@ -44,7 +44,7 @@ export interface SearchOutcome {
   suggestion: string | null;
 }
 
-const PLATFORM_WORDS: Record<string, PerformancePlatform> = {
+const PLATFORM_WORDS: Record<string, AudienceSearchPlatform> = {
   tiktok: 'tiktok', 'tik tok': 'tiktok',
   instagram: 'instagram', insta: 'instagram', ig: 'instagram',
   youtube: 'youtube', yt: 'youtube',
@@ -264,7 +264,7 @@ export interface CountrySuggestion {
  * Exact names rank first, then names starting with the text, then names with
  * a later word starting with it, then names containing it.
  */
-export function suggestCountries(raw: string, tracks: PerformanceTrack[], lang: string, limit = 6): CountrySuggestion[] {
+export function suggestCountries(raw: string, tracks: AudienceSearchTrack[], lang: string, limit = 6): CountrySuggestion[] {
   const query = normalize(raw);
   if (query.length < 2) { return []; }
 
@@ -318,7 +318,7 @@ export function resolveCountries(text: string): string[] {
 }
 
 /** Hometown of a catalog artist that the text names, if any. */
-function resolveHometown(text: string, artists: PerformanceArtist[]): string | null {
+function resolveHometown(text: string, artists: AudienceSearchArtist[]): string | null {
   const query = normalize(text);
   if (query.length < 3) { return null; }
   let best: { key: string; score: number } | null = null;
@@ -335,7 +335,7 @@ function resolveHometown(text: string, artists: PerformanceArtist[]): string | n
   return best?.key ?? null;
 }
 
-function hometownMatches(artist: PerformanceArtist, key: string): boolean {
+function hometownMatches(artist: AudienceSearchArtist, key: string): boolean {
   const town = normalize(artist.hometown);
   if (!town) { return false; }
   return town === key || normalize((artist.hometown ?? '').split(',')[0]) === key
@@ -346,7 +346,7 @@ function hometownMatches(artist: PerformanceArtist, key: string): boolean {
 
 interface ParsedQuery {
   normalized: string;
-  platform: PerformancePlatform | null;
+  platform: AudienceSearchPlatform | null;
   ranking: boolean;
   audience: boolean;
   /** What is left once platform, ranking, audience and filler words are gone. */
@@ -383,7 +383,7 @@ function isPlaceArticle(phrase: string[]): boolean {
 
 function parseQuery(raw: string): ParsedQuery {
   let normalized = normalize(raw);
-  let platform: PerformancePlatform | null = null;
+  let platform: AudienceSearchPlatform | null = null;
   // Two-word platform names first ("tik tok").
   for (const [word, key] of Object.entries(PLATFORM_WORDS)) {
     if (word.includes(' ') && ` ${normalized} `.includes(` ${word} `)) {
@@ -413,7 +413,7 @@ function parseQuery(raw: string): ParsedQuery {
 
 /* ─────────── Search ─────────── */
 
-export function searchCatalog(tracks: PerformanceTrack[], raw: string): SearchOutcome {
+export function searchCatalog(tracks: AudienceSearchTrack[], raw: string): SearchOutcome {
   const base: SearchOutcome = {
     mode: 'all', tracks, ranked: false, place: null, platform: null,
     missingPlatformData: false, missingAudienceData: false, approximate: false, suggestion: null,
@@ -471,7 +471,7 @@ export function searchCatalog(tracks: PerformanceTrack[], raw: string): SearchOu
 }
 
 /** Codes of catalog countries whose name starts with the query (or a word in it does). */
-function countryPrefixCodes(query: string, artists: PerformanceArtist[]): string[] {
+function countryPrefixCodes(query: string, artists: AudienceSearchArtist[]): string[] {
   if (query.length < 3) { return []; }
   const codes = new Set(artists.map(a => a.countryCode?.toUpperCase()).filter((c): c is string => !!c));
   const ranked = [...codes]
@@ -482,7 +482,7 @@ function countryPrefixCodes(query: string, artists: PerformanceArtist[]): string
   return ranked.filter(r => r.rank === best).map(r => r.code);
 }
 
-function resolvePlace(text: string, artists: PerformanceArtist[]): SearchPlace | null {
+function resolvePlace(text: string, artists: AudienceSearchArtist[]): SearchPlace | null {
   const codes = resolveCountries(text);
   if (codes.length) {
     return { kind: 'country', label: text, key: codes.join(',') };
@@ -491,7 +491,7 @@ function resolvePlace(text: string, artists: PerformanceArtist[]): SearchPlace |
   return town ? { kind: 'city', label: text, key: town } : null;
 }
 
-function placeMatches(artist: PerformanceArtist, place: SearchPlace): boolean {
+function placeMatches(artist: AudienceSearchArtist, place: SearchPlace): boolean {
   if (place.kind === 'country') {
     return !!artist.countryCode && place.key.split(',').includes(artist.countryCode.toUpperCase());
   }
@@ -504,7 +504,7 @@ function rankByPlatform(outcome: SearchOutcome, query: ParsedQuery): SearchOutco
   if (!platform && !query.ranking) {
     return { ...outcome, tracks: byArtistThenName(outcome.tracks, a => a.totalAudience) };
   }
-  const metric = (a: PerformanceArtist) => (platform ? a.audience[platform] : a.totalAudience);
+  const metric = (a: AudienceSearchArtist) => (platform ? a.audience[platform] : a.totalAudience);
   const withData = outcome.tracks.filter(t => t.artist && metric(t.artist) !== null);
   return {
     ...outcome,
@@ -530,14 +530,14 @@ export function cityMatches(cityName: string, query: string): boolean {
   return ` ${name} `.includes(` ${q} `) || similarity(name, q) >= 0.85;
 }
 
-function audienceSearch(base: SearchOutcome, tracks: PerformanceTrack[], placeText: string, only?: 'city'): SearchOutcome {
+function audienceSearch(base: SearchOutcome, tracks: AudienceSearchTrack[], placeText: string, only?: 'city'): SearchOutcome {
   const codes = only === 'city' ? [] : resolveCountries(placeText);
   const city = normalize(placeText);
   const kind: SearchPlace['kind'] = codes.length ? 'country' : 'city';
   const place: SearchPlace = { kind, label: placeText, key: codes.length ? codes.join(',') : city };
 
   // Best Chartmetric rank this artist has for the place; lower is stronger.
-  const rankFor = (artist: PerformanceArtist): { rank: number; weight: number } | null => {
+  const rankFor = (artist: AudienceSearchArtist): { rank: number; weight: number } | null => {
     const entries = kind === 'country'
       ? artist.instagramTopCountries.filter(c => codes.includes(c.code))
       : artist.instagramTopCities.filter(c => cityMatches(c.name, city));
@@ -548,7 +548,7 @@ function audienceSearch(base: SearchOutcome, tracks: PerformanceTrack[], placeTe
 
   const scored = tracks
     .map(track => ({ track, score: track.artist ? rankFor(track.artist) : null }))
-    .filter((row): row is { track: PerformanceTrack; score: { rank: number; weight: number } } => !!row.score)
+    .filter((row): row is { track: AudienceSearchTrack; score: { rank: number; weight: number } } => !!row.score)
     .sort((a, b) => a.score.rank - b.score.rank || b.score.weight - a.score.weight
       || (a.track.artist?.name ?? '').localeCompare(b.track.artist?.name ?? '') || a.track.name.localeCompare(b.track.name));
 
@@ -563,7 +563,7 @@ function audienceSearch(base: SearchOutcome, tracks: PerformanceTrack[], placeTe
   };
 }
 
-function textSearch(base: SearchOutcome, tracks: PerformanceTrack[], artists: PerformanceArtist[], query: string): SearchOutcome {
+function textSearch(base: SearchOutcome, tracks: AudienceSearchTrack[], artists: AudienceSearchArtist[], query: string): SearchOutcome {
   const scored = tracks
     .map(track => ({
       track,
@@ -593,7 +593,7 @@ function textSearch(base: SearchOutcome, tracks: PerformanceTrack[], artists: Pe
 }
 
 /** Closest artist name when the query is not one, for "Did you mean …?". */
-function suggestArtist(query: string, artists: PerformanceArtist[]): string | null {
+function suggestArtist(query: string, artists: AudienceSearchArtist[]): string | null {
   if (query.length < 3) { return null; }
   let best: { name: string; score: number } | null = null;
   for (const artist of artists) {
@@ -605,14 +605,14 @@ function suggestArtist(query: string, artists: PerformanceArtist[]): string | nu
   return best?.name ?? null;
 }
 
-function uniqueArtists(tracks: PerformanceTrack[]): PerformanceArtist[] {
-  const map = new Map<string, PerformanceArtist>();
+function uniqueArtists(tracks: AudienceSearchTrack[]): AudienceSearchArtist[] {
+  const map = new Map<string, AudienceSearchArtist>();
   tracks.forEach(t => { if (t.artist) { map.set(t.artist.uuid, t.artist); } });
   return [...map.values()];
 }
 
-function byArtistThenName(tracks: PerformanceTrack[], metric: (a: PerformanceArtist) => number | null): PerformanceTrack[] {
-  const value = (t: PerformanceTrack) => (t.artist ? metric(t.artist) ?? -1 : -1);
+function byArtistThenName(tracks: AudienceSearchTrack[], metric: (a: AudienceSearchArtist) => number | null): AudienceSearchTrack[] {
+  const value = (t: AudienceSearchTrack) => (t.artist ? metric(t.artist) ?? -1 : -1);
   return [...tracks].sort((a, b) =>
     value(b) - value(a)
     || (a.artist?.name ?? '').localeCompare(b.artist?.name ?? '')

@@ -3,95 +3,190 @@
   [teamLogo]="teamLogo"
   [tagline]="tagline"
   [primaryColor]="primaryColor"
-  [secondaryColor]="secondaryColor">
+  [secondaryColor]="secondaryColor"
+  variant="compact"
+  [pageTitle]="'projects.headerTitle' | transloco"
+  [pageDescription]="'projects.headerDescription' | transloco">
 </acrylic-header>
 
 <div class="projects">
 
-  <div class="projects__header">
-    <div class="projects__header-text">
-      <h2 class="projects__title">{{ 'projects.title' | transloco }}</h2>
-      <p class="projects__subtitle">{{ 'projects.subtitle' | transloco }}</p>
-    </div>
-    <button class="projects__create-btn" (click)="startCreating()">
-      + {{ 'projects.newProject' | transloco }}
+  <!-- Library and projects -->
+  <nav class="projects-nav" [attr.aria-label]="'projects.navLabel' | transloco">
+    <span class="projects-nav__heading">{{ 'projects.projectsLabel' | transloco }}</span>
+
+    @if (projects.length) {
+      <input class="projects-input projects-nav__search" type="search" [(ngModel)]="projectQuery"
+             [placeholder]="'saveTo.searchProjects' | transloco" [attr.aria-label]="'saveTo.searchProjects' | transloco" />
+    }
+
+    <span class="projects-nav__label">{{ 'projects.folders' | transloco }}</span>
+
+    <button type="button" class="projects-nav__saved" [class.projects-nav__saved--active]="isSavedView"
+            [attr.aria-current]="isSavedView ? 'page' : null" (click)="selectView('saved')">
+      <img src="assets/images/icons/projects/saved-tracks-heart.svg" width="20" height="20" alt="" />
+      <span>{{ 'projects.savedTracks' | transloco }}</span>
     </button>
-  </div>
 
-  <div class="projects__new-form" *ngIf="isCreating">
-    <input
-      class="projects__input"
-      [(ngModel)]="newProjectName"
-      [placeholder]="'projects.projectNamePlaceholder' | transloco"
-      (keyup.enter)="submitCreate()"
-      autofocus />
-    <input
-      class="projects__input"
-      [(ngModel)]="newProjectDesc"
-      [placeholder]="'projects.descriptionPlaceholder' | transloco"
-      (keyup.enter)="submitCreate()" />
-    <div class="projects__new-form-actions">
-      <button class="projects__btn projects__btn--ghost" (click)="cancelCreate()">{{ 'projects.cancel' | transloco }}</button>
-      <button class="projects__btn projects__btn--primary" (click)="submitCreate()" [disabled]="!newProjectName.trim()">{{ 'projects.create' | transloco }}</button>
-    </div>
-  </div>
-
-  <div class="projects__section">
-
-    <div class="projects__empty" *ngIf="projects.length === 0 && !isCreating">
-      <p>{{ 'projects.empty' | transloco }}</p>
-    </div>
-
-    <div class="project-card" *ngFor="let project of projects" [class.project-card--open]="expandedUuid === project.uuid">
-
-      <div class="project-card__header" (click)="toggleExpand(project.uuid)">
-        <div class="project-card__covers">
-          <img
-            *ngFor="let track of project.tracks.slice(0, 3)"
-            [src]="track.cover_image"
-            [alt]="track.track_name"
-            class="project-card__thumb"
-            (error)="onImgError($event)" />
-          <div class="project-card__thumb project-card__thumb--empty" *ngFor="let slot of getEmptySlots(project)"></div>
+    @for (project of visibleProjects; track project.uuid) {
+      <button type="button" class="projects-nav__project" [class.projects-nav__project--active]="selectedId === project.uuid"
+              [attr.aria-current]="selectedId === project.uuid ? 'page' : null" [title]="project.name" (click)="selectView(project.uuid)">
+        <span class="projects-nav__project-name">{{ project.name }}</span>
+        <span class="projects-nav__project-count">{{ 'projects.trackCount' | transloco: { count: project.tracks.length } }}</span>
+      </button>
+    } @empty {
+      @if (projectsFailed) {
+        <div class="projects-nav__empty" role="alert">
+          <p>{{ 'projects.errors.loadFailed' | transloco }}</p>
+          <button type="button" class="projects-link" (click)="retryProjects()">{{ 'saveTo.retry' | transloco }}</button>
         </div>
-        <div class="project-card__meta">
-          <span class="project-card__name">{{ project.name }}</span>
-          <span class="project-card__count">{{ project.tracks.length }} {{ project.tracks.length !== 1 ? ('projects.tracks' | transloco) : ('projects.track' | transloco) }}</span>
+      } @else if (projectQuery.trim()) {
+        <!-- D1: no match keeps the search and New project visible. -->
+        <div class="projects-nav__empty" role="status">
+          <p>{{ 'saveTo.noProjectsMatch' | transloco: { query: projectQuery.trim() } }}</p>
+          <button type="button" class="projects-link" (click)="projectQuery = ''">{{ 'saveTo.clearSearch' | transloco }}</button>
         </div>
-        <span class="project-card__chevron" [class.project-card__chevron--open]="expandedUuid === project.uuid">›</span>
+      } @else {
+        <p class="projects-nav__empty">{{ 'projects.projectsEmpty' | transloco }}</p>
+      }
+    }
+
+    <button type="button" class="projects-btn projects-nav__new" (click)="newProject()">
+      + {{ 'projects.newProjectShort' | transloco }}
+    </button>
+
+    <span class="projects-nav__spacer"></span>
+    <p class="projects-nav__note">{{ teamName }}</p>
+  </nav>
+
+  <!-- Current collection -->
+  <section class="collection">
+    <div class="collection__title">
+      <div class="collection__heading">
+        <h2>{{ isSavedView ? ('projects.savedTracks' | transloco) : selectedProject?.name }}</h2>
+        <p>
+          @if (isSavedView) {
+            {{ 'projects.savedDescription' | transloco }}
+          } @else {
+            {{ selectedProject?.description || ('projects.projectDescription' | transloco) }}
+          }
+        </p>
       </div>
+      <div class="collection__actions">
+        @if (!isSavedView && selectedProject) {
+          <button type="button" class="projects-btn" (click)="editProject()">{{ 'projects.editProject' | transloco }}</button>
+          <button type="button" class="projects-btn" (click)="deleteProject()">{{ 'projects.delete.action' | transloco }}</button>
+        }
+        <button type="button" class="projects-btn" (click)="newProject()">+ {{ 'projects.newProjectShort' | transloco }}</button>
+      </div>
+    </div>
 
-      <div class="project-card__tracks" *ngIf="expandedUuid === project.uuid">
-        <div class="project-card__tracks-empty" *ngIf="project.tracks.length === 0">
-          {{ 'projects.noTracksYet' | transloco }}
-        </div>
-        <div class="project-track" *ngFor="let track of project.tracks">
-          <img [src]="track.cover_image" [alt]="track.track_name" class="project-track__cover" (error)="onImgError($event)" />
-          <div class="project-track__info">
-            <span class="project-track__name">{{ track.track_name }}</span>
-            <span class="project-track__artist">{{ track.artist_name }}</span>
+    <p class="collection__summary">
+      {{ 'projects.summary' | transloco: { tracks: viewTracks.length, licensed: licensedCount } }}
+    </p>
+
+    <div class="collection__tools">
+      <input class="projects-input collection__search" type="search" [(ngModel)]="query"
+             [placeholder]="(isSavedView ? 'projects.searchSaved' : 'projects.searchProject') | transloco"
+             [attr.aria-label]="(isSavedView ? 'projects.searchSaved' : 'projects.searchProject') | transloco" />
+      <div class="collection__sort">
+        <button type="button" class="projects-btn" aria-haspopup="listbox" [attr.aria-expanded]="sortMenuOpen"
+                (click)="toggleSortMenu($event)">
+          {{ 'projects.sort.' + sort | transloco }}
+        </button>
+        @if (sortMenuOpen) {
+          <ul class="projects-menu" role="listbox" (click)="$event.stopPropagation()">
+            @for (option of sortOptions; track option) {
+              <li role="option" [attr.aria-selected]="option === sort">
+                <button type="button" [class.is-current]="option === sort" (click)="chooseSort(option)">
+                  {{ 'projects.sort.' + option | transloco }}
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+
+    <div class="collection__toolbar">
+      <label class="projects-check">
+        <input type="checkbox" [checked]="allVisibleSelected" [disabled]="!visibleTracks.length" (change)="toggleAll()" />
+        <span class="projects-check__box" aria-hidden="true"></span>
+        <span class="projects-check__label">{{ 'projects.selectAll' | transloco }}</span>
+      </label>
+      <span class="collection__flex"></span>
+      @if (selected.size) {
+        <span class="collection__selected">{{ 'projects.selectedCount' | transloco: { count: selected.size } }}</span>
+        <!-- C1: bulk add through the shared picker; adding never removes. -->
+        <button type="button" class="projects-btn" (click)="addSelectedTo()">{{ 'projects.addTo' | transloco }}</button>
+        <button type="button" class="projects-btn" (click)="removeSelected()">
+          {{ (isSavedView ? 'projects.removeFromSaved' : 'projects.removeFromProject') | transloco }}
+        </button>
+        <button type="button" class="projects-link" (click)="clearSelection()">{{ 'projects.clearSelection' | transloco }}</button>
+      } @else {
+        <span class="collection__hint">{{ 'projects.selectHint' | transloco }}</span>
+      }
+    </div>
+
+    <div class="collection__columns" aria-hidden="true">
+      <span>{{ 'projects.columns.track' | transloco }}</span>
+      <span>{{ 'projects.columns.metrics' | transloco }}</span>
+      <span class="collection__columns-end">
+        <span>{{ 'projects.columns.preview' | transloco }}</span>
+        <span>{{ 'projects.columns.license' | transloco }}</span>
+      </span>
+    </div>
+
+    <div class="collection__list">
+      @for (row of visibleTracks; track trackByKey($index, row)) {
+        <div class="collection-row" [class.collection-row--selected]="isSelected(row)">
+          <label class="projects-check">
+            <input type="checkbox" [checked]="isSelected(row)" (change)="toggleSelected(row)"
+                   [attr.aria-label]="'projects.selectTrack' | transloco" />
+            <span class="projects-check__box" aria-hidden="true"></span>
+          </label>
+
+          <acrylic-track-row-projects [track]="rowTrack(row)"></acrylic-track-row-projects>
+
+          <div class="collection-row__actions">
+            <button type="button" class="collection-row__more" [attr.aria-label]="'projects.trackActions' | transloco"
+                    aria-haspopup="menu" [attr.aria-expanded]="menuFor === row.key" (click)="toggleMenu(row, $event)">
+              <svg width="18" height="4" viewBox="0 0 18 4" fill="currentColor" aria-hidden="true"><circle cx="2" cy="2" r="2"/><circle cx="9" cy="2" r="2"/><circle cx="16" cy="2" r="2"/></svg>
+            </button>
+            @if (menuFor === row.key) {
+              <ul class="projects-menu projects-menu--right" role="menu" (click)="$event.stopPropagation()">
+                <li role="none">
+                  <!-- C2: opens on the track's current destinations. -->
+                  <button type="button" role="menuitem" (click)="editDestinations(row)">{{ 'saveTo.savedTo' | transloco }}</button>
+                </li>
+                <li role="none">
+                  @if (isSavedView) {
+                    <button type="button" role="menuitem" (click)="removeFromSaved([row])">{{ 'projects.removeFromSaved' | transloco }}</button>
+                  } @else {
+                    <button type="button" role="menuitem" (click)="removeFromProject([row])">{{ 'projects.removeFromProject' | transloco }}</button>
+                  }
+                </li>
+              </ul>
+            }
           </div>
-          <button class="project-track__remove" (click)="removeTrack(project, track)" aria-label="Remove track">✕</button>
         </div>
-      </div>
-
+      } @empty {
+        <p class="collection__empty">
+          @if (query) {
+            {{ 'projects.noMatches' | transloco }}
+          } @else if (isSavedView) {
+            {{ 'projects.heartTracks' | transloco }}
+          } @else {
+            {{ 'projects.noTracksYet' | transloco }}
+          }
+        </p>
+      }
     </div>
-  </div>
 
-  <!-- Saved Tracks -->
-  <div class="favorites" *ngIf="favorites.length > 0">
-    <div class="favorites__header">
-      <h3 class="favorites__title">{{ 'projects.savedTracks' | transloco }}</h3>
+    <div class="collection__footer">
+      <span>{{ 'projects.showing' | transloco: { shown: visibleTracks.length, total: viewTracks.length } }}</span>
+      <span class="collection__flex"></span>
+      <span>{{ 'projects.footerNote' | transloco }}</span>
     </div>
-    <div class="favorites__list">
-      <div class="favorite-item" *ngFor="let fav of favorites">
-        <acrylic-track-row-projects [track]="rowTrack(fav)"></acrylic-track-row-projects>
-      </div>
-    </div>
-  </div>
-
-  <div class="favorites favorites--empty" *ngIf="!loading && favorites.length === 0">
-    <p>{{ 'projects.heartTracks' | transloco }}</p>
-  </div>
-
+  </section>
 </div>
