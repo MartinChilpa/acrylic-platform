@@ -86,7 +86,7 @@
     </p>
 
     <div class="collection__tools">
-      <input class="projects-input collection__search" type="search" [(ngModel)]="query"
+      <input class="projects-input collection__search" type="search" [(ngModel)]="query" (ngModelChange)="onQueryChange()"
              [placeholder]="(isSavedView ? 'projects.searchSaved' : 'projects.searchProject') | transloco"
              [attr.aria-label]="(isSavedView ? 'projects.searchSaved' : 'projects.searchProject') | transloco" />
       <div class="collection__sort">
@@ -138,7 +138,7 @@
     </div>
 
     <div class="collection__list">
-      @for (row of visibleTracks; track trackByKey($index, row)) {
+      @for (row of pageTracks; track trackByKey($index, row)) {
         <div class="collection-row" [class.collection-row--selected]="isSelected(row)">
           <label class="projects-check">
             <input type="checkbox" [checked]="isSelected(row)" (change)="toggleSelected(row)"
@@ -185,6 +185,16 @@
 
     <div class="collection__footer">
       <span>{{ 'projects.showing' | transloco: { shown: visibleTracks.length, total: viewTracks.length } }}</span>
+      @if (totalPages > 1) {
+        <nav class="collection__pagination" [attr.aria-label]="'projects.pagination.label' | transloco">
+          <button type="button" class="collection__page-btn" (click)="previousPage()" [disabled]="currentPage === 1"
+                  [attr.aria-label]="'projects.pagination.previous' | transloco">&lt;</button>
+          <span aria-live="polite">{{ currentPage }} {{ 'projects.pagination.of' | transloco }} {{ totalPages }}</span>
+          <button type="button" class="collection__page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages"
+                  [attr.aria-label]="'projects.pagination.next' | transloco">&gt;</button>
+          <span>{{ 'projects.pagination.perPage' | transloco }}</span>
+        </nav>
+      }
       <span class="collection__flex"></span>
       <span>{{ 'projects.footerNote' | transloco }}</span>
     </div>

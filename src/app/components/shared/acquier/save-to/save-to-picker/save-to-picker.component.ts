@@ -152,10 +152,9 @@ export class SaveToPickerComponent implements OnInit, AfterViewInit {
     this.saving = true;
     this.saveFailed = false;
     const { mode, items } = buildRequest(this.mode, this.tracks.map(t => t.uuid), this.selection);
-    const snapshots = new Map(this.tracks.filter(t => t.snapshot).map(t => [t.uuid, t.snapshot]));
     const selection = this.selection;
     const previous = this.current;
-    this.projectsService.applyDestinations(mode, items, snapshots).subscribe({
+    this.projectsService.applyDestinations(mode, items).subscribe({
       next: result => {
         this.saving = false;
         this.saveTo.notifySaved(this.mode, this.tracks, selection, previous);

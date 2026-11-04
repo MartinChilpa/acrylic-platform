@@ -194,8 +194,7 @@ export class SaveToService {
       this.showError(t('saveTo.errors.removeFailed'), () => this.removeFromSaved(list));
       return false;
     }
-    const snapshots = new Map(list.filter(track => track.snapshot).map(track => [track.uuid, track.snapshot]));
-    const undo = () => this.restore(previous, snapshots);
+    const undo = () => this.restore(previous);
     this.toasts.show({
       title: many ? t('saveTo.toast.removedManyFromSaved', { count: list.length }) : t('saveTo.toast.removedFromSaved'),
       body: many ? undefined : list[0].title,
@@ -206,10 +205,10 @@ export class SaveToService {
   }
 
   /** Puts tracks back exactly where they were. */
-  restore(previous: ITrackDestinations[], snapshots?: Map<string, any>): void {
+  restore(previous: ITrackDestinations[]): void {
     const request = buildUndo(previous);
-    this.projectsService.applyDestinations(request.mode, request.items, snapshots).subscribe({
-      error: () => this.showError(this.transloco.translate('saveTo.errors.undoFailed'), () => this.restore(previous, snapshots)),
+    this.projectsService.applyDestinations(request.mode, request.items).subscribe({
+      error: () => this.showError(this.transloco.translate('saveTo.errors.undoFailed'), () => this.restore(previous)),
     });
   }
 

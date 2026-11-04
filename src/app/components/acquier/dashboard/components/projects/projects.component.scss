@@ -436,6 +436,28 @@ $bp-phone:     640px;
 
     @media (max-width: $bp-phone) { flex-direction: column; }
   }
+
+  &__pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__page-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid $border-soft;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: $text;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+
+    &:hover:not(:disabled) { background: rgba(255, 255, 255, 0.14); }
+    &:focus-visible { outline: 2px solid $active-bg; outline-offset: 2px; }
+    &:disabled { opacity: 0.35; cursor: not-allowed; }
+  }
 }
 
 .collection-row {

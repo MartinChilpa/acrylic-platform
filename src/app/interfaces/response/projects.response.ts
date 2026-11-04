@@ -7,7 +7,7 @@ export interface IFavoriteResult {
   artist_name: string;
   cover_image: string;
   created: string;
-  /** Full track snapshot so rich UI (waveform, metrics, tier) can render later. */
+  /** Full track payload returned by the favorites API for waveform and metrics. */
   track?: any;
 }
 

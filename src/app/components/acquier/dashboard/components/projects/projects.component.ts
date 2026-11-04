@@ -74,6 +74,9 @@ export class ProjectsComponent implements OnInit {
   selected = new Set<string>();
   /** Track key whose ••• menu is open. */
   menuFor: string | null = null;
+  readonly pageSize = 10;
+  /** 1-based page asked for; `currentPage` keeps it in range when the list shrinks. */
+  pageNumber = 1;
 
   ngOnInit(): void {
     const branding = this.brandingService.getActiveBranding();
@@ -178,6 +181,31 @@ export class ProjectsComponent implements OnInit {
     }
   }
 
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.visibleTracks.length / this.pageSize));
+  }
+
+  get currentPage(): number {
+    return Math.min(Math.max(1, this.pageNumber), this.totalPages);
+  }
+
+  get pageTracks(): LibraryRow[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.visibleTracks.slice(start, start + this.pageSize);
+  }
+
+  previousPage(): void {
+    this.pageNumber = Math.max(1, this.currentPage - 1);
+  }
+
+  nextPage(): void {
+    this.pageNumber = Math.min(this.totalPages, this.currentPage + 1);
+  }
+
+  onQueryChange(): void {
+    this.pageNumber = 1;
+  }
+
   get licensedCount(): number {
     return this.viewTracks.filter(f => this.licensedKeys.has(f.key)).length;
   }
@@ -192,6 +220,7 @@ export class ProjectsComponent implements OnInit {
   private applyView(id: string): void {
     this.selectedId = id;
     this.query = '';
+    this.pageNumber = 1;
     this.selected.clear();
     this.menuFor = null;
   }
@@ -346,6 +375,7 @@ export class ProjectsComponent implements OnInit {
   chooseSort(sort: ProjectsSort): void {
     this.sort = sort;
     this.sortMenuOpen = false;
+    this.pageNumber = 1;
   }
 
   @HostListener('document:click')
