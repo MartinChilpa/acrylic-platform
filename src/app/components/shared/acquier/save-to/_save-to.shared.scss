@@ -1,0 +1,61 @@
+// Classes shared by the Save to… dialogs (picker, project form, confirmation).
+@use '../../../../styles/custom/dialog' as *;
+
+.dlg-backdrop { @include dlg-backdrop; }
+
+.dlg {
+  @include dlg-panel;
+
+  &:focus { outline: none; }
+
+  &__close { @include dlg-close; }
+
+  &__title { @include dlg-title; }
+
+  &__lede {
+    margin: 0;
+    color: $dlg-muted;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+
+  &__error { @include dlg-error; }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+
+    &--split { justify-content: space-between; }
+  }
+
+  &__action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+.dlg-btn { @include dlg-btn; }
+.dlg-btn-primary { @include dlg-btn-primary; }
+.dlg-btn-secondary { @include dlg-btn-secondary; }
+.dlg-btn-ghost { @include dlg-btn-ghost; }
+.dlg-btn-outline { @include dlg-btn-outline; }
+.dlg-field { @include dlg-field; }
+.dlg-label { @include dlg-label; }
+
+.dlg-check-row {
+  @include dlg-check-row;
+  position: relative;
+
+  &__label { flex: 1 1 auto; min-width: 0; }
+
+  // Long names truncate in lists; the full name is in the title tooltip (D1).
+  &__label--truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

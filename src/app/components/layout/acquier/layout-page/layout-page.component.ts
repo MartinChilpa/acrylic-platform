@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { SidenavComponent } from '../sidenav/sidenav.component';
 import { HeaderComponent } from '../../../shared/acquier/header/header.component';
 import { TeamBrandingService } from '../../../../services/team-branding.service';
+import { SaveToHostComponent } from '../../../shared/acquier/save-to/save-to-host.component';
 
 @Component({
   selector: 'acrylic-layout-page',
@@ -10,7 +11,8 @@ import { TeamBrandingService } from '../../../../services/team-branding.service'
   imports: [
     RouterOutlet,
     SidenavComponent,
-    HeaderComponent
+    HeaderComponent,
+    SaveToHostComponent
   ],
   templateUrl: './layout-page.component.html',
   styleUrl: './layout-page.component.scss'

@@ -20,7 +20,7 @@ export class SidenavComponent {
   isExpanded = signal(false);
   navItems = acquierSidenavItems;
 
-  /** Child routes (/brand/performance/track/…) keep their tab lit; query params never matter. */
+  /** Child routes (/brand/audience-search/track/…) keep their tab lit; query params never matter. */
   readonly activeOptions: IsActiveMatchOptions = {
     paths: 'subset',
     queryParams: 'ignored',
@@ -64,7 +64,7 @@ export class SidenavComponent {
       'Home': 'acquerSidenav.home',
       'Projects': 'acquerSidenav.projects',
       'Licenses': 'acquerSidenav.licenses',
-      'Performance': 'acquerSidenav.performance'
+      'Audience Search': 'acquerSidenav.audienceSearch'
     };
     return keyMap[label] || label;
   }

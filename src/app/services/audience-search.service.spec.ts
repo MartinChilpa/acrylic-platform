@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { PerformanceService } from './performance.service';
-import { PerformanceCatalog, PerformanceTrack } from '../interfaces/response/performance.response';
+import { AudienceSearchService } from './audience-search.service';
+import { AudienceSearchCatalog, AudienceSearchTrack } from '../interfaces/response/audience-search.response';
 
 /** Stand-in for HTMLAudioElement so playback can be driven from the test. */
 class FakeAudio extends EventTarget {
@@ -31,20 +31,20 @@ class FakeAudio extends EventTarget {
 
 const page = (results: unknown[]) => ({ count: results.length, next: null, previous: null, results });
 
-describe('PerformanceService', () => {
-  let service: PerformanceService;
+describe('AudienceSearchService', () => {
+  let service: AudienceSearchService;
   let http: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
-    service = TestBed.inject(PerformanceService);
+    service = TestBed.inject(AudienceSearchService);
     http = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => http.verify());
 
-  function loadCatalog(trackRows: unknown[], artistRows: unknown[]): PerformanceCatalog {
-    let catalog: PerformanceCatalog | null = null;
+  function loadCatalog(trackRows: unknown[], artistRows: unknown[]): AudienceSearchCatalog {
+    let catalog: AudienceSearchCatalog | null = null;
     service.loadCatalog().subscribe(c => (catalog = c));
     http.expectOne(r => r.url === '/api/v1/tracks/').flush(page(trackRows));
     http.expectOne(r => r.url === '/api/v1/artists/').flush(page(artistRows));
@@ -99,7 +99,7 @@ describe('PerformanceService', () => {
 
   describe('preview playback', () => {
     let created: FakeAudio[];
-    const track = (): PerformanceTrack => ({
+    const track = (): AudienceSearchTrack => ({
       uuid: 't1', isrc: 'X', name: 'Dakar Nights', artistUuid: 'a1', artist: null, tier: 'Artist Promo',
       extendedCommercialUse: false, spotifyStreams: null, previewUrl: 'https://media.example/old.wav', coverUrl: null,
     });

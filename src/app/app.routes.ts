@@ -9,8 +9,8 @@ export const routesNames = {
   DASHBOARD: 'dashboard',
   PROJECTS: 'projects',
   LICENSES: 'licenses',
-  PERFORMANCE: 'performance',
-  PERFORMANCE_TRACK: 'performance/track/:uuid',
+  AUDIENCE_SEARCH: 'audience-search',
+  AUDIENCE_SEARCH_TRACK: 'audience-search/track/:uuid',
   AUTH: 'auth',
   BRAND: 'brand',
   LABEL: 'label',
@@ -78,13 +78,16 @@ export const routes: Routes = [
         loadComponent: () => import('./components/acquier/dashboard/components/licenses/licenses.component').then((c)=>c.LicensesComponent),
       },
       {
-        path: routesNames.PERFORMANCE,
-        loadComponent: () => import('./components/acquier/dashboard/components/performance/performance.component').then((c)=>c.PerformanceComponent),
+        path: routesNames.AUDIENCE_SEARCH,
+        loadComponent: () => import('./components/acquier/dashboard/components/audience-search/audience-search.component').then((c)=>c.AudienceSearchComponent),
       },
       {
-        path: routesNames.PERFORMANCE_TRACK,
-        loadComponent: () => import('./components/acquier/dashboard/components/performance/performance-track/performance-track.component').then((c)=>c.PerformanceTrackComponent),
-      }
+        path: routesNames.AUDIENCE_SEARCH_TRACK,
+        loadComponent: () => import('./components/acquier/dashboard/components/audience-search/audience-search-track/audience-search-track.component').then((c)=>c.AudienceSearchTrackComponent),
+      },
+      // The tab was called Performance; keep old bookmarks and shared links working.
+      { path: 'performance', redirectTo: routesNames.AUDIENCE_SEARCH, pathMatch: 'full' },
+      { path: 'performance/track/:uuid', redirectTo: 'audience-search/track/:uuid' },
     ]
   },
   {

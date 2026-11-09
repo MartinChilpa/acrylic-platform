@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, EMPTY, Observable, catchError, expand, of, reduce, tap, throwError } from 'rxjs';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
+import { BehaviorSubject, EMPTY, Observable, catchError, expand, forkJoin, map, of, reduce, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ICommonSuccessResponse } from '../interfaces/response/common.response';
-import { IFavoriteResult, IProjectResult } from '../interfaces/response/projects.response';
+import { DestinationsMode, IFavoriteResult, IProjectResult, ITrackDestinations } from '../interfaces/response/projects.response';
+import { SKIP_ERROR_ALERT } from '../interceptors/error.interceptor';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsService {
@@ -103,24 +104,170 @@ export class ProjectsService {
     );
   }
 
+  /**
+   * Like = save to Saved tracks, right away and optimistically (the heart is
+   * filled before the request returns). Never unsaves; a no-op when saved.
+   */
+  addFavorite(trackUuid: string, trackSnapshot?: any): Observable<unknown> {
+    const previous = this.favoritesSubject.getValue();
+    if (!trackUuid || previous.some(f => this.trackKey(f) === trackUuid)) { return of(null); }
+
+    const snap = trackSnapshot && typeof trackSnapshot === 'object' ? trackSnapshot : {};
+    const numericId = Number(snap.track_id ?? snap.id);
+    const tempFav: IFavoriteResult = {
+      uuid: `temp-${trackUuid}`,
+      track_id: Number.isFinite(numericId) ? numericId : undefined,
+      track_uuid: trackUuid,
+      isrc: snap.isrc ?? '',
+      track_name: snap.track_name ?? snap.name ?? '',
+      artist_name: snap.artist_canonical ?? snap.artist_name ?? snap.artist?.name ?? '',
+      cover_image: snap.cover_image ?? snap.image_url ?? '',
+      created: new Date().toISOString(),
+      track: trackSnapshot ?? undefined,
+    };
+    this.setFavorites([tempFav, ...previous]);
+
+    return this.http.post<ITrackDestinations>(`${this.base}/favorites/add/`, { track_uuid: trackUuid }, { context: this.quiet() }).pipe(
+      tap(() => this.loadFavorites()),
+      catchError(err => {
+        this.setFavorites(previous);
+        return throwError(() => err);
+      }),
+    );
+  }
+
   getFavorites(): Observable<ICommonSuccessResponse<IFavoriteResult[]>> {
     return this.http.get<ICommonSuccessResponse<IFavoriteResult[]>>(`${this.base}/favorites/`);
   }
 
   getProjects(): Observable<ICommonSuccessResponse<IProjectResult[]>> {
-    return this.http.get<ICommonSuccessResponse<IProjectResult[]>>(`${this.base}/projects/`);
+    // The Projects page shows its own message when these fail.
+    return this.http.get<ICommonSuccessResponse<IProjectResult[]>>(`${this.base}/projects/`, { context: this.quiet() });
+  }
+
+  // ─── Projects cache shared by the picker, Projects page and Home ─────
+
+  private projectsSubject = new BehaviorSubject<IProjectResult[]>([]);
+  projects$ = this.projectsSubject.asObservable();
+  /** 'idle' until the first load; 'error' keeps the last list but lets pages say so. */
+  projectsState: 'idle' | 'loading' | 'ready' | 'error' = 'idle';
+
+  get projects(): IProjectResult[] {
+    return this.projectsSubject.getValue();
+  }
+
+  loadProjects(): void {
+    this.projectsState = 'loading';
+    this.getProjects().subscribe({
+      next: (res) => {
+        const list: IProjectResult[] = Array.isArray(res) ? (res as any) : (res?.results ?? []);
+        this.projectsState = 'ready';
+        this.setProjects(list.map(p => ({ ...p, tracks: p.tracks ?? [] })));
+      },
+      error: () => { this.projectsState = 'error'; this.setProjects([...this.projects]); },
+    });
   }
 
   createProject(name: string, description?: string): Observable<IProjectResult> {
-    return this.http.post<IProjectResult>(`${this.base}/projects/`, { name, description });
+    return this.http.post<IProjectResult>(`${this.base}/projects/`, { name, description: description ?? '' }, { context: this.quiet() }).pipe(
+      tap(project => this.setProjects([{ ...project, tracks: project.tracks ?? [] }, ...this.projects])),
+    );
   }
 
-  addTrackToProject(projectUuid: string, favoriteUuid: string): Observable<any> {
-    return this.http.post<any>(`${this.base}/projects/${projectUuid}/add-track/`, { track_favorite_uuid: favoriteUuid });
+  updateProject(uuid: string, changes: { name?: string; description?: string }): Observable<IProjectResult> {
+    return this.http.patch<IProjectResult>(`${this.base}/projects/${uuid}/`, changes, { context: this.quiet() }).pipe(
+      tap(project => this.replaceProject(project)),
+    );
   }
 
-  removeTrackFromProject(projectUuid: string, favoriteUuid: string): Observable<any> {
-    return this.http.post<any>(`${this.base}/projects/${projectUuid}/remove-track/`, { track_favorite_uuid: favoriteUuid });
+  deleteProject(uuid: string): Observable<unknown> {
+    return this.http.delete(`${this.base}/projects/${uuid}/`, { context: this.quiet() }).pipe(
+      tap(() => this.setProjects(this.projects.filter(p => p.uuid !== uuid))),
+    );
+  }
+
+  addTrackToProject(projectUuid: string, trackUuid: string): Observable<IProjectResult> {
+    return this.addTracksToProject(projectUuid, [trackUuid]);
+  }
+
+  removeTrackFromProject(projectUuid: string, trackUuid: string): Observable<IProjectResult> {
+    return this.removeTracksFromProject(projectUuid, [trackUuid]);
+  }
+
+  /** Bulk add; the tracks are saved to Saved tracks as well. */
+  addTracksToProject(projectUuid: string, trackUuids: string[]): Observable<IProjectResult> {
+    return this.http.post<IProjectResult>(`${this.base}/projects/${projectUuid}/add-tracks/`, { track_uuids: trackUuids }, { context: this.quiet() }).pipe(
+      tap(project => { this.replaceProject(project); this.loadFavorites(); }),
+    );
+  }
+
+  /** Bulk remove from one project; the tracks stay in Saved tracks. */
+  removeTracksFromProject(projectUuid: string, trackUuids: string[]): Observable<IProjectResult> {
+    return this.http.post<IProjectResult>(`${this.base}/projects/${projectUuid}/remove-tracks/`, { track_uuids: trackUuids }, { context: this.quiet() }).pipe(
+      tap(project => this.replaceProject(project)),
+    );
+  }
+
+  // ─── Destinations: where each track is kept ────────────────────────
+
+  /** Where each track is now, in the order given. Chunked so a large selection keeps URLs short. */
+  getDestinations(trackUuids: string[]): Observable<ITrackDestinations[]> {
+    const chunkSize = 50;
+    const requests: Observable<ITrackDestinations[]>[] = [];
+    for (let i = 0; i < trackUuids.length; i += chunkSize) {
+      let params = new HttpParams();
+      trackUuids.slice(i, i + chunkSize).forEach(uuid => { params = params.append('track_uuid', uuid); });
+      requests.push(this.http.get<{ results: ITrackDestinations[] }>(`${this.base}/favorites/destinations/`, { params, context: this.quiet() }).pipe(
+        map(res => res.results ?? []),
+      ));
+    }
+    if (!requests.length) { return of([]); }
+    return forkJoin(requests).pipe(map(chunks => chunks.flat()));
+  }
+
+  /**
+   * add: union with what is there (single and bulk save).
+   * set: exactly these destinations (edit, undo).
+   * Refreshes favorites and projects so every page sees the change.
+   */
+  applyDestinations(mode: DestinationsMode, items: ITrackDestinations[]): Observable<ITrackDestinations[]> {
+    return this.http.post<{ results: ITrackDestinations[] }>(`${this.base}/favorites/destinations/`, { mode, items }, { context: this.quiet() }).pipe(
+      map(res => res.results ?? []),
+      tap(() => { this.loadFavorites(); this.loadProjects(); }),
+    );
+  }
+
+  /** Remove from Saved tracks; the backend also removes it from every project. */
+  removeFromSaved(trackUuid: string): Observable<ITrackDestinations> {
+    const previous = this.favoritesSubject.getValue();
+    this.setFavorites(previous.filter(f => this.trackKey(f) !== trackUuid));
+    return this.http.post<ITrackDestinations>(`${this.base}/favorites/remove/`, { track_uuid: trackUuid }, { context: this.quiet() }).pipe(
+      tap(() => { this.loadFavorites(); this.loadProjects(); }),
+      catchError(err => { this.setFavorites(previous); return throwError(() => err); }),
+    );
+  }
+
+  isSaved(trackUuid: string | null | undefined): boolean {
+    return !!trackUuid && this.favoritesSubject.getValue().some(f => this.trackKey(f) === trackUuid);
+  }
+
+  /** Projects that hold the track, by name, from the cached list. */
+  projectsContaining(trackUuid: string): IProjectResult[] {
+    return this.projects.filter(p => p.tracks.some(t => t.track_uuid === trackUuid));
+  }
+
+  private replaceProject(project: IProjectResult): void {
+    const next = { ...project, tracks: project.tracks ?? [] };
+    const exists = this.projects.some(p => p.uuid === project.uuid);
+    this.setProjects(exists ? this.projects.map(p => p.uuid === project.uuid ? next : p) : [next, ...this.projects]);
+  }
+
+  private setProjects(projects: IProjectResult[]): void {
+    this.projectsSubject.next(projects);
+  }
+
+  private quiet(): HttpContext {
+    return new HttpContext().set(SKIP_ERROR_ALERT, true);
   }
 
   trackKey(f: any): string {
@@ -159,6 +306,8 @@ export class ProjectsService {
 
   clear(): void {
     this.favoritesSubject.next([]);
+    this.projectsSubject.next([]);
+    this.projectsState = 'idle';
   }
 
   private setFavorites(favs: IFavoriteResult[]): void {

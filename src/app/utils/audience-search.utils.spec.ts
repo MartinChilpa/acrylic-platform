@@ -1,13 +1,13 @@
-import { PerformanceArtist, PerformanceTrack } from '../interfaces/response/performance.response';
+import { AudienceSearchArtist, AudienceSearchTrack } from '../interfaces/response/audience-search.response';
 import {
-  DEFAULT_PERFORMANCE_FILTERS,
+  DEFAULT_AUDIENCE_SEARCH_FILTERS,
   audienceComposition,
   formatAudience,
-  matchesPerformanceFilters,
+  matchesAudienceSearchFilters,
   sortBySocial,
-} from './performance.utils';
+} from './audience-search.utils';
 
-function artist(name: string, audience: Partial<PerformanceArtist['audience']>): PerformanceArtist {
+function artist(name: string, audience: Partial<AudienceSearchArtist['audience']>): AudienceSearchArtist {
   return {
     uuid: name, name, countryCode: 'SN', hometown: null, instagramTopCountries: [], instagramTopCities: [],
     audience: { tiktok: null, instagram: null, youtube: null, spotify: null, ...audience },
@@ -16,14 +16,14 @@ function artist(name: string, audience: Partial<PerformanceArtist['audience']>):
   };
 }
 
-function track(name: string, a: PerformanceArtist, ecu = false): PerformanceTrack {
+function track(name: string, a: AudienceSearchArtist, ecu = false): AudienceSearchTrack {
   return {
     uuid: name, isrc: name, name, artistUuid: a.uuid, artist: a, tier: 'Artist Promo',
     extendedCommercialUse: ecu, spotifyStreams: null, previewUrl: null, coverUrl: null,
   };
 }
 
-describe('performance utils', () => {
+describe('audience search utils', () => {
   it('formats audience counts as the design writes them', () => {
     expect(formatAudience(38_000_000)).toBe('38 M');
     expect(formatAudience(3_360_000, 2)).toBe('3.36 M');
@@ -34,9 +34,9 @@ describe('performance utils', () => {
   describe('ECU filter', () => {
     it('keeps only tracks with Extended Commercial Use when asked', () => {
       const a = artist('A', {});
-      const filters = { ...DEFAULT_PERFORMANCE_FILTERS, ecu: 'available' as const };
-      expect(matchesPerformanceFilters(track('yes', a, true), filters)).toBeTrue();
-      expect(matchesPerformanceFilters(track('no', a, false), filters)).toBeFalse();
+      const filters = { ...DEFAULT_AUDIENCE_SEARCH_FILTERS, ecu: 'available' as const };
+      expect(matchesAudienceSearchFilters(track('yes', a, true), filters)).toBeTrue();
+      expect(matchesAudienceSearchFilters(track('no', a, false), filters)).toBeFalse();
     });
   });
 
@@ -46,10 +46,10 @@ describe('performance utils', () => {
     const none = artist('None', {});
 
     it('drops artists without a follower count on the platform', () => {
-      const filters = { ...DEFAULT_PERFORMANCE_FILTERS, social: 'instagram' as const };
-      expect(matchesPerformanceFilters(track('b', big), filters)).toBeTrue();
-      expect(matchesPerformanceFilters(track('s', small), filters)).toBeFalse();
-      expect(matchesPerformanceFilters(track('n', none), filters)).toBeFalse();
+      const filters = { ...DEFAULT_AUDIENCE_SEARCH_FILTERS, social: 'instagram' as const };
+      expect(matchesAudienceSearchFilters(track('b', big), filters)).toBeTrue();
+      expect(matchesAudienceSearchFilters(track('s', small), filters)).toBeFalse();
+      expect(matchesAudienceSearchFilters(track('n', none), filters)).toBeFalse();
     });
 
     it('ranks by followers on that platform', () => {

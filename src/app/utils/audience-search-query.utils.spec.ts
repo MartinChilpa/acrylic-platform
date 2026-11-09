@@ -1,7 +1,7 @@
-import { PerformanceArtist, PerformanceTrack } from '../interfaces/response/performance.response';
-import { cityMatches, matchScore, resolveCountries, searchCatalog, suggestCountries } from './performance-search.utils';
+import { AudienceSearchArtist, AudienceSearchTrack } from '../interfaces/response/audience-search.response';
+import { cityMatches, matchScore, resolveCountries, searchCatalog, suggestCountries } from './audience-search-query.utils';
 
-function artist(uuid: string, name: string, country: string | null, extra: Partial<PerformanceArtist> = {}): PerformanceArtist {
+function artist(uuid: string, name: string, country: string | null, extra: Partial<AudienceSearchArtist> = {}): AudienceSearchArtist {
   return {
     uuid, name, countryCode: country, hometown: null, instagramTopCountries: [], instagramTopCities: [],
     audience: { tiktok: null, instagram: null, youtube: null, spotify: null }, totalAudience: null,
@@ -10,7 +10,7 @@ function artist(uuid: string, name: string, country: string | null, extra: Parti
   };
 }
 
-function track(uuid: string, name: string, a: PerformanceArtist): PerformanceTrack {
+function track(uuid: string, name: string, a: AudienceSearchArtist): AudienceSearchTrack {
   return {
     uuid, isrc: uuid, name, artistUuid: a.uuid, artist: a, tier: 'Artist Promo',
     extendedCommercialUse: false, spotifyStreams: null, previewUrl: null, coverUrl: null,
@@ -34,9 +34,9 @@ const catalog = [
   track('t1', 'NAS', didi), track('t2', 'Rolls Royce', didi),
   track('t3', 'Lou Yakou Yawa', samba), track('t4', 'Dakar Nights', wally),
 ];
-const names = (tracks: PerformanceTrack[]) => tracks.map(t => t.name);
+const names = (tracks: AudienceSearchTrack[]) => tracks.map(t => t.name);
 
-describe('performance search', () => {
+describe('audience search query', () => {
   describe('countries', () => {
     it('reads a country name as artist origin', () => {
       const out = searchCatalog(catalog, 'Senegal');

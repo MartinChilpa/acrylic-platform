@@ -2,6 +2,7 @@ import { NgClass } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { PreClearPriceInput, formatTierPrice, isPreClearPrice, resolvePreClearPrice } from '../../../../../utils/license-tier.utils';
+import { formatUsd } from '../../../../../utils/number-format.utils';
 @Component({
   selector: 'acrylic-license',
   standalone: true,
@@ -49,7 +50,7 @@ export class LicenseComponent {
   get displayPrice(): string {
     const raw = Number(this.trackPrice);
     if (Number.isFinite(raw) && raw > 0) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(raw);
+      return formatUsd(raw);
     }
     return '$1,500';
   }

@@ -21,6 +21,9 @@ import { LicenseService } from '../../../../../services/license.service';
 import { formatTierPrice, getPreClearTrackPrice, isPreClearTrack } from '../../../../../utils/license-tier.utils';
 import { SpotifyService } from '../../../../../services/spotify.service';
 import { ISpotifySearchResult } from '../../../../../interfaces/response/spotify.response';
+import { SaveTrackRef } from '../../../../../services/save-to.service';
+import { SaveHeartComponent } from '../../../../shared/acquier/save-to/save-heart/save-heart.component';
+import { formatInteger, formatUsd, formatUsdCents } from '../../../../../utils/number-format.utils';
 
 type SpotifySuggestState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -45,7 +48,7 @@ interface SpotifyTrackInfo {
 @Component({
   selector: 'acrylic-similarity-search',
   standalone: true,
-  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule, TeamPlayerOptimizationComponent, SortFilterComponent, TranslocoModule],
+  imports: [NgClass, NgFor, NgIf, ReactiveFormsModule, LicenseComponent, FormsModule, TeamPlayerOptimizationComponent, SortFilterComponent, TranslocoModule, SaveHeartComponent],
   templateUrl: './similarity-search.component.html',
   styleUrls: ['./similarity-search.component.base.scss', './similarity-search.component.scss']
 })
@@ -378,16 +381,28 @@ export class SimilaritySearchComponent implements OnInit {
     return this.projectsService.trackKey(result);
   }
 
-  toggleFavorite(result: any): void {
-    const id = this.getTrackId(result);
-    if (!id) {
-      console.warn('[SimilaritySearch] toggleFavorite: track has no stable key, skipping', result);
-      return;
+  /**
+   * E: what the heart's menu saves. Cached per result so change detection
+   * hands the same object back; the result itself is kept as the snapshot the
+   * Projects page renders rich rows from.
+   */
+  saveRef(result: any): SaveTrackRef {
+    let ref = this.saveRefs.get(result);
+    if (!ref) {
+      ref = {
+        uuid: this.getTrackId(result),
+        title: (result?.track_name ?? result?.name ?? '').toString(),
+        artist: (result?.artist_canonical ?? result?.artist_name ?? '').toString(),
+        snapshot: result,
+      };
+      this.saveRefs.set(result, ref);
     }
+    return ref;
+  }
+  private saveRefs = new WeakMap<object, SaveTrackRef>();
+
+  onHeartOpened(result: any): void {
     this.trackResultInteraction(result, 'favorite');
-    this.projectsService.toggleFavorite(id, result).subscribe({
-      error: (err) => console.error('[SimilaritySearch] toggleFavorite request failed', err)
-    });
   }
 
   private loadClubPlayers(): void {
@@ -1523,16 +1538,11 @@ export class SimilaritySearchComponent implements OnInit {
   }
 
   private formatUsd(amount: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
+    return formatUsd(amount);
   }
 
   private formatUsdCents(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+    return formatUsdCents(amount);
   }
 
   /** "Base License" row: PreClear shows its price even when it only lives in price_temp. */
@@ -1569,7 +1579,7 @@ export class SimilaritySearchComponent implements OnInit {
     if (amount !== null) {
       return this.transloco.translate('license.licenseForPrice', { price: formatTierPrice(amount) });
     }
-    return this.transloco.translate('similaritySearch.modal.license');
+    return this.transloco.translate('license.licenseCta');
   }
 
   getTrackLicensePrice(track: any): string | null {
@@ -1714,7 +1724,7 @@ export class SimilaritySearchComponent implements OnInit {
     if (!Number.isFinite(num) || num < 0) {
       return null;
     }
-    return new Intl.NumberFormat('en-US').format(num);
+    return formatInteger(num);
   }
 
   getAudienceSize(track: any): string | null {
@@ -1722,7 +1732,7 @@ export class SimilaritySearchComponent implements OnInit {
     if (total === null) {
       return null;
     }
-    return new Intl.NumberFormat('en-US').format(total);
+    return formatInteger(total);
   }
 
   getAudienceSizeValue(track: any): number | null {

@@ -1,0 +1,119 @@
+<div class="dlg-backdrop" (click)="cancel()">
+  <div #panel class="dlg" role="dialog" aria-modal="true" [attr.aria-labelledby]="titleId" tabindex="-1"
+       [attr.aria-busy]="saving || loadState === 'loading'" (click)="$event.stopPropagation()">
+    <button type="button" class="dlg__close" (click)="cancel()" [attr.aria-label]="'saveTo.close' | transloco">
+      <img src="assets/images/icons/audience-search/close-dialog.svg" width="32" height="32" alt="" />
+    </button>
+
+    <h2 class="dlg__title" [id]="titleId">
+      @if (mode === 'bulk') {
+        {{ 'saveTo.titleBulk' | transloco: { count: tracks.length } }}
+      } @else {
+        {{ 'saveTo.title' | transloco }}
+      }
+    </h2>
+
+    <!-- The track(s) being saved stay visible the whole time. -->
+    <div class="picker-track">
+      @if (mode === 'bulk') {
+        <span class="picker-track__overline">{{ 'saveTo.selectedTracks' | transloco }}</span>
+        <strong class="picker-track__title">{{ 'saveTo.trackCount' | transloco: { count: tracks.length } }}</strong>
+        <span class="picker-track__artist">{{ bulkNames }}</span>
+      } @else {
+        <span class="picker-track__overline">{{ 'saveTo.selectedTrack' | transloco }}</span>
+        <strong class="picker-track__title">{{ firstTrack.title }}</strong>
+        <span class="picker-track__artist">{{ firstTrack.artist }}</span>
+      }
+    </div>
+
+    @switch (loadState) {
+      @case ('loading') {
+        <p class="picker-state" role="status">
+          <span class="picker-state__spinner" aria-hidden="true"></span>
+          {{ 'saveTo.loadingDestinations' | transloco }}
+        </p>
+      }
+      @case ('error') {
+        <div class="picker-state picker-state--error" role="alert">
+          <p class="dlg__error">{{ 'saveTo.errors.loadFailed' | transloco }}</p>
+          <button type="button" class="dlg-btn" (click)="loadDestinations()">{{ 'saveTo.retry' | transloco }}</button>
+        </div>
+      }
+      @default {
+        <fieldset class="picker-group" [disabled]="saving">
+          <legend class="picker-group__lede">{{ 'saveTo.chooseDestinations' | transloco }}</legend>
+
+          <label class="dlg-check-row" [class.dlg-check-row--locked]="savedLocked">
+            <input type="checkbox" [checked]="selection.saved" [disabled]="savedLocked"
+                   [attr.aria-describedby]="titleId + '-saved-hint'" (change)="onToggleSaved()" />
+            <span class="dlg-check" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M0.832031 4.8335L3.4987 7.50016L10.1654 0.833496" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" stroke="#000000"/></svg>
+            </span>
+            <span class="dlg-check-row__label">{{ 'saveTo.savedTracks' | transloco }}</span>
+          </label>
+          <p class="picker-group__hint" [id]="titleId + '-saved-hint'">
+            {{ (savedLocked ? 'saveTo.savedIncluded' : 'saveTo.projectsOptional') | transloco }}
+          </p>
+        </fieldset>
+
+        <fieldset class="picker-group" [disabled]="saving">
+          <legend class="picker-group__heading">{{ 'saveTo.projects' | transloco }}</legend>
+
+          <!-- No projects yet: only Saved tracks and Create new project (A6). -->
+          @if (projects.length) {
+            <input class="dlg-field" type="search" [(ngModel)]="query" name="projectSearch"
+                   [placeholder]="'saveTo.searchProjects' | transloco"
+                   [attr.aria-label]="'saveTo.searchProjects' | transloco" />
+
+            <div class="picker-projects">
+              @for (project of visibleProjects; track project.uuid) {
+                <label class="dlg-check-row" [title]="project.name">
+                  <input type="checkbox" [checked]="isChecked(project)" (change)="onToggleProject(project)" />
+                  <span class="dlg-check" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M0.832031 4.8335L3.4987 7.50016L10.1654 0.833496" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" stroke="#000000"/></svg>
+                  </span>
+                  <span class="dlg-check-row__label dlg-check-row__label--truncate">{{ project.name }}</span>
+                </label>
+              } @empty {
+                <div class="picker-empty" role="status">
+                  <p>{{ 'saveTo.noProjectsMatch' | transloco: { query: query.trim() } }}</p>
+                  <button type="button" class="picker-link" (click)="clearSearch()">{{ 'saveTo.clearSearch' | transloco }}</button>
+                </div>
+              }
+            </div>
+          }
+
+          <button #createButton type="button" class="dlg-btn-outline picker-create" (click)="createProject()">
+            + {{ 'saveTo.createProject' | transloco }}
+          </button>
+        </fieldset>
+
+        <p class="picker-summary" aria-live="polite">{{ summary }}</p>
+
+        @if (saveFailed) {
+          <div class="picker-error" role="alert">
+            <p class="dlg__error">{{ 'saveTo.errors.saveFailedTitle' | transloco: { count: tracks.length } }}</p>
+            <p class="picker-error__body">{{ 'saveTo.errors.saveFailedBody' | transloco }}</p>
+          </div>
+        }
+      }
+    }
+
+    <div class="dlg__actions">
+      <button type="button" class="dlg-btn" (click)="cancel()" [disabled]="saving">{{ 'saveTo.cancel' | transloco }}</button>
+      <button type="button" class="dlg-btn-primary" [disabled]="!canSubmit" (click)="submit()">
+        @if (saving) {
+          {{ 'saveTo.saving' | transloco }}
+        } @else if (saveFailed) {
+          {{ 'saveTo.retry' | transloco }}
+        } @else if (mode === 'edit') {
+          {{ 'saveTo.saveChanges' | transloco }}
+        } @else if (mode === 'bulk') {
+          {{ 'saveTo.addTracks' | transloco: { count: tracks.length } }}
+        } @else {
+          {{ 'saveTo.addTrack' | transloco }}
+        }
+      </button>
+    </div>
+  </div>
+</div>

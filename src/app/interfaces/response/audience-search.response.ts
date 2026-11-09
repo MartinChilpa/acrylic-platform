@@ -1,6 +1,6 @@
 /* ─────────── Raw API rows (GET /tracks/, /artists/, /prices/) ─────────── */
 
-export interface IPerformanceTrackResult {
+export interface IAudienceSearchTrackResult {
   uuid: string;
   isrc: string;
   /** Artist uuid. */
@@ -35,7 +35,7 @@ export interface IChartmetricCity {
   weights?: number;
 }
 
-export interface IPerformanceArtistResult {
+export interface IAudienceSearchArtistResult {
   uuid: string;
   name: string;
   /** ISO 3166-1 alpha-2 code. */
@@ -54,18 +54,18 @@ export interface IPerformanceArtistResult {
   spotify_url: string | null;
 }
 
-export interface IPerformancePriceResult {
+export interface IAudienceSearchPriceResult {
   uuid: string;
   name: string;
 }
 
 /* ─────────── View model ─────────── */
 
-export type PerformancePlatform = 'tiktok' | 'instagram' | 'youtube' | 'spotify';
+export type AudienceSearchPlatform = 'tiktok' | 'instagram' | 'youtube' | 'spotify';
 
-export type PerformanceTier = 'PreClear' | 'Artist Promo';
+export type AudienceSearchTier = 'PreClear' | 'Artist Promo';
 
-export interface PerformanceArtist {
+export interface AudienceSearchArtist {
   uuid: string;
   name: string;
   countryCode: string | null;
@@ -78,22 +78,22 @@ export interface PerformanceArtist {
   instagramTopCountries: { code: string; rank: number; weight: number | null }[];
   instagramTopCities: { name: string; code: string | null; rank: number; weight: number | null }[];
   /** Follower count per platform; null where the source has no number. */
-  audience: Record<PerformancePlatform, number | null>;
+  audience: Record<AudienceSearchPlatform, number | null>;
   /** Sum of the platform counts, null when none is known. Not unique reach. */
   totalAudience: number | null;
-  largestPlatform: PerformancePlatform | null;
-  profileUrls: Record<PerformancePlatform, string | null>;
+  largestPlatform: AudienceSearchPlatform | null;
+  profileUrls: Record<AudienceSearchPlatform, string | null>;
   updated: Date | null;
 }
 
-export interface PerformanceTrack {
+export interface AudienceSearchTrack {
   uuid: string;
   isrc: string;
   name: string;
   artistUuid: string;
   /** Null when the artist is inactive or missing from /artists/. */
-  artist: PerformanceArtist | null;
-  tier: PerformanceTier;
+  artist: AudienceSearchArtist | null;
+  tier: AudienceSearchTier;
   extendedCommercialUse: boolean;
   /** Per-track streams are not stored yet, so this is usually null. */
   spotifyStreams: number | null;
@@ -102,8 +102,8 @@ export interface PerformanceTrack {
   coverUrl: string | null;
 }
 
-export interface PerformanceCatalog {
-  tracks: PerformanceTrack[];
+export interface AudienceSearchCatalog {
+  tracks: AudienceSearchTrack[];
   /** Most recent artist update, used for "Data updated". */
   updated: Date | null;
 }

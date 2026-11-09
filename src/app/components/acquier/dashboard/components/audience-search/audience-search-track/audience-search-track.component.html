@@ -1,0 +1,161 @@
+<acrylic-header
+  [teamName]="teamName"
+  [teamLogo]="teamLogo"
+  [tagline]="tagline"
+  [primaryColor]="primaryColor"
+  [secondaryColor]="secondaryColor"
+  variant="compact"
+  [pageTitle]="'acquerSidenav.audienceSearch' | transloco"
+  [pageDescription]="'audienceSearch.lede' | transloco">
+</acrylic-header>
+
+<div class="ptd-page">
+  <button type="button" class="aud-btn ptd-back" (click)="backToResults()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    {{ 'audienceSearch.details.back' | transloco }}
+  </button>
+
+  @switch (loadState) {
+    @case ('loading') {
+      <div class="ptd-state" role="status">
+        <span class="ptd-state__spinner" aria-hidden="true"></span>
+        {{ 'audienceSearch.loading' | transloco }}
+      </div>
+    }
+    @case ('error') {
+      <div class="ptd-state ptd-state--error" role="alert">
+        {{ 'audienceSearch.details.notFound' | transloco }}
+      </div>
+    }
+    @default {
+      @if (track; as t) {
+        <!-- Identity -->
+        <header class="ptd-identity">
+          <span class="ptd-identity__crumb">{{ 'audienceSearch.details.crumb' | transloco }}</span>
+          <h2 class="ptd-identity__title">{{ t.name }}</h2>
+          <span class="ptd-identity__sub">{{ artistName }}&nbsp;&nbsp;·&nbsp;&nbsp;{{ origin }}</span>
+        </header>
+
+        <!-- Preview -->
+        <div class="ptd-preview">
+          <button type="button" class="aud-play" [ngClass]="'aud-play--' + tierClass(t)"
+                  [disabled]="!canPreview(t)" [attr.aria-busy]="isLoading(t)"
+                  [attr.aria-label]="(isPlaying(t) ? 'audienceSearch.pause' : 'audienceSearch.play') | transloco"
+                  (click)="togglePreview(t)">
+            @if (isLoading(t)) {<span class="aud-play__spinner" aria-hidden="true"></span>} @else if (isPlaying(t)) {
+              <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+            } @else {
+              <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+            }
+          </button>
+          <strong class="ptd-preview__label">{{ 'audienceSearch.previewTrack' | transloco }}</strong>
+          <span class="ptd-preview__time">{{ formatTime(isLoaded(t) ? currentTime() : 0) }}</span>
+          <div class="aud-timeline"><div class="aud-timeline__value" [style.width.%]="isLoaded(t) ? progress : 0"></div></div>
+          <span class="ptd-preview__status">{{ (isLoading(t) ? 'audienceSearch.loadingPreview' : canPreview(t) ? 'audienceSearch.details.readyToPlay' : 'audienceSearch.previewUnavailable') | transloco }}</span>
+        </div>
+
+        <div class="ptd-columns">
+          <div class="ptd-main">
+            <!-- Primary metrics -->
+            <div class="ptd-metrics">
+              <div class="ptd-card ptd-metric">
+                <span class="ptd-metric__label">{{ 'audienceSearch.columns.totalAudience' | transloco }}</span>
+                <span class="ptd-metric__value" [class.aud-metric__value--na]="t.artist?.totalAudience == null">{{ audience(t.artist?.totalAudience) }}</span>
+                <span class="ptd-metric__label">{{ 'audienceSearch.details.combinedCounts' | transloco }}</span>
+              </div>
+              <div class="ptd-card ptd-metric">
+                <span class="ptd-metric__label">{{ 'audienceSearch.columns.spotifyStreams' | transloco }}</span>
+                <span class="ptd-metric__value" [class.aud-metric__value--na]="t.spotifyStreams === null">{{ audience(t.spotifyStreams) }}</span>
+                <span class="ptd-metric__label">{{ 'audienceSearch.details.forThisTrack' | transloco }}</span>
+              </div>
+            </div>
+
+            <!-- Audience by platform -->
+            <section class="ptd-card ptd-platforms">
+              <h3 class="ptd-card__title">{{ 'audienceSearch.details.audienceByPlatform' | transloco: { artist: artistName } }}</h3>
+              @for (platform of platforms; track platform.key) {
+                <div class="ptd-platform">
+                  <span class="ptd-platform__name">{{ platform.label }}</span>
+                  <div class="ptd-bar" aria-hidden="true">
+                    <div class="ptd-bar__value" [style.width.%]="barWidth(platform.key)" [style.background]="platform.color"></div>
+                  </div>
+                  <strong class="ptd-platform__value" [class.aud-metric__value--na]="t.artist?.audience?.[platform.key] == null">{{ audience(t.artist?.audience?.[platform.key], 2) }}</strong>
+                  @if (t.artist?.profileUrls?.[platform.key]; as url) {
+                    <a class="ptd-platform__link" [href]="url" target="_blank" rel="noopener noreferrer">{{ 'audienceSearch.details.profile' | transloco }}</a>
+                  } @else {
+                    <span class="ptd-platform__link ptd-platform__link--none">{{ 'audienceSearch.details.profile' | transloco }}</span>
+                  }
+                </div>
+              }
+              <!-- Hidden for now; the string stays in the i18n files to bring it back.
+              <p class="ptd-note">{{ 'audienceSearch.details.platformNote' | transloco }}</p>
+              -->
+            </section>
+
+            <!-- Geography -->
+            <section class="ptd-card ptd-geo">
+              <h3 class="ptd-geo__title">{{ 'audienceSearch.details.artistOrigin' | transloco: { origin: origin } }}</h3>
+              <p class="ptd-note">{{ 'audienceSearch.details.originNote' | transloco }}</p>
+            </section>
+          </div>
+
+          <!-- Use and license -->
+          <aside class="aud-use ptd-use">
+            <h3 class="aud-use__title">{{ 'audienceSearch.use.title' | transloco }}</h3>
+            <span class="aud-tier aud-tier--lg" [ngClass]="'aud-tier--' + tierClass(t)">{{ t.tier }}</span>
+            <p class="aud-use__lede">{{ 'audienceSearch.use.lede' | transloco }}</p>
+            <div class="aud-use__ecu">
+              @if (t.extendedCommercialUse) {
+                <strong>{{ 'audienceSearch.ecuAvailable' | transloco }}</strong>
+                <span class="aud-use__ecu-sub">{{ 'audienceSearch.use.ecuName' | transloco }}</span>
+                <span>{{ 'audienceSearch.use.ecuBody' | transloco }}</span>
+              } @else {
+                <strong>{{ 'audienceSearch.use.checkAdUse' | transloco }}</strong>
+                <span class="aud-use__ecu-sub">{{ 'audienceSearch.use.paidAds' | transloco }}</span>
+                <span>{{ 'audienceSearch.use.checkAdUseBody' | transloco }}</span>
+              }
+            </div>
+            <button type="button" class="aud-license" [disabled]="licensing || !t.isrc" (click)="licenseTrack(t)">
+              {{ (licensing ? 'audienceSearch.use.opening' : 'audienceSearch.use.license') | transloco }}
+            </button>
+            @if (licenseError) {
+              <p class="aud-use__error" role="alert">{{ 'audienceSearch.use.licenseError' | transloco }}</p>
+            }
+            <p class="aud-use__note">{{ 'audienceSearch.use.detailsNote' | transloco }}</p>
+          </aside>
+        </div>
+
+        <!-- More from the artist -->
+        @if (moreFromArtist.length) {
+          <section class="ptd-more">
+            <h3 class="ptd-more__title">{{ 'audienceSearch.details.moreFrom' | transloco: { artist: artistName } }}</h3>
+            <div class="ptd-more__list">
+              @for (other of moreFromArtist; track other.uuid) {
+                <div class="ptd-more__row">
+                  <button type="button" class="aud-play" [ngClass]="'aud-play--' + tierClass(other)"
+                          [disabled]="!canPreview(other)" [attr.aria-busy]="isLoading(other)"
+                          [attr.aria-label]="(isPlaying(other) ? 'audienceSearch.pause' : 'audienceSearch.play') | transloco"
+                          (click)="togglePreview(other)">
+                    @if (isLoading(other)) {<span class="aud-play__spinner" aria-hidden="true"></span>} @else if (isPlaying(other)) {
+                      <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+                    } @else {
+                      <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+                    }
+                  </button>
+                  <strong class="ptd-more__name">{{ other.name }}</strong>
+                  <span class="ptd-more__streams">{{ 'audienceSearch.details.streamsLabel' | transloco: { value: audience(other.spotifyStreams) } }}</span>
+                  <button type="button" class="aud-btn aud-btn--view" (click)="viewTrack(other)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                    {{ 'audienceSearch.viewTrack' | transloco }}
+                  </button>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <p class="ptd-note">{{ 'audienceSearch.missingNote' | transloco }}</p>
+      }
+    }
+  }
+</div>

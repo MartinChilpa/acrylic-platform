@@ -1,0 +1,24 @@
+<div class="toast-region" aria-live="polite" aria-atomic="true">
+  @if (toasts.current(); as toast) {
+    <div class="toast" [class.toast--error]="toast.tone === 'error'" role="status"
+         (mouseenter)="toasts.pause()" (mouseleave)="toasts.resume()"
+         (focusin)="toasts.pause()" (focusout)="toasts.resume()">
+      <div class="toast__text">
+        <p class="toast__title">{{ toast.title }}</p>
+        @if (toast.body) {
+          <p class="toast__body">{{ toast.body }}</p>
+        }
+      </div>
+      <div class="toast__actions">
+        @for (action of toast.actions; track action.label) {
+          <button type="button" [class]="action.primary ? 'toast__btn toast__btn--primary' : 'toast__btn'" (click)="toasts.run(action)">
+            {{ action.label }}
+          </button>
+        }
+        <button type="button" class="toast__close" (click)="toasts.dismiss(toast.id)" [attr.aria-label]="'saveTo.dismiss' | transloco">
+          <img src="assets/images/icons/audience-search/close-dialog.svg" width="32" height="32" alt="" />
+        </button>
+      </div>
+    </div>
+  }
+</div>

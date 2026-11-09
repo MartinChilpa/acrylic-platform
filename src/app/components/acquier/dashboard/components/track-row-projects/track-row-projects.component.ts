@@ -5,6 +5,9 @@ import { ProjectsService } from '../../../../../services/projects.service';
 import { LicenseService } from '../../../../../services/license.service';
 import { AimsDownloadService } from '../../services/aims-download.service';
 import { isPreClearTrack } from '../../../../../utils/license-tier.utils';
+import { SaveTrackRef } from '../../../../../services/save-to.service';
+import { SaveHeartComponent } from '../../../../shared/acquier/save-to/save-heart/save-heart.component';
+import { formatInteger, formatUsd } from '../../../../../utils/number-format.utils';
 
 /**
  * Self-contained replica of the similarity-search result row, reusable anywhere
@@ -14,7 +17,7 @@ import { isPreClearTrack } from '../../../../../utils/license-tier.utils';
 @Component({
   selector: 'acrylic-track-row-projects',
   standalone: true,
-  imports: [NgClass, NgIf],
+  imports: [NgClass, NgIf, SaveHeartComponent],
   templateUrl: './track-row-projects.component.html',
   styleUrls: ['./track-row-projects.component.scss'],
 })
@@ -96,11 +99,22 @@ export class TrackRowProjectsComponent implements OnInit, OnChanges, AfterViewIn
     return !!key && this.projectsService.trackKey(entry) === key;
   }
 
-  toggleFavorite(): void {
-    const key = this.getTrackKey();
-    if (!key) { return; }
-    this.projectsService.toggleFavorite(key, this.track).subscribe({ error: () => {} });
+  /** What the heart's menu saves: the catalog uuid plus labels for the picker. */
+  get saveRef(): SaveTrackRef {
+    if (this.saveRefFor !== this.track) {
+      this.saveRefFor = this.track;
+      const t = this.track ?? {};
+      this.saveRefCache = {
+        uuid: this.getTrackKey(),
+        title: (t.track_name ?? t.track_name_track ?? t.name ?? '').toString(),
+        artist: (t.artist_canonical ?? t.artist_name ?? t.artist ?? '').toString(),
+        snapshot: t,
+      };
+    }
+    return this.saveRefCache!;
   }
+  private saveRefFor: any = null;
+  private saveRefCache: SaveTrackRef | null = null;
 
   togglePanel(): void {
     this.panelOpen = !this.panelOpen;
@@ -175,7 +189,7 @@ export class TrackRowProjectsComponent implements OnInit, OnChanges, AfterViewIn
   getTrackLicensePrice(track: any): string | null {
     const raw = Number(track?.price ?? track?.license_price ?? track?.price_amount);
     if (!Number.isFinite(raw) || raw <= 0) { return null; }
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(raw);
+    return formatUsd(raw);
   }
 
   /* ---------- imagery / metadata ---------- */
@@ -259,7 +273,7 @@ export class TrackRowProjectsComponent implements OnInit, OnChanges, AfterViewIn
   getAudienceSize(track: any): string | null {
     const total = this.getAudienceSizeValue(track);
     if (total === null) { return null; }
-    return new Intl.NumberFormat('en-US').format(total);
+    return formatInteger(total);
   }
 
   private getAudienceSizeValue(track: any): number | null {

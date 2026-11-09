@@ -7,21 +7,21 @@ import { of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { HeaderComponent } from '../../../../../shared/acquier/header/header.component';
 import { TeamBrandingService } from '../../../../../../services/team-branding.service';
-import { PerformanceService } from '../../../../../../services/performance.service';
-import { PerformancePlatform, PerformanceTrack } from '../../../../../../interfaces/response/performance.response';
-import { PERFORMANCE_PLATFORMS, countryName, formatAudience } from '../../../../../../utils/performance.utils';
+import { AudienceSearchService } from '../../../../../../services/audience-search.service';
+import { AudienceSearchPlatform, AudienceSearchTrack } from '../../../../../../interfaces/response/audience-search.response';
+import { AUDIENCE_SEARCH_PLATFORMS, countryName, formatAudience } from '../../../../../../utils/audience-search.utils';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
 @Component({
-  selector: 'acrylic-performance-track',
+  selector: 'acrylic-audience-search-track',
   standalone: true,
   imports: [CommonModule, RouterModule, TranslocoModule, HeaderComponent],
-  templateUrl: './performance-track.component.html',
-  styleUrl: './performance-track.component.scss',
+  templateUrl: './audience-search-track.component.html',
+  styleUrl: './audience-search-track.component.scss',
 })
-export class PerformanceTrackComponent implements OnInit, OnDestroy {
-  private performanceService = inject(PerformanceService);
+export class AudienceSearchTrackComponent implements OnInit, OnDestroy {
+  private audienceSearchService = inject(AudienceSearchService);
   private brandingService = inject(TeamBrandingService);
   private transloco = inject(TranslocoService);
   private route = inject(ActivatedRoute);
@@ -35,17 +35,17 @@ export class PerformanceTrackComponent implements OnInit, OnDestroy {
   primaryColor = this.branding.primaryColor;
   secondaryColor = this.branding.secondaryColor;
 
-  readonly platforms = PERFORMANCE_PLATFORMS;
+  readonly platforms = AUDIENCE_SEARCH_PLATFORMS;
 
   loadState: LoadState = 'loading';
-  track: PerformanceTrack | null = null;
-  moreFromArtist: PerformanceTrack[] = [];
+  track: AudienceSearchTrack | null = null;
+  moreFromArtist: AudienceSearchTrack[] = [];
   licensing = false;
   licenseError = false;
 
-  readonly playingUuid = this.performanceService.playingUuid;
-  readonly currentTime = this.performanceService.currentTime;
-  readonly duration = this.performanceService.duration;
+  readonly playingUuid = this.audienceSearchService.playingUuid;
+  readonly currentTime = this.audienceSearchService.currentTime;
+  readonly duration = this.audienceSearchService.duration;
 
   ngOnInit(): void {
     this.brandingService.applyCssVars(this.branding);
@@ -58,9 +58,9 @@ export class PerformanceTrackComponent implements OnInit, OnDestroy {
         this.moreFromArtist = [];
         this.licenseError = false;
       }),
-      switchMap(uuid => this.performanceService.getTrack(uuid).pipe(
+      switchMap(uuid => this.audienceSearchService.getTrack(uuid).pipe(
         catchError(err => {
-          console.error('[Performance] track load failed', err);
+          console.error('[AudienceSearch] track load failed', err);
           return of(null);
         })
       )),
@@ -73,12 +73,12 @@ export class PerformanceTrackComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.performanceService.stopPreview();
+    this.audienceSearchService.stopPreview();
   }
 
-  private loadMoreFromArtist(track: PerformanceTrack): void {
-    this.performanceService.getArtistTracks(track.artistUuid).pipe(
-      catchError(() => of([] as PerformanceTrack[])),
+  private loadMoreFromArtist(track: AudienceSearchTrack): void {
+    this.audienceSearchService.getArtistTracks(track.artistUuid).pipe(
+      catchError(() => of([] as AudienceSearchTrack[])),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(tracks => {
       this.moreFromArtist = tracks.filter(t => t.uuid !== track.uuid).slice(0, 5);
@@ -87,44 +87,44 @@ export class PerformanceTrackComponent implements OnInit, OnDestroy {
 
   /** Back to the list with the search, filters and page it was opened from. */
   backToResults(): void {
-    this.router.navigate(['/brand/performance'], { queryParams: this.route.snapshot.queryParams });
+    this.router.navigate(['/brand/audience-search'], { queryParams: this.route.snapshot.queryParams });
   }
 
-  viewTrack(track: PerformanceTrack): void {
-    this.router.navigate(['/brand/performance/track', track.uuid], {
+  viewTrack(track: AudienceSearchTrack): void {
+    this.router.navigate(['/brand/audience-search/track', track.uuid], {
       queryParams: this.route.snapshot.queryParams,
     });
   }
 
-  togglePreview(track: PerformanceTrack): void {
-    this.performanceService.togglePreview(track);
+  togglePreview(track: AudienceSearchTrack): void {
+    this.audienceSearchService.togglePreview(track);
   }
 
   /** A preview link exists and has not failed to play. */
-  canPreview(track: PerformanceTrack | null): boolean {
-    return this.performanceService.canPreview(track);
+  canPreview(track: AudienceSearchTrack | null): boolean {
+    return this.audienceSearchService.canPreview(track);
   }
 
   /** The preview is fetching or buffering. */
-  isLoading(track: PerformanceTrack | null): boolean {
-    return !!track && this.performanceService.loadingUuid() === track.uuid;
+  isLoading(track: AudienceSearchTrack | null): boolean {
+    return !!track && this.audienceSearchService.loadingUuid() === track.uuid;
   }
 
   /** The preview is loaded (playing or paused), so its position is shown. */
-  isLoaded(track: PerformanceTrack | null): boolean {
-    return !!track && this.performanceService.loadedUuid() === track.uuid;
+  isLoaded(track: AudienceSearchTrack | null): boolean {
+    return !!track && this.audienceSearchService.loadedUuid() === track.uuid;
   }
 
-  isPlaying(track: PerformanceTrack | null): boolean {
+  isPlaying(track: AudienceSearchTrack | null): boolean {
     return !!track && this.playingUuid() === track.uuid;
   }
 
   /** Hands the track to the dashboard search, where the license flow lives. */
-  licenseTrack(track: PerformanceTrack): void {
+  licenseTrack(track: AudienceSearchTrack): void {
     if (this.licensing) { return; }
     this.licensing = true;
     this.licenseError = false;
-    this.performanceService.getSpotifyUrl(track).pipe(
+    this.audienceSearchService.getSpotifyUrl(track).pipe(
       catchError(() => of(null)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(url => {
@@ -140,27 +140,27 @@ export class PerformanceTrackComponent implements OnInit, OnDestroy {
   /* ─────────── Formatting ─────────── */
 
   audience(value: number | null | undefined, digits = 1): string {
-    return formatAudience(value, digits) ?? this.transloco.translate('performance.unavailable');
+    return formatAudience(value, digits) ?? this.transloco.translate('audienceSearch.unavailable');
   }
 
   get origin(): string {
     return countryName(this.track?.artist?.countryCode, this.transloco.getActiveLang())
-      ?? this.transloco.translate('performance.unavailable');
+      ?? this.transloco.translate('audienceSearch.unavailable');
   }
 
   get artistName(): string {
-    return this.track?.artist?.name || this.transloco.translate('performance.unknownArtist');
+    return this.track?.artist?.name || this.transloco.translate('audienceSearch.unknownArtist');
   }
 
   /** Bar length relative to the artist's largest platform. */
-  barWidth(platform: PerformancePlatform): number {
+  barWidth(platform: AudienceSearchPlatform): number {
     const audience = this.track?.artist?.audience;
     if (!audience) { return 0; }
     const max = Math.max(...this.platforms.map(p => audience[p.key] ?? 0));
     return max ? ((audience[platform] ?? 0) / max) * 100 : 0;
   }
 
-  tierClass(track: PerformanceTrack): string {
+  tierClass(track: AudienceSearchTrack): string {
     return track.tier === 'PreClear' ? 'preclear' : 'artist';
   }
 

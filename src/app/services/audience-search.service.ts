@@ -7,41 +7,41 @@ import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { ICommonSuccessResponse } from '../interfaces/response/common.response';
 import {
-  IPerformanceArtistResult,
-  IPerformancePriceResult,
-  IPerformanceTrackResult,
-  PerformanceArtist,
-  PerformanceCatalog,
-  PerformancePlatform,
-  PerformanceTrack,
-} from '../interfaces/response/performance.response';
-import { PERFORMANCE_PLATFORMS } from '../utils/performance.utils';
+  IAudienceSearchArtistResult,
+  IAudienceSearchPriceResult,
+  IAudienceSearchTrackResult,
+  AudienceSearchArtist,
+  AudienceSearchCatalog,
+  AudienceSearchPlatform,
+  AudienceSearchTrack,
+} from '../interfaces/response/audience-search.response';
+import { AUDIENCE_SEARCH_PLATFORMS } from '../utils/audience-search.utils';
 import { SpotifyService } from './spotify.service';
 
 /**
- * Data for the Performance tab: every track in catalog_track joined with its
+ * Data for the AudienceSearch tab: every track in catalog_track joined with its
  * artist's platform audience and its price tier.
  *
  * TODO(backend): replace the three-request join below with one endpoint that
  * searches, filters, sorts and paginates server-side and returns the fields of
- * PerformanceTrack (including per-track spotify_streams and a preview url).
- * Only this service needs to change; the components read PerformanceTrack.
+ * AudienceSearchTrack (including per-track spotify_streams and a preview url).
+ * Only this service needs to change; the components read AudienceSearchTrack.
  */
 @Injectable({
   providedIn: 'root'
 })
-export class PerformanceService {
+export class AudienceSearchService {
   private http = inject(HttpClient);
   private spotifyService = inject(SpotifyService);
   private readonly base = `${environment.API_URL}/${environment.VERSION}`;
   private static readonly PAGE_SIZE = 100;
 
-  private artists$?: Observable<Map<string, PerformanceArtist>>;
+  private artists$?: Observable<Map<string, AudienceSearchArtist>>;
   private tiers$?: Observable<Map<string, string>>;
 
   /* ─────────── Catalog ─────────── */
 
-  private catalog$?: Observable<PerformanceCatalog>;
+  private catalog$?: Observable<AudienceSearchCatalog>;
 
   /**
    * Last search, filters, sort and page of the list, so returning to the tab
@@ -53,15 +53,15 @@ export class PerformanceService {
 
   /**
    * Every track in catalog_track with its artist, loaded once per session.
-   * Search runs over this in the browser (see performance-search.utils), since
+   * Search runs over this in the browser (see audience-search-query.utils), since
    * geographic, platform and approximate matching need the artist fields that
    * /tracks/?search= cannot filter on.
    */
-  loadCatalog(): Observable<PerformanceCatalog> {
+  loadCatalog(): Observable<AudienceSearchCatalog> {
     if (!this.catalog$) {
-      const params = new HttpParams().set('page_size', PerformanceService.PAGE_SIZE);
+      const params = new HttpParams().set('page_size', AudienceSearchService.PAGE_SIZE);
       this.catalog$ = forkJoin({
-        tracks: this.fetchAll<IPerformanceTrackResult>(`${this.base}/tracks/`, params),
+        tracks: this.fetchAll<IAudienceSearchTrackResult>(`${this.base}/tracks/`, params),
         artists: this.loadArtists(),
         tiers: this.loadTiers(),
       }).pipe(
@@ -76,19 +76,19 @@ export class PerformanceService {
     return this.catalog$;
   }
 
-  getTrack(uuid: string): Observable<PerformanceTrack> {
+  getTrack(uuid: string): Observable<AudienceSearchTrack> {
     return forkJoin({
-      track: this.http.get<IPerformanceTrackResult>(`${this.base}/tracks/${uuid}/`),
+      track: this.http.get<IAudienceSearchTrackResult>(`${this.base}/tracks/${uuid}/`),
       artists: this.loadArtists(),
       tiers: this.loadTiers(),
     }).pipe(map(({ track, artists, tiers }) => this.toTrack(track, artists, tiers)));
   }
 
   /** The artist's other tracks, for "More from …". */
-  getArtistTracks(artistUuid: string): Observable<PerformanceTrack[]> {
-    const params = new HttpParams().set('page_size', PerformanceService.PAGE_SIZE);
+  getArtistTracks(artistUuid: string): Observable<AudienceSearchTrack[]> {
+    const params = new HttpParams().set('page_size', AudienceSearchService.PAGE_SIZE);
     return forkJoin({
-      tracks: this.fetchAll<IPerformanceTrackResult>(`${this.base}/artists/${artistUuid}/tracks/`, params),
+      tracks: this.fetchAll<IAudienceSearchTrackResult>(`${this.base}/artists/${artistUuid}/tracks/`, params),
       artists: this.loadArtists(),
       tiers: this.loadTiers(),
     }).pipe(map(({ tracks, artists, tiers }) => tracks.map(t => this.toTrack(t, artists, tiers))));
@@ -98,14 +98,14 @@ export class PerformanceService {
    * The Spotify URL the dashboard search takes as a seed, which is where the
    * existing license flow lives. Resolved from the ISRC.
    */
-  getSpotifyUrl(track: PerformanceTrack): Observable<string | null> {
+  getSpotifyUrl(track: AudienceSearchTrack): Observable<string | null> {
     if (!track.isrc) { return of(null); }
     return this.spotifyService.getTrack(track.isrc).pipe(map(res => res?.spotify_url || null));
   }
 
   /** Reads the first page, then requests the remaining pages in parallel. */
   private fetchAll<T>(url: string, params: HttpParams, context?: HttpContext): Observable<T[]> {
-    const pageSize = Number(params.get('page_size')) || PerformanceService.PAGE_SIZE;
+    const pageSize = Number(params.get('page_size')) || AudienceSearchService.PAGE_SIZE;
     return this.http.get<ICommonSuccessResponse<T[]>>(url, { params, context }).pipe(
       switchMap(first => {
         const pages = Math.ceil((first.count ?? 0) / pageSize);
@@ -119,10 +119,10 @@ export class PerformanceService {
     );
   }
 
-  private loadArtists(): Observable<Map<string, PerformanceArtist>> {
+  private loadArtists(): Observable<Map<string, AudienceSearchArtist>> {
     if (!this.artists$) {
-      const params = new HttpParams().set('page_size', PerformanceService.PAGE_SIZE);
-      this.artists$ = this.fetchAll<IPerformanceArtistResult>(`${this.base}/artists/`, params).pipe(
+      const params = new HttpParams().set('page_size', AudienceSearchService.PAGE_SIZE);
+      this.artists$ = this.fetchAll<IAudienceSearchArtistResult>(`${this.base}/artists/`, params).pipe(
         map(rows => new Map(rows.map(row => [row.uuid, this.toArtist(row)]))),
         // A failed load must not stay cached; the next search retries it.
         catchError(err => { this.artists$ = undefined; return throwError(() => err); }),
@@ -135,15 +135,15 @@ export class PerformanceService {
   /** Price uuid -> tier name ("PreClear", "Basic", …). */
   private loadTiers(): Observable<Map<string, string>> {
     if (!this.tiers$) {
-      const params = new HttpParams().set('page_size', PerformanceService.PAGE_SIZE);
+      const params = new HttpParams().set('page_size', AudienceSearchService.PAGE_SIZE);
       // Optional data: a failure here falls back quietly, without the global alert.
       const silent = new HttpContext().set(SKIP_ERROR_ALERT, true);
-      this.tiers$ = this.fetchAll<IPerformancePriceResult>(`${this.base}/prices/`, params, silent).pipe(
+      this.tiers$ = this.fetchAll<IAudienceSearchPriceResult>(`${this.base}/prices/`, params, silent).pipe(
         map(rows => new Map(rows.map(row => [row.uuid, row.name]))),
         // Tiers only label rows; without them every track reads as Artist Promo
         // rather than the whole catalog failing. Not cached, so it is retried.
         catchError(err => {
-          console.error('[Performance] prices load failed', err);
+          console.error('[AudienceSearch] prices load failed', err);
           this.tiers$ = undefined;
           return of(new Map<string, string>());
         }),
@@ -153,16 +153,16 @@ export class PerformanceService {
     return this.tiers$;
   }
 
-  private toArtist(row: IPerformanceArtistResult): PerformanceArtist {
+  private toArtist(row: IAudienceSearchArtistResult): AudienceSearchArtist {
     const count = (value: number | null) => (value && value > 0 ? value : null);
-    const audience: Record<PerformancePlatform, number | null> = {
+    const audience: Record<AudienceSearchPlatform, number | null> = {
       tiktok: count(row.tiktok_followers),
       instagram: count(row.instagram_followers),
       youtube: count(row.youtube_followers),
       spotify: count(row.spotify_followers),
     };
-    const known = PERFORMANCE_PLATFORMS.filter(p => audience[p.key] !== null);
-    const largest = known.reduce<PerformancePlatform | null>(
+    const known = AUDIENCE_SEARCH_PLATFORMS.filter(p => audience[p.key] !== null);
+    const largest = known.reduce<AudienceSearchPlatform | null>(
       (best, p) => (best === null || (audience[p.key] ?? 0) > (audience[best] ?? 0) ? p.key : best), null);
 
     return {
@@ -194,7 +194,7 @@ export class PerformanceService {
     };
   }
 
-  private toTrack(row: IPerformanceTrackResult, artists: Map<string, PerformanceArtist>, tiers: Map<string, string>): PerformanceTrack {
+  private toTrack(row: IAudienceSearchTrackResult, artists: Map<string, AudienceSearchArtist>, tiers: Map<string, string>): AudienceSearchTrack {
     const tierName = row.price ? tiers.get(row.price) ?? '' : '';
     return {
       uuid: row.uuid,
@@ -244,7 +244,7 @@ export class PerformanceService {
     return /^(https?:)?\/\//i.test(url) || url.startsWith('/') ? url : null;
   }
 
-  private latestUpdate(artists: Map<string, PerformanceArtist>): Date | null {
+  private latestUpdate(artists: Map<string, AudienceSearchArtist>): Date | null {
     let latest: Date | null = null;
     artists.forEach(a => {
       if (a.updated && (!latest || a.updated > latest)) { latest = a.updated; }
@@ -267,12 +267,26 @@ export class PerformanceService {
   private listeners: AbortController | null = null;
   private refreshSub: Subscription | null = null;
 
-  canPreview(track: PerformanceTrack | null): boolean {
+  canPreview(track: AudienceSearchTrack | null): boolean {
     return !!track?.previewUrl && !this.failedPreviews().has(track.uuid);
   }
 
+  /** The preview exists but could not be played (D2: "Preview not loading"). */
+  previewFailed(track: AudienceSearchTrack | null): boolean {
+    return !!track?.previewUrl && this.failedPreviews().has(track.uuid);
+  }
+
+  /** "Retry preview": forget the failure and load it again, refreshing the link if needed. */
+  retryPreview(track: AudienceSearchTrack): void {
+    if (!track.previewUrl) { return; }
+    const next = new Set(this.failedPreviews());
+    next.delete(track.uuid);
+    this.failedPreviews.set(next);
+    this.startPreview(track, track.previewUrl, true);
+  }
+
   /** Play/pause; one preview at a time. Audio only, nothing else is drawn. */
-  togglePreview(track: PerformanceTrack): void {
+  togglePreview(track: AudienceSearchTrack): void {
     if (!this.canPreview(track)) { return; }
     if (this.loadedUuid() !== track.uuid) {
       this.startPreview(track, track.previewUrl!, true);
@@ -303,7 +317,7 @@ export class PerformanceService {
     this.duration.set(0);
   }
 
-  private startPreview(track: PerformanceTrack, url: string, mayRefresh: boolean): void {
+  private startPreview(track: AudienceSearchTrack, url: string, mayRefresh: boolean): void {
     this.stopPreview();
     const audio = new Audio();
     audio.preload = 'auto';
@@ -354,11 +368,11 @@ export class PerformanceService {
     });
   }
 
-  private refreshPreview(track: PerformanceTrack): void {
+  private refreshPreview(track: AudienceSearchTrack): void {
     // Stays in the loading state while the new link is fetched.
     this.loadedUuid.set(track.uuid);
     this.loadingUuid.set(track.uuid);
-    this.refreshSub = this.http.get<IPerformanceTrackResult>(`${this.base}/tracks/${track.uuid}/`).pipe(
+    this.refreshSub = this.http.get<IAudienceSearchTrackResult>(`${this.base}/tracks/${track.uuid}/`).pipe(
       map(row => this.toMediaUrl(row.preview_url ?? row.audio_url)),
       catchError(() => of(null))
     ).subscribe(url => {
@@ -374,7 +388,7 @@ export class PerformanceService {
     });
   }
 
-  private markFailed(track: PerformanceTrack): void {
+  private markFailed(track: AudienceSearchTrack): void {
     const next = new Set(this.failedPreviews());
     next.add(track.uuid);
     this.failedPreviews.set(next);

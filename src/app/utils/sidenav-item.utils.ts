@@ -45,5 +45,5 @@ export const acquierSidenavItems: AcquierSidenavItem[] = [
   { icon: 'home', label: 'Home', routerLink: '/brand/dashboard' },
   { icon: 'projects', label: 'Projects', routerLink: '/brand/projects' },
   { icon: 'licenses', label: 'Licenses', routerLink: '/brand/licenses' },
-  { icon: 'performance', label: 'Performance', routerLink: '/brand/performance' },
+  { icon: 'audience-search', label: 'Audience Search', routerLink: '/brand/audience-search' },
 ];

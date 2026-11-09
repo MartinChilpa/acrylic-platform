@@ -1,0 +1,570 @@
+<acrylic-header
+  [teamName]="teamName"
+  [teamLogo]="teamLogo"
+  [tagline]="tagline"
+  [primaryColor]="primaryColor"
+  [secondaryColor]="secondaryColor"
+  variant="compact"
+  [pageTitle]="'acquerSidenav.audienceSearch' | transloco"
+  [pageDescription]="'audienceSearch.lede' | transloco">
+</acrylic-header>
+
+<div class="aud-page">
+
+  <!-- Header -->
+  <header class="aud-head">
+    <div class="aud-head__row">
+      <h2 class="aud-head__title">{{ 'audienceSearch.title' | transloco }}</h2>
+      <button type="button" class="aud-action" (click)="goToProjects()">{{ 'saveTo.goToProjects' | transloco }}</button>
+    </div>
+    <p class="aud-head__lede">{{ 'audienceSearch.lede' | transloco }}</p>
+  </header>
+
+  <!-- Search and filters -->
+  <section class="aud-filters">
+    <form class="aud-search" role="search" (ngSubmit)="runSearch()">
+      <input class="aud-search__input"
+             type="search"
+             name="q"
+             autocomplete="off"
+             role="combobox"
+             aria-autocomplete="list"
+             aria-controls="aud-country-suggestions"
+             [attr.aria-expanded]="suggestionsOpen"
+             [attr.aria-activedescendant]="activeSuggestion >= 0 ? 'aud-country-' + activeSuggestion : null"
+             [attr.aria-label]="'audienceSearch.searchPlaceholder' | transloco"
+             [placeholder]="'audienceSearch.searchPlaceholder' | transloco"
+             [(ngModel)]="search"
+             (ngModelChange)="onSearchInput($event)"
+             (keydown)="onSearchKeydown($event)"
+             (focus)="onSearchFocus()"
+             (blur)="onSearchBlur()" />
+      @if (search) {
+        <button type="button" class="aud-search__clear" (click)="clearSearch()" [attr.aria-label]="'audienceSearch.clearSearch' | transloco">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </button>
+      }
+      <!-- A2: nothing is searched while typing; only this button or Enter runs it. -->
+      <button type="submit" class="aud-search__submit" [disabled]="!canSearch">
+        <img src="assets/images/icons/audience-search/search.svg" width="16" height="16" alt="" />
+        {{ 'audienceSearch.search' | transloco }}
+      </button>
+
+      <!-- Country suggestions; mousedown keeps focus in the input so the pick lands. -->
+      @if (suggestionsOpen) {
+        <ul class="aud-suggest" id="aud-country-suggestions" role="listbox"
+            [attr.aria-label]="'audienceSearch.suggest.label' | transloco">
+          @for (suggestion of suggestions; track suggestion.code; let i = $index) {
+            <li class="aud-suggest__item" role="option"
+                [id]="'aud-country-' + i"
+                [class.aud-suggest__item--active]="i === activeSuggestion"
+                [attr.aria-selected]="i === activeSuggestion"
+                (mousedown)="$event.preventDefault()"
+                (mouseenter)="activeSuggestion = i"
+                (click)="selectCountry(suggestion)">
+              <span class="aud-suggest__kind">{{ 'audienceSearch.suggest.country' | transloco }}</span>
+              <span class="aud-suggest__name">{{ suggestion.name }}</span>
+              <span class="aud-suggest__count">{{ plural('audienceSearch.suggest.artists', suggestion.artistCount) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </form>
+
+    <!-- How the search was read: place, platform ranking, audience, or a spelling hint -->
+    @if (loadState === 'ready' && query) {
+      <div class="aud-search-hint" aria-live="polite">
+        @switch (outcome.mode) {
+          @case ('geo') {
+            <span>{{ 'audienceSearch.search.fromPlace' | transloco: { place: placeLabel } }}</span>
+          }
+          @case ('audience') {
+            <span>{{ (outcome.place?.kind === 'city' ? 'audienceSearch.search.audienceCity' : 'audienceSearch.search.audienceCountry') | transloco: { place: placeLabel } }}</span>
+          }
+          @case ('all') {
+            @if (outcome.platform) {
+              <span>{{ 'audienceSearch.search.allArtists' | transloco }}</span>
+            }
+          }
+        }
+        @if (outcome.mode !== 'audience' && outcome.platform && !outcome.missingPlatformData) {
+          <span class="aud-search-hint__rank">{{ 'audienceSearch.search.rankedBy' | transloco: { platform: platformName(outcome.platform) } }}</span>
+        }
+        @if (outcome.missingPlatformData) {
+          <span class="aud-search-hint__warn">{{ 'audienceSearch.search.noPlatformData' | transloco: { platform: platformName(outcome.platform) } }}</span>
+        }
+        @if (outcome.missingAudienceData) {
+          <span class="aud-search-hint__warn">{{ 'audienceSearch.search.noAudienceData' | transloco: { place: placeLabel } }}</span>
+        }
+        @if (outcome.approximate) {
+          <span>{{ 'audienceSearch.search.approximate' | transloco: { query: query } }}</span>
+        }
+        @if (outcome.suggestion) {
+          <button type="button" class="aud-search-hint__suggest" (click)="applySuggestion(outcome.suggestion)">
+            {{ 'audienceSearch.search.didYouMean' | transloco: { name: outcome.suggestion } }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="aud-filters__row">
+      <label class="aud-select aud-select--origin">
+        <span class="aud-select__sr">{{ 'audienceSearch.filters.origin' | transloco }}</span>
+        <select [ngModel]="filters.origin" (ngModelChange)="setFilter('origin', $event)">
+          <option value="">{{ 'audienceSearch.filters.originAll' | transloco }}</option>
+          @for (option of originOptions; track option.code) {
+            <option [value]="option.code">{{ 'audienceSearch.filters.originValue' | transloco: { origin: option.name } }}</option>
+          }
+        </select>
+      </label>
+
+      <!-- Platform dropdown hidden for now; platform context comes from the search
+           ("best artists on TikTok"). The ?platform= filter still works. To restore,
+           uncomment this block.
+      <label class="aud-select aud-select--platform">
+        <span class="aud-select__sr">{{ 'audienceSearch.filters.platform' | transloco }}</span>
+        <select [ngModel]="filters.platform" (ngModelChange)="setFilter('platform', $event)">
+          <option value="">{{ 'audienceSearch.filters.platformAll' | transloco }}</option>
+          @for (platform of platforms; track platform.key) {
+            <option [value]="platform.key">{{ 'audienceSearch.filters.platformValue' | transloco: { platform: platform.label } }}</option>
+          }
+        </select>
+      </label>
+      -->
+
+      <label class="aud-select aud-select--size">
+        <span class="aud-select__sr">{{ 'audienceSearch.filters.size' | transloco }}</span>
+        <select [ngModel]="filters.size" (ngModelChange)="setFilter('size', $event)">
+          <option value="any">{{ 'audienceSearch.filters.sizeAny' | transloco }}</option>
+          <option value="under1m">{{ 'audienceSearch.filters.sizeUnder1m' | transloco }}</option>
+          <option value="1to10m">{{ 'audienceSearch.filters.size1to10m' | transloco }}</option>
+          <option value="over10m">{{ 'audienceSearch.filters.sizeOver10m' | transloco }}</option>
+        </select>
+      </label>
+
+      <!-- Ranks by follower count, the only Instagram/TikTok metric with data. -->
+      <label class="aud-select aud-select--social">
+        <span class="aud-select__sr">{{ 'audienceSearch.filters.social' | transloco }}</span>
+        <select [ngModel]="filters.social" (ngModelChange)="setFilter('social', $event)">
+          <option value="">{{ 'audienceSearch.filters.socialAny' | transloco }}</option>
+          <option value="instagram">{{ 'audienceSearch.filters.socialInstagram' | transloco }}</option>
+          <option value="tiktok">{{ 'audienceSearch.filters.socialTiktok' | transloco }}</option>
+        </select>
+      </label>
+
+      <button type="button" class="aud-toggle" role="switch" [attr.aria-checked]="filters.artistPromoOnly"
+              (click)="toggleArtistPromoOnly()">
+        <span class="aud-toggle__track" aria-hidden="true"><span class="aud-toggle__thumb"></span></span>
+        {{ 'audienceSearch.filters.artistPromoOnly' | transloco }}
+      </button>
+
+      <!-- Resets search, filters, sort and view in one click (back to the first screen). -->
+      @if (canClearAll) {
+        <button type="button" class="aud-clear-all" (click)="clearAll()">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          {{ 'audienceSearch.clearAll' | transloco }}
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section class="aud-results">
+    @if (view === 'landing') {
+      <!-- A1: nothing searched yet. -->
+      <div class="aud-landing">
+        <h3 class="aud-landing__title">{{ 'audienceSearch.landing.title' | transloco }}</h3>
+        <p class="aud-landing__body">{{ 'audienceSearch.landing.body' | transloco }}</p>
+      </div>
+    } @else {
+      <div class="aud-toolbar">
+        <div class="aud-tabs" role="tablist">
+          <button type="button" role="tab" class="aud-tab"
+                  [class.aud-tab--active]="tab === 'artists'"
+                  [attr.aria-selected]="tab === 'artists'"
+                  (click)="setTab('artists')">
+            {{ 'audienceSearch.tabs.artists' | transloco }}&nbsp;&nbsp;{{ loadState === 'ready' ? artistRows.length : '–' }}
+          </button>
+          <button type="button" role="tab" class="aud-tab"
+                  [class.aud-tab--active]="tab === 'tracks'"
+                  [attr.aria-selected]="tab === 'tracks'"
+                  (click)="setTab('tracks')">
+            {{ 'audienceSearch.tabs.tracks' | transloco }}&nbsp;&nbsp;{{ loadState === 'ready' ? filteredTracks.length : '–' }}
+          </button>
+        </div>
+
+        <label class="aud-select aud-select--sort">
+          <span class="aud-select__sr">{{ 'audienceSearch.sort.label' | transloco }}</span>
+          <select [ngModel]="sort" (ngModelChange)="setSort($event)">
+            <option value="audience">{{ 'audienceSearch.sort.audience' | transloco }}</option>
+            <option value="audienceAsc">{{ 'audienceSearch.sort.audienceAsc' | transloco }}</option>
+            <option value="name">{{ 'audienceSearch.sort.name' | transloco }}</option>
+          </select>
+        </label>
+      </div>
+
+      @switch (loadState) {
+        @case ('loading') {
+          <div class="aud-state" role="status">
+            <span class="aud-state__spinner" aria-hidden="true"></span>
+            {{ 'audienceSearch.loading' | transloco }}
+          </div>
+        }
+        @case ('error') {
+          <div class="aud-state aud-state--error" role="alert">
+            <span>{{ 'audienceSearch.error' | transloco }}</span>
+            <button type="button" class="aud-btn" (click)="retry()">{{ 'audienceSearch.retry' | transloco }}</button>
+          </div>
+        }
+        @default {
+          @if (view === 'artistTracks' && focusRow; as row) {
+            <!-- A3a: one artist's tracks; the search stays as it was. -->
+            <div class="aud-artist-context">
+              <button type="button" class="aud-btn aud-btn--strong" (click)="backToArtists()">{{ 'audienceSearch.backToArtists' | transloco }}</button>
+              <h3 class="aud-artist-context__title">{{ plural('audienceSearch.artistTracksTitle', row.tracks.length, { artist: row.artist.name }) }}</h3>
+            </div>
+          }
+
+          @if (resultCount === 0) {
+            <div class="aud-state">
+              @if (outcome.mode === 'geo' || outcome.mode === 'audience') {
+                <span>{{ 'audienceSearch.search.noPlaceResults' | transloco: { place: placeLabel } }}</span>
+              } @else {
+                <span>{{ 'audienceSearch.emptySearch' | transloco: { query: query } }}</span>
+              }
+              @if (outcome.suggestion) {
+                <button type="button" class="aud-btn" (click)="applySuggestion(outcome.suggestion)">
+                  {{ 'audienceSearch.search.didYouMean' | transloco: { name: outcome.suggestion } }}
+                </button>
+              }
+              @if (hasActiveFilters) {
+                <button type="button" class="aud-btn" (click)="resetFilters()">{{ 'audienceSearch.resetFilters' | transloco }}</button>
+              }
+            </div>
+          } @else if (view === 'artists') {
+            <!-- A3: one row per artist -->
+            <div class="aud-table aud-table--artists" role="table">
+              <div class="aud-table__head" role="row">
+                <span role="columnheader">{{ 'audienceSearch.columns.artistCatalogue' | transloco }}</span>
+                <span role="columnheader">{{ 'audienceSearch.columns.origin' | transloco }}</span>
+                <span role="columnheader">{{ 'audienceSearch.columns.totalAudience' | transloco }}</span>
+                <span role="columnheader">{{ 'audienceSearch.columns.largestPlatform' | transloco }}</span>
+                <span role="columnheader">{{ 'audienceSearch.columns.availableTracks' | transloco }}</span>
+                <span role="columnheader"></span>
+              </div>
+
+              @for (row of pagedArtists; track row.artist.uuid) {
+                <div class="aud-row" role="row">
+                  <span class="aud-row__identity" role="cell">
+                    <span class="aud-row__title">{{ row.artist.name }}</span>
+                    <span class="aud-row__sub">{{ plural('audienceSearch.tracksInCatalogue', row.tracks.length) }}</span>
+                  </span>
+                  <span class="aud-row__muted" role="cell">
+                    <span class="aud-row__label">{{ 'audienceSearch.columns.origin' | transloco }}</span>
+                    {{ originName(row.artist.countryCode) }}
+                  </span>
+                  <span class="aud-row__strong" role="cell">
+                    <span class="aud-row__label">{{ 'audienceSearch.columns.totalAudience' | transloco }}</span>
+                    {{ audience(row.artist.totalAudience) }}
+                  </span>
+                  <span class="aud-row__muted" role="cell">
+                    <span class="aud-row__label">{{ 'audienceSearch.columns.largestPlatform' | transloco }}</span>
+                    @if (row.artist.largestPlatform) {
+                      <span class="aud-dot" [style.background]="platformColor(row.artist.largestPlatform)" aria-hidden="true"></span>
+                    }
+                    {{ platformLabel(row.artist.largestPlatform) }}
+                  </span>
+                  <span class="aud-row__muted" role="cell">
+                    <span class="aud-row__label">{{ 'audienceSearch.columns.availableTracks' | transloco }}</span>
+                    {{ plural('audienceSearch.trackCount', row.tracks.length) }}
+                  </span>
+                  <span class="aud-row__action" role="cell">
+                    <button type="button" class="aud-btn aud-btn--view" (click)="viewArtistTracks(row)">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                      {{ 'audienceSearch.viewTracks' | transloco }}
+                    </button>
+                  </span>
+                </div>
+              }
+            </div>
+          } @else {
+            <!-- A3a / A3b: tracks, each with Preview and Save to… -->
+            <div class="aud-table aud-table--tracks" role="table">
+              <div class="aud-table__head" role="row">
+                <span role="columnheader"></span>
+                <span role="columnheader">{{ 'audienceSearch.columns.trackArtist' | transloco }}</span>
+                <span role="columnheader">{{ 'audienceSearch.columns.origin' | transloco }}</span>
+                <span role="columnheader">{{ 'audienceSearch.columns.totalAudience' | transloco }}</span>
+                <span role="columnheader">{{ 'audienceSearch.columns.spotifyStreams' | transloco }}</span>
+                <span role="columnheader">{{ 'audienceSearch.columns.useSave' | transloco }}</span>
+                <span role="columnheader"></span>
+              </div>
+
+              @for (track of pagedTracks; track track.uuid) {
+                <div class="aud-row" role="row" tabindex="0" [attr.data-track-uuid]="track.uuid"
+                     [class.aud-row--selected]="selectedTrack?.uuid === track.uuid"
+                     (click)="openTrack(track)"
+                     (keydown.enter)="openTrack(track)">
+                  <span class="aud-row__play" role="cell">
+                    <button type="button" class="aud-play" [ngClass]="'aud-play--' + tierClass(track)"
+                            [disabled]="!canPreview(track)" [attr.aria-busy]="isLoading(track)"
+                            [attr.aria-label]="(isPlaying(track) ? 'audienceSearch.pause' : 'audienceSearch.play') | transloco"
+                            [title]="canPreview(track) ? '' : ((previewFailed(track) ? 'audienceSearch.previewFailed' : 'audienceSearch.previewUnavailable') | transloco)"
+                            (click)="togglePreview(track, $event)">
+                      @if (isLoading(track)) {<span class="aud-play__spinner" aria-hidden="true"></span>} @else if (isPlaying(track)) {
+                        <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+                      } @else {
+                        <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+                      }
+                    </button>
+                  </span>
+                  <span class="aud-row__identity aud-row__identity--cover" role="cell">
+                    <img class="aud-cover" [src]="track.coverUrl || coverFallback" alt="" loading="lazy" (error)="onCoverError($event)" />
+                    <span class="aud-row__names">
+                      <span class="aud-row__title">{{ track.name || '–' }}</span>
+                      <span class="aud-row__sub">{{ track.artist?.name || ('audienceSearch.unknownArtist' | transloco) }}</span>
+                    </span>
+                  </span>
+                  <span class="aud-row__muted aud-row__origin" role="cell">
+                    <span class="aud-row__label">{{ 'audienceSearch.columns.origin' | transloco }}</span>
+                    {{ origin(track) }}
+                  </span>
+                  <span class="aud-row__strong aud-row__audience" role="cell">
+                    <span class="aud-row__label">{{ 'audienceSearch.columns.totalAudience' | transloco }}</span>
+                    {{ audience(track.artist?.totalAudience) }}
+                  </span>
+                  <span class="aud-row__muted aud-row__streams" role="cell">
+                    <span class="aud-row__label">{{ 'audienceSearch.columns.spotifyStreams' | transloco }}</span>
+                    {{ audience(track.spotifyStreams) }}
+                  </span>
+                  <span class="aud-row__use" role="cell">
+                    <span class="aud-tier" [ngClass]="'aud-tier--' + tierClass(track)">{{ track.tier }}</span>
+                    <!-- D2: the ECU tag only when it is available; otherwise no tag. -->
+                    @if (track.extendedCommercialUse) {
+                      <span class="aud-ecu-badge" [title]="'audienceSearch.ecuAvailable' | transloco">{{ 'audienceSearch.ecuTag' | transloco }}</span>
+                    }
+                  </span>
+                  <span class="aud-row__action aud-row__action--pair" role="cell">
+                    <button type="button" class="aud-btn aud-btn--strong" (click)="viewTrack(track, $event)">
+                      {{ 'audienceSearch.viewTrack' | transloco }}
+                    </button>
+                    <button type="button" class="aud-save" [class.aud-save--saved]="isSaved(track)" (click)="saveTrack(track, $event)">
+                      @if (isSaved(track)) {
+                        <img src="assets/images/icons/audience-search/saved-check.svg" width="16" height="16" alt="" />
+                        {{ 'saveTo.savedTo' | transloco }}
+                      } @else {
+                        {{ 'saveTo.saveTo' | transloco }}
+                      }
+                    </button>
+                  </span>
+                </div>
+              }
+            </div>
+          }
+
+          @if (resultCount > 0) {
+            <div class="aud-footer">
+              <div class="aud-footer__summary">
+                @if (view === 'artistTracks' && focusRow; as row) {
+                  <span>{{ plural('audienceSearch.tracksByArtist', row.tracks.length, { artist: row.artist.name }) }}</span>
+                } @else {
+                  <span>{{ (view === 'tracks' ? 'audienceSearch.showingTracks' : 'audienceSearch.showingArtists') | transloco: { from: pageStart + 1, to: pageEnd, total: resultCount } }}</span>
+                }
+                @if (pageCount > 1) {
+                  <nav class="aud-pager" [attr.aria-label]="'audienceSearch.pagination' | transloco">
+                    <button type="button" class="aud-pager__link" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">{{ 'audienceSearch.previous' | transloco }}</button>
+                    @for (p of pages; track $index) {
+                      @if (p === null) {
+                        <span class="aud-pager__gap">…</span>
+                      } @else {
+                        <button type="button" class="aud-pager__link"
+                                [class.aud-pager__link--active]="p === currentPage"
+                                [attr.aria-current]="p === currentPage ? 'page' : null"
+                                (click)="goToPage(p)">{{ p }}</button>
+                      }
+                    }
+                    <button type="button" class="aud-pager__link" [disabled]="currentPage === pageCount" (click)="goToPage(currentPage + 1)">{{ 'audienceSearch.next' | transloco }}</button>
+                  </nav>
+                }
+              </div>
+              <p class="aud-note">
+                @switch (view) {
+                  @case ('artistTracks') { {{ 'audienceSearch.artistTracksNote' | transloco }} }
+                  @case ('tracks') { {{ 'audienceSearch.tracksNote' | transloco }} }
+                  @default { {{ 'audienceSearch.artistsNote' | transloco }} }
+                }
+              </p>
+            </div>
+          }
+        }
+      }
+    }
+  </section>
+
+  <!-- Persistent player -->
+  @if (playerTrack && view !== 'landing') {
+    <div class="aud-player">
+      <button type="button" class="aud-play" [ngClass]="'aud-play--' + tierClass(playerTrack)"
+              [disabled]="!canPreview(playerTrack)" [attr.aria-busy]="isLoading(playerTrack)"
+              [attr.aria-label]="(isPlaying(playerTrack) ? 'audienceSearch.pause' : 'audienceSearch.play') | transloco"
+              (click)="togglePreview(playerTrack)">
+        @if (isLoading(playerTrack)) {<span class="aud-play__spinner" aria-hidden="true"></span>} @else if (isPlaying(playerTrack)) {
+          <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+        } @else {
+          <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+        }
+      </button>
+      <div class="aud-player__track">
+        <span class="aud-row__title">{{ playerTrack.name }}</span>
+        <span class="aud-row__sub">{{ playerTrack.artist?.name || ('audienceSearch.unknownArtist' | transloco) }}</span>
+      </div>
+      <span class="aud-player__time">{{ formatTime(isLoaded(playerTrack) ? currentTime() : 0) }}</span>
+      <div class="aud-timeline"><div class="aud-timeline__value" [style.width.%]="isLoaded(playerTrack) ? playerProgress : 0"></div></div>
+      @if (previewFailed(playerTrack)) {
+        <!-- D2: say what happened and offer the next step; saving stays available. -->
+        <span class="aud-player__status aud-player__status--error" role="status">{{ 'audienceSearch.previewFailed' | transloco }}</span>
+        <button type="button" class="aud-btn aud-btn--strong" (click)="retryPreview(playerTrack)">{{ 'audienceSearch.retryPreview' | transloco }}</button>
+      } @else {
+        <span class="aud-player__status">{{ (isLoading(playerTrack) ? 'audienceSearch.loadingPreview' : canPreview(playerTrack) ? 'audienceSearch.preview' : 'audienceSearch.previewUnavailable') | transloco }}</span>
+      }
+      <button type="button" class="aud-btn aud-btn--view" (click)="viewTrack(playerTrack)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+        {{ 'audienceSearch.viewTrack' | transloco }}
+      </button>
+    </div>
+  }
+</div>
+
+<!-- Track panel: side drawer on desktop, full screen on phones -->
+@if (selectedTrack; as track) {
+  <div class="aud-drawer-backdrop" (click)="closeTrack()"></div>
+  <aside class="aud-drawer" role="dialog" aria-modal="true" [attr.aria-label]="track.name">
+    <div class="aud-drawer__head">
+      <button type="button" class="aud-drawer__back" (click)="closeTrack()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {{ 'acquerSidenav.audienceSearch' | transloco }}
+      </button>
+      <div class="aud-drawer__titles">
+        <span class="aud-drawer__title">{{ track.name }}</span>
+        <span class="aud-drawer__sub">{{ track.artist?.name || ('audienceSearch.unknownArtist' | transloco) }} · {{ origin(track) }}</span>
+      </div>
+      <button type="button" class="aud-drawer__close" (click)="closeTrack()" [attr.aria-label]="'audienceSearch.close' | transloco">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="aud-drawer__body">
+      <div class="aud-drawer__preview">
+        <button type="button" class="aud-play aud-play--lg" [ngClass]="'aud-play--' + tierClass(track)"
+                [disabled]="!canPreview(track)" [attr.aria-busy]="isLoading(track)"
+                [attr.aria-label]="(isPlaying(track) ? 'audienceSearch.pause' : 'audienceSearch.play') | transloco"
+                (click)="togglePreview(track)">
+          @if (isLoading(track)) {<span class="aud-play__spinner" aria-hidden="true"></span>} @else if (isPlaying(track)) {
+            <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.8" fill="currentColor"/></svg>
+          } @else {
+            <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 1.5L12 7L2.5 12.5V1.5Z" fill="currentColor"/></svg>
+          }
+        </button>
+        @if (previewFailed(track)) {
+          <span class="aud-drawer__preview-label">{{ 'audienceSearch.previewFailed' | transloco }}</span>
+          <button type="button" class="aud-btn aud-btn--strong" (click)="retryPreview(track)">{{ 'audienceSearch.retryPreview' | transloco }}</button>
+        } @else {
+          <span class="aud-drawer__preview-label">{{ (isLoading(track) ? 'audienceSearch.loadingPreview' : canPreview(track) ? 'audienceSearch.previewTrack' : 'audienceSearch.previewUnavailable') | transloco }}</span>
+        }
+        <button type="button" class="aud-save aud-drawer__save" [class.aud-save--saved]="isSaved(track)" (click)="saveTrack(track)">
+          @if (isSaved(track)) {
+            <img src="assets/images/icons/audience-search/saved-check.svg" width="16" height="16" alt="" />
+            {{ 'saveTo.savedTo' | transloco }}
+          } @else {
+            {{ 'saveTo.saveTo' | transloco }}
+          }
+        </button>
+      </div>
+
+      <hr class="aud-divider" />
+
+      <!-- Audience composition: the artist's four platform counts as one pie -->
+      @if (composition(track); as comp) {
+        <section class="aud-composition">
+          <h3 class="aud-composition__title">{{ 'audienceSearch.panel.artistAudience' | transloco: { artist: track.artist?.name || ('audienceSearch.unknownArtist' | transloco) } }}</h3>
+          <div class="aud-composition__total">
+            <strong [class.aud-metric__value--na]="comp.total === null">{{ audience(comp.total, 2) }}</strong>
+            <span>{{ 'audienceSearch.columns.totalAudience' | transloco }}</span>
+          </div>
+          <div class="aud-composition__body">
+            @if (comp.complete) {
+              <svg class="aud-composition__pie" width="148" height="148" viewBox="0 0 148 148" role="img"
+                   [attr.aria-label]="'audienceSearch.panel.pieLabel' | transloco: { total: audience(comp.total, 2) }">
+                @for (slice of comp.slices; track slice.key) {
+                  @if (slice.path) {
+                    <path [attr.d]="slice.path" [attr.fill]="slice.color" stroke="#171717" stroke-width="1" />
+                  }
+                }
+              </svg>
+            }
+            <ul class="aud-composition__legend">
+              @for (slice of comp.slices; track slice.key) {
+                <li class="aud-composition__item">
+                  <span class="aud-composition__dot" [style.background]="slice.value === null ? 'transparent' : slice.color"
+                        [class.aud-composition__dot--na]="slice.value === null" aria-hidden="true"></span>
+                  <span class="aud-composition__label">
+                    <strong>{{ slice.label }}</strong>
+                    <span>
+                      @if (slice.value !== null) {
+                        {{ audience(slice.value, 2) }}@if (slice.share !== null) { · {{ slice.share | number:'1.1-1' }}% }
+                      } @else {
+                        {{ 'audienceSearch.unavailable' | transloco }}
+                      }
+                    </span>
+                  </span>
+                </li>
+              }
+            </ul>
+          </div>
+          <p class="aud-composition__note">
+            {{ (comp.complete ? 'audienceSearch.panel.compositionNote' : 'audienceSearch.panel.compositionIncomplete') | transloco }}
+          </p>
+        </section>
+      }
+
+      <div class="aud-metric aud-metric--wide">
+        <span class="aud-metric__label">{{ 'audienceSearch.columns.spotifyStreams' | transloco }}</span>
+        <span class="aud-metric__value" [class.aud-metric__value--na]="track.spotifyStreams === null">{{ audience(track.spotifyStreams) }}</span>
+      </div>
+
+      <span class="aud-drawer__overline">{{ 'audienceSearch.panel.country' | transloco }}</span>
+      <strong class="aud-drawer__origin">{{ origin(track) }}</strong>
+      <p class="aud-drawer__note">{{ 'audienceSearch.panel.artistCountry' | transloco: { artist: track.artist?.name || ('audienceSearch.unknownArtist' | transloco) } }}</p>
+
+      <hr class="aud-divider" />
+
+      <div class="aud-use">
+        <h3 class="aud-use__title">{{ 'audienceSearch.use.title' | transloco }}</h3>
+        <span class="aud-tier aud-tier--lg" [ngClass]="'aud-tier--' + tierClass(track)">{{ track.tier }}</span>
+        <p class="aud-use__lede">{{ 'audienceSearch.use.lede' | transloco }}</p>
+        <div class="aud-use__ecu">
+          @if (track.extendedCommercialUse) {
+            <strong>{{ 'audienceSearch.use.ecuName' | transloco }}</strong>
+            <span class="aud-use__ecu-sub">{{ 'audienceSearch.use.paidAds' | transloco }}</span>
+            <span>{{ 'audienceSearch.use.ecuPanelBody' | transloco }}</span>
+          } @else {
+            <strong>{{ 'audienceSearch.use.checkAdUse' | transloco }}</strong>
+            <span class="aud-use__ecu-sub">{{ 'audienceSearch.use.paidAds' | transloco }}</span>
+            <span>{{ 'audienceSearch.use.checkAdUseBody' | transloco }}</span>
+          }
+        </div>
+        <button type="button" class="aud-license" [disabled]="licensingUuid === track.uuid || !track.isrc" (click)="licenseTrack(track)">
+          {{ (licensingUuid === track.uuid ? 'audienceSearch.use.opening' : 'audienceSearch.use.license') | transloco }}
+        </button>
+        @if (licenseError) {
+          <p class="aud-use__error" role="alert">{{ 'audienceSearch.use.licenseError' | transloco }}</p>
+        }
+        <p class="aud-use__note">{{ 'audienceSearch.use.panelNote' | transloco }}</p>
+      </div>
+    </div>
+  </aside>
+}

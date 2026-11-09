@@ -1,0 +1,23 @@
+@use '../../../../../styles/custom/dialog' as *;
+@use '../save-to.shared' as *;
+
+.dlg-backdrop--top { z-index: 1020; }
+
+.confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.confirm-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: $dlg-list;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+
+  li::before { content: '• '; }
+}

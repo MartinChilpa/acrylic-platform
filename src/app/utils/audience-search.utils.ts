@@ -1,20 +1,20 @@
 import {
-  PerformanceArtist,
-  PerformancePlatform,
-  PerformanceTrack,
-} from '../interfaces/response/performance.response';
+  AudienceSearchArtist,
+  AudienceSearchPlatform,
+  AudienceSearchTrack,
+} from '../interfaces/response/audience-search.response';
 
-export const PERFORMANCE_PLATFORMS: { key: PerformancePlatform; label: string; color: string }[] = [
+export const AUDIENCE_SEARCH_PLATFORMS: { key: AudienceSearchPlatform; label: string; color: string }[] = [
   { key: 'tiktok', label: 'TikTok', color: '#25F4EE' },
   { key: 'instagram', label: 'Instagram', color: '#E1306C' },
   { key: 'youtube', label: 'YouTube', color: '#FF0033' },
   { key: 'spotify', label: 'Spotify', color: '#1ED760' },
 ];
 
-/* ─────────── Audience composition (Figma: Performance / Audience composition / V1) ─────────── */
+/* ─────────── Audience composition (Figma: AudienceSearch / Audience composition / V1) ─────────── */
 
 /** Pie order (clockwise from 12 o'clock) and slice colors from the design. */
-const COMPOSITION_SLICES: { key: PerformancePlatform; label: string; color: string }[] = [
+const COMPOSITION_SLICES: { key: AudienceSearchPlatform; label: string; color: string }[] = [
   { key: 'spotify', label: 'Spotify', color: '#E79888' },
   { key: 'instagram', label: 'Instagram', color: '#8DC4C2' },
   { key: 'youtube', label: 'YouTube', color: '#FFCC8F' },
@@ -22,7 +22,7 @@ const COMPOSITION_SLICES: { key: PerformancePlatform; label: string; color: stri
 ];
 
 export interface CompositionSlice {
-  key: PerformancePlatform;
+  key: AudienceSearchPlatform;
   label: string;
   color: string;
   /** Null when the platform has no count. */
@@ -48,7 +48,7 @@ export interface AudienceComposition {
  * largest-remainder rounding so they add up to exactly 100%. These are
  * follower counts, not track streams or unique people.
  */
-export function audienceComposition(artist: PerformanceArtist | null | undefined): AudienceComposition {
+export function audienceComposition(artist: AudienceSearchArtist | null | undefined): AudienceComposition {
   const values = COMPOSITION_SLICES.map(s => artist?.audience[s.key] ?? null);
   const known = values.filter((v): v is number => v !== null && v > 0);
   const total = known.length ? known.reduce((a, b) => a + b, 0) : null;
@@ -114,26 +114,30 @@ export type EcuFilter = 'any' | 'available';
  */
 export type SocialFilter = '' | 'instagram' | 'tiktok';
 export const SOCIAL_PLATFORMS: Exclude<SocialFilter, ''>[] = ['instagram', 'tiktok'];
-export type PerformanceSort = 'audience' | 'name';
+/** audience: biggest first; audienceAsc: smallest first (unknown audiences always last). */
+export type AudienceSearchSort = 'audience' | 'audienceAsc' | 'name';
 
-export interface PerformanceFilters {
+export interface AudienceSearchFilters {
   origin: string;           // ISO code, or '' for all
-  platform: PerformancePlatform | '';
+  platform: AudienceSearchPlatform | '';
   size: AudienceSize;
   ecu: EcuFilter;
   social: SocialFilter;
+  /** Only Artist Promo tracks (the "ArtistPromo only" toggle). */
+  artistPromoOnly: boolean;
 }
 
-export const DEFAULT_PERFORMANCE_FILTERS: PerformanceFilters = {
+export const DEFAULT_AUDIENCE_SEARCH_FILTERS: AudienceSearchFilters = {
   origin: '',
   platform: '',
   size: 'any',
   ecu: 'any',
   social: '',
+  artistPromoOnly: false,
 };
 
 /** Most followers on the platform first; artists without the count are filtered out before. */
-export function sortBySocial(tracks: PerformanceTrack[], platform: Exclude<SocialFilter, ''>): PerformanceTrack[] {
+export function sortBySocial(tracks: AudienceSearchTrack[], platform: Exclude<SocialFilter, ''>): AudienceSearchTrack[] {
   return [...tracks].sort((a, b) =>
     (b.artist?.audience[platform] ?? -1) - (a.artist?.audience[platform] ?? -1)
     || (a.artist?.name ?? '').localeCompare(b.artist?.name ?? '')
@@ -141,9 +145,9 @@ export function sortBySocial(tracks: PerformanceTrack[], platform: Exclude<Socia
 }
 
 /** One artist with the tracks of theirs that survived the filters. */
-export interface PerformanceArtistRow {
-  artist: PerformanceArtist;
-  tracks: PerformanceTrack[];
+export interface AudienceSearchArtistRow {
+  artist: AudienceSearchArtist;
+  tracks: AudienceSearchTrack[];
 }
 
 /**
@@ -176,12 +180,13 @@ export function countryName(code: string | null | undefined, lang: string): stri
   }
 }
 
-export function matchesPerformanceFilters(track: PerformanceTrack, filters: PerformanceFilters): boolean {
+export function matchesAudienceSearchFilters(track: AudienceSearchTrack, filters: AudienceSearchFilters): boolean {
   const artist = track.artist;
   if (filters.origin && artist?.countryCode !== filters.origin) { return false; }
   if (filters.platform && !(artist?.audience[filters.platform])) { return false; }
   if (filters.social && !(artist?.audience[filters.social])) { return false; }
   if (filters.ecu === 'available' && !track.extendedCommercialUse) { return false; }
+  if (filters.artistPromoOnly && track.tier !== 'Artist Promo') { return false; }
   if (filters.size !== 'any') {
     const total = artist?.totalAudience;
     if (total === null || total === undefined) { return false; }
@@ -193,18 +198,26 @@ export function matchesPerformanceFilters(track: PerformanceTrack, filters: Perf
 }
 
 /** Biggest audience first; unknown audiences sink to the bottom. */
-export function sortPerformanceTracks(tracks: PerformanceTrack[], sort: PerformanceSort): PerformanceTrack[] {
+export function sortAudienceSearchTracks(tracks: AudienceSearchTrack[], sort: AudienceSearchSort): AudienceSearchTrack[] {
   const copy = [...tracks];
   if (sort === 'name') {
     return copy.sort((a, b) => a.name.localeCompare(b.name));
   }
+  const direction = sort === 'audienceAsc' ? -1 : 1;
   return copy.sort((a, b) =>
-    (b.artist?.totalAudience ?? -1) - (a.artist?.totalAudience ?? -1) || a.name.localeCompare(b.name));
+    compareAudience(a.artist?.totalAudience, b.artist?.totalAudience, direction) || a.name.localeCompare(b.name));
+}
+
+/** Biggest first (direction 1) or smallest first (-1); unknown audiences always last. */
+function compareAudience(a: number | null | undefined, b: number | null | undefined, direction: 1 | -1): number {
+  const known = (v: number | null | undefined): v is number => v !== null && v !== undefined;
+  if (!known(a) || !known(b)) { return (known(a) ? 0 : 1) - (known(b) ? 0 : 1); }
+  return (b - a) * direction;
 }
 
 /** `keepOrder` keeps artists in the order their tracks arrive (a search ranking). */
-export function groupTracksByArtist(tracks: PerformanceTrack[], sort: PerformanceSort, keepOrder = false): PerformanceArtistRow[] {
-  const rows = new Map<string, PerformanceArtistRow>();
+export function groupTracksByArtist(tracks: AudienceSearchTrack[], sort: AudienceSearchSort, keepOrder = false): AudienceSearchArtistRow[] {
+  const rows = new Map<string, AudienceSearchArtistRow>();
   for (const track of tracks) {
     if (!track.artist) { continue; }
     const row = rows.get(track.artist.uuid) ?? { artist: track.artist, tracks: [] };
@@ -216,8 +229,9 @@ export function groupTracksByArtist(tracks: PerformanceTrack[], sort: Performanc
   if (sort === 'name') {
     return list.sort((a, b) => a.artist.name.localeCompare(b.artist.name));
   }
+  const direction = sort === 'audienceAsc' ? -1 : 1;
   return list.sort((a, b) =>
-    (b.artist.totalAudience ?? -1) - (a.artist.totalAudience ?? -1) || a.artist.name.localeCompare(b.artist.name));
+    compareAudience(a.artist.totalAudience, b.artist.totalAudience, direction) || a.artist.name.localeCompare(b.artist.name));
 }
 
 /**

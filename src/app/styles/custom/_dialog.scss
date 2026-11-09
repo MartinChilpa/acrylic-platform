@@ -1,0 +1,214 @@
+// Dialogs, toasts and their controls (Figma: Acrylic Design System, Save to… flow A4–E).
+// One place for these values; components @use this file instead of repeating them.
+
+$dlg-font: 'Glacial Indifference', sans-serif;
+$dlg-backdrop: rgba(0, 0, 0, 0.72);
+$dlg-surface: #393939;
+$dlg-border: #525252;
+$dlg-text: #FFFFFF;
+$dlg-muted: #BABABA;
+$dlg-label: #D1D1D1;
+$dlg-field-bg: #202020;
+$dlg-field-border: #808080;
+$dlg-check-bg: #141414;
+$dlg-check-border: #BABABA;
+$dlg-summary-bg: #1F1F1F;
+$dlg-accent: #54ABFF;
+$dlg-overline: #C3B1CC;
+$dlg-list: #B2D1F5;
+$dlg-error: #FF9C91;
+$dlg-btn-dark: #141414;
+$dlg-btn-mid: #404040;
+$dlg-btn-mid-border: #A6A6A6;
+$dlg-btn-outline: #BFBFBF;
+$dlg-disabled-opacity: 0.42;
+$dlg-bp-phone: 640px;
+
+@mixin dlg-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: $dlg-backdrop;
+}
+
+@mixin dlg-panel($width: 640px) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: min(#{$width}, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 48px 32px 32px;
+  border: 1px solid $dlg-border;
+  border-radius: 14px;
+  background: $dlg-surface;
+  color: $dlg-text;
+  font-family: $dlg-font;
+
+  @media (max-width: $dlg-bp-phone) { padding: 48px 20px 24px; }
+}
+
+@mixin dlg-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+@mixin dlg-close {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+
+  &:focus-visible { outline: 2px solid $dlg-accent; }
+}
+
+@mixin dlg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid $dlg-border;
+  border-radius: 8px;
+  background: $dlg-btn-dark;
+  color: $dlg-text;
+  font-family: $dlg-font;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter 0.15s, opacity 0.15s;
+
+  &:hover:not(:disabled) { filter: brightness(1.2); }
+  &:focus-visible { outline: 2px solid $dlg-accent; outline-offset: 2px; }
+  &:disabled { opacity: $dlg-disabled-opacity; cursor: not-allowed; }
+}
+
+@mixin dlg-btn-primary {
+  @include dlg-btn;
+  border-color: #FFFFFF;
+  background: #FFFFFF;
+  color: #000000;
+
+  &:hover:not(:disabled) { filter: brightness(0.9); }
+}
+
+@mixin dlg-btn-secondary {
+  @include dlg-btn;
+  border-color: $dlg-btn-mid-border;
+  background: $dlg-btn-mid;
+}
+
+@mixin dlg-btn-ghost {
+  @include dlg-btn;
+  border-color: transparent;
+  background: transparent;
+}
+
+// "+ Create new project", "Save to…": 1.5px light outline.
+@mixin dlg-btn-outline {
+  @include dlg-btn;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid $dlg-btn-outline;
+}
+
+@mixin dlg-field {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid $dlg-field-border;
+  border-radius: 8px;
+  background: $dlg-field-bg;
+  color: $dlg-text;
+  font-family: $dlg-font;
+  font-size: 16px;
+  line-height: 1.3;
+  box-sizing: border-box;
+
+  &::placeholder { color: $dlg-muted; }
+  &:focus { outline: none; border-color: $dlg-accent; }
+  &[aria-invalid='true'] { border-color: $dlg-error; }
+}
+
+@mixin dlg-label {
+  display: block;
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+@mixin dlg-error {
+  margin: 0;
+  color: $dlg-error;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+// Checkbox row: 22px box, selected state is white with a black check (spec SVG).
+@mixin dlg-check-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 17px;
+  line-height: 1.3;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  &:hover { background: rgba(255, 255, 255, 0.04); }
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+
+  .dlg-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    border: 1px solid $dlg-check-border;
+    border-radius: 4px;
+    background: $dlg-check-bg;
+    box-sizing: border-box;
+
+    svg { display: none; }
+  }
+
+  input:checked + .dlg-check {
+    border-color: #FFFFFF;
+    background: #FFFFFF;
+
+    svg { display: block; }
+  }
+
+  input:focus-visible + .dlg-check { outline: 2px solid $dlg-accent; outline-offset: 2px; }
+
+  input:disabled + .dlg-check { cursor: not-allowed; }
+}

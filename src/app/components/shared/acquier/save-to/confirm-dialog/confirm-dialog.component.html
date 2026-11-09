@@ -1,0 +1,36 @@
+<div class="dlg-backdrop dlg-backdrop--top" (click)="choose(null)">
+  <div class="dlg" role="alertdialog" aria-modal="true" [attr.aria-labelledby]="titleId"
+       [attr.aria-describedby]="titleId + '-body'" (click)="$event.stopPropagation()">
+    <button type="button" class="dlg__close" (click)="choose(null)" [attr.aria-label]="'saveTo.close' | transloco">
+      <img src="assets/images/icons/audience-search/close-dialog.svg" width="32" height="32" alt="" />
+    </button>
+
+    <h2 class="dlg__title" [id]="titleId">{{ request.title }}</h2>
+
+    <div class="confirm-body" [id]="titleId + '-body'">
+      @if (request.body) {
+        <p class="dlg__lede">{{ request.body }}</p>
+      }
+      @if (request.items?.length) {
+        <ul class="confirm-list">
+          @for (item of request.items; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      }
+      @if (request.note) {
+        <p class="dlg__lede">{{ request.note }}</p>
+      }
+    </div>
+
+    <div class="dlg__actions dlg__actions--split">
+      <button #cancelButton type="button" class="dlg-btn-ghost" (click)="choose(null)">{{ request.cancelLabel }}</button>
+      <div class="dlg__action-group">
+        @if (request.secondaryLabel) {
+          <button type="button" class="dlg-btn-secondary" (click)="choose('secondary')">{{ request.secondaryLabel }}</button>
+        }
+        <button type="button" class="dlg-btn-primary" (click)="choose('confirm')">{{ request.confirmLabel }}</button>
+      </div>
+    </div>
+  </div>
+</div>
