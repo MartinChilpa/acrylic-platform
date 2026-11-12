@@ -5,7 +5,7 @@ import { DestinationsMode, ITrackDestinations } from '../interfaces/response/pro
  * bulk:   several tracks, starts empty, "Add N tracks"; never removes (C1).
  * edit:   one track, starts on its current destinations, "Save changes" (C2).
  */
-export type SavePickerMode = 'single' | 'bulk' | 'edit';
+export type SavePickerMode = 'single' | 'bulk' | 'edit' | 'project';
 
 export interface PickerSelection {
   saved: boolean;

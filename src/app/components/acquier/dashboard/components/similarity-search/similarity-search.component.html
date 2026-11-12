@@ -317,8 +317,11 @@
                 </audio>
 
                   <div class="button-section">
-                    <!-- E: the heart is the one save control; its menu opens Add to projects. -->
-<acrylic-save-heart [track]="saveRef(seed)" [saved]="favoriteTrackIds.has(getTrackId(seed))" (opened)="onHeartOpened(seed)"></acrylic-save-heart>
+                    <acrylic-save-heart [track]="saveRef(seed)" [saved]="favoriteTrackIds.has(getTrackId(seed))"></acrylic-save-heart>
+                    <button type="button" class="btn-section-action btn-section-action--project" aria-label="Add track to project"
+                      (click)="addTrackToProject(seed, $event)">
+                      <span class="btn-section-action__plus" aria-hidden="true">+</span>
+                    </button>
                     <button
                       type="button"
                       class="btn-section-action"
@@ -673,8 +676,11 @@
               </audio>
 
                 <div class="button-section">
-                  <!-- E: the heart is the one save control; its menu opens Add to projects. -->
-<acrylic-save-heart [track]="saveRef(result)" [saved]="favoriteTrackIds.has(getTrackId(result))" (opened)="onHeartOpened(result)"></acrylic-save-heart>
+                  <acrylic-save-heart [track]="saveRef(result)" [saved]="favoriteTrackIds.has(getTrackId(result))"></acrylic-save-heart>
+                  <button type="button" class="btn-section-action btn-section-action--project" aria-label="Add track to project"
+                    (click)="addTrackToProject(result, $event)">
+                    <span class="btn-section-action__plus" aria-hidden="true">+</span>
+                  </button>
                   <button
                     type="button"
                     class="btn-section-action"
