@@ -27,6 +27,8 @@ export interface ILicenseResult {
 
 /** A track inside a project (backend: ClubProjectTrackSerializer). */
 export interface IProjectTrack {
+  /** UUID of the association between the project and the track. */
+  uuid?: string;
   track_uuid: string;
   isrc: string;
   track_name: string;
@@ -44,6 +46,7 @@ export interface IProjectResult {
   track_count?: number;
   tracks: IProjectTrack[];
   created: string;
+  updated?: string;
 }
 
 /** Where a club keeps one track: Saved tracks and any number of projects. */

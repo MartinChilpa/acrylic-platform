@@ -21,7 +21,7 @@ import { LicenseService } from '../../../../../services/license.service';
 import { formatTierPrice, getPreClearTrackPrice, isPreClearTrack } from '../../../../../utils/license-tier.utils';
 import { SpotifyService } from '../../../../../services/spotify.service';
 import { ISpotifySearchResult } from '../../../../../interfaces/response/spotify.response';
-import { SaveTrackRef } from '../../../../../services/save-to.service';
+import { SaveToService, SaveTrackRef } from '../../../../../services/save-to.service';
 import { SaveHeartComponent } from '../../../../shared/acquier/save-to/save-heart/save-heart.component';
 import { formatInteger, formatUsd, formatUsdCents } from '../../../../../utils/number-format.utils';
 
@@ -67,6 +67,7 @@ export class SimilaritySearchComponent implements OnInit {
   private teamPlayersService = inject(TeamPlayersService);
   private brandingService = inject(TeamBrandingService);
   private projectsService = inject(ProjectsService);
+  private saveTo = inject(SaveToService);
   private licenseService = inject(LicenseService);
   private transloco = inject(TranslocoService);
   private spotifyService = inject(SpotifyService);
@@ -400,6 +401,11 @@ export class SimilaritySearchComponent implements OnInit {
     return ref;
   }
   private saveRefs = new WeakMap<object, SaveTrackRef>();
+
+  addTrackToProject(result: any, event: Event): void {
+    event.stopPropagation();
+    this.saveTo.openProjectPicker(this.saveRef(result));
+  }
 
   onHeartOpened(result: any): void {
     this.trackResultInteraction(result, 'favorite');

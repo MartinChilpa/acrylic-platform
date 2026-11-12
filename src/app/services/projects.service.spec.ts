@@ -101,4 +101,63 @@ describe('ProjectsService', () => {
 
     expect(setItem).not.toHaveBeenCalled();
   });
+
+  it('creates a project with its name and description', () => {
+    service.createProject('Matchday playlist', 'Tracks para partidos en casa').subscribe();
+
+    const request = http.expectOne('/api/v1/my-club/projects/');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({
+      name: 'Matchday playlist',
+      description: 'Tracks para partidos en casa',
+    });
+    request.flush({
+      uuid: 'project-uuid',
+      name: 'Matchday playlist',
+      description: 'Tracks para partidos en casa',
+      track_count: 0,
+      tracks: [],
+      created: '2026-11-11T00:00:00Z',
+      updated: '2026-11-11T00:00:00Z',
+    });
+  });
+
+  it('lists projects and normalizes their nested saved tracks', () => {
+    let projects: any[] = [];
+    service.projects$.subscribe(value => { projects = value; });
+
+    service.loadProjects();
+    const request = http.expectOne('/api/v1/my-club/projects/');
+    expect(request.request.method).toBe('GET');
+    request.flush({
+      count: 1,
+      results: [{
+        uuid: 'project-uuid',
+        name: 'Matchday playlist',
+        description: 'Tracks para partidos en casa',
+        track_count: 1,
+        tracks: [{
+          uuid: 'project-track-uuid',
+          track: { track_uuid: 'saved-track-uuid', track_name: 'Nombre del track' },
+          created: '2026-11-11T00:00:00Z',
+        }],
+        created: '2026-11-11T00:00:00Z',
+        updated: '2026-11-11T00:00:00Z',
+      }],
+    });
+
+    expect(projects[0].tracks[0].track_uuid).toBe('saved-track-uuid');
+    expect(projects[0].tracks[0].track_name).toBe('Nombre del track');
+  });
+
+  it('adds a saved track through the project tracks endpoint', () => {
+    service.addTrackToProject('project-uuid', 'saved-track-uuid').subscribe();
+
+    const request = http.expectOne('/api/v1/my-club/projects/project-uuid/tracks/');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ track_uuid: 'saved-track-uuid' });
+    request.flush({ uuid: 'project-track-uuid' });
+
+    http.expectOne('/api/v1/my-club/projects/').flush({ count: 0, results: [] });
+  });
 });

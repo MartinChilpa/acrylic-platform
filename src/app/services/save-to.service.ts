@@ -89,6 +89,11 @@ export class SaveToService {
     });
   }
 
+  /** Opens the existing project selector for any catalog track. */
+  openProjectPicker(track: SaveTrackRef): Promise<ITrackDestinations[] | null> {
+    return this.openPicker([track], 'project');
+  }
+
   openProjectForm(mode: 'create' | 'edit', project?: IProjectResult): Promise<IProjectResult | null> {
     this.rememberFocus();
     return new Promise(resolve => {

@@ -162,7 +162,7 @@ export class ProjectsService {
       next: (res) => {
         const list: IProjectResult[] = Array.isArray(res) ? (res as any) : (res?.results ?? []);
         this.projectsState = 'ready';
-        this.setProjects(list.map(p => ({ ...p, tracks: p.tracks ?? [] })));
+        this.setProjects(list.map(p => this.normalizeProject(p)));
       },
       error: () => { this.projectsState = 'error'; this.setProjects([...this.projects]); },
     });
@@ -170,7 +170,7 @@ export class ProjectsService {
 
   createProject(name: string, description?: string): Observable<IProjectResult> {
     return this.http.post<IProjectResult>(`${this.base}/projects/`, { name, description: description ?? '' }, { context: this.quiet() }).pipe(
-      tap(project => this.setProjects([{ ...project, tracks: project.tracks ?? [] }, ...this.projects])),
+      tap(project => this.setProjects([this.normalizeProject(project), ...this.projects])),
     );
   }
 
@@ -186,8 +186,13 @@ export class ProjectsService {
     );
   }
 
-  addTrackToProject(projectUuid: string, trackUuid: string): Observable<IProjectResult> {
-    return this.addTracksToProject(projectUuid, [trackUuid]);
+  /** Adds one catalog track to a project. */
+  addTrackToProject(projectUuid: string, trackUuid: string): Observable<unknown> {
+    return this.http.post(`${this.base}/projects/${projectUuid}/tracks/`, { track_uuid: trackUuid }, { context: this.quiet() }).pipe(
+      // This endpoint returns the project-track association, so refresh the
+      // project cache to obtain the complete project and its updated tracks.
+      tap(() => this.loadProjects()),
+    );
   }
 
   removeTrackFromProject(projectUuid: string, trackUuid: string): Observable<IProjectResult> {
@@ -257,13 +262,32 @@ export class ProjectsService {
   }
 
   private replaceProject(project: IProjectResult): void {
-    const next = { ...project, tracks: project.tracks ?? [] };
+    const next = this.normalizeProject(project);
     const exists = this.projects.some(p => p.uuid === project.uuid);
     this.setProjects(exists ? this.projects.map(p => p.uuid === project.uuid ? next : p) : [next, ...this.projects]);
   }
 
   private setProjects(projects: IProjectResult[]): void {
     this.projectsSubject.next(projects);
+  }
+
+  /** Normalizes the nested track returned by the project-list endpoint. */
+  private normalizeProject(project: IProjectResult): IProjectResult {
+    return {
+      ...project,
+      tracks: (project.tracks ?? []).map((entry: any) => {
+        const track = entry?.track ?? {};
+        return {
+          ...entry,
+          track_uuid: entry?.track_uuid ?? track?.track_uuid ?? track?.uuid ?? '',
+          isrc: entry?.isrc ?? track?.isrc ?? '',
+          track_name: entry?.track_name ?? track?.track_name ?? track?.name ?? '',
+          artist_name: entry?.artist_name ?? track?.artist_name ?? track?.artist_canonical ?? '',
+          cover_image: entry?.cover_image ?? track?.cover_image ?? track?.image_url ?? '',
+          track,
+        };
+      }),
+    };
   }
 
   private quiet(): HttpContext {

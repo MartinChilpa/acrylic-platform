@@ -1,5 +1,3 @@
-@use '../../../../../styles/custom/dialog' as *;
-
 :host {
   position: relative;
   display: inline-flex;
@@ -21,65 +19,9 @@
     transition: background 0.15s;
 
     &:hover { background: rgba(255, 255, 255, 0.25); }
-    &:focus-visible { outline: 2px solid $dlg-accent; outline-offset: 2px; }
+    &:focus-visible { outline: 2px solid #54abff; outline-offset: 2px; }
+    &:disabled { cursor: wait; opacity: 0.7; }
 
     &--sm { width: 32px; height: 32px; }
-  }
-
-  // Anchored under the heart, aligned to its right edge.
-  &__menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    z-index: 900;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 220px;
-    padding: 8px;
-    border: 1px solid $dlg-border;
-    border-radius: 10px;
-    background: $dlg-surface;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-  }
-
-  // "Added to Saved tracks" after a like.
-  &__status {
-    margin: 0;
-    padding: 4px 8px 0;
-    color: $dlg-muted;
-    font-family: $dlg-font;
-    font-size: 14px;
-    line-height: 1.3;
-  }
-
-  &__item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    background: transparent;
-    color: $dlg-text;
-    font-family: $dlg-font;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.3;
-    white-space: nowrap;
-    text-align: left;
-    cursor: pointer;
-
-    &:hover, &:focus-visible { background: rgba(255, 255, 255, 0.06); outline: none; }
-
-    // Figma E: Button / Add to projects.
-    &--primary {
-      padding: 14px 16px;
-      border-color: rgba(84, 171, 255, 0.55);
-      background: #29303B;
-
-      &:hover, &:focus-visible { background: #323B48; }
-    }
   }
 }

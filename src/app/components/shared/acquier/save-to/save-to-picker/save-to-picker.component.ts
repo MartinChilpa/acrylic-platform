@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, HostListener, Input, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { IProjectResult, ITrackDestinations } from '../../../../../interfaces/response/projects.response';
 import { ProjectsService } from '../../../../../services/projects.service';
@@ -71,6 +72,15 @@ export class SaveToPickerComponent implements OnInit, AfterViewInit {
 
   loadDestinations(): void {
     this.loadState = 'loading';
+    // Project mode directly assigns the selected track, so no destinations
+    // lookup is necessary before showing the existing project dialog.
+    if (this.mode === 'project') {
+      this.current = [];
+      this.initial = initialSelection(this.mode, null);
+      this.selection = this.initial;
+      this.loadState = 'ready';
+      return;
+    }
     this.projectsService.getDestinations(this.request.tracks.map(t => t.uuid))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -151,6 +161,23 @@ export class SaveToPickerComponent implements OnInit, AfterViewInit {
     if (!this.canSubmit) { return; }
     this.saving = true;
     this.saveFailed = false;
+
+    if (this.mode === 'project') {
+      forkJoin([...this.selection.projects].map(projectUuid =>
+        this.projectsService.addTrackToProject(projectUuid, this.firstTrack.uuid)
+      )).subscribe({
+        next: () => {
+          this.saving = false;
+          this.request.resolve([]);
+        },
+        error: () => {
+          this.saving = false;
+          this.saveFailed = true;
+        },
+      });
+      return;
+    }
+
     const { mode, items } = buildRequest(this.mode, this.tracks.map(t => t.uuid), this.selection);
     const selection = this.selection;
     const previous = this.current;
