@@ -150,22 +150,26 @@ export class ProjectsComponent implements OnInit {
       return this.favorites.map(f => ({
         key: this.key(f),
         track_uuid: f.track_uuid,
-        track_name: f.track_name,
-        artist_name: f.artist_name,
+        track_name: this.resolveTrackName(f),
+        artist_name: this.resolveArtistName(f),
         created: f.created,
-        track: f.track,
+        track: f.track ?? f,
       }));
     }
-    // A project row borrows the rich snapshot its Saved twin already has.
-    const snapshots = new Map(this.favorites.map(f => [this.key(f), f.track]));
-    return (this.selectedProject?.tracks ?? []).map(t => ({
-      key: t.track_uuid,
-      track_uuid: t.track_uuid,
-      track_name: t.track_name,
-      artist_name: t.artist_name,
-      created: t.created,
-      track: t.track ?? snapshots.get(t.track_uuid),
-    }));
+
+    const snapshots = new Map(this.favorites.map(f => [this.key(f), f.track ?? f]));
+    return (this.selectedProject?.tracks ?? []).map((t) => {
+      const snapshot = this.resolveTrackSnapshot(t, snapshots);
+      const key = this.resolveTrackKey(t, snapshot);
+      return {
+        key,
+        track_uuid: this.resolveTrackUuid(t, snapshot),
+        track_name: this.resolveTrackName(t, snapshot),
+        artist_name: this.resolveArtistName(t, snapshot),
+        created: this.resolveCreated(t, snapshot),
+        track: snapshot ?? t,
+      };
+    });
   }
 
   /** What the list shows: the view filtered by the search box and sorted. */
@@ -278,10 +282,10 @@ export class ProjectsComponent implements OnInit {
     if (result) { this.selected.clear(); }
   }
 
-  /** C2: the picker opens on the track's current destinations. */
+  /** Keep the Projects Saved to… action aligned with the project-picker flow used elsewhere. */
   editDestinations(row: LibraryRow): void {
     this.menuFor = null;
-    this.saveTo.openPicker([this.ref(row)], 'edit');
+    this.saveTo.openProjectPicker(this.ref(row));
   }
 
   /** C3: removing from Saved warns about the projects it also leaves. */
@@ -423,6 +427,42 @@ export class ProjectsComponent implements OnInit {
     };
   }
 
+  private resolveTrackKey(track: any, snapshot?: any): string {
+    const source = snapshot ?? track ?? {};
+    const key = this.projectsService.trackKey(source);
+    if (key && !key.startsWith('temp-')) { return key; }
+    return this.projectsService.trackKey(track) || (track?.track_uuid ?? source?.track_uuid ?? source?.uuid ?? '').toString();
+  }
+
+  private resolveTrackUuid(track: any, snapshot?: any): string {
+    const source = snapshot ?? track ?? {};
+    return (track?.track_uuid ?? source?.track_uuid ?? source?.uuid ?? track?.uuid ?? '').toString();
+  }
+
+  private resolveTrackName(track: any, snapshot?: any): string {
+    const source = snapshot ?? track ?? {};
+    return (track?.track_name ?? source?.track_name ?? source?.name ?? track?.name ?? '').toString();
+  }
+
+  private resolveArtistName(track: any, snapshot?: any): string {
+    const source = snapshot ?? track ?? {};
+    return (track?.artist_canonical ?? track?.artist_name ?? source?.artist_canonical ?? source?.artist_name ?? source?.artist ?? '').toString();
+  }
+
+  private resolveCreated(track: any, snapshot?: any): string {
+    const source = snapshot ?? track ?? {};
+    return (track?.created ?? source?.created ?? '').toString();
+  }
+
+  private resolveTrackSnapshot(track: any, snapshots: Map<string, any>): any {
+    const key = this.resolveTrackKey(track, track);
+    const source = track?.track && typeof track.track === 'object' ? track.track : track;
+    if (source && typeof source === 'object' && Object.keys(source).length) {
+      return snapshots.get(key) ?? source;
+    }
+    return snapshots.get(key) ?? this.favorites.find(f => this.key(f) === key) ?? track;
+  }
+
   private trackName(row: LibraryRow): string {
     const track = this.rowTrack(row);
     return (row.track_name || track?.track_name || track?.name || '').toString();
@@ -430,7 +470,7 @@ export class ProjectsComponent implements OnInit {
 
   private artistName(row: LibraryRow): string {
     const track = this.rowTrack(row);
-    return (row.artist_name || track?.artist_canonical || track?.artist_name || '').toString();
+    return (row.artist_name || track?.artist_canonical || track?.artist_name || track?.artist || '').toString();
   }
 
   private time(row: LibraryRow): number {

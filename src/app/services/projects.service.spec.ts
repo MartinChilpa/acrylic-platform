@@ -159,5 +159,6 @@ describe('ProjectsService', () => {
     request.flush({ uuid: 'project-track-uuid' });
 
     http.expectOne('/api/v1/my-club/projects/').flush({ count: 0, results: [] });
+    http.expectOne('/api/v1/my-club/favorites/').flush({ results: [] });
   });
 });

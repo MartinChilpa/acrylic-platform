@@ -206,7 +206,7 @@ export class TrackRowProjectsComponent implements OnInit, OnChanges, AfterViewIn
   }
 
   getTrackImage(track: any): string {
-    const coverImage = track?.cover_image ?? track?.image_url;
+    const coverImage = track?.cover_image ?? track?.image_url ?? track?.artwork_url ?? track?.thumbnail_url;
     if (typeof coverImage === 'string' && coverImage.trim().length > 0) {
       return coverImage;
     }
@@ -366,12 +366,12 @@ export class TrackRowProjectsComponent implements OnInit, OnChanges, AfterViewIn
   /* ---------- audio / waveform ---------- */
 
   getTrackAudioUrl(track: any): string | null {
-    const source = track?.file_wav ?? track?.audio_url ?? track?.file_mp3;
+    const source = track?.file_wav ?? track?.audio_url ?? track?.file_mp3 ?? track?.preview_url ?? track?.stream_url ?? track?.url;
     return typeof source === 'string' && source.length > 0 ? source : null;
   }
 
   getTrackWaveformUrl(track: any): string | null {
-    const source = track?.waveform ?? track?.waveform_url;
+    const source = track?.waveform ?? track?.waveform_url ?? track?.waveformUrl ?? track?.waveform_json ?? track?.visualizer_url;
     return typeof source === 'string' && source.length > 0 ? source : null;
   }
 
