@@ -189,9 +189,13 @@ export class ProjectsService {
   /** Adds one catalog track to a project. */
   addTrackToProject(projectUuid: string, trackUuid: string): Observable<unknown> {
     return this.http.post(`${this.base}/projects/${projectUuid}/tracks/`, { track_uuid: trackUuid }, { context: this.quiet() }).pipe(
-      // This endpoint returns the project-track association, so refresh the
-      // project cache to obtain the complete project and its updated tracks.
-      tap(() => this.loadProjects()),
+      // The project list may omit the rich track payload, so refresh both the
+      // project cache and the favorites cache that carries the audio/waveform
+      // snapshot used by the row component.
+      tap(() => {
+        this.loadProjects();
+        this.loadFavorites();
+      }),
     );
   }
 
