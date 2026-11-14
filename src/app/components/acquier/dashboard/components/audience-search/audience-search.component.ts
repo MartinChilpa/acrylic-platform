@@ -456,14 +456,17 @@ export class AudienceSearchComponent implements OnInit, OnDestroy {
     return this.savedUuids.has(track.uuid);
   }
 
-  /** A3a/A3b: the shared picker; a saved track opens on its current destinations (C2). */
+  /** Use the same project-selection flow as Projects → Saved to… so the track
+   * is added to a project with the same picker UX and behavior.
+   */
   saveTrack(track: AudienceSearchTrack, event?: Event): void {
     event?.stopPropagation();
-    this.saveTo.openPicker([{
+    this.saveTo.openProjectPicker({
       uuid: track.uuid,
       title: track.name || '–',
       artist: track.artist?.name || this.transloco.translate('audienceSearch.unknownArtist'),
-    }]);
+      snapshot: track,
+    });
   }
 
   /* ─────────── Formatting ─────────── */
