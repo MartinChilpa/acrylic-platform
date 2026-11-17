@@ -63,11 +63,6 @@
                 <span class="ptd-metric__value" [class.aud-metric__value--na]="t.artist?.totalAudience == null">{{ audience(t.artist?.totalAudience) }}</span>
                 <span class="ptd-metric__label">{{ 'audienceSearch.details.combinedCounts' | transloco }}</span>
               </div>
-              <div class="ptd-card ptd-metric">
-                <span class="ptd-metric__label">{{ 'audienceSearch.columns.spotifyStreams' | transloco }}</span>
-                <span class="ptd-metric__value" [class.aud-metric__value--na]="t.spotifyStreams === null">{{ audience(t.spotifyStreams) }}</span>
-                <span class="ptd-metric__label">{{ 'audienceSearch.details.forThisTrack' | transloco }}</span>
-              </div>
             </div>
 
             <!-- Audience by platform -->
@@ -143,7 +138,6 @@
                     }
                   </button>
                   <strong class="ptd-more__name">{{ other.name }}</strong>
-                  <span class="ptd-more__streams">{{ 'audienceSearch.details.streamsLabel' | transloco: { value: audience(other.spotifyStreams) } }}</span>
                   <button type="button" class="aud-btn aud-btn--view" (click)="viewTrack(other)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
                     {{ 'audienceSearch.viewTrack' | transloco }}

@@ -120,6 +120,28 @@ export class TrackRowProjectsComponent implements OnInit, OnChanges, AfterViewIn
     this.panelOpen = !this.panelOpen;
   }
 
+  /**
+   * A click anywhere on the row does what the license button on the right does.
+   * Clicks on anything with its own action (play, waveform seek, heart, links,
+   * other buttons and inputs) are left to that control.
+   */
+  onRowClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target?.closest(TrackRowProjectsComponent.OWN_ACTION)) { return; }
+    if (window.getSelection()?.toString()) { return; }  // selecting text is not a click
+    this.togglePanel();
+  }
+
+  /** Enter/Space on the focused row itself; keys inside a control stay with it. */
+  onRowKey(event: Event): void {
+    if (event.target !== event.currentTarget) { return; }
+    event.preventDefault();  // Space would otherwise scroll the page
+    this.togglePanel();
+  }
+
+  private static readonly OWN_ACTION =
+    'button, a, input, select, textarea, label, audio, [role="menu"], [role="menuitem"], acrylic-save-heart, .waveform-box';
+
   // Step 1: arm the download (no DB write yet). Turns the "License this track"
   // button into a "Download" button, matching the home flow.
   licenseTrack(): void {

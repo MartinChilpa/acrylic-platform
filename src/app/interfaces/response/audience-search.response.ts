@@ -11,7 +11,6 @@ export interface IAudienceSearchTrackResult {
   price: string | null;
   extended_commercial_use: boolean;
   /** Not on the public serializer yet; read when the backend adds them. */
-  spotify_streams?: number | null;
   /** Signed, expiring URL for catalog_track.file_wav (backend: TrackSerializer.preview_url). */
   preview_url?: string | null;
   /** Older name for the same thing; read as a fallback. */
@@ -95,8 +94,6 @@ export interface AudienceSearchTrack {
   artist: AudienceSearchArtist | null;
   tier: AudienceSearchTier;
   extendedCommercialUse: boolean;
-  /** Per-track streams are not stored yet, so this is usually null. */
-  spotifyStreams: number | null;
   previewUrl: string | null;
   /** catalog_track.cover_image, once the tracks endpoint returns it. */
   coverUrl: string | null;

@@ -19,7 +19,7 @@ function artist(name: string, audience: Partial<AudienceSearchArtist['audience']
 function track(name: string, a: AudienceSearchArtist, ecu = false): AudienceSearchTrack {
   return {
     uuid: name, isrc: name, name, artistUuid: a.uuid, artist: a, tier: 'Artist Promo',
-    extendedCommercialUse: ecu, spotifyStreams: null, previewUrl: null, coverUrl: null,
+    extendedCommercialUse: ecu, previewUrl: null, coverUrl: null,
   };
 }
 

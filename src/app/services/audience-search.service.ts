@@ -24,7 +24,7 @@ import { SpotifyService } from './spotify.service';
  *
  * TODO(backend): replace the three-request join below with one endpoint that
  * searches, filters, sorts and paginates server-side and returns the fields of
- * AudienceSearchTrack (including per-track spotify_streams and a preview url).
+ * AudienceSearchTrack (including a preview url).
  * Only this service needs to change; the components read AudienceSearchTrack.
  */
 @Injectable({
@@ -204,7 +204,6 @@ export class AudienceSearchService {
       artist: artists.get(row.artist) ?? null,
       tier: /preclear/i.test(tierName) ? 'PreClear' : 'Artist Promo',
       extendedCommercialUse: !!row.extended_commercial_use,
-      spotifyStreams: row.spotify_streams ?? null,
       previewUrl: this.toMediaUrl(row.preview_url ?? row.audio_url),
       coverUrl: this.toImageUrl(row.cover_image),
     };

@@ -345,9 +345,10 @@
   display: flex;
   flex-direction: column;
 
-  // Figma A3a/A3b: play, track/artist, origin, total audience, Spotify streams, use/save, actions.
+  // Figma A3a/A3b: play, track/artist, origin, total audience, use/save, actions.
+  // (No Spotify streams column: there is no per-track streams data.)
   &--tracks {
-    --aud-cols: 36px minmax(180px, 2.4fr) minmax(90px, 1fr) minmax(90px, 1fr) minmax(90px, 0.9fr) minmax(110px, 1.1fr) 212px;
+    --aud-cols: 36px minmax(180px, 2.4fr) minmax(90px, 1fr) minmax(90px, 1fr) minmax(110px, 1.1fr) 212px;
   }
 
   &--artists {
@@ -464,14 +465,13 @@
       grid-template-areas:
         'play identity identity'
         '. origin audience'
-        '. streams use'
+        '. use use'
         'action action action';
 
       .aud-row__play { grid-area: play; }
       .aud-row__identity { grid-area: identity; }
       .aud-row__origin { grid-area: origin; }
       .aud-row__audience { grid-area: audience; }
-      .aud-row__streams { grid-area: streams; }
       .aud-row__use { grid-area: use; }
       .aud-row__action { grid-area: action; }
     }

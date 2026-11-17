@@ -13,7 +13,7 @@ function artist(uuid: string, name: string, country: string | null, extra: Parti
 function track(uuid: string, name: string, a: AudienceSearchArtist): AudienceSearchTrack {
   return {
     uuid, isrc: uuid, name, artistUuid: a.uuid, artist: a, tier: 'Artist Promo',
-    extendedCommercialUse: false, spotifyStreams: null, previewUrl: null, coverUrl: null,
+    extendedCommercialUse: false, previewUrl: null, coverUrl: null,
   };
 }
 

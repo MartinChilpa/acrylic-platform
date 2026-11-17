@@ -299,7 +299,6 @@
                 <span role="columnheader">{{ 'audienceSearch.columns.trackArtist' | transloco }}</span>
                 <span role="columnheader">{{ 'audienceSearch.columns.origin' | transloco }}</span>
                 <span role="columnheader">{{ 'audienceSearch.columns.totalAudience' | transloco }}</span>
-                <span role="columnheader">{{ 'audienceSearch.columns.spotifyStreams' | transloco }}</span>
                 <span role="columnheader">{{ 'audienceSearch.columns.useSave' | transloco }}</span>
                 <span role="columnheader"></span>
               </div>
@@ -336,10 +335,6 @@
                   <span class="aud-row__strong aud-row__audience" role="cell">
                     <span class="aud-row__label">{{ 'audienceSearch.columns.totalAudience' | transloco }}</span>
                     {{ audience(track.artist?.totalAudience) }}
-                  </span>
-                  <span class="aud-row__muted aud-row__streams" role="cell">
-                    <span class="aud-row__label">{{ 'audienceSearch.columns.spotifyStreams' | transloco }}</span>
-                    {{ audience(track.spotifyStreams) }}
                   </span>
                   <span class="aud-row__use" role="cell">
                     <span class="aud-tier" [ngClass]="'aud-tier--' + tierClass(track)">{{ track.tier }}</span>
@@ -530,11 +525,6 @@
           </p>
         </section>
       }
-
-      <div class="aud-metric aud-metric--wide">
-        <span class="aud-metric__label">{{ 'audienceSearch.columns.spotifyStreams' | transloco }}</span>
-        <span class="aud-metric__value" [class.aud-metric__value--na]="track.spotifyStreams === null">{{ audience(track.spotifyStreams) }}</span>
-      </div>
 
       <span class="aud-drawer__overline">{{ 'audienceSearch.panel.country' | transloco }}</span>
       <strong class="aud-drawer__origin">{{ origin(track) }}</strong>
