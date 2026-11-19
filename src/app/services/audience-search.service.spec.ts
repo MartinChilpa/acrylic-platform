@@ -101,7 +101,7 @@ describe('AudienceSearchService', () => {
     let created: FakeAudio[];
     const track = (): AudienceSearchTrack => ({
       uuid: 't1', isrc: 'X', name: 'Dakar Nights', artistUuid: 'a1', artist: null, tier: 'Artist Promo',
-      extendedCommercialUse: false, spotifyStreams: null, previewUrl: 'https://media.example/old.wav', coverUrl: null,
+      extendedCommercialUse: false, previewUrl: 'https://media.example/old.wav', coverUrl: null,
     });
 
     beforeEach(() => {

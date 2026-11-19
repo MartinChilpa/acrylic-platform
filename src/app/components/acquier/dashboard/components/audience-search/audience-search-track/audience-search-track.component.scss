@@ -102,7 +102,7 @@
 
 .ptd-metrics {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
 
   @media (max-width: $aud-bp-phone) { gap: 12px; }
@@ -214,17 +214,12 @@
     gap: 20px;
   }
 
+  // Takes the row's free space, keeping View track at the right edge.
   &__name {
-    flex: 0 1 240px;
+    flex: 1 1 auto;
     min-width: 0;
     font-size: 16px;
     overflow-wrap: anywhere;
-  }
-
-  &__streams {
-    flex: 1 1 auto;
-    color: $aud-muted;
-    font-size: 14px;
   }
 
   @media (max-width: $aud-bp-tablet) {
@@ -237,8 +232,6 @@
 
   @media (max-width: $aud-bp-phone) {
     &__row { gap: 12px; }
-    &__streams { display: none; }
-    &__name { flex: 1 1 auto; }
 
     .aud-btn--view { width: auto; }
   }

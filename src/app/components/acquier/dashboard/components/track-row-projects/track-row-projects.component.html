@@ -1,7 +1,15 @@
 <div class="result-card result-row" [ngClass]="getResultThemeClass(track)">
   <div class="track-grid">
     <div>
-      <div class="header-artist">
+      <!-- The whole row opens the license panel, like the button on the right.
+           Controls inside keep their own action (see onRowClick). -->
+      <div class="header-artist header-artist--clickable"
+           tabindex="0"
+           [attr.aria-expanded]="panelOpen"
+           [attr.aria-label]="(track.track_name || track.name || '') + ': license panel'"
+           (click)="onRowClick($event)"
+           (keydown.enter)="onRowKey($event)"
+           (keydown.space)="onRowKey($event)">
         <img
           class="thumb-image"
           [src]="getTrackImage(track)"
