@@ -1,0 +1,97 @@
+@use '../../../../styles/custom/dialog' as *;
+
+// Figma: Questions & Feedback · QF components (Acrylic Design System 2688:53498–53507).
+$qf-field-bg: #171717;
+$qf-field-border: #858585;
+$qf-placeholder: #BDBDBD;
+
+:host {
+  display: block;
+  width: 100%;
+  max-width: 704px;
+}
+
+.qf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  font-family: $dlg-font;
+}
+
+.qf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__label {
+    margin: 0;
+    color: $dlg-text;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+  }
+
+  &__input {
+    @include dlg-field;
+    height: 52px;
+    padding: 14px 16px;
+    border-color: $qf-field-border;
+    background: $qf-field-bg;
+    line-height: 24px;
+
+    &::placeholder { color: $qf-placeholder; }
+    // Visible 2px focus ring (the shared field only recolors its border).
+    &:focus-visible { outline: 2px solid $dlg-accent; outline-offset: 2px; }
+
+    &--message {
+      // styles/overrides/_input.scss forces every textarea to 100px !important.
+      height: 184px !important;
+      min-height: 120px;
+      resize: vertical;
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    color: $qf-placeholder;
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  &__error {
+    @include dlg-error;
+    font-size: 14px;
+  }
+}
+
+.qf-submit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding-top: 8px;
+
+  &__note {
+    margin: 0;
+    color: $qf-placeholder;
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  &__button {
+    @include dlg-btn-primary;
+    min-height: 0;
+    padding: 14px 24px;
+    color: #111111;
+  }
+
+  // Always in the DOM so screen readers hear changes; empty while idle.
+  &__status {
+    margin: 0;
+    color: $dlg-label;
+    font-size: 14px;
+    line-height: 21px;
+
+    &--error { color: $dlg-error; }
+  }
+}

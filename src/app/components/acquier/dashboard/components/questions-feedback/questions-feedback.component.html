@@ -1,0 +1,21 @@
+<acrylic-header
+  [teamName]="teamName"
+  [teamLogo]="teamLogo"
+  [tagline]="tagline"
+  [primaryColor]="primaryColor"
+  [secondaryColor]="secondaryColor"
+  variant="compact"
+  [pageTitle]="'feedback.headerTitle' | transloco"
+  [pageDescription]="'feedback.headerDescription' | transloco">
+</acrylic-header>
+
+<div class="qf-page">
+  <div class="qf-page__column">
+    <header class="qf-page__intro">
+      <h2 class="qf-page__title">{{ 'feedback.title' | transloco }}</h2>
+      <p class="qf-page__lede">{{ 'feedback.intro' | transloco }}</p>
+    </header>
+
+    <acrylic-feedback-form [status]="status" (send)="onSend($event)"></acrylic-feedback-form>
+  </div>
+</div>

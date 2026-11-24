@@ -1,0 +1,55 @@
+<form class="qf-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <!-- QF / Message field -->
+  <div class="qf-field">
+    <label class="qf-field__label" [for]="ids.message">{{ 'feedback.messageLabel' | transloco }}</label>
+    <textarea #messageInput
+              class="qf-field__input qf-field__input--message"
+              [id]="ids.message"
+              formControlName="message"
+              required
+              [placeholder]="'feedback.messagePlaceholder' | transloco"
+              [attr.aria-invalid]="messageError ? 'true' : null"
+              [attr.aria-describedby]="messageError ? ids.message + '-error' : null"></textarea>
+    @if (messageError) {
+      <p class="qf-field__error" [id]="ids.message + '-error'">{{ messageError | transloco }}</p>
+    }
+  </div>
+
+  <!-- QF / Reply email field -->
+  <div class="qf-field">
+    <label class="qf-field__label" [for]="ids.email">{{ 'feedback.emailLabel' | transloco }}</label>
+    <input #emailInput
+           class="qf-field__input"
+           [id]="ids.email"
+           type="email"
+           autocomplete="email"
+           inputmode="email"
+           formControlName="email"
+           required
+           [placeholder]="'feedback.emailPlaceholder' | transloco"
+           [attr.aria-invalid]="emailError ? 'true' : null"
+           [attr.aria-describedby]="(emailError ? ids.email + '-error ' : '') + ids.email + '-hint'" />
+    @if (emailError) {
+      <p class="qf-field__error" [id]="ids.email + '-error'">{{ emailError | transloco }}</p>
+    }
+    <p class="qf-field__hint" [id]="ids.email + '-hint'">{{ 'feedback.emailHint' | transloco }}</p>
+  </div>
+
+  <!-- Submit -->
+  <div class="qf-submit">
+    <p class="qf-submit__note">{{ 'feedback.footnote' | transloco }}</p>
+    <button type="submit" class="qf-submit__button" [disabled]="sending" [attr.aria-busy]="sending">
+      {{ (sending ? 'feedback.sending' : status === 'error' ? 'feedback.retry' : 'feedback.send') | transloco }}
+    </button>
+    <!-- Progress and outcome are announced to screen readers. -->
+    <p class="qf-submit__status" [class.qf-submit__status--error]="status === 'error'" role="status" aria-live="polite">
+      @if (status === 'sent') {
+        {{ 'feedback.sent' | transloco }}
+      } @else if (status === 'error') {
+        {{ 'feedback.sendFailed' | transloco }}
+      } @else if (sending) {
+        {{ 'feedback.sending' | transloco }}
+      }
+    </p>
+  </div>
+</form>
