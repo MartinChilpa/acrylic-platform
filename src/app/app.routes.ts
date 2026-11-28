@@ -11,6 +11,7 @@ export const routesNames = {
   LICENSES: 'licenses',
   AUDIENCE_SEARCH: 'audience-search',
   AUDIENCE_SEARCH_TRACK: 'audience-search/track/:uuid',
+  QUESTIONS_FEEDBACK: 'questions-feedback',
   AUTH: 'auth',
   BRAND: 'brand',
   LABEL: 'label',
@@ -84,6 +85,10 @@ export const routes: Routes = [
       {
         path: routesNames.AUDIENCE_SEARCH_TRACK,
         loadComponent: () => import('./components/acquier/dashboard/components/audience-search/audience-search-track/audience-search-track.component').then((c)=>c.AudienceSearchTrackComponent),
+      },
+      {
+        path: routesNames.QUESTIONS_FEEDBACK,
+        loadComponent: () => import('./components/acquier/dashboard/components/questions-feedback/questions-feedback.component').then((c)=>c.QuestionsFeedbackComponent),
       },
       // The tab was called Performance; keep old bookmarks and shared links working.
       { path: 'performance', redirectTo: routesNames.AUDIENCE_SEARCH, pathMatch: 'full' },
